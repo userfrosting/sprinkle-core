@@ -3,12 +3,9 @@
  * UserFrosting (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/UserFrosting
- * @copyright Copyright (c) 2013-2016 Alexander Weissman
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/licenses/UserFrosting.md (MIT License)
  */
-namespace UserFrosting\Sprinkle\Core\Model;
-
-use UserFrosting\Sprinkle\Core\Model\UFModel;
+namespace UserFrosting\Sprinkle\Core\Database\Models;
 
 /**
  * Throttle Class
@@ -19,7 +16,7 @@ use UserFrosting\Sprinkle\Core\Model\UFModel;
  * @property string ip
  * @property string request_data
  */
-class Throttle extends UFModel
+class Throttle extends Model
 {    
     /**
      * @var string The name of the table for the current model.

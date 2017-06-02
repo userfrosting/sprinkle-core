@@ -3,19 +3,20 @@
  * UserFrosting (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/UserFrosting
- * @copyright Copyright (c) 2013-2017 Alexander Weissman
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/licenses/UserFrosting.md (MIT License)
  */
-namespace UserFrosting\Sprinkle\Core\Model\Relations;
+namespace UserFrosting\Sprinkle\Core\Database\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
+ * A BelongsToMany relationship that queries through an additional intermediate model.
+ *
+ * @author Alex Weissman (https://alexanderweissman.com)
  * @link https://github.com/laravel/framework/blob/5.4/src/Illuminate/Database/Eloquent/Relations/BelongsToMany.php
  */
 class BelongsToManyThrough extends BelongsToMany
@@ -102,8 +103,6 @@ class BelongsToManyThrough extends BelongsToMany
 
         $constrainedBuilder = $constrainedBuilder->distinct();
 
-        $countBuilder = new QueryBuilder($this->parent->getConnection());
-        
         return $constrainedBuilder->count($this->relatedKey);
     }
 

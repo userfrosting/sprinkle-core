@@ -3,15 +3,19 @@
  * UserFrosting (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/UserFrosting
- * @copyright Copyright (c) 2013-2017 Alexander Weissman
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/licenses/UserFrosting.md (MIT License)
  */
-namespace UserFrosting\Sprinkle\Core\Model\Relations\Concerns;
+namespace UserFrosting\Sprinkle\Core\Database\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * Implements the `sync` method for HasMany relationships.
+ *
+ * @author Alex Weissman (https://alexanderweissman.com)
+ */
 trait Syncable
 {
     public function sync($data, $deleting = true)

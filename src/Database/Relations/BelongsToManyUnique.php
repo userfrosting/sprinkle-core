@@ -3,10 +3,9 @@
  * UserFrosting (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/UserFrosting
- * @copyright Copyright (c) 2013-2017 Alexander Weissman
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/licenses/UserFrosting.md (MIT License)
  */
-namespace UserFrosting\Sprinkle\Core\Model\Relations;
+namespace UserFrosting\Sprinkle\Core\Database\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,6 +13,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
+ * A BelongsToMany relationship that reduces the related members to a unique (by primary key) set.
+ *
+ * @author Alex Weissman (https://alexanderweissman.com)
  * @link https://github.com/laravel/framework/blob/5.4/src/Illuminate/Database/Eloquent/Relations/BelongsToMany.php
  */
 class BelongsToManyUnique extends BelongsToMany
