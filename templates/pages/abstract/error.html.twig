@@ -1,5 +1,9 @@
 {# This is the layout template for error pages.  Note that there is no navigation bar. #}
-{% extends "layouts/basic.html.twig" %}
+{% extends "pages/abstract/base.html.twig" %}
+
+{% block page_title %}{{ translate('ERROR.TITLE') }}{% endblock %}
+
+{% block page_description %}{{ translate('ERROR.DESCRIPTION') }}{% endblock %}
 
 {% block body %}
     <body {% block body_attributes %}{% endblock %}>

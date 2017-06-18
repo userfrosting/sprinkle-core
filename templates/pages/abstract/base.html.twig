@@ -15,7 +15,7 @@
 
             <title>{{ site.title }} | {% block page_title %}New Page{% endblock %}</title>
 
-            {% include "components/favicons.html.twig" %}
+            {% include "pages/partials/favicons.html.twig" %}
 
             {# Use this block to add extra content in page head without having to override the entire base layout #}
             {% block head_extra %}{% endblock %}
@@ -58,7 +58,7 @@
                 <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
             <![endif]-->
 
-            {% include "components/analytics.html.twig" %}
+            {% include "pages/partials/analytics.html.twig" %}
         </head>
     {% endblock %}
 
@@ -69,12 +69,12 @@
 
             {# Handlebars template for uf-alerts. #}
             {% block uf_alerts_template %}
-                {% include "components/alerts.html.twig" %}
+                {% include "pages/partials/alerts.html.twig" %}
             {% endblock %}
 
             <!-- Javascript configuration -->
             <script>
-            {% include "components/config.js.twig" %}
+            {% include "pages/partials/config.js.twig" %}
             </script>
 
             {% block scripts %}
