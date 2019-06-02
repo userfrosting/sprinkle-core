@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * UserFrosting (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/UserFrosting
@@ -7,7 +8,7 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Unit;
+namespace UserFrosting\Sprinkle\Core\Tests\Integration\Filesystem;
 
 use Illuminate\Filesystem\FilesystemAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
@@ -88,7 +89,7 @@ class FilesystemTest extends TestCase
 
         // We'll delete the test file now
         $this->assertTrue($files->delete('file.txt'));
-        $this->assertFileNotExists($this->testDir.'/file.txt');
+        $this->assertFileNotExists($this->testDir . '/file.txt');
     }
 
     /**
@@ -116,7 +117,7 @@ class FilesystemTest extends TestCase
         $url = $files->url('file.txt');
         $this->assertEquals('files/testing/file.txt', $url);
         $this->assertTrue($files->delete('file.txt'));
-        $this->assertFileNotExists($this->testDir.'/file.txt');
+        $this->assertFileNotExists($this->testDir . '/file.txt');
     }
 
     /**

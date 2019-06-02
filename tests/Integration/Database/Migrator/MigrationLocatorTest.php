@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * UserFrosting (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/UserFrosting
@@ -7,7 +8,7 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration;
+namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 
 use Mockery as m;
 use UserFrosting\Tests\TestCase;
@@ -17,6 +18,9 @@ use UserFrosting\UniformResourceLocator\ResourceLocator;
 use UserFrosting\UniformResourceLocator\ResourceLocation;
 use UserFrosting\UniformResourceLocator\ResourceStream;
 
+/**
+ * MigrationLocator Tests
+ */
 class MigrationLocatorTest extends TestCase
 {
     public function tearDown()
@@ -85,7 +89,7 @@ class MigrationLocatorTest extends TestCase
             new Resource($resourceStream, $resourceAccountLocation, 'one/CreateUsersTable.php'),
             new Resource($resourceStream, $resourceAccountLocation, 'one/CreatePasswordResetsTable.php'),
             new Resource($resourceStream, $resourceAccountLocation, 'two/CreateFlightsTable.php'),
-            new Resource($resourceStream, $resourceAccountLocation, 'CreateMainTable.php')
+            new Resource($resourceStream, $resourceAccountLocation, 'CreateMainTable.php'),
         ]);
 
         // Create a new MigrationLocator instance with our simulated ResourceLocation
@@ -101,7 +105,7 @@ class MigrationLocatorTest extends TestCase
             '\\UserFrosting\\Sprinkle\\Account\\Database\\Migrations\\one\\CreateUsersTable',
             '\\UserFrosting\\Sprinkle\\Account\\Database\\Migrations\\one\\CreatePasswordResetsTable',
             '\\UserFrosting\\Sprinkle\\Account\\Database\\Migrations\\two\\CreateFlightsTable',
-            '\\UserFrosting\\Sprinkle\\Account\\Database\\Migrations\\CreateMainTable'
+            '\\UserFrosting\\Sprinkle\\Account\\Database\\Migrations\\CreateMainTable',
         ];
 
         // Test results match expectations

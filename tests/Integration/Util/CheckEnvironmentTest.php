@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * UserFrosting (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/UserFrosting
@@ -7,11 +8,14 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration;
+namespace UserFrosting\Sprinkle\Core\Tests\Integration\Util;
 
 use UserFrosting\Sprinkle\Core\Util\CheckEnvironment;
 use UserFrosting\Tests\TestCase;
 
+/**
+ * CheckEnvironement Test
+ */
 class CheckEnvironmentTest extends TestCase
 {
     /**

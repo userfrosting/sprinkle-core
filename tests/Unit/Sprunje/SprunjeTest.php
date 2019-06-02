@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * UserFrosting (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/UserFrosting
@@ -7,10 +8,10 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Unit;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Sprunje;
 
 use Mockery as m;
-use UserFrosting\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Builder as Builder;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;
 use UserFrosting\Sprinkle\Core\Sprunje\Sprunje;
@@ -32,8 +33,8 @@ class SprunjeTest extends TestCase
     {
         $sprunje = new SprunjeStub([
             'filters' => [
-                'species' => 'Tyto'
-            ]
+                'species' => 'Tyto',
+            ],
         ]);
 
         $builder = $sprunje->getQuery();
@@ -54,8 +55,8 @@ class SprunjeTest extends TestCase
     {
         $sprunje = new SprunjeStub([
             'sorts' => [
-                'species' => 'asc'
-            ]
+                'species' => 'asc',
+            ],
         ]);
 
         $builder = $sprunje->getQuery();
@@ -67,11 +68,11 @@ class SprunjeTest extends TestCase
 class SprunjeStub extends Sprunje
 {
     protected $filterable = [
-        'species'
+        'species',
     ];
 
     protected $sortable = [
-        'species'
+        'species',
     ];
 
     public function __construct($options)

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * UserFrosting (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/UserFrosting
@@ -7,7 +8,7 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration;
+namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
 use Mockery as m;
 use Symfony\Component\Console\Application;
@@ -15,6 +16,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
 use UserFrosting\Tests\TestCase;
 
+/**
+ * MigrateStatusCommand
+ */
 class BakeryMigrateStatusCommandTest extends TestCase
 {
     public function tearDown()
@@ -85,7 +89,7 @@ class BakeryMigrateStatusCommandTest extends TestCase
 
         // Add the command to the input to create the execute argument
         $execute = array_merge([
-            'command' => $command->getName()
+            'command' => $command->getName(),
         ], $input);
 
         // Execute command tester
@@ -99,7 +103,7 @@ class BakeryMigrateStatusCommandTest extends TestCase
     {
         return collect([
             (object) ['migration' => 'foo', 'batch' => 1, 'sprinkle' => 'foo'],
-            (object) ['migration' => 'bar', 'batch' => 2, 'sprinkle' => 'bar']
+            (object) ['migration' => 'bar', 'batch' => 2, 'sprinkle' => 'bar'],
         ]);
     }
 }

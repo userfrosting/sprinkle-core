@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * UserFrosting (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/UserFrosting
@@ -7,7 +8,7 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration;
+namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
@@ -15,6 +16,9 @@ use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
 use UserFrosting\Tests\TestCase;
 
+/**
+ * Migrator Tests
+ */
 class DatabaseMigratorIntegrationTest extends TestCase
 {
     /**
@@ -238,7 +242,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
         // Only the `CreateFlightsTable` migration should be ran
         $this->assertEquals([
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable'
+            '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
         ], $migrated);
     }
 
@@ -307,7 +311,7 @@ class MigrationLocatorStub extends MigrationLocator
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable'
+            '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
         ];
     }
 }
@@ -317,7 +321,7 @@ class FlightsTableMigrationLocatorStub extends MigrationLocator
     public function getMigrations()
     {
         return [
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable'
+            '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
         ];
     }
 }
@@ -330,7 +334,7 @@ class InvalidMigrationLocatorStub extends MigrationLocator
     public function getMigrations()
     {
         return [
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\Foo'
+            '\\UserFrosting\\Tests\\Integration\\Migrations\\Foo',
         ];
     }
 }
@@ -347,7 +351,7 @@ class DependableMigrationLocatorStub extends MigrationLocator
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
             '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable'
+            '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
         ];
     }
 }
@@ -363,7 +367,7 @@ class UnfulfillableMigrationLocatorStub extends MigrationLocator
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
             '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\UnfulfillableTable'
+            '\\UserFrosting\\Tests\\Integration\\Migrations\\UnfulfillableTable',
         ];
     }
 }
@@ -377,7 +381,7 @@ class DeprecatedMigrationLocatorStub extends MigrationLocator
     public function getMigrations()
     {
         return [
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\DeprecatedClassTable'
+            '\\UserFrosting\\Tests\\Integration\\Migrations\\DeprecatedClassTable',
         ];
     }
 }
