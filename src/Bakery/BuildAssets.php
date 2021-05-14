@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
 use UserFrosting\Sprinkle\Core\Util\VersionValidator;
-use UserFrosting\System\Bakery\BaseCommand;
+use UserFrosting\Bakery\CommandReceipe;
 
 /**
  * Assets builder CLI Tools.
@@ -23,7 +23,7 @@ use UserFrosting\System\Bakery\BaseCommand;
  *
  * @author Alex Weissman (https://alexanderweissman.com)
  */
-class BuildAssets extends BaseCommand
+class BuildAssets extends CommandReceipe
 {
     /**
      * @var string Path to the build/ directory

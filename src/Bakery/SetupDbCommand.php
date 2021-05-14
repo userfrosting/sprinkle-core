@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Support\DotenvEditor\DotenvEditor;
 use UserFrosting\Support\Repository\Repository as Config;
-use UserFrosting\System\Bakery\BaseCommand;
+use UserFrosting\Bakery\CommandReceipe;
 
 /**
  * DB Setup Wizard CLI Tools.
@@ -24,7 +24,7 @@ use UserFrosting\System\Bakery\BaseCommand;
  *
  * @author Alex Weissman (https://alexanderweissman.com)
  */
-class SetupDbCommand extends BaseCommand
+class SetupDbCommand extends CommandReceipe
 {
     /**
      * @var string Path to the .env file

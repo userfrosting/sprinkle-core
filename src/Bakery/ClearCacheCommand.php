@@ -13,14 +13,14 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Twig\CacheHelper;
-use UserFrosting\System\Bakery\BaseCommand;
+use UserFrosting\Bakery\CommandReceipe;
 
 /**
  * ClearCache CLI Command.
  *
  * @author Alex Weissman (https://alexanderweissman.com)
  */
-class ClearCacheCommand extends BaseCommand
+class ClearCacheCommand extends CommandReceipe
 {
     /**
      * {@inheritdoc}

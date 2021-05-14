@@ -14,7 +14,7 @@ use Illuminate\Support\Collection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use UserFrosting\System\Bakery\BaseCommand;
+use UserFrosting\Bakery\CommandReceipe;
 
 /**
  * migrate:status Bakery Command
@@ -22,7 +22,7 @@ use UserFrosting\System\Bakery\BaseCommand;
  *
  * @author Louis Charette
  */
-class MigrateStatusCommand extends BaseCommand
+class MigrateStatusCommand extends CommandReceipe
 {
     /**
      * {@inheritdoc}

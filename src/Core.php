@@ -10,158 +10,84 @@
 
 namespace UserFrosting\Sprinkle\Core;
 
-use RocketTheme\Toolbox\Event\Event;
-use UserFrosting\Sprinkle\Core\Csrf\SlimCsrfProvider;
-use UserFrosting\Sprinkle\Core\Database\Models\Model;
-use UserFrosting\Sprinkle\Core\I18n\LocaleServicesProvider;
-use UserFrosting\Sprinkle\Core\I18n\TranslatorServicesProvider;
-use UserFrosting\Sprinkle\Core\Util\EnvironmentInfo;
-use UserFrosting\Sprinkle\Core\Util\ShutdownHandler;
-use UserFrosting\System\Sprinkle\Sprinkle;
+use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
+use UserFrosting\Sprinkle\Core\Bakery\BuildAssets;
+use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugCommand;
+use UserFrosting\Sprinkle\Core\Bakery\LocaleCompareCommand;
+use UserFrosting\Sprinkle\Core\Bakery\LocaleDictionaryCommand;
+use UserFrosting\Sprinkle\Core\Bakery\LocaleInfoCommand;
+use UserFrosting\Sprinkle\Core\Bakery\MigrateCommand;
+use UserFrosting\Sprinkle\Core\Bakery\MigrateRefreshCommand;
+use UserFrosting\Sprinkle\Core\Bakery\MigrateResetCommand;
+use UserFrosting\Sprinkle\Core\Bakery\MigrateRollbackCommand;
+use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
+use UserFrosting\Sprinkle\Core\Bakery\RouteListCommand;
+use UserFrosting\Sprinkle\Core\Bakery\SeedCommand;
+use UserFrosting\Sprinkle\Core\Bakery\SeedListCommand;
+use UserFrosting\Sprinkle\Core\Bakery\SetupCommand;
+use UserFrosting\Sprinkle\Core\Bakery\SetupDbCommand;
+use UserFrosting\Sprinkle\Core\Bakery\SetupEnvCommand;
+use UserFrosting\Sprinkle\Core\Bakery\SetupSmtpCommand;
+use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
+use UserFrosting\Sprinkle\Core\Bakery\Test;
+use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
+use UserFrosting\Sprinkle\SprinkleReceipe;
 
-/**
- * Bootstrapper class for the core sprinkle.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
- */
-class Core extends Sprinkle
+class Core implements SprinkleReceipe
 {
     /**
-     * @var string[] List of services provider to register
+     * {@inheritdoc}
      */
-    protected $servicesproviders = [
-        LocaleServicesProvider::class,
-        TranslatorServicesProvider::class,
-    ];
+    public function getName(): string
+    {
+        return 'Core Sprinkle';
+    }
 
     /**
-     * Defines which events in the UF lifecycle our Sprinkle should hook into.
+     * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public function getPath(): string
+    {
+        return __DIR__;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBakeryCommands(): array
     {
         return [
-            'onSprinklesInitialized'      => ['onSprinklesInitialized', 0],
-            'onSprinklesRegisterServices' => ['onSprinklesRegisterServices', 0],
-            'onAddGlobalMiddleware'       => ['onAddGlobalMiddleware', 0],
-            'onAppInitialize'             => ['onAppInitialize', 0],
+            new BakeCommand(),
+            new BuildAssets(),
+            new ClearCacheCommand(),
+            new DebugCommand(),
+            new LocaleCompareCommand(),
+            new LocaleDictionaryCommand(),
+            new LocaleInfoCommand(),
+            new MigrateCommand(),
+            new MigrateRefreshCommand(),
+            new MigrateResetCommand(),
+            new MigrateRollbackCommand(),
+            new MigrateStatusCommand(),
+            new RouteListCommand(),
+            new SeedCommand(),
+            new SeedListCommand(),
+            new SetupCommand(),
+            new SetupDbCommand(),
+            new SetupEnvCommand(),
+            new SetupSmtpCommand(),
+            new SprinkleListCommand(),
+            new Test(),
+            new TestMailCommand(),
         ];
     }
 
     /**
-     * Set static references to DI container in necessary classes.
+     * {@inheritdoc}
      */
-    public function onSprinklesInitialized()
+    public function getSprinkles(): array
     {
-        // Set container for data model
-        Model::$ci = $this->ci;
-
-        // Set container for environment info class
-        EnvironmentInfo::$ci = $this->ci;
-
-        $this->registerStreams();
-    }
-
-    /**
-     * Register all sprinkles services providers.
-     */
-    public function onSprinklesRegisterServices()
-    {
-        $this->setupShutdownHandlerService();
-    }
-
-    /**
-     * Steps required to register the ShutdownHandler Service.
-     * Get shutdownHandler set up.  This needs to be constructed explicitly because it's invoked natively by PHP.
-     *
-     * @TODO: Move to it's own serviceProvider class (Target UF 5.0)
-     */
-    public function setupShutdownHandlerService(): void
-    {
-        // Set up any global PHP settings from the config service.
-        $config = $this->ci->config;
-
-        // Display PHP fatal errors natively.
-        if (isset($config['php.display_errors_native'])) {
-            ini_set('display_errors', $config['php.display_errors_native']);
-        }
-
-        // Log PHP fatal errors
-        if (isset($config['php.log_errors'])) {
-            ini_set('log_errors', $config['php.log_errors']);
-        }
-
-        // Configure error-reporting level
-        if (isset($config['php.error_reporting'])) {
-            error_reporting($config['php.error_reporting']);
-        }
-
-        // Configure time zone
-        if (isset($config['php.timezone'])) {
-            date_default_timezone_set($config['php.timezone']);
-        }
-
-        // Determine if error display is enabled in the shutdown handler.
-        $displayErrors = false;
-        if (in_array(strtolower($config['php.display_errors']), [
-            '1',
-            'on',
-            'true',
-            'yes',
-        ])) {
-            $displayErrors = true;
-        }
-
-        $sh = new ShutdownHandler($this->ci, $displayErrors);
-        $sh->register();
-    }
-
-    /**
-     * Register routes.
-     *
-     * @param Event $event
-     */
-    public function onAppInitialize(Event $event)
-    {
-        $this->ci->router->loadRoutes($event->getApp());
-    }
-
-    /**
-     * Add CSRF middleware.
-     *
-     * @param Event $event
-     */
-    public function onAddGlobalMiddleware(Event $event)
-    {
-        // Don't register CSRF if CLI
-        if (!$this->ci->cli) {
-            SlimCsrfProvider::registerMiddleware($event->getApp(), $this->ci->request, $this->ci->csrf);
-        }
-    }
-
-    /**
-     * Register Core sprinkle locator streams.
-     */
-    protected function registerStreams()
-    {
-        /** @var \UserFrosting\UniformResourceLocator\ResourceLocator $locator */
-        $locator = $this->ci->locator;
-
-        // Register core locator shared streams
-        $locator->registerStream('cache', '', \UserFrosting\APP_DIR . \UserFrosting\DS . \UserFrosting\CACHE_DIR_NAME, true);
-        $locator->registerStream('log', '', \UserFrosting\APP_DIR . \UserFrosting\DS . \UserFrosting\LOG_DIR_NAME, true);
-        $locator->registerStream('session', '', \UserFrosting\APP_DIR . \UserFrosting\DS . \UserFrosting\SESSION_DIR_NAME, true);
-
-        // Register core locator sprinkle streams
-        $locator->registerStream('config', '', \UserFrosting\CONFIG_DIR_NAME);
-        $locator->registerStream('extra', '', \UserFrosting\EXTRA_DIR_NAME);
-        $locator->registerStream('factories', '', \UserFrosting\FACTORY_DIR_NAME);
-        $locator->registerStream('locale', '', \UserFrosting\LOCALE_DIR_NAME);
-        $locator->registerStream('routes', '', \UserFrosting\ROUTE_DIR_NAME);
-        $locator->registerStream('schema', '', \UserFrosting\SCHEMA_DIR_NAME);
-        $locator->registerStream('templates', '', \UserFrosting\TEMPLATE_DIR_NAME);
-
-        // Register core sprinkle class streams
-        $locator->registerStream('seeds', '', \UserFrosting\SEEDS_DIR);
-        $locator->registerStream('migrations', '', \UserFrosting\MIGRATIONS_DIR);
+        return [];
     }
 }

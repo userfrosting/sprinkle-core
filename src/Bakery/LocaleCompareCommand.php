@@ -19,7 +19,7 @@ use UserFrosting\I18n\Compare;
 use UserFrosting\I18n\Dictionary;
 use UserFrosting\I18n\DictionaryInterface;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\LocaleOption;
-use UserFrosting\System\Bakery\BaseCommand;
+use UserFrosting\Bakery\CommandReceipe;
 
 /**
  * locale:missing-keys command.
@@ -27,7 +27,7 @@ use UserFrosting\System\Bakery\BaseCommand;
  *
  * @author Amos Folz
  */
-class LocaleCompareCommand extends BaseCommand
+class LocaleCompareCommand extends CommandReceipe
 {
     use LocaleOption;
 

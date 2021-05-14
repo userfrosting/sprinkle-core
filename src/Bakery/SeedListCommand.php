@@ -12,7 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use UserFrosting\System\Bakery\BaseCommand;
+use UserFrosting\Bakery\CommandReceipe;
 
 /**
  * seed Bakery Command
@@ -20,7 +20,7 @@ use UserFrosting\System\Bakery\BaseCommand;
  *
  * @author Louis Charette
  */
-class SeedListCommand extends BaseCommand
+class SeedListCommand extends CommandReceipe
 {
     /**
      * {@inheritdoc}

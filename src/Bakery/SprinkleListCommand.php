@@ -12,12 +12,12 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use UserFrosting\System\Bakery\BaseCommand;
+use UserFrosting\Bakery\CommandReceipe;
 
 /**
  * Sprinkle:list CLI tool.
  */
-class SprinkleListCommand extends BaseCommand
+class SprinkleListCommand extends CommandReceipe
 {
     /**
      * @var array The table header

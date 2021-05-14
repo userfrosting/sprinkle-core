@@ -15,14 +15,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\DatabaseTest;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
 use UserFrosting\Sprinkle\Core\Util\VersionValidator;
-use UserFrosting\System\Bakery\BaseCommand;
+use UserFrosting\Bakery\CommandReceipe;
 
 /**
  * Debug CLI tool.
  *
  * @author Alex Weissman (https://alexanderweissman.com)
  */
-class DebugCommand extends BaseCommand
+class DebugCommand extends CommandReceipe
 {
     use DatabaseTest;
 

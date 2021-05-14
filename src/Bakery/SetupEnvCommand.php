@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Support\DotenvEditor\DotenvEditor;
-use UserFrosting\System\Bakery\BaseCommand;
+use UserFrosting\Bakery\CommandReceipe;
 
 /**
  * Setup wizard CLI Tools.
@@ -22,7 +22,7 @@ use UserFrosting\System\Bakery\BaseCommand;
  *
  * @author Alex Weissman (https://alexanderweissman.com)
  */
-class SetupEnvCommand extends BaseCommand
+class SetupEnvCommand extends CommandReceipe
 {
     /**
      * @var string Path to the .env file

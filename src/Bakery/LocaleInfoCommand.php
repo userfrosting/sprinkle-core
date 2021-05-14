@@ -13,7 +13,7 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use UserFrosting\System\Bakery\BaseCommand;
+use UserFrosting\Bakery\CommandReceipe;
 
 /**
  * locale:info command.
@@ -21,7 +21,7 @@ use UserFrosting\System\Bakery\BaseCommand;
  *
  * @author Louis Charette
  */
-class LocaleInfoCommand extends BaseCommand
+class LocaleInfoCommand extends CommandReceipe
 {
     /**
      * {@inheritdoc}
