@@ -39,7 +39,7 @@ class Core implements SprinkleReceipe
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public static function getName(): string
     {
         return 'Core Sprinkle';
     }
@@ -47,7 +47,7 @@ class Core implements SprinkleReceipe
     /**
      * {@inheritdoc}
      */
-    public function getPath(): string
+    public static function getPath(): string
     {
         return __DIR__;
     }
@@ -55,7 +55,7 @@ class Core implements SprinkleReceipe
     /**
      * {@inheritdoc}
      */
-    public function getBakeryCommands(): array
+    public static function getBakeryCommands(): array
     {
         return [
             BakeCommand::class,
@@ -86,7 +86,7 @@ class Core implements SprinkleReceipe
     /**
      * {@inheritdoc}
      */
-    public function getSprinkles(): array
+    public static function getSprinkles(): array
     {
         return [];
     }
