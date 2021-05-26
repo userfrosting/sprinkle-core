@@ -41,10 +41,8 @@
         "monolog/monolog": "^1",
         "phpmailer/phpmailer": "^6.0.7",
         "slim/csrf": "^0.8",
-        "slim/slim": "^3.12",
         "slim/twig-view": "^2.5",
         "symfony/http-foundation": "*",
-        "twig/twig": "^2.11",
         "vlucas/phpdotenv": "^5.3",
         "userfrosting/framework": "dev-develop-5.0"
     },

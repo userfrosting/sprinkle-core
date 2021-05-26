@@ -104,9 +104,9 @@ $rules = [
 
 $finder = PhpCsFixer\Finder::create()
     ->in([
-        __DIR__ . '/app/sprinkles',
-        __DIR__ . '/app/system',
-        __DIR__ . '/public'
+        __DIR__ . '/container',
+        __DIR__ . '/routes',
+        __DIR__ . '/src'
     ]);
 
 return PhpCsFixer\Config::create()

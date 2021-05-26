@@ -12,7 +12,6 @@ namespace UserFrosting\Sprinkle\Core;
 
 use Illuminate\Filesystem\Filesystem;
 use InvalidArgumentException;
-use Slim\App;
 use Slim\Interfaces\RouteInterface;
 use Slim\Interfaces\RouterInterface;
 
@@ -92,25 +91,5 @@ class Router extends \Slim\Router implements RouterInterface
 
         // It's still considered a success if file doesn't exist
         return true;
-    }
-
-    /**
-     * Load all available routes.
-     *
-     * @param App $slimApp
-     */
-    public function loadRoutes(App $slimApp)
-    {
-        // Since routes aren't encapsulated in a class yet, we need this workaround :(
-        global $app;
-        $app = $slimApp;
-
-        $ci = $app->getContainer();
-
-        // Reverse the list, so the lower priority are required first
-        $routeFiles = array_reverse($ci->locator->listResources('routes://', true, false));
-        foreach ($routeFiles as $routeFile) {
-            require $routeFile;
-        }
     }
 }

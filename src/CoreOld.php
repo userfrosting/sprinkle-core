@@ -163,5 +163,7 @@ class CoreOld extends Sprinkle
         // Register core sprinkle class streams
         $locator->registerStream('seeds', '', \UserFrosting\SEEDS_DIR);
         $locator->registerStream('migrations', '', \UserFrosting\MIGRATIONS_DIR);
+
+        // $locator->registerStream('sprinkles', '', '');
     }
 }

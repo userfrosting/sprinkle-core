@@ -49,7 +49,7 @@ class Core implements SprinkleReceipe
      */
     public static function getPath(): string
     {
-        return __DIR__;
+        return __DIR__ . '/../';
     }
 
     /**
@@ -89,5 +89,29 @@ class Core implements SprinkleReceipe
     public static function getSprinkles(): array
     {
         return [];
+    }
+
+    /**
+     * Returns a list of routes definition in PHP files.
+     *
+     * @return string[]
+     */
+    public static function getRoutes(): array
+    {
+        return [
+            Routes::class,
+        ];
+    }
+
+    /**
+     * Returns a list of all PHP-DI services/container definitions files.
+     *
+     * @return string[]
+     */
+    public static function getServices(): array
+    {
+        return [
+            Services::class,
+        ];
     }
 }
