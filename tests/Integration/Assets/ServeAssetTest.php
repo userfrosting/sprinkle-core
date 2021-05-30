@@ -18,19 +18,17 @@ use UserFrosting\Assets\AssetLoader;
 use UserFrosting\Assets\Assets;
 use UserFrosting\Assets\ServeAsset\SlimServeAsset;
 use UserFrosting\Sprinkle\Core\Core;
-use UserFrosting\Tests\UserFrostingTestCase;
+use UserFrosting\Sprinkle\Core\Tests\UserFrostingTestCase;
+use UserFrosting\Testing\TestCase;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
 
 /**
  * Tests SlimServeAsset class.
  */
-class SlimServeAssetTest extends UserFrostingTestCase
+class SlimServeAssetTest extends TestCase
 {
     protected string $mainSprinkle = Core::class;
     
-    /** @var AssetLoader */
-    private $assetLoader;
-
     /**
      * Initializes test environment.
      */
@@ -92,7 +90,7 @@ class SlimServeAssetTest extends UserFrostingTestCase
     /**
      * Test with existent asset.
      */
-    public function testAssetOfUnknownType(SlimServeAsset $controller): void
+    public function testAssetOfUnknownType(): void
     {
         // Create request with method and url and fetch response
         $request = $this->createRequest('GET', '/assets-raw/mysterious'); // TODO Change url to config

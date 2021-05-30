@@ -104,8 +104,6 @@ $rules = [
 
 $finder = PhpCsFixer\Finder::create()
     ->in([
-        __DIR__ . '/container',
-        __DIR__ . '/routes',
         __DIR__ . '/src'
     ]);
 

@@ -10,8 +10,6 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
-use Dotenv\Dotenv;
-use Dotenv\Exception\InvalidPathException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Events\QueryExecuted;
@@ -35,7 +33,6 @@ use UserFrosting\Assets\Assets;
 use UserFrosting\Cache\MemcachedStore;
 use UserFrosting\Cache\RedisStore;
 use UserFrosting\Cache\TaggableFileStore;
-use UserFrosting\Config\ConfigPathBuilder;
 use UserFrosting\Session\Session;
 use UserFrosting\Sprinkle\Core\Alert\CacheAlertStream;
 use UserFrosting\Sprinkle\Core\Alert\SessionAlertStream;
@@ -57,7 +54,6 @@ use UserFrosting\Sprinkle\Core\Util\CheckEnvironment;
 use UserFrosting\Sprinkle\Core\Util\ClassMapper;
 use UserFrosting\Sprinkle\Core\Util\RawAssetBundles;
 use UserFrosting\Support\Exception\NotFoundException;
-use UserFrosting\Support\Repository\Loader\ArrayFileLoader;
 use UserFrosting\Support\Repository\Repository;
 
 /**
@@ -94,79 +90,6 @@ class ServicesProvider
             } else {
                 throw new \Exception("Bad alert storage handler type '{$config['alert.storage']}' specified in configuration file.");
             }
-        };
-
-        /*
-         * Asset loader service
-         *
-         * Loads assets from a specified relative location.
-         * Assets are Javascript, CSS, image, and other files used by your site.
-         * This implementation is a temporary hack until Assets can be refactored.
-         *
-         * @return \UserFrosting\Assets\AssetLoader
-         */
-        $container['assetLoader'] = function ($c) {
-            return new AssetLoader($c->assets);
-        };
-
-        /*
-         * Asset manager service.
-         *
-         * Loads raw or compiled asset information from your bundle.config.json schema file.
-         * Assets are Javascript, CSS, image, and other files used by your site.
-         *
-         * @return \UserFrosting\Assets\Assets
-         */
-        $container['assets'] = function ($c) {
-            $config = $c->config;
-            $locator = $c->locator;
-
-            // Load asset schema
-            if ($config['assets.use_raw']) {
-
-                // Register sprinkle assets stream, plus vendor assets in shared streams
-                $locator->registerStream('assets', 'vendor', \UserFrosting\NPM_ASSET_DIR, true);
-                $locator->registerStream('assets', 'vendor', \UserFrosting\BROWSERIFIED_ASSET_DIR, true);
-                $locator->registerStream('assets', 'vendor', \UserFrosting\BOWER_ASSET_DIR, true);
-                $locator->registerStream('assets', '', \UserFrosting\ASSET_DIR_NAME);
-
-                $baseUrl = $config['site.uri.public'] . '/' . $config['assets.raw.path'];
-
-                $assets = new Assets($locator, 'assets', $baseUrl);
-
-                // Load raw asset bundles for each Sprinkle.
-
-                // Retrieve locations of raw asset bundle schemas that exist.
-                $bundleSchemas = array_reverse($locator->findResources('sprinkles://' . $config['assets.raw.schema']));
-
-                // Load asset bundle schemas that exist.
-                if (array_key_exists(0, $bundleSchemas)) {
-                    $bundles = new RawAssetBundles(array_shift($bundleSchemas));
-
-                    foreach ($bundleSchemas as $bundleSchema) {
-                        $bundles->extend($bundleSchema);
-                    }
-
-                    // Add bundles to asset manager.
-                    $assets->addAssetBundles($bundles);
-                }
-            } else {
-
-                // Register compiled assets stream in public folder + alias for vendor ones + build stream for CompiledAssetBundles
-                $locator->registerStream('assets', '', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
-                $locator->registerStream('assets', 'vendor', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
-                $locator->registerStream('build', '', \UserFrosting\BUILD_DIR_NAME, true);
-
-                $baseUrl = $config['site.uri.public'] . '/' . $config['assets.compiled.path'];
-                $assets = new Assets($locator, 'assets', $baseUrl);
-
-                // Load compiled asset bundle.
-                $path = $locator->findResource('build://' . $config['assets.compiled.schema'], true, true);
-                $bundles = new CompiledAssetBundles($path);
-                $assets->addAssetBundles($bundles);
-            }
-
-            return $assets;
         };
 
         /*

@@ -11,6 +11,7 @@
 namespace UserFrosting\Sprinkle\Core\Controller;
 
 use Psr\Http\Message\ResponseInterface as Response;
+use UserFrosting\Assets\AssetLoader;
 use UserFrosting\Support\Exception\NotFoundException;
 
 /**
@@ -39,15 +40,12 @@ class CoreController
      * Handle all requests for raw assets.
      * Request type: GET.
      *
+     * @param string   $url
      * @param Response $response
-     * @param array    $args
      */
-    public function getAsset(Response $response, array $args): Response
+    public function getAsset($url, Response $response, AssetLoader $assetLoader): Response
     {
-        /** @var \UserFrosting\Assets\AssetLoader $assetLoader */
-        $assetLoader = $this->ci->assetLoader;
-
-        if (!isset($args['url']) || !$assetLoader->loadAsset($args['url'])) {
+        if (!isset($url) || !$assetLoader->loadAsset($url)) {
             throw new NotFoundException();
         }
 
