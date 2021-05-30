@@ -15,7 +15,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateCommand;
-use UserFrosting\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * MigrateCommand Test

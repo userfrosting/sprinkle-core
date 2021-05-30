@@ -18,7 +18,7 @@ use Illuminate\Database\Schema\Grammars\Grammar;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
-use UserFrosting\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  *    Tests for the Migrator Class

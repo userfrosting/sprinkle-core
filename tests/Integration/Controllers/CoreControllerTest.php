@@ -12,7 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Tests;
 
 use UserFrosting\Sprinkle\Core\Controller\CoreController;
 use UserFrosting\Support\Exception\NotFoundException;
-use UserFrosting\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests CoreController

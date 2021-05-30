@@ -11,7 +11,7 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
 use UserFrosting\Sprinkle\Core\Bakery\LocaleInfoCommand;
-use UserFrosting\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
 
 /**

@@ -10,7 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration;
 
-use UserFrosting\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase
 {

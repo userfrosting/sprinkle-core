@@ -12,7 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use UserFrosting\Sprinkle\Core\Alert\CacheAlertStream;
 use UserFrosting\Sprinkle\Core\Alert\SessionAlertStream;
-use UserFrosting\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Integration tests for `alerts` service.

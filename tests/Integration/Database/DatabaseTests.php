@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;
 use UserFrosting\Support\Exception\BadRequestException;
-use UserFrosting\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseTests extends TestCase
 {

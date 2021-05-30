@@ -13,7 +13,7 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Twig;
 use Mockery;
 use UserFrosting\Sprinkle\Core\Alert\AlertStream;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
-use UserFrosting\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * CoreExtensionTest class.

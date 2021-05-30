@@ -11,7 +11,7 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
-use UserFrosting\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for the Migrator Service
