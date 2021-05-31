@@ -12,18 +12,18 @@ namespace UserFrosting\Sprinkle\Core;
 
 use Slim\App;
 use UserFrosting\Routes\RouteDefinitionInterface;
-use UserFrosting\Sprinkle\Core\Controller\CoreController;
+use UserFrosting\Sprinkle\Core\Controller\AlertsController;
+use UserFrosting\Sprinkle\Core\Controller\AssetsController;
 use UserFrosting\Sprinkle\Core\Util\NoCache;
+use UserFrosting\Support\Repository\Repository as Config;
 
 class Routes implements RouteDefinitionInterface
 {
     public function register(App $app): void
     {
-        // TODO : Update config definition
-        // $config = $app->getContainer()->get('config');
+        $config = $app->getContainer()->get(Config::class);
 
-        $app->get('/alerts', [CoreController::class, 'jsonAlerts'])->add(new NoCache());
-        // $app->get('/' . $config['assets.raw.path'] . '/{url:.+}', [CoreController::class, 'getAsset']);
-        $app->get('/assets-raw/{url:.+}', [CoreController::class, 'getAsset']);
+        $app->get('/alerts', AlertsController::class); //->add(new NoCache()); // TODO
+        $app->get('/' . $config['assets.raw.path'] . '/{url:.+}', AssetsController::class);
     }
 }

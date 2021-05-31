@@ -32,6 +32,26 @@ use UserFrosting\Sprinkle\Core\Bakery\SetupSmtpCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\Test;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
+use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\AssetService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\CsrfService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\DbService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\ErrorHandlerService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\FactoryService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\FilesystemService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\LocaleService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\LocatorService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\LoggersService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\MailService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\MigratorService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\RouterService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\SeederService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\SessionService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\TranslatorService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\SprinkleReceipe;
 
 class Core implements SprinkleReceipe
@@ -111,7 +131,26 @@ class Core implements SprinkleReceipe
     public static function getServices(): array
     {
         return [
-            Services::class,
+            AlertStreamService::class,
+            AssetService::class,
+            CacheService::class,
+            ConfigService::class,
+            // CsrfService::class,
+            DbService::class,
+            ErrorHandlerService::class,
+            // FactoryService::class,
+            FilesystemService::class,
+            LocaleService::class,
+            LocatorService::class,
+            LoggersService::class,
+            // MailService::class,
+            MigratorService::class,
+            // RouterService::class,
+            SeederService::class,
+            SessionService::class,
+            // ThrottlerService::class,
+            TranslatorService::class,
+            TwigService::class,
         ];
     }
 }

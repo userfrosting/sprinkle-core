@@ -12,8 +12,8 @@ namespace UserFrosting\Sprinkle\Core\Tests\Unit\Alert;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use UserFrosting\Sprinkle\Core\Alert\AlertStream;
-use UserFrosting\Sprinkle\Core\Alert\CacheAlertStream;
+use UserFrosting\Alert\AlertStream;
+use UserFrosting\Alert\CacheAlertStream;
 use Illuminate\Cache\Repository as Cache;
 use UserFrosting\I18n\Translator;
 
