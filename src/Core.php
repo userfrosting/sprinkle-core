@@ -32,6 +32,8 @@ use UserFrosting\Sprinkle\Core\Bakery\SetupSmtpCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\Test;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
+use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
+use UserFrosting\Sprinkle\Core\Routes\AssetsRoutes;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AssetService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
@@ -119,7 +121,8 @@ class Core implements SprinkleReceipe
     public static function getRoutes(): array
     {
         return [
-            Routes::class,
+            AlertsRoutes::class,
+            AssetsRoutes::class,
         ];
     }
 
