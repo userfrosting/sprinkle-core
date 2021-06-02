@@ -32,7 +32,7 @@ class TwigService implements ServicesProviderInterface
             // TODO : Reimplements extenions
             Twig::class => function (ResourceLocatorInterface $locator, Config $config) {
                 $templatePaths = $locator->getResources('templates://');
-                $view = new Twig(array_map('strval', $templatePaths));
+                $view = Twig::create(array_map('strval', $templatePaths));
                 $loader = $view->getLoader();
 
                 // Add Sprinkles' templates namespaces
