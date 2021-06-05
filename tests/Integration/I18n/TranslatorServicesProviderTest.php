@@ -11,7 +11,8 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\I18n;
 
 use UserFrosting\I18n\Translator;
-use PHPUnit\Framework\TestCase;
+use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
  * Tests AccountController
@@ -27,6 +28,8 @@ class TranslatorServicesProviderTest extends TestCase
         'es_ES' => false,
     ];
 
+    protected Config $config;
+
     /**
      * Setup test database for controller tests
      */
@@ -34,8 +37,11 @@ class TranslatorServicesProviderTest extends TestCase
     {
         parent::setUp();
 
+        // Set alias
+        $this->config = $this->ci->get(Config::class);
+
         // Set test config
-        $this->ci->config['site.locales.available'] = $this->testLocale;
+        $this->config->set('site.locales.available', $this->testLocale);
     }
 
     /**
@@ -43,9 +49,10 @@ class TranslatorServicesProviderTest extends TestCase
      */
     public function testActualService(): void
     {
-        $this->ci->config['site.locales.default'] = 'fr_FR';
-        $this->assertInstanceOf(Translator::class, $this->ci->translator);
-        $this->assertSame('fr_FR', $this->ci->translator->getLocale()->getIdentifier());
+        $this->config->set('site.locales.default', 'fr_FR');
+        $translator = $this->ci->get(Translator::class);
+        $this->assertInstanceOf(Translator::class, $translator);
+        $this->assertSame('fr_FR', $translator->getLocale()->getIdentifier());
     }
 
     /**
@@ -53,9 +60,10 @@ class TranslatorServicesProviderTest extends TestCase
      */
     public function testActualServiceWithDefaultIndentifier(): void
     {
-        $this->ci->config['site.locales.default'] = '';
-        $this->assertInstanceOf(Translator::class, $this->ci->translator);
-        $this->assertSame('en_US', $this->ci->translator->getLocale()->getIdentifier());
+        $this->config->set('site.locales.default', '');
+        $translator = $this->ci->get(Translator::class);
+        $this->assertInstanceOf(Translator::class, $translator);
+        $this->assertSame('en_US', $translator->getLocale()->getIdentifier());
     }
 
     /**
@@ -63,8 +71,9 @@ class TranslatorServicesProviderTest extends TestCase
      */
     public function testActualServiceWithNonStringIndentifier(): void
     {
-        $this->ci->config['site.locales.default'] = ['foo', 'bar'];
-        $this->assertInstanceOf(Translator::class, $this->ci->translator);
-        $this->assertSame('en_US', $this->ci->translator->getLocale()->getIdentifier());
+        $this->config->set('site.locales.default', ['foo', 'bar']);
+        $translator = $this->ci->get(Translator::class);
+        $this->assertInstanceOf(Translator::class, $translator);
+        $this->assertSame('en_US', $translator->getLocale()->getIdentifier());
     }
 }

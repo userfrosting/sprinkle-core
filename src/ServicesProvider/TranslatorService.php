@@ -29,7 +29,6 @@ class TranslatorService implements ServicesProviderInterface
     {
         return [
             Translator::class => function (SiteLocale $locale, ResourceLocatorInterface $locator) {
-                // Create the $translator object
                 $locale = new Locale($locale->getLocaleIndentifier());
                 $dictionary = new Dictionary($locale, $locator);
                 $translator = new Translator($dictionary);

@@ -16,14 +16,14 @@ use UserFrosting\I18n\Locale;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
 use UserFrosting\Support\Repository\Repository as Config;
-use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
+use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
  * Tests SiteLocale.
  * 
  * N.B.: This requires the full App stack, since locale files will be loaded.
  */
-class SiteLocaleTest extends CoreTestCase
+class SiteLocaleTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
@@ -46,6 +46,7 @@ class SiteLocaleTest extends CoreTestCase
         $this->config = $this->ci->get(Config::class);
         $this->locale = $this->ci->get(SiteLocale::class);
 
+        // Set test config
         $this->config->set('site.locales.available', $this->testLocale);
     }
 
