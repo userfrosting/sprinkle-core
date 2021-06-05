@@ -43,7 +43,6 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\DbService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ErrorHandlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\FactoryService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\FilesystemService;
-use UserFrosting\Sprinkle\Core\ServicesProvider\LocaleService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\LocatorService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\LoggersService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\MailService;
@@ -143,7 +142,6 @@ class Core implements SprinkleReceipe
             ErrorHandlerService::class,
             // FactoryService::class,
             FilesystemService::class,
-            LocaleService::class,
             LocatorService::class,
             LoggersService::class,
             // MailService::class,

@@ -10,8 +10,9 @@
 
 namespace UserFrosting\Sprinkle\Core\I18n;
 
-use Psr\Container\ContainerInterface;
+use Psr\Http\Message\RequestInterface;
 use UserFrosting\I18n\Locale;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Helper methods for the locale system.
@@ -21,18 +22,13 @@ use UserFrosting\I18n\Locale;
 class SiteLocale
 {
     /**
-     * @var ContainerInterface
-     *
-     * @todo Change this to only the config service
+     * @param Config           $config
+     * @param RequestInterface $request
      */
-    protected $ci;
-
-    /**
-     * @param ContainerInterface $ci
-     */
-    public function __construct(ContainerInterface $ci)
-    {
-        $this->ci = $ci;
+    public function __construct(
+        protected Config $config,
+        // protected RequestInterface $request,
+    ) {
     }
 
     /**
@@ -94,7 +90,7 @@ class SiteLocale
     public function getAvailableIdentifiers(): array
     {
         // Get all keys where value is true
-        $available = array_filter($this->ci->config['site.locales.available']);
+        $available = array_filter($this->config->get('site.locales.available'));
 
         // Add the default to the list. it will always be available
         $default = $this->getDefaultLocale();
@@ -112,7 +108,7 @@ class SiteLocale
      */
     public function getDefaultLocale(): string
     {
-        $defaultIdentifier = $this->ci->config['site.locales.default'];
+        $defaultIdentifier = $this->config->get('site.locales.default');
 
         // Make sure the locale config is a valid string. Otherwise, fallback to en_US
         if (!is_string($defaultIdentifier) || $defaultIdentifier == '') {
@@ -132,7 +128,7 @@ class SiteLocale
     public function getLocaleIndentifier(): string
     {
         // Get default locales as specified in configurations.
-        $browserLocale = $this->getBrowserLocale();
+        $browserLocale = null; //$this->getBrowserLocale(); // TODO : This will need to be reimplement using middleware
         if (!is_null($browserLocale)) {
             $localeIdentifier = $browserLocale;
         } else {
@@ -151,7 +147,7 @@ class SiteLocale
      */
     protected function getBrowserLocale(): ?string
     {
-        $request = $this->ci->request;
+        $request = $this->request;
 
         // Get available locales
         $availableLocales = $this->getAvailableIdentifiers();
