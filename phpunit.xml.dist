@@ -4,6 +4,10 @@
     <include>
       <directory suffix=".php">src/</directory>
     </include>
+    <report>
+      <clover outputFile="_meta/coverage.xml"/>
+      <html outputDirectory="_meta/coverage"/>
+    </report>
   </coverage>
   <testsuites>
     <testsuite name="Unit Tests">
