@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core;
 
+use Slim\Views\TwigMiddleware;
 use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
 use UserFrosting\Sprinkle\Core\Bakery\BuildAssets;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
@@ -32,6 +33,7 @@ use UserFrosting\Sprinkle\Core\Bakery\SetupSmtpCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\Test;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
+use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
 use UserFrosting\Sprinkle\Core\Routes\AssetsRoutes;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
@@ -51,7 +53,7 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\RouterService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\SeederService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\SessionService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
-use UserFrosting\Sprinkle\Core\ServicesProvider\TranslatorService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\I18nService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\SprinkleReceipe;
 
@@ -142,6 +144,7 @@ class Core implements SprinkleReceipe
             ErrorHandlerService::class,
             // FactoryService::class,
             FilesystemService::class,
+            I18nService::class,
             LocatorService::class,
             LoggersService::class,
             // MailService::class,
@@ -150,8 +153,20 @@ class Core implements SprinkleReceipe
             SeederService::class,
             SessionService::class,
             // ThrottlerService::class,
-            TranslatorService::class,
             TwigService::class,
+        ];
+    }
+
+    /**
+     * Returns a list of all Middlewares classes.
+     *
+     * @return \Psr\Http\Server\MiddlewareInterface[]
+     */
+    public static function getMiddlewares(): array
+    {
+        return [
+            LocaleMiddleware::class,
+            TwigMiddleware::class,
         ];
     }
 }

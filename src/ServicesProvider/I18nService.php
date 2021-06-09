@@ -23,7 +23,7 @@ use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
  * Registers:
  *  - translator : \UserFrosting\I18n\Translator
  */
-class TranslatorService implements ServicesProviderInterface
+class I18nService implements ServicesProviderInterface
 {
     public function register(): array
     {
