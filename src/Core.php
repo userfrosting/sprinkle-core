@@ -40,6 +40,7 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AssetService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\VersionsService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CsrfService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\DbService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ErrorHandlerService;
@@ -154,6 +155,7 @@ class Core implements SprinkleReceipe
             SessionService::class,
             // ThrottlerService::class,
             TwigService::class,
+            VersionsService::class,
         ];
     }
 
