@@ -25,8 +25,8 @@ class VersionsService implements ServicesProviderInterface
     {
         return [
             // Minimum requirements
-            'PHP_MIN_VERSION'           => '^7.2',
-            'PHP_RECOMMENDED_VERSION'   => '^7.4',
+            'PHP_MIN_VERSION'           => '^8.0',
+            'PHP_RECOMMENDED_VERSION'   => '^8.0',
             'NODE_MIN_VERSION'          => '^12.17.0 || >=14.0.0',
             'NPM_MIN_VERSION'           => '>=6.14.4',
 
