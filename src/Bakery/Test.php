@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use UserFrosting\Bakery\CommandReceipe;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * Automated testing CLI tool.
@@ -23,7 +23,7 @@ use UserFrosting\Bakery\CommandReceipe;
  *
  * @author Alex Weissman (https://alexanderweissman.com)
  */
-class Test extends CommandReceipe
+class Test extends Command
 {
     /**
      * @var string Path to the build/ directory

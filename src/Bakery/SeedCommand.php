@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\ConfirmableTrait;
 use UserFrosting\Sprinkle\Core\Database\Seeder\Seeder;
-use UserFrosting\Bakery\CommandReceipe;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * seed Bakery Command
@@ -24,7 +24,7 @@ use UserFrosting\Bakery\CommandReceipe;
  *
  * @author Louis Charette
  */
-class SeedCommand extends CommandReceipe
+class SeedCommand extends Command
 {
     use ConfirmableTrait;
 

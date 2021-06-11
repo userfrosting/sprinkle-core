@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\I18n\Dictionary;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\LocaleOption;
-use UserFrosting\Bakery\CommandReceipe;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * locale:dictionary command.
@@ -24,7 +24,7 @@ use UserFrosting\Bakery\CommandReceipe;
  *
  * @author Louis Charette
  */
-class LocaleDictionaryCommand extends CommandReceipe
+class LocaleDictionaryCommand extends Command
 {
     use LocaleOption;
 

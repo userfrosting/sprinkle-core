@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\ConfirmableTrait;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
-use UserFrosting\Bakery\CommandReceipe;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * migrate Bakery Command
@@ -23,7 +23,7 @@ use UserFrosting\Bakery\CommandReceipe;
  *
  * @author Louis Charette
  */
-class MigrateCommand extends CommandReceipe
+class MigrateCommand extends Command
 {
     use ConfirmableTrait;
 

@@ -12,18 +12,24 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use UserFrosting\Bakery\CommandReceipe;
+use Symfony\Component\Console\Command\Command;
+use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\Sprinkle\SprinkleManager;
 
 /**
  * Sprinkle:list CLI tool.
  */
-class SprinkleListCommand extends CommandReceipe
+class SprinkleListCommand extends Command
 {
+    use WithSymfonyStyle;
+
     /**
      * @var array The table header
      */
     protected $headers = ['Sprinkle', 'Path'];
+
+    /** @Inject */
+    protected SprinkleManager $sprinkleManager;
 
     /**
      * {@inheritdoc}
@@ -41,11 +47,8 @@ class SprinkleListCommand extends CommandReceipe
     {
         $this->io->title('Loaded Sprinkles');
 
-        /** @var \UserFrosting\System\Sprinkle\SprinkleManager $sprinkleManager */
-        $sprinkleManager = $this->ci->get(SprinkleManager::class);
-
         // Get sprinkle list
-        $sprinkles = $sprinkleManager->getSprinkles();
+        $sprinkles = $this->sprinkleManager->getSprinkles();
 
         // Compile the routes into a displayable format
         $sprinklesTable = collect($sprinkles)->map(function ($sprinkle) {

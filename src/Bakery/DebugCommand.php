@@ -11,20 +11,39 @@
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\OutputInterface;s
 use UserFrosting\Sprinkle\Core\Bakery\Helper\DatabaseTest;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
-use UserFrosting\Sprinkle\Core\Util\VersionValidator;
-use UserFrosting\Bakery\CommandReceipe;
+use Symfony\Component\Console\Command\Command;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Validators\NodeVersionValidator;
+use UserFrosting\Sprinkle\Core\Validators\NpmVersionValidator;
+use UserFrosting\Sprinkle\Core\Validators\PhpVersionValidator;
+use UserFrosting\Sprinkle\SprinkleManager;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Debug CLI tool.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
-class DebugCommand extends CommandReceipe
+class DebugCommand extends Command
 {
     use DatabaseTest;
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected Config $config;
+
+    /** @Inject */
+    protected SprinkleManager $sprinkleManager;
+
+    /** @Inject */
+    protected PhpVersionValidator $phpVersionValidator;
+
+    /** @Inject */
+    protected NodeVersionValidator $nodeVersionValidator;
+
+    /** @Inject */
+    protected NpmVersionValidator $npmVersionValidator;
 
     /**
      * {@inheritdoc}
@@ -45,24 +64,10 @@ class DebugCommand extends CommandReceipe
         $this->io->title('UserFrosting');
 
         // Need to touch the config service first to load dotenv values
-        $this->ci->config;
+        // $config = $this->ci->get(Config::class);
 
-        // Validate PHP, Node and npm version
-        try {
-            VersionValidator::validatePhpVersion();
-            VersionValidator::validateNodeVersion();
-            VersionValidator::validateNpmVersion();
-        } catch (VersionCompareException $e) {
-            $this->io->error($e->getMessage());
-            exit(1);
-        }
-
-        // Validate deprecated versions
-        try {
-            VersionValidator::validatePhpDeprecation();
-        } catch (VersionCompareException $e) {
-            $this->io->warning($e->getMessage());
-        }
+        // Validate PHP, Node and Npm versions.
+        $this->validateVersions();
 
         // Perform tasks & display info
         $this->io->definitionList(
@@ -70,9 +75,9 @@ class DebugCommand extends CommandReceipe
             ['OS Name'              => php_uname('s')],
             ['Project Root'         => \UserFrosting\ROOT_DIR],
             ['Environment mode'     => env('UF_MODE', 'default')],
-            ['PHP Version'          => VersionValidator::getPhpVersion()],
-            ['Node Version'         => VersionValidator::getNodeVersion()],
-            ['NPM Version'          => VersionValidator::getNpmVersion()]
+            ['PHP Version'          => $this->phpVersionValidator->getInstalled()],
+            ['Node Version'         => $this->nodeVersionValidator->getInstalled()],
+            ['NPM Version'          => $this->npmVersionValidator->getInstalled()]
         );
 
         // Now we list Sprinkles
@@ -82,7 +87,8 @@ class DebugCommand extends CommandReceipe
         $this->showConfig();
 
         // Check database connection
-        $this->checkDatabase();
+        // TODO
+        // $this->checkDatabase();
 
         // If all went well and there's no fatal errors, we are ready to bake
         $this->io->success('Ready to bake !');
@@ -92,32 +98,38 @@ class DebugCommand extends CommandReceipe
     }
 
     /**
-     * List all sprinkles defined in the Sprinkles schema file,
-     * making sure this file exist at the same time.
+     * Validate PHP, Node and Npm versions.
+     */
+    protected function validateVersions(): void
+    {
+        // Validate PHP, Node and npm version
+        try {
+            $this->phpVersionValidator->validate();
+            $this->nodeVersionValidator->validate();
+            $this->npmVersionValidator->validate();
+        } catch (VersionCompareException $e) {
+            $this->io->error($e->getMessage());
+            exit(1);
+        }
+
+        // Validate deprecated versions
+        try {
+            $this->phpVersionValidator->validateDeprecation();
+        } catch (VersionCompareException $e) {
+            $this->io->warning($e->getMessage());
+        }
+    }
+
+    /**
+     * List all sprinkles defined in the Sprinkles schema file
      *
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
     protected function listSprinkles(InputInterface $input, OutputInterface $output): void
     {
-        // Check for Sprinkles schema file
-        $path = \UserFrosting\SPRINKLES_SCHEMA_FILE;
-        if (@file_exists($path) === false) {
-            $this->io->error("The file `$path` not found.");
-        }
-
-        // List installed sprinkles
         $command = $this->getApplication()->find('sprinkle:list');
         $command->run($input, $output);
-
-        /** @var \UserFrosting\System\Sprinkle\SprinkleManager $sprinkleManager */
-        $sprinkleManager = $this->ci->sprinkleManager;
-
-        // Throw fatal error if the `core` sprinkle is missing
-        if (!$sprinkleManager->isAvailable('core')) {
-            $this->io->error("The `core` sprinkle is missing from the 'sprinkles.json' file.");
-            exit(1);
-        }
     }
 
     /**
@@ -145,18 +157,15 @@ class DebugCommand extends CommandReceipe
      */
     protected function showConfig(): void
     {
-        // Get config
-        $config = $this->ci->config;
-
         // Display database info
         $this->io->title('Database config');
         $this->io->definitionList(
-            ['DRIVER'   => $config['db.default.driver']],
-            ['HOST'     => $config['db.default.host']],
-            ['PORT'     => $config['db.default.port']],
-            ['DATABASE' => $config['db.default.database']],
-            ['USERNAME' => $config['db.default.username']],
-            ['PASSWORD' => ($config['db.default.password'] ? '*********' : '')]
+            ['DRIVER'   => $this->config->get('db.default.driver')],
+            ['HOST'     => $this->config->get('db.default.host')],
+            ['PORT'     => $this->config->get('db.default.port')],
+            ['DATABASE' => $this->config->get('db.default.database')],
+            ['USERNAME' => $this->config->get('db.default.username')],
+            ['PASSWORD' => ($this->config->get('db.default.password') ? '*********' : '')]
         );
     }
 }

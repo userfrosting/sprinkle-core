@@ -19,7 +19,7 @@ use UserFrosting\I18n\Compare;
 use UserFrosting\I18n\Dictionary;
 use UserFrosting\I18n\DictionaryInterface;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\LocaleOption;
-use UserFrosting\Bakery\CommandReceipe;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * locale:missing-keys command.
@@ -27,7 +27,7 @@ use UserFrosting\Bakery\CommandReceipe;
  *
  * @author Amos Folz
  */
-class LocaleCompareCommand extends CommandReceipe
+class LocaleCompareCommand extends Command
 {
     use LocaleOption;
 

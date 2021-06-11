@@ -12,7 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use UserFrosting\Bakery\CommandReceipe;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * Bake command.
@@ -20,7 +20,7 @@ use UserFrosting\Bakery\CommandReceipe;
  *
  * @author Alex Weissman (https://alexanderweissman.com)
  */
-class BakeCommand extends CommandReceipe
+class BakeCommand extends Command
 {
     /**
      * @var string The UserFrosting ASCII art.

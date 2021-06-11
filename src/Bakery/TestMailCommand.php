@@ -16,14 +16,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Mail\EmailRecipient;
 use UserFrosting\Sprinkle\Core\Mail\TwigMailMessage;
-use UserFrosting\Bakery\CommandReceipe;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * TestMail CLI Command.
  *
  * @author Louis Charette
  */
-class TestMailCommand extends CommandReceipe
+class TestMailCommand extends Command
 {
     /**
      * {@inheritdoc}

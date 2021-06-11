@@ -16,7 +16,7 @@ use Slim\Route;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use UserFrosting\Bakery\CommandReceipe;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * route:list Bakery Command
@@ -26,7 +26,7 @@ use UserFrosting\Bakery\CommandReceipe;
  * @author Jose Vasconcellos
  * @author Louis Charette
  */
-class RouteListCommand extends CommandReceipe
+class RouteListCommand extends Command
 {
     /**
      * @var array The table header
