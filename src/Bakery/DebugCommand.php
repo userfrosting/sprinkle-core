@@ -11,13 +11,14 @@
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;s
+use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\DatabaseTest;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
 use Symfony\Component\Console\Command\Command;
 use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\Sprinkle\Core\Validators\NodeVersionValidator;
 use UserFrosting\Sprinkle\Core\Validators\NpmVersionValidator;
+use UserFrosting\Sprinkle\Core\Validators\PhpDeprecationValidator;
 use UserFrosting\Sprinkle\Core\Validators\PhpVersionValidator;
 use UserFrosting\Sprinkle\SprinkleManager;
 use UserFrosting\Support\Repository\Repository as Config;
@@ -38,6 +39,9 @@ class DebugCommand extends Command
 
     /** @Inject */
     protected PhpVersionValidator $phpVersionValidator;
+
+    /** @Inject */
+    protected PhpDeprecationValidator $phpDeprecationValidator;
 
     /** @Inject */
     protected NodeVersionValidator $nodeVersionValidator;
@@ -114,7 +118,7 @@ class DebugCommand extends Command
 
         // Validate deprecated versions
         try {
-            $this->phpVersionValidator->validateDeprecation();
+            $this->phpDeprecationValidator->validate();
         } catch (VersionCompareException $e) {
             $this->io->warning($e->getMessage());
         }
