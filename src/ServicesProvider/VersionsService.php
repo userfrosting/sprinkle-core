@@ -31,29 +31,26 @@ class VersionsService implements ServicesProviderInterface
             'NODE_MIN_VERSION'          => '^12.17.0 || >=14.0.0',
             'NPM_MIN_VERSION'           => '>=6.14.4',
 
+            // Installed version
+            'PHP_VERSION'  => (string) phpversion(),
+            'NODE_VERSION' => exec('node -v'),
+            'NPM_VERSION'  => exec('npm -v'),
+
             // Version validators
             PhpVersionValidator::class => function (ContainerInterface $c) {
-                $version = (string) phpversion();
-
-                return new PhpVersionValidator($version, $c->get('PHP_MIN_VERSION'));
+                return new PhpVersionValidator($c->get('PHP_VERSION'), $c->get('PHP_MIN_VERSION'));
             },
 
             PhpDeprecationValidator::class => function (ContainerInterface $c) {
-                $version = (string) phpversion();
-
-                return new PhpDeprecationValidator($version, $c->get('PHP_RECOMMENDED_VERSION'));
+                return new PhpDeprecationValidator($c->get('PHP_VERSION'), $c->get('PHP_RECOMMENDED_VERSION'));
             },
 
             NodeVersionValidator::class => function (ContainerInterface $c) {
-                $version = exec('node -v');
-
-                return new NodeVersionValidator($version, $c->get('NODE_MIN_VERSION'));
+                return new NodeVersionValidator($c->get('NODE_VERSION'), $c->get('NODE_MIN_VERSION'));
             },
 
             NpmVersionValidator::class => function (ContainerInterface $c) {
-                $version = exec('npm -v');
-
-                return new NpmVersionValidator($version, $c->get('NPM_MIN_VERSION'));
+                return new NpmVersionValidator($c->get('NPM_VERSION'), $c->get('NPM_MIN_VERSION'));
             },
         ];
     }
