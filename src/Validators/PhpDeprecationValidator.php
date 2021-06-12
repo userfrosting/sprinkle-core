@@ -10,9 +10,6 @@
 
 namespace UserFrosting\Sprinkle\Core\Validators;
 
-use Composer\Semver\Semver;
-use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
-
 /**
  * Helper trait to check PHP deprecation.
  */
