@@ -12,32 +12,28 @@ namespace UserFrosting\Sprinkle\Core\Tests\Unit\Validators;
 
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
+use UserFrosting\Sprinkle\Core\Validators\PhpDeprecationValidator;
 use UserFrosting\Sprinkle\Core\Validators\PhpVersionValidator;
 
 /**
  * Unit tests for PhpVersionValidator trait.
  */
-class PhpVersionValidatorTest extends AbstractVersionValidatorTester
+class PhpDeprecationValidatorTest extends AbstractVersionValidatorTester
 {
-    protected string $required = '^7.3 | ^8.0';
+    protected string $required = '^8.0';
 
-    protected string $validator = PhpVersionValidator::class;
+    protected string $validator = PhpDeprecationValidator::class;
 
     /**
      * PHP version provider.
      *
-     * @return array [version, sanitized, valid]
+     * @return array [version, sanitized, deprecated]
      */
     public function versionProvider(): array
     {
         return [
-            ['7.2.3', '7.2.3', false],
-            ['7.3.14', '7.3.14', true],
-            ['7.3', '7.3', true],
-            ['7.4', '7.4', true],
-            ['7.4.13', '7.4.13', true],
+            ['7.4.13', '7.4.13', false],
             ['8.0.3', '8.0.3', true],
-            ['7.4.34-18+ubuntu20.04.1+deb.sury.org+1', '7.4.34', true],
         ];
     }
 }

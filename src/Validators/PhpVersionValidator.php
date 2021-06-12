@@ -18,37 +18,7 @@ use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
  */
 class PhpVersionValidator extends AbstractVersionValidator
 {
-    protected string $entity = 'PHP';
-
-    public function __construct(
-        protected string $installed,
-        protected string $required,
-        protected string $recommended,
-    ) {
-    }
-
-    /**
-     * Check if php version is deprecated.
-     *
-     * @throws VersionCompareException If constraint version is not matched.
-     *
-     * @return true Version is valid
-     */
-    public function validateDeprecation(): bool
-    {
-        $phpVersion = $this->getInstalled();
-        $constraint = $this->getRecommended();
-
-        if (!Semver::satisfies($phpVersion, $constraint)) {
-            $message = 'UserFrosting recommend a PHP version that satisfies "' . $constraint . '". While your PHP version (' . $phpVersion . ') is still supported by UserFrosting, we recommend upgrading as your current version will soon be unsupported. See http://php.net/supported-versions.php for more info.';
-            $exception = new VersionCompareException($message);
-            $exception->setConstraint($constraint)->setVersion($phpVersion);
-
-            throw $exception;
-        }
-
-        return true;
-    }
+    protected string $message = 'UserFrosting requires PHP with a version that satisfies "%s", but found %s. Check the documentation for more details.';
 
     /**
      * Returns system php version.
@@ -63,15 +33,5 @@ class PhpVersionValidator extends AbstractVersionValidator
         $version = preg_replace('#^([^~+-]+).*$#', '$1', $this->installed);
 
         return $version;
-    }
-
-    /**
-     * Returns the recommended PHP semver range.
-     *
-     * @return string
-     */
-    public function getRecommended(): string
-    {
-        return $this->recommended;
     }
 }

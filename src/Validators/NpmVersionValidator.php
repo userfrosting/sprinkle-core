@@ -15,5 +15,5 @@ namespace UserFrosting\Sprinkle\Core\Validators;
  */
 class NpmVersionValidator extends AbstractVersionValidator
 {
-    protected string $entity = 'NPM';
+    protected string $message = 'UserFrosting requires NPM with a version that satisfies "%s", but found %s. Check the documentation for more details.';
 }

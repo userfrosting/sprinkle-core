@@ -15,5 +15,5 @@ namespace UserFrosting\Sprinkle\Core\Validators;
  */
 class NodeVersionValidator extends AbstractVersionValidator
 {
-    protected string $entity = 'Node';
+    protected string $message = 'UserFrosting requires Node with a version that satisfies "%s", but found %s. Check the documentation for more details.';
 }

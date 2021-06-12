@@ -14,6 +14,7 @@ use Psr\Container\ContainerInterface;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Validators\NodeVersionValidator;
 use UserFrosting\Sprinkle\Core\Validators\NpmVersionValidator;
+use UserFrosting\Sprinkle\Core\Validators\PhpDeprecationValidator;
 use UserFrosting\Sprinkle\Core\Validators\PhpVersionValidator;
 
 /*
@@ -34,7 +35,13 @@ class VersionsService implements ServicesProviderInterface
             PhpVersionValidator::class => function (ContainerInterface $c) {
                 $version = (string) phpversion();
 
-                return new PhpVersionValidator($version, $c->get('PHP_MIN_VERSION'), $c->get('PHP_RECOMMENDED_VERSION'));
+                return new PhpVersionValidator($version, $c->get('PHP_MIN_VERSION'));
+            },
+
+            PhpDeprecationValidator::class => function (ContainerInterface $c) {
+                $version = (string) phpversion();
+
+                return new PhpDeprecationValidator($version, $c->get('PHP_RECOMMENDED_VERSION'));
             },
 
             NodeVersionValidator::class => function (ContainerInterface $c) {

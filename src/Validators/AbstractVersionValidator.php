@@ -18,7 +18,7 @@ use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
  */
 class AbstractVersionValidator
 {
-    protected string $entity = '';
+    protected string $message = '';
 
     public function __construct(
         protected string $installed,
@@ -39,7 +39,7 @@ class AbstractVersionValidator
         $constraint = $this->getConstraint();
 
         if (!Semver::satisfies($version, $constraint)) {
-            $message = 'UserFrosting requires ' . $this->entity . ' with a version that satisfies "' . $constraint . '", but found ' . $version . '. Check the documentation for more details.';
+            $message = sprintf($this->message, $constraint, $version);
             $exception = new VersionCompareException($message);
             $exception->setConstraint($constraint)->setVersion($version);
 
