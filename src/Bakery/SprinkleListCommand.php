@@ -26,7 +26,7 @@ class SprinkleListCommand extends Command
     /**
      * @var array The table header
      */
-    protected $headers = ['Sprinkle', 'Path'];
+    protected $headers = ['Sprinkle', 'Class', 'Path'];
 
     /** @Inject */
     protected SprinkleManager $sprinkleManager;
@@ -54,6 +54,7 @@ class SprinkleListCommand extends Command
         $sprinklesTable = collect($sprinkles)->map(function ($sprinkle) {
             return [
                 'sprinkle'  => $sprinkle::getName(),
+                'class'     => $sprinkle,
                 'path'      => $sprinkle::getPath(),
             ];
         })->all();
