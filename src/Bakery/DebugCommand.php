@@ -91,8 +91,7 @@ class DebugCommand extends Command
         $this->showConfig();
 
         // Check database connection
-        // TODO
-        // $this->checkDatabase();
+        $this->checkDatabase();
 
         // If all went well and there's no fatal errors, we are ready to bake
         $this->io->success('Ready to bake !');

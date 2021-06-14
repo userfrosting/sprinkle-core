@@ -15,11 +15,12 @@ use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Database Test Trait. Include method to test the db connection
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 trait DatabaseTest
 {
+    /** @Inject */
+    protected Capsule $capsule;
+    
     /**
      * Function to test the db connection.
      *
@@ -29,12 +30,6 @@ trait DatabaseTest
      */
     protected function testDB(): bool
     {
-        // Boot db
-        // $this->ci->db;
-
-        // Get config
-        // $config = $this->ci->config;
-
         // Check params are valid
         $dbParams = $this->config->get('db.default');
         if (!$dbParams) {
@@ -43,7 +38,7 @@ trait DatabaseTest
 
         // Test database connection directly using PDO
         try {
-            Capsule::connection()->getPdo();
+            $this->capsule::connection()->getPdo();
         } catch (\PDOException $e) {
             $message = "Could not connect to the database '{$dbParams['username']}@{$dbParams['host']}/{$dbParams['database']}':" . PHP_EOL;
             $message .= 'Exception: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
