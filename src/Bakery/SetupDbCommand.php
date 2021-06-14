@@ -21,14 +21,13 @@ use Symfony\Component\Console\Command\Command;
 /**
  * DB Setup Wizard CLI Tools.
  * Helper command to setup database config in .env file.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class SetupDbCommand extends Command
 {
     /**
      * @var string Path to the .env file
      */
+    // TODO : Use locator base path
     protected $envPath = \UserFrosting\APP_DIR . '/.env';
 
     /**
@@ -71,6 +70,8 @@ class SetupDbCommand extends Command
         $this->io->note("Database credentials will be saved in `{$this->envPath}`");
 
         // Get an instance of the DotenvEditor
+        // TODO : Use locator base path
+        // TODO : Move dotenvEditor to services
         $dotenvEditor = new DotenvEditor(\UserFrosting\APP_DIR, false);
         $dotenvEditor->load($this->envPath);
         $dotenvEditor->save(); // Save make sure empty file is created if none exist before reading it

@@ -27,6 +27,7 @@ class SetupEnvCommand extends Command
     /**
      * @var string Path to the .env file
      */
+    // TODO : Use locator base path
     protected $envPath = \UserFrosting\APP_DIR . '/.env';
 
     /**
@@ -56,6 +57,8 @@ class SetupEnvCommand extends Command
         $this->io->write('Select desired environment mode. Production should only be used when deploying a live app.');
 
         // Get an instance of the DotenvEditor
+        // TODO : Use locator base path
+        // TODO : Move dotenvEditor to services
         $dotenvEditor = new DotenvEditor(\UserFrosting\APP_DIR, false);
         $dotenvEditor->load($this->envPath);
 

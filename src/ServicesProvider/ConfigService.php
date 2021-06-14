@@ -19,11 +19,9 @@ use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /*
- * Site config service (separate from Slim settings).
+ * Site config service.
  *
  * Will attempt to automatically determine which config file(s) to use based on the value of the UF_MODE environment variable.
- *
- * @return \UserFrosting\Support\Repository\Repository
  */
 class ConfigService implements ServicesProviderInterface
 {
@@ -33,8 +31,9 @@ class ConfigService implements ServicesProviderInterface
             // TODO : Use interface & Implement request ?
             Config::class => function (ResourceLocatorInterface $locator) {
                 // Grab any relevant dotenv variables from the .env file
+                // located at the locator base path
                 try {
-                    $dotenv = Dotenv::createImmutable(\UserFrosting\APP_DIR);
+                    $dotenv = Dotenv::createImmutable($locator->getBasePath());
                     $dotenv->load();
                 } catch (InvalidPathException $e) {
                     // Skip loading the environment config file if it doesn't exist.
