@@ -10,8 +10,10 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration;
 
-use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use UserFrosting\Support\Repository\Repository as Config;
 
 class TestDatabaseTraitTest extends TestCase
 {
@@ -30,12 +32,16 @@ class TestDatabaseTraitTest extends TestCase
     }
 
     /**
-     *    Test the TestDatabase traits works
+     * Test the TestDatabase traits works
      */
     public function testTrait()
     {
+        // Fetch services from CI
+        $config = $this->ci->get(Config::class);
+        $db = $this->ci->get(Capsule::class);
+
         // Use the testing db for this test
-        $connection = $this->ci->db->getConnection();
-        $this->assertEquals($this->ci->config['testing.dbConnection'], $connection->getName());
+        $connection = $db->getConnection();
+        $this->assertEquals($config->get('testing.dbConnection'), $connection->getName());
     }
 }
