@@ -102,7 +102,6 @@ class Core implements SprinkleReceipe
             SetupEnvCommand::class,
             SetupSmtpCommand::class,
             SprinkleListCommand::class,
-            Test::class,
             TestMailCommand::class,
         ];
     }
