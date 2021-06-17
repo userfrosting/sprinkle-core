@@ -97,7 +97,7 @@ class CoreExtension extends AbstractExtension implements GlobalsInterface
      *
      * @return array[mixed]
      */
-    public function getGlobals()
+    public function getGlobals(): array
     {
         // CSRF token name and value
         // TODO : Needs new CSRF service
