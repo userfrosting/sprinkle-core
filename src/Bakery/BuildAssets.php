@@ -14,21 +14,28 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
-use UserFrosting\Sprinkle\Core\Util\VersionValidator;
 use Symfony\Component\Console\Command\Command;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Validators\NodeVersionValidator;
+use UserFrosting\Sprinkle\Core\Validators\NpmVersionValidator;
+use UserFrosting\Sprinkle\SprinkleManager;
 
 /**
  * Assets builder CLI Tools.
  * Wrapper for npm/node commands.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class BuildAssets extends Command
 {
-    /**
-     * @var string Path to the build/ directory
-     */
-    protected $buildPath;
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected NodeVersionValidator $nodeVersionValidator;
+
+    /** @Inject */
+    protected NpmVersionValidator $npmVersionValidator;
+
+    /** @Inject */
+    protected SprinkleManager $sprinkleManager;
 
     /**
      * {@inheritdoc}
@@ -45,22 +52,19 @@ class BuildAssets extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Display header,
         $this->io->title("UserFrosting's Assets Builder");
 
         // Validate Node and npm version
         try {
-            VersionValidator::validateNodeVersion();
-            VersionValidator::validateNpmVersion();
+            $this->nodeVersionValidator->validate();
+            $this->npmVersionValidator->validate();
         } catch (VersionCompareException $e) {
             $this->io->error($e->getMessage());
             exit(1);
         }
-
-        // Set $buildPath. We'll use the absolute path for this task
-        $this->buildPath = \UserFrosting\ROOT_DIR . \UserFrosting\DS . \UserFrosting\BUILD_DIR_NAME;
 
         // Delete cached data is requested
         if ($input->getOption('force')) {
@@ -72,7 +76,8 @@ class BuildAssets extends Command
         $this->assetsInstall();
 
         // Compile if requested
-        if ($input->getOption('compile') || $this->isProduction()) {
+        // TODO Reimplement production status
+        if ($input->getOption('compile')/* || $this->isProduction()*/) {
             $this->buildAssets();
         }
 
@@ -87,14 +92,14 @@ class BuildAssets extends Command
      *
      * @param bool $force Force `npm install` to be run, ignoring evidence of a previous run.
      */
-    protected function npmInstall($force)
+    protected function npmInstall(bool $force): void
     {
         $this->io->section('Installing npm dependencies');
         $this->io->writeln('> <comment>npm install</comment>');
 
         // Temporarily change the working directory so we can install npm dependencies
         $wd = getcwd();
-        chdir($this->buildPath);
+        chdir($this->getBuildPath());
 
         // Delete troublesome package-lock.json
         if (file_exists('package-lock.json')) {
@@ -136,36 +141,34 @@ class BuildAssets extends Command
     /**
      * Perform UF Assets installation.
      */
-    protected function assetsInstall()
+    protected function assetsInstall(): void
     {
         $this->io->section('Installing frontend vendor assets');
         $this->io->writeln('> <comment>npm run uf-assets-install</comment>');
 
         // Temporarily change the working directory (more reliable than --prefix npm switch)
         $wd = getcwd();
-        chdir($this->buildPath);
+        chdir($this->getBuildPath());
         $exitCode = 0;
         passthru('npm run uf-assets-install', $exitCode);
         chdir($wd);
 
         if ($exitCode !== 0) {
             $this->io->error('assets installation has failed');
-            exit(1);
+            exit($exitCode);
         }
-
-        return $exitCode;
     }
 
     /**
      * Build the production bundle.
      */
-    protected function buildAssets()
+    protected function buildAssets(): void
     {
         $this->io->section('Building assets for production');
 
         // Temporarily change the working directory (more reliable than --prefix npm switch)
         $wd = getcwd();
-        chdir($this->buildPath);
+        chdir($this->getBuildPath());
 
         $exitCode = 0;
 
@@ -174,7 +177,7 @@ class BuildAssets extends Command
 
         if ($exitCode !== 0) {
             $this->io->error('bundling has failed');
-            exit(1);
+            exit($exitCode);
         }
 
         chdir($wd);
@@ -184,21 +187,32 @@ class BuildAssets extends Command
      * Run the `uf-clean` command to delete installed assets, delete compiled
      * bundle config file and delete compiled assets.
      */
-    protected function clean()
+    protected function clean(): void
     {
         $this->io->section('Cleaning cached data');
         $this->io->writeln('> <comment>npm run uf-clean</comment>');
 
         // Temporarily change the working directory (more reliable than --prefix npm switch)
         $wd = getcwd();
-        chdir($this->buildPath);
+        chdir($this->getBuildPath());
         $exitCode = 0;
         passthru('npm run uf-clean', $exitCode);
         chdir($wd);
 
         if ($exitCode !== 0) {
             $this->io->error('Failed to clean cached data');
-            exit(1);
+            exit($exitCode);
         }
+    }
+
+    /**
+     * Return path where to place the build artifacts.
+     *
+     * @return string
+     */
+    protected function getBuildPath(): string
+    {
+        // TODO : See if locator could be better fit here.
+        return $this->sprinkleManager->getMainSprinkle()::getPath() . \UserFrosting\DS . \UserFrosting\BUILD_DIR_NAME;
     }
 }

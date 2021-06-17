@@ -19,7 +19,7 @@ if (!defined('UserFrosting\APP_DIR')) {
 }
 
 // The directory containing APP_DIR.  Usually, this will contain the entire website.
-define('UserFrosting\ROOT_DIR', realpath(__DIR__ . '/..'));
+// define('UserFrosting\ROOT_DIR', realpath(__DIR__ . '/..'));
 
 // Names of app directories
 define('UserFrosting\APP_DIR_NAME', basename(__DIR__));
