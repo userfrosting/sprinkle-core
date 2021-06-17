@@ -31,7 +31,6 @@ use UserFrosting\Sprinkle\Core\Bakery\SetupDbCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupEnvCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupSmtpCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
-use UserFrosting\Sprinkle\Core\Bakery\Test;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
 use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;

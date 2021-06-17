@@ -29,8 +29,7 @@ class TwigService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            // TODO : Reimplements extenions
-            Twig::class => function (ResourceLocatorInterface $locator, Config $config) {
+            Twig::class => function (ResourceLocatorInterface $locator, Config $config, CoreExtension $coreExtension) {
                 $templatePaths = $locator->getResources('templates://');
                 $view = Twig::create(array_map('strval', $templatePaths));
                 $loader = $view->getLoader();
@@ -52,8 +51,7 @@ class TwigService implements ServicesProviderInterface
                 }
 
                 // Register the core UF extension with Twig
-                // $coreExtension = new CoreExtension($c);
-                // $view->addExtension($coreExtension);
+                $view->addExtension($coreExtension);
 
                 return $view;
             },

@@ -23,6 +23,7 @@ class AssetService implements ServicesProviderInterface
     public function register(): array
     {
         return [
+            // TODO : Might be able to autowrite this one
             AssetLoader::class => function (Assets $assets) {
                 return new AssetLoader($assets);
             },
@@ -30,7 +31,7 @@ class AssetService implements ServicesProviderInterface
             Assets::class => function (Config $config, ResourceLocatorInterface $locator) {
 
                 // Load asset schema
-                if ($config['assets.use_raw']) {
+                if ($config->get('assets.use_raw')) {
 
                     // Register sprinkle assets stream, plus vendor assets in shared streams
                     $locator->registerStream('assets', 'vendor', \UserFrosting\NPM_ASSET_DIR, true);
@@ -38,14 +39,14 @@ class AssetService implements ServicesProviderInterface
                     $locator->registerStream('assets', 'vendor', \UserFrosting\BOWER_ASSET_DIR, true);
                     $locator->registerStream('assets', '', \UserFrosting\ASSET_DIR_NAME);
 
-                    $baseUrl = $config['site.uri.public'] . '/' . $config['assets.raw.path'];
+                    $baseUrl = $config->get('site.uri.public') . '/' . $config->get('assets.raw.path');
 
                     $assets = new Assets($locator, 'assets', $baseUrl);
 
                     // Load raw asset bundles for each Sprinkle.
 
                     // Retrieve locations of raw asset bundle schemas that exist.
-                    $bundleSchemas = array_reverse($locator->findResources('sprinkles://' . $config['assets.raw.schema']));
+                    $bundleSchemas = array_reverse($locator->findResources('sprinkles://' . $config->get('assets.raw.schema')));
 
                     // Load asset bundle schemas that exist.
                     if (array_key_exists(0, $bundleSchemas)) {
@@ -65,11 +66,11 @@ class AssetService implements ServicesProviderInterface
                     $locator->registerStream('assets', 'vendor', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
                     $locator->registerStream('build', '', \UserFrosting\BUILD_DIR_NAME, true);
 
-                    $baseUrl = $config['site.uri.public'] . '/' . $config['assets.compiled.path'];
+                    $baseUrl = $config->get('site.uri.public') . '/' . $config->get('assets.compiled.path');
                     $assets = new Assets($locator, 'assets', $baseUrl);
 
                     // Load compiled asset bundle.
-                    $path = $locator->findResource('build://' . $config['assets.compiled.schema'], true, true);
+                    $path = $locator->findResource('build://' . $config->get('assets.compiled.schema'), true, true);
                     $bundles = new CompiledAssetBundles($path);
                     $assets->addAssetBundles($bundles);
                 }

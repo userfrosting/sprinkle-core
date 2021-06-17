@@ -10,34 +10,37 @@
 
 namespace UserFrosting\Sprinkle\Core\Twig;
 
-use Psr\Container\ContainerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use UserFrosting\Alert\AlertStream;
+use UserFrosting\Assets\Assets;
 use UserFrosting\Assets\AssetsTemplatePlugin;
+use UserFrosting\I18n\Translator;
+use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 use UserFrosting\Sprinkle\Core\Util\Util;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Extends Twig functionality for the Core sprinkle.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class CoreExtension extends AbstractExtension implements GlobalsInterface
 {
     /**
-     * @var ContainerInterface The global container object, which holds all your services.
+     * @param AlertStream $translator The alert stream service
+     * @param Assets      $assets     The assets service
+     * @param Config      $config     The config service
+     * @param SiteLocale  $locale     The site locale service
+     * @param Translator  $translator The translator service
      */
-    protected $services;
-
-    /**
-     * Constructor.
-     *
-     * @param ContainerInterface $services The global container object, which holds all your services.
-     */
-    public function __construct(ContainerInterface $services)
-    {
-        $this->services = $services;
+    public function __construct(
+        protected AlertStream $alertStream,
+        protected Assets $assets,
+        protected Config $config,
+        protected SiteLocale $locale,
+        protected Translator $translator,
+    ) {
     }
 
     /**
@@ -45,20 +48,21 @@ class CoreExtension extends AbstractExtension implements GlobalsInterface
      *
      * @return TwigFunction[]
      */
+    // TODO : Could be revised similar to TwigRuntimeExtension
     public function getFunctions()
     {
         return [
             // Add Twig function for fetching alerts
             new TwigFunction('getAlerts', function ($clear = true) {
-                $alerts = $this->services->alerts;
                 if ($clear) {
-                    return $alerts->getAndClearMessages();
+                    return $this->alertStream->getAndClearMessages();
                 } else {
-                    return $alerts->messages();
+                    return $this->alertStream->messages();
                 }
             }),
-            new TwigFunction('translate', function ($hook, $params = []) {
-                return $this->services['translator']->translate($hook, $params);
+            // Add Twig translator function
+            new TwigFunction('translate', function (string $hook, $params = []) {
+                return $this->translator->translate($hook, $params);
             }, [
                 'is_safe' => ['html'],
             ]),
@@ -96,7 +100,8 @@ class CoreExtension extends AbstractExtension implements GlobalsInterface
     public function getGlobals()
     {
         // CSRF token name and value
-        $csrfNameKey = $this->services->csrf->getTokenNameKey();
+        // TODO : Needs new CSRF service
+        /*$csrfNameKey = $this->services->csrf->getTokenNameKey();
         $csrfValueKey = $this->services->csrf->getTokenValueKey();
         $csrfName = $this->services->csrf->getTokenName();
         $csrfValue = $this->services->csrf->getTokenValue();
@@ -113,11 +118,14 @@ class CoreExtension extends AbstractExtension implements GlobalsInterface
         ];
 
         $site = array_replace_recursive($this->services->config['site'], $csrf);
+        */
+        //TEMP :
+        $site = $this->config->get('site');
 
         return [
             'site'          => $site,
-            'assets'        => new AssetsTemplatePlugin($this->services->assets),
-            'currentLocale' => $this->services->locale->getLocaleIndentifier(),
+            'assets'        => new AssetsTemplatePlugin($this->assets),
+            'currentLocale' => $this->locale->getLocaleIndentifier(),
         ];
     }
 }
