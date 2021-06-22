@@ -8,58 +8,53 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
 use Mockery as m;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
 use PHPUnit\Framework\TestCase;
 
 /**
- *    Tests for the Migrator Class
+ * Tests for the Migrator Class
  *
- *    Theses tests make sure the Migrator works correctly, without validating
- *    against a simulated database. Those tests are performed by `DatabaseMigratorIntegrationTest`
- *
- *    @author Louis Charette
+ * Theses tests make sure the Migrator works correctly, without validating
+ * against a simulated database. Those tests are performed by `DatabaseMigratorIntegrationTest`
  */
-class DatabaseMigratorTest extends TestCase
+class MigratorTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
 
     /**
-     * @var \Illuminate\Database\Schema\Builder
+     * @var Builder
      */
-    protected $schema;
+    protected Builder $schema;
 
     /**
      * @var Migrator The migrator instance.
      */
-    protected $migrator;
+    protected Migrator $migrator;
 
     /**
      * @var MigrationLocator The migration locator instance.
      */
-    protected $locator;
+    protected MigrationLocator $locator;
 
     /**
      * @var DatabaseMigrationRepository The migration repository instance.
      */
-    protected $repository;
+    protected DatabaseMigrationRepository $repository;
 
     /**
      * @var Connection
      */
-    protected $connection;
+    protected Connection $connection;
 
     /**
      * Setup base mock and migrator instance.
@@ -85,7 +80,7 @@ class DatabaseMigratorTest extends TestCase
     }
 
     /**
-     *    Basic test to make sure the base method syntax is ok
+     * Basic test to make sure the base method syntax is ok
      */
     public function testMigratorUpWithNoMigrations()
     {
@@ -100,7 +95,7 @@ class DatabaseMigratorTest extends TestCase
     }
 
     /**
-     *    Basic test where all available migrations are pending and fulfillable
+     * Basic test where all available migrations are pending and fulfillable
      */
     public function testMigratorUpWithOnlyPendingMigrations()
     {
@@ -135,7 +130,7 @@ class DatabaseMigratorTest extends TestCase
     }
 
     /**
-     *    Test where one of the available migrations is already installed
+     * Test where one of the available migrations is already installed
      */
     public function testMigratorUpWithOneInstalledMigrations()
     {
@@ -172,7 +167,7 @@ class DatabaseMigratorTest extends TestCase
     }
 
     /**
-     *    Test where all available migrations have been ran
+     * Test where all available migrations have been ran
      */
     public function testMigratorUpWithNoPendingMigrations()
     {
@@ -202,12 +197,12 @@ class DatabaseMigratorTest extends TestCase
     }
 
     /**
-     *    Test where one of the available migrations is missing a dependency
+     * Test where one of the available migrations is missing a dependency
      */
     //!TODO
 
     /**
-     *    Test rolling back where no migrations have been ran
+     * Test rolling back where no migrations have been ran
      */
     public function testMigratorRollbackWithNoInstalledMigrations()
     {
@@ -222,7 +217,7 @@ class DatabaseMigratorTest extends TestCase
     }
 
     /**
-     *    Test rolling back all installed migrations
+     * Test rolling back all installed migrations
      */
     public function testMigratorRollbackAllInstalledMigrations()
     {
@@ -257,7 +252,7 @@ class DatabaseMigratorTest extends TestCase
     }
 
     /**
-     *    Test where one of the installed migration is not in the available migration classes
+     * Test where one of the installed migration is not in the available migration classes
      */
     public function testMigratorRollbackAllInstalledMigrationsWithOneMissing()
     {
@@ -374,7 +369,7 @@ class DatabaseMigratorTest extends TestCase
     }
 
     /**
-     *    Test where one of the installed migration is not in the available migration classes
+     * Test where one of the installed migration is not in the available migration classes
      */
     public function testMigratorResetAllInstalledMigrations()
     {

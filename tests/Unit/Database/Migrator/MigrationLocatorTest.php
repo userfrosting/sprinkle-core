@@ -8,9 +8,10 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
 use Mockery as m;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
 use UserFrosting\UniformResourceLocator\Resource;
@@ -23,11 +24,7 @@ use UserFrosting\UniformResourceLocator\ResourceStream;
  */
 class MigrationLocatorTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
 
     /**
      * Make sure no error is thrown if the Migration dir doesn't exist
@@ -119,26 +116,5 @@ class MigrationLocatorTest extends TestCase
         $this->assertEquals($expected, $results);
 
         return $locator;
-    }
-
-    /**
-     *    Test MigrationLocator against the real thing, no Mockery
-     */
-    public function testActualInstance()
-    {
-        // Get sprinkle manager and make sure `core` is returned
-        $sprinklesNames = $this->ci->sprinkleManager->getSprinkleNames();
-        $this->assertIsArray($sprinklesNames);
-        $this->assertContains('core', $sprinklesNames);
-
-        // Create a new MigrationLocator instance with our real SprinkleManager and filesystem
-        // and ask to find core sprinkle migration files
-        $locator = new MigrationLocator($this->ci->locator);
-        $results = $locator->getMigrations();
-
-        // We'll need to convert the array returned by `getMigrations` to a
-        // collection to make it easier to search
-        $this->assertIsArray($results);
-        $this->assertContains('\UserFrosting\Sprinkle\Core\Database\Migrations\v400\SessionsTable', $results);
     }
 }

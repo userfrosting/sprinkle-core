@@ -33,7 +33,7 @@ class VersionsService implements ServicesProviderInterface
 
             // Installed version
             'PHP_VERSION'  => (string) phpversion(),
-            'NODE_VERSION' => exec('node -v'),
+            'NODE_VERSION' => exec('node -v'), // TODO : Required Try catch 
             'NPM_VERSION'  => exec('npm -v'),
 
             // Version validators

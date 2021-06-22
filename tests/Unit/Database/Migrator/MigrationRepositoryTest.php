@@ -8,13 +8,14 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
 use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Illuminate\Support\Collection;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 
 /**
  * DatabaseMigrationRepository Test
@@ -23,13 +24,7 @@ class MigrationRepositoryTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    protected $repository;
+    protected MigrationRepositoryInterface $repository;
 
     public function setUp(): void
     {

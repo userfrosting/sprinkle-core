@@ -10,46 +10,55 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Schema\Builder;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
-use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * Migrator Tests
  */
-class DatabaseMigratorIntegrationTest extends TestCase
+class MigratorTest extends TestCase
 {
     /**
      * @var string The db connection to use for the test.
      */
-    protected $connection = 'test_integration';
+    protected string $connection;
 
     /**
      * @var string The migration table name
      */
-    protected $migrationTable = 'migrations';
+    protected string $migrationTable = 'migrations';
 
     /**
-     * @var \Illuminate\Database\Schema\Builder
+     * @var Builder
      */
-    protected $schema;
+    protected Builder $schema;
 
     /**
      * @var Migrator The migrator instance.
      */
-    protected $migrator;
+    protected Migrator $migrator;
 
     /**
      * @var MigrationLocator The migration locator instance.
      */
-    protected $locator;
+    protected MigrationLocator $migrationLocator;
 
     /**
      * @var DatabaseMigrationRepository The migration repository instance.
      */
-    protected $repository;
+    protected DatabaseMigrationRepository $repository;
+
+    /**
+     * @var ResourceLocatorInterface The migration locator instance.
+     */
+    protected ResourceLocatorInterface $locator;
 
     /**
      * Setup migration instances used for all tests
@@ -59,12 +68,20 @@ class DatabaseMigratorIntegrationTest extends TestCase
         // Boot parent TestCase, which will set up the database and connections for us.
         parent::setUp();
 
+        // Fetch services from CI
+        $db = $this->ci->get(Capsule::class);
+        $config = $this->ci->get(Config::class);
+        $this->locator = $this->ci->get(ResourceLocatorInterface::class);
+
+        // Set db connection name property from config
+        $this->connection = $config->get('testing.dbConnection');
+
         // Get the repository and locator instances
-        $this->repository = new DatabaseMigrationRepository($this->ci->db, $this->migrationTable);
-        $this->locator = new MigrationLocatorStub($this->ci->locator);
+        $this->repository = new DatabaseMigrationRepository($db, $this->migrationTable);
+        $this->migrationLocator = new MigrationLocatorStub($this->locator);
 
         // Get the migrator instance and setup right connection
-        $this->migrator = new Migrator($this->ci->db, $this->repository, $this->locator);
+        $this->migrator = new Migrator($db, $this->repository, $this->migrationLocator);
         $this->migrator->setConnection($this->connection);
 
         // Get schema Builder
@@ -75,12 +92,12 @@ class DatabaseMigratorIntegrationTest extends TestCase
         }
     }
 
-    public function testMigrationRepositoryCreated()
+    public function testMigrationRepositoryCreated(): void
     {
         $this->assertTrue($this->schema->hasTable($this->migrationTable));
     }
 
-    public function testBasicMigration()
+    public function testBasicMigration(): void
     {
         $ran = $this->migrator->run();
 
@@ -93,7 +110,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         ], $ran);
     }
 
-    public function testRepository()
+    public function testRepository(): void
     {
         $ran = $this->migrator->run();
 
@@ -109,7 +126,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertEquals($expected, $this->repository->getMigrationsList());
     }
 
-    public function testMigrationsCanBeRolledBack()
+    public function testMigrationsCanBeRolledBack(): void
     {
         // Run up
         $this->migrator->run();
@@ -123,10 +140,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
         // Make sure the data returned from migrator is accurate.
         // N.B.: The order returned by the rollback method is ordered by which
         // migration was rolled back first (reversed from the order they where ran up)
-        $this->assertEquals(array_reverse($this->locator->getMigrations()), $rolledBack);
+        $this->assertEquals(array_reverse($this->migrationLocator->getMigrations()), $rolledBack);
     }
 
-    public function testMigrationsCanBeReset()
+    public function testMigrationsCanBeReset(): void
     {
         // Run up
         $this->migrator->run();
@@ -138,10 +155,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->schema->hasTable('password_resets'));
 
         // Make sure the data returned from migrator is accurate.
-        $this->assertEquals(array_reverse($this->locator->getMigrations()), $rolledBack);
+        $this->assertEquals(array_reverse($this->migrationLocator->getMigrations()), $rolledBack);
     }
 
-    public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist()
+    public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist(): void
     {
         $this->migrator->run();
         $this->assertTrue($this->schema->hasTable('users'));
@@ -149,7 +166,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->run();
     }
 
-    public function testNoErrorIsThrownWhenNothingToRollback()
+    public function testNoErrorIsThrownWhenNothingToRollback(): void
     {
         $this->migrator->run();
         $this->assertTrue($this->schema->hasTable('users'));
@@ -160,7 +177,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->rollback();
     }
 
-    public function testPretendUp()
+    public function testPretendUp(): void
     {
         $result = $this->migrator->run(['pretend' => true]);
         $notes = $this->migrator->getNotes();
@@ -169,7 +186,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertNotEquals([], $notes);
     }
 
-    public function testPretendRollback()
+    public function testPretendRollback(): void
     {
         // Run up as usual
         $result = $this->migrator->run();
@@ -187,10 +204,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertEquals(array_reverse($expected), $rolledBack);
     }
 
-    public function testWithInvalidClass()
+    public function testWithInvalidClass(): void
     {
         // Change the repository so we can test with the InvalidMigrationLocatorStub
-        $locator = new InvalidMigrationLocatorStub($this->ci->locator);
+        $locator = new InvalidMigrationLocatorStub($this->locator);
         $this->migrator->setLocator($locator);
 
         // Expect a `BadClassNameException` exception
@@ -200,10 +217,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->run();
     }
 
-    public function testDependableMigrations()
+    public function testDependableMigrations(): void
     {
         // Change the repository so we can test with the DependableMigrationLocatorStub
-        $locator = new DependableMigrationLocatorStub($this->ci->locator);
+        $locator = new DependableMigrationLocatorStub($this->locator);
         $this->migrator->setLocator($locator);
 
         // Run up
@@ -219,7 +236,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertEquals('\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable', $migrated[2]);
     }
 
-    public function testDependableMigrationsWithInstalled()
+    public function testDependableMigrationsWithInstalled(): void
     {
         // Run the `one` migrations
         $this->migrator->run();
@@ -227,7 +244,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue($this->schema->hasTable('password_resets'));
 
         // Change the repository so we can run up the `two` migrations
-        $locator = new FlightsTableMigrationLocatorStub($this->ci->locator);
+        $locator = new FlightsTableMigrationLocatorStub($this->locator);
         $this->migrator->setLocator($locator);
 
         // Run up again
@@ -240,10 +257,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
         ], $migrated);
     }
 
-    public function testUnfulfillableMigrations()
+    public function testUnfulfillableMigrations(): void
     {
         // Change the repository so we can test with the unfulfillable Stub
-        $locator = new UnfulfillableMigrationLocatorStub($this->ci->locator);
+        $locator = new UnfulfillableMigrationLocatorStub($this->locator);
         $this->migrator->setLocator($locator);
 
         // Should have an exception for unfulfilled migrations
@@ -251,10 +268,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $migrated = $this->migrator->run();
     }
 
-    public function testSpecificMigrationCanBeRollback()
+    public function testSpecificMigrationCanBeRollback(): void
     {
         // Change the repository so we can test with the DependableMigrationLocatorStub
-        $locator = new DependableMigrationLocatorStub($this->ci->locator);
+        $locator = new DependableMigrationLocatorStub($this->locator);
         $this->migrator->setLocator($locator);
 
         // Run up
@@ -275,10 +292,10 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->schema->hasTable('flights'));
     }
 
-    public function testSpecificMigrationRollbackWithDependencies()
+    public function testSpecificMigrationRollbackWithDependencies(): void
     {
         // Change the repository so we can test with the DependableMigrationLocatorStub
-        $locator = new DependableMigrationLocatorStub($this->ci->locator);
+        $locator = new DependableMigrationLocatorStub($this->locator);
         $this->migrator->setLocator($locator);
 
         // Run up
@@ -301,7 +318,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
 class MigrationLocatorStub extends MigrationLocator
 {
-    public function getMigrations()
+    public function getMigrations(): array
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
@@ -312,7 +329,7 @@ class MigrationLocatorStub extends MigrationLocator
 
 class FlightsTableMigrationLocatorStub extends MigrationLocator
 {
-    public function getMigrations()
+    public function getMigrations(): array
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
@@ -325,7 +342,7 @@ class FlightsTableMigrationLocatorStub extends MigrationLocator
  */
 class InvalidMigrationLocatorStub extends MigrationLocator
 {
-    public function getMigrations()
+    public function getMigrations(): array
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\Foo',
@@ -340,7 +357,7 @@ class InvalidMigrationLocatorStub extends MigrationLocator
  */
 class DependableMigrationLocatorStub extends MigrationLocator
 {
-    public function getMigrations()
+    public function getMigrations(): array
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
@@ -356,7 +373,7 @@ class DependableMigrationLocatorStub extends MigrationLocator
  */
 class UnfulfillableMigrationLocatorStub extends MigrationLocator
 {
-    public function getMigrations()
+    public function getMigrations(): array
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',

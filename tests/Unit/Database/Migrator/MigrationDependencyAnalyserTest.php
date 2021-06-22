@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationDependencyAnalyser;
 use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
@@ -16,11 +16,6 @@ use PHPUnit\Framework\TestCase;
 
 class MigrationDependencyAnalyserTest extends TestCase
 {
-    /**
-     * @var MigrationLocator The migration locator instance.
-     */
-    protected $locator;
-
     public function testAnalyser()
     {
         $migrations = [
