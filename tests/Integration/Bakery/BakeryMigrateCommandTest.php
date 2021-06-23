@@ -12,40 +12,38 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
 use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateCommand;
-use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
+use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
+use UserFrosting\Testing\BakeryCommandTester;
 
 /**
- * MigrateCommand Test
+ * Test MigrateCommand
  */
 class BakeryMigrateCommandTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
+    use TestDatabase;
+    use BakeryCommandTester;
 
     public function testBasicMigrationsCallMigratorWithProperArguments()
     {
         // Setup migrator mock
-        $migrator = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\Migrator');
+        $migrator = m::mock(Migrator::class);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
         $migrator->shouldReceive('getPendingMigrations')->once()->andReturn(['foo']);
         $migrator->shouldReceive('run')->once()->with(['pretend' => false, 'step' => false])->andReturn([]);
         $migrator->shouldReceive('getNotes');
 
-        // Run command
-        $commandTester = $this->runCommand($migrator, []);
+        // Set mock in CI and run command
+        $this->ci->set(Migrator::class, $migrator);
+        $this->runCommand(MigrateCommand::class);
     }
 
     public function testMigrationRepositoryCreatedWhenNecessary()
     {
-        $migrator = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\Migrator');
+        $migrator = m::mock(Migrator::class);
         $repository = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository');
 
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(false);
@@ -57,7 +55,8 @@ class BakeryMigrateCommandTest extends TestCase
         $repository->shouldReceive('createRepository')->once();
 
         // Run command
-        $commandTester = $this->runCommand($migrator, []);
+        $this->ci->set(Migrator::class, $migrator);
+        $this->runCommand(MigrateCommand::class);
     }
 
     public function testTheCommandMayBePretended()
@@ -70,7 +69,11 @@ class BakeryMigrateCommandTest extends TestCase
         $migrator->shouldReceive('getNotes');
 
         // Run command
-        $commandTester = $this->runCommand($migrator, ['--pretend' => true]);
+        $this->ci->set(Migrator::class, $migrator);
+        $this->runCommand(
+            command: MigrateCommand::class,
+            input: ['--pretend' => true]
+        );
     }
 
     public function testStepMayBeSet()
@@ -83,30 +86,10 @@ class BakeryMigrateCommandTest extends TestCase
         $migrator->shouldReceive('getNotes');
 
         // Run command
-        $commandTester = $this->runCommand($migrator, ['--step' => true]);
-    }
-
-    protected function runCommand($migrator, $input = [])
-    {
-        // Place the mock migrator inside the $ci
-        $ci = $this->ci;
-        $ci->migrator = $migrator;
-
-        // Create the app, create the command, replace $ci and add the command to the app
-        $app = new Application();
-        $command = new MigrateCommand();
-        $command->setContainer($ci);
-        $app->add($command);
-
-        // Add the command to the input to create the execute argument
-        $execute = array_merge([
-            'command' => $command->getName(),
-        ], $input);
-
-        // Execute command tester
-        $commandTester = new CommandTester($command);
-        $commandTester->execute($execute);
-
-        return $commandTester;
+        $this->ci->set(Migrator::class, $migrator);
+        $this->runCommand(
+            command: MigrateCommand::class,
+            input: ['--step' => true]
+        );
     }
 }
