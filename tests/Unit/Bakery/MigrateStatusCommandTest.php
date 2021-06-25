@@ -14,6 +14,7 @@ use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;
 
@@ -28,7 +29,6 @@ class MigrateStatusCommandTest extends TestCase
     {
         // Define dummy data
         $available = ['foo', 'bar', 'oof', 'rab'];
-        // $installed = $this->getInstalledMigrationStub()->pluck('migration')->all();
         $pending = ['oof', 'rab'];
         
         // Setup repository mock
@@ -54,23 +54,21 @@ class MigrateStatusCommandTest extends TestCase
 
     public function testDatabaseMayBeSet(): void
     {
-        // Setup migrator mock
-        $migrator = m::mock(Migrator::class);
-        $repository = m::mock(DatabaseMigrationRepository::class);
-
         // Define dummy data
         $available = ['foo', 'bar', 'oof', 'rab'];
-        $installed = $this->getInstalledMigrationStub()->pluck('migration')->all();
         $pending = ['oof', 'rab'];
 
-        // Set expectations
+        // Setup repository mock
+        $repository = m::mock(DatabaseMigrationRepository::class);
+        $repository->shouldReceive('getMigrations')->once()->andReturn($this->getInstalledMigrationStub());
+
+        // Setup migrator mock
+        $migrator = m::mock(Migrator::class);
         $migrator->shouldReceive('setConnection')->once()->with('test')->andReturn(null);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
         $migrator->shouldReceive('getRepository')->once()->andReturn($repository);
         $migrator->shouldReceive('getAvailableMigrations')->once()->andReturn($available);
         $migrator->shouldReceive('getPendingMigrations')->once()->andReturn($pending);
-
-        $repository->shouldReceive('getMigrations')->once()->andReturn($this->getInstalledMigrationStub());
 
         // Run command
         $ci = ContainerStub::create();
