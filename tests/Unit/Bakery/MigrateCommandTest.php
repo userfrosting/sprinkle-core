@@ -8,24 +8,22 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Bakery;
 
 use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateCommand;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
-use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
-use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
-use UserFrosting\Testing\BakeryCommandTester;
+use PHPUnit\Framework\TestCase;
+use UserFrosting\Testing\BakeryTester;
+use UserFrosting\Testing\ContainerStub;
 
 /**
  * Test MigrateCommand
  */
-class BakeryMigrateCommandTest extends TestCase
+class MigrateCommandTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
-    use TestDatabase;
-    use BakeryCommandTester;
 
     public function testBasicMigrationsCallMigratorWithProperArguments()
     {
@@ -37,8 +35,10 @@ class BakeryMigrateCommandTest extends TestCase
         $migrator->shouldReceive('getNotes');
 
         // Set mock in CI and run command
-        $this->ci->set(Migrator::class, $migrator);
-        $this->runCommand(MigrateCommand::class);
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $command = $ci->get(MigrateCommand::class);
+        BakeryTester::runCommand($command);
     }
 
     public function testMigrationRepositoryCreatedWhenNecessary()
@@ -55,8 +55,10 @@ class BakeryMigrateCommandTest extends TestCase
         $repository->shouldReceive('createRepository')->once();
 
         // Run command
-        $this->ci->set(Migrator::class, $migrator);
-        $this->runCommand(MigrateCommand::class);
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $command = $ci->get(MigrateCommand::class);
+        BakeryTester::runCommand($command);
     }
 
     public function testTheCommandMayBePretended()
@@ -69,9 +71,11 @@ class BakeryMigrateCommandTest extends TestCase
         $migrator->shouldReceive('getNotes');
 
         // Run command
-        $this->ci->set(Migrator::class, $migrator);
-        $this->runCommand(
-            command: MigrateCommand::class,
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $command = $ci->get(MigrateCommand::class);
+        BakeryTester::runCommand(
+            command: $command,
             input: ['--pretend' => true]
         );
     }
@@ -86,9 +90,11 @@ class BakeryMigrateCommandTest extends TestCase
         $migrator->shouldReceive('getNotes');
 
         // Run command
-        $this->ci->set(Migrator::class, $migrator);
-        $this->runCommand(
-            command: MigrateCommand::class,
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $command = $ci->get(MigrateCommand::class);
+        BakeryTester::runCommand(
+            command: $command,
             input: ['--step' => true]
         );
     }
