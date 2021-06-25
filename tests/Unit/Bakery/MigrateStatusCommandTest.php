@@ -12,53 +12,51 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
 use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
-use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
+use UserFrosting\Testing\BakeryTester;
+use UserFrosting\Testing\ContainerStub;
 
 /**
  * MigrateStatusCommand
  */
-class BakeryMigrateStatusCommandTest extends TestCase
+class MigrateStatusCommandTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    public function tearDown(): void
+    public function testBasicMigrationsCallMigratorWithProperArguments(): void
     {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function testBasicMigrationsCallMigratorWithProperArguments()
-    {
-        // Setup migrator mock
-        $migrator = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\Migrator');
-        $repository = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository');
-
         // Define dummy data
         $available = ['foo', 'bar', 'oof', 'rab'];
-        $installed = $this->getInstalledMigrationStub()->pluck('migration')->all();
+        // $installed = $this->getInstalledMigrationStub()->pluck('migration')->all();
         $pending = ['oof', 'rab'];
+        
+        // Setup repository mock
+        $repository = m::mock(DatabaseMigrationRepository::class);
+        $repository->shouldReceive('getMigrations')->once()->andReturn($this->getInstalledMigrationStub());
 
-        // Set expectations
+        // Setup migrator mock
+        $migrator = m::mock(Migrator::class);
         $migrator->shouldReceive('setConnection')->once()->with(null)->andReturn(null);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
         $migrator->shouldReceive('getRepository')->once()->andReturn($repository);
         $migrator->shouldReceive('getAvailableMigrations')->once()->andReturn($available);
         $migrator->shouldReceive('getPendingMigrations')->once()->andReturn($pending);
 
-        $repository->shouldReceive('getMigrations')->once()->andReturn($this->getInstalledMigrationStub());
 
         // Run command
-        $commandTester = $this->runCommand($migrator, []);
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $ci->set(DatabaseMigrationRepository::class, $repository);
+        $command = $ci->get(MigrateStatusCommand::class);
+        BakeryTester::runCommand($command);
     }
 
-    public function testDatabaseMayBeSet()
+    public function testDatabaseMayBeSet(): void
     {
         // Setup migrator mock
-        $migrator = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\Migrator');
-        $repository = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository');
+        $migrator = m::mock(Migrator::class);
+        $repository = m::mock(DatabaseMigrationRepository::class);
 
         // Define dummy data
         $available = ['foo', 'bar', 'oof', 'rab'];
@@ -75,31 +73,10 @@ class BakeryMigrateStatusCommandTest extends TestCase
         $repository->shouldReceive('getMigrations')->once()->andReturn($this->getInstalledMigrationStub());
 
         // Run command
-        $commandTester = $this->runCommand($migrator, ['--database' => 'test']);
-    }
-
-    protected function runCommand($migrator, $input = [])
-    {
-        // Place the mock migrator inside the $ci
-        $ci = $this->ci;
-        $ci->migrator = $migrator;
-
-        // Create the app, create the command, replace $ci and add the command to the app
-        $app = new Application();
-        $command = new MigrateStatusCommand();
-        $command->setContainer($ci);
-        $app->add($command);
-
-        // Add the command to the input to create the execute argument
-        $execute = array_merge([
-            'command' => $command->getName(),
-        ], $input);
-
-        // Execute command tester
-        $commandTester = new CommandTester($command);
-        $commandTester->execute($execute);
-
-        return $commandTester;
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $command = $ci->get(MigrateStatusCommand::class);
+        BakeryTester::runCommand($command, ['--database' => 'test']);
     }
 
     protected function getInstalledMigrationStub()

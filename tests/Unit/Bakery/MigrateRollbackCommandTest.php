@@ -12,41 +12,39 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
 use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateRollbackCommand;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
+use UserFrosting\Testing\BakeryTester;
+use UserFrosting\Testing\ContainerStub;
 use PHPUnit\Framework\TestCase;
 
 /**
  * MigrateRollbackCommand
  */
-class BakeryMigrateRollbackCommandTest extends TestCase
+class MigrateRollbackCommandTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function testBasicMigrationsCallMigratorWithProperArguments()
+    public function testBasicMigrationsCallMigratorWithProperArguments(): void
     {
         // Setup migrator mock
-        $migrator = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\Migrator');
+        $migrator = m::mock(Migrator::class);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
         $migrator->shouldReceive('getRanMigrations')->once()->andReturn(['foo']);
         $migrator->shouldReceive('rollback')->once()->with(['pretend' => false, 'steps' => 1])->andReturn([]);
         $migrator->shouldReceive('getNotes');
 
         // Run command
-        $commandTester = $this->runCommand($migrator, []);
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $command = $ci->get(MigrateRollbackCommand::class);
+        BakeryTester::runCommand($command);
     }
 
-    public function testMigrationRepositoryCreatedWhenNecessary()
+    public function testMigrationRepositoryCreatedWhenNecessary(): void
     {
-        $migrator = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\Migrator');
-        $repository = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository');
+        $migrator = m::mock(Migrator::class);
+        $repository = m::mock(DatabaseMigrationRepository::class);
 
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(false);
         $migrator->shouldReceive('getRanMigrations')->once()->andReturn(['foo']);
@@ -57,56 +55,41 @@ class BakeryMigrateRollbackCommandTest extends TestCase
         $repository->shouldReceive('createRepository')->once();
 
         // Run command
-        $commandTester = $this->runCommand($migrator, []);
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $command = $ci->get(MigrateRollbackCommand::class);
+        BakeryTester::runCommand($command);
     }
 
-    public function testTheCommandMayBePretended()
+    public function testTheCommandMayBePretended(): void
     {
         // Setup migrator mock
-        $migrator = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\Migrator');
+        $migrator = m::mock(Migrator::class);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
         $migrator->shouldReceive('getRanMigrations')->once()->andReturn(['foo']);
         $migrator->shouldReceive('rollback')->once()->with(['pretend' => true, 'steps' => 1])->andReturn([]);
         $migrator->shouldReceive('getNotes');
 
         // Run command
-        $commandTester = $this->runCommand($migrator, ['--pretend' => true]);
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $command = $ci->get(MigrateRollbackCommand::class);
+        BakeryTester::runCommand($command, ['--pretend' => true]);
     }
 
-    public function testStepsMayBeSet()
+    public function testStepsMayBeSet(): void
     {
         // Setup migrator mock
-        $migrator = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\Migrator');
+        $migrator = m::mock(Migrator::class);
         $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
         $migrator->shouldReceive('getRanMigrations')->once()->andReturn(['foo']);
         $migrator->shouldReceive('rollback')->once()->with(['pretend' => false, 'steps' => 3])->andReturn([]);
         $migrator->shouldReceive('getNotes');
 
         // Run command
-        $commandTester = $this->runCommand($migrator, ['--steps' => 3]);
-    }
-
-    protected function runCommand($migrator, $input = [])
-    {
-        // Place the mock migrator inside the $ci
-        $ci = $this->ci;
-        $ci->migrator = $migrator;
-
-        // Create the app, create the command, replace $ci and add the command to the app
-        $app = new Application();
-        $command = new MigrateRollbackCommand();
-        $command->setContainer($ci);
-        $app->add($command);
-
-        // Add the command to the input to create the execute argument
-        $execute = array_merge([
-            'command' => $command->getName(),
-        ], $input);
-
-        // Execute command tester
-        $commandTester = new CommandTester($command);
-        $commandTester->execute($execute);
-
-        return $commandTester;
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $command = $ci->get(MigrateRollbackCommand::class);
+        BakeryTester::runCommand($command, ['--steps' => 3]);
     }
 }

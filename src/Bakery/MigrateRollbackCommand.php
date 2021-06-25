@@ -17,8 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * migrate:rollback Bakery Command
  * Rollback the last migrations ran against the database.
- *
- * @author Louis Charette
  */
 class MigrateRollbackCommand extends MigrateCommand
 {
@@ -61,7 +59,8 @@ class MigrateRollbackCommand extends MigrateCommand
         }
 
         // Show migrations about to be reset when in production mode
-        if ($this->isProduction()) {
+        //TODO : Reimplement production status
+        /*if ($this->isProduction()) {
             $this->io->section('Migrations to rollback');
             $this->io->listing($ran);
 
@@ -69,7 +68,7 @@ class MigrateRollbackCommand extends MigrateCommand
             if (!$this->confirmToProceed($input->getOption('force'))) {
                 exit(1);
             }
-        }
+        }*/
 
         // Rollback migrations
         try {

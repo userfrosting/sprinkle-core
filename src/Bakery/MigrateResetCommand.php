@@ -17,8 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * migrate:reset Bakery Command
  * Reset the database to a clean state.
- *
- * @author Louis Charette
  */
 class MigrateResetCommand extends MigrateCommand
 {
@@ -75,7 +73,8 @@ class MigrateResetCommand extends MigrateCommand
         }
 
         // Show migrations about to be reset when in production mode
-        if ($this->isProduction()) {
+        //TODO : Reimplement production status
+        /*if ($this->isProduction()) {
             $this->io->section('Migrations to rollback');
             $this->io->listing($ran);
 
@@ -83,7 +82,7 @@ class MigrateResetCommand extends MigrateCommand
             if (!$this->confirmToProceed($input->getOption('force'))) {
                 exit(1);
             }
-        }
+        }*/
 
         // Reset migrator
         try {
@@ -120,7 +119,7 @@ class MigrateResetCommand extends MigrateCommand
     protected function performHardReset(InputInterface $input)
     {
         // Get current connection
-        $database = ($input->getOption('database')) ?: $this->ci->db->getDatabaseManager()->getDefaultConnection();
+        $database = ($input->getOption('database')) ?: $this->db->getDatabaseManager()->getDefaultConnection();
 
         // Confirm action
         $this->io->warning("This will drop all existing tables from the `$database` database, including tables not managed by bakery. All data will be lost! You have been warned!");
@@ -130,7 +129,7 @@ class MigrateResetCommand extends MigrateCommand
         }
 
         // Get schema Builder
-        $connection = $this->ci->db->connection($database);
+        $connection = $this->db->connection($database);
         $schema = $connection->getSchemaBuilder();
 
         // Get a list of all tables

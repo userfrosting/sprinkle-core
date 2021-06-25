@@ -15,15 +15,20 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 
 /**
  * migrate:status Bakery Command
  * Show the list of installed and pending migration.
- *
- * @author Louis Charette
  */
 class MigrateStatusCommand extends Command
 {
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected Migrator $migrator;
+    
     /**
      * {@inheritdoc}
      */
@@ -42,22 +47,19 @@ class MigrateStatusCommand extends Command
     {
         $this->io->title('Migration status');
 
-        // Get migrator
-        $migrator = $this->ci->migrator;
-
         // Set connection to the selected database
-        $migrator->setConnection($input->getOption('database'));
+        $this->migrator->setConnection($input->getOption('database'));
 
         // Get ran migrations. If repository doesn't exist, there's no ran
-        if (!$migrator->repositoryExists()) {
+        if (!$this->migrator->repositoryExists()) {
             $ran = collect();
         } else {
-            $ran = $migrator->getRepository()->getMigrations();
+            $ran = $this->migrator->getRepository()->getMigrations();
         }
 
         // Get available migrations and calculate pending one
-        $available = $migrator->getAvailableMigrations();
-        $pending = $migrator->getPendingMigrations();
+        $available = $this->migrator->getAvailableMigrations();
+        $pending = $this->migrator->getPendingMigrations();
 
         // Display ran migrations
         $this->io->section('Installed migrations');

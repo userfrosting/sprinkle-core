@@ -10,22 +10,29 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\ConfirmableTrait;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use Symfony\Component\Console\Command\Command;
+use UserFrosting\Bakery\WithSymfonyStyle;
 
 /**
  * migrate Bakery Command
  * Perform database migration.
- *
- * @author Louis Charette
  */
 class MigrateCommand extends Command
 {
     use ConfirmableTrait;
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected Migrator $migrator;
+
+    /** @Inject */
+    protected Capsule $db;
 
     /**
      * {@inheritdoc}
@@ -66,7 +73,8 @@ class MigrateCommand extends Command
         }
 
         // Show migrations about to be ran when in production mode
-        if ($this->isProduction()) {
+        //TODO : Reimplement production status
+        /*if ($this->isProduction()) {
             $this->io->section('Pending migrations');
             $this->io->listing($pending);
 
@@ -74,7 +82,7 @@ class MigrateCommand extends Command
             if (!$this->confirmToProceed($input->getOption('force'))) {
                 exit(1);
             }
-        }
+        }*/
 
         // Run migration
         try {
@@ -104,24 +112,21 @@ class MigrateCommand extends Command
      *
      * @param InputInterface $input
      *
-     * @return \UserFrosting\Sprinkle\Core\Database\Migrator\Migrator The migrator instance
+     * @return Migrator The migrator instance
      */
     protected function setupMigrator(InputInterface $input)
     {
-        /** @var \UserFrosting\Sprinkle\Core\Database\Migrator\Migrator */
-        $migrator = $this->ci->migrator;
-
         // Set connection to the selected database
         $database = $input->getOption('database');
         if ($database != '') {
             $this->io->note("Running {$this->getName()} with `$database` database connection");
-            $this->ci->db->getDatabaseManager()->setDefaultConnection($database);
+            $this->db->getDatabaseManager()->setDefaultConnection($database);
         }
 
         // Make sure repository exist. Should be done in ServicesProvider,
         // but if we change connection, it might not exist
-        if (!$migrator->repositoryExists()) {
-            $migrator->getRepository()->createRepository();
+        if (!$this->migrator->repositoryExists()) {
+            $this->migrator->getRepository()->createRepository();
         }
 
         // Show note if pretending
@@ -129,7 +134,7 @@ class MigrateCommand extends Command
             $this->io->note("Running {$this->getName()} in pretend mode");
         }
 
-        return $migrator;
+        return $this->migrator;
     }
 
     /**

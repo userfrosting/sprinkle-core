@@ -13,15 +13,15 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 
 /**
  * migrate:refresh Bakery Command.
  * Refresh the database by rolling back the last migrations and running them up again.
- *
- * @author Louis Charette
  */
 class MigrateRefreshCommand extends MigrateCommand
-{
+{   
     /**
      * {@inheritdoc}
      */
@@ -57,7 +57,8 @@ class MigrateRefreshCommand extends MigrateCommand
         }
 
         // Show migrations about to be reset when in production mode
-        if ($this->isProduction()) {
+        //TODO : Reimplement production status
+        /*if ($this->isProduction()) {
             $this->io->section('Migrations to refresh');
             $this->io->listing($ran);
 
@@ -65,7 +66,7 @@ class MigrateRefreshCommand extends MigrateCommand
             if (!$this->confirmToProceed($input->getOption('force'))) {
                 exit(1);
             }
-        }
+        }*/
 
         // Rollback migration
         try {

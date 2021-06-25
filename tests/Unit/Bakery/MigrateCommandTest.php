@@ -25,7 +25,7 @@ class MigrateCommandTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    public function testBasicMigrationsCallMigratorWithProperArguments()
+    public function testBasicMigrationsCallMigratorWithProperArguments(): void
     {
         // Setup migrator mock
         $migrator = m::mock(Migrator::class);
@@ -41,7 +41,7 @@ class MigrateCommandTest extends TestCase
         BakeryTester::runCommand($command);
     }
 
-    public function testMigrationRepositoryCreatedWhenNecessary()
+    public function testMigrationRepositoryCreatedWhenNecessary(): void
     {
         $migrator = m::mock(Migrator::class);
         $repository = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository');
@@ -61,7 +61,7 @@ class MigrateCommandTest extends TestCase
         BakeryTester::runCommand($command);
     }
 
-    public function testTheCommandMayBePretended()
+    public function testTheCommandMayBePretended(): void
     {
         // Setup migrator mock
         $migrator = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\Migrator');
@@ -80,7 +80,7 @@ class MigrateCommandTest extends TestCase
         );
     }
 
-    public function testStepMayBeSet()
+    public function testStepMayBeSet(): void
     {
         // Setup migrator mock
         $migrator = m::mock('UserFrosting\Sprinkle\Core\Database\Migrator\Migrator');
