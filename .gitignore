@@ -8,6 +8,7 @@
 
 # Ignore developer resources
 _meta/*
+bakery
 
 # Ignore composer-generated files
 composer.lock
