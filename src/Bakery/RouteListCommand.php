@@ -22,9 +22,6 @@ use Symfony\Component\Console\Command\Command;
  * route:list Bakery Command
  * Generate a list all registered routes
  * Inspired by Laravel `route:list` artisan command.
- *
- * @author Jose Vasconcellos
- * @author Louis Charette
  */
 class RouteListCommand extends Command
 {

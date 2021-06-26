@@ -17,9 +17,9 @@ class RouterTest extends TestCase
     /**
      * Test router integration in Tests
      */
-    public function testBasicTest()
+    /*public function testBasicTest()
     {
-        /** @var \UserFrosting\Sprinkle\Core\Router $router */
+        /** @var \UserFrosting\Sprinkle\Core\Router $router * /
         $router = $this->ci->router;
 
         // Get all routes. We should have more than 0 in a default install
@@ -29,5 +29,5 @@ class RouterTest extends TestCase
         // Try to get a path
         $path = $router->pathFor('index');
         $this->assertEquals('/', $path);
-    }
+    }*/
 }
