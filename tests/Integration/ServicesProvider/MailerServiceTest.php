@@ -10,8 +10,14 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
-use UserFrosting\Sprinkle\Core\Mail\Mailer;
+use Mockery as m;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Mail\Mailer;
+use UserFrosting\Sprinkle\Core\ServicesProvider\MailService;
+use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\Testing\ContainerStub;
 
 /**
  * Integration tests for `mailer` service.
@@ -19,8 +25,42 @@ use PHPUnit\Framework\TestCase;
  */
 class MailerServiceTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     public function testService()
     {
-        $this->assertInstanceOf(Mailer::class, $this->ci->mailer);
+        // Create container with provider to test
+        $provider = new MailService();
+        $ci = ContainerStub::create($provider->register());
+
+        // TODO : We test the service implementation here. This shouldn't be necessary.
+        $mailConfig = [
+            'mailer'          => 'smtp',
+            'host'            => 'localhost',
+            'port'            => 587,
+            'auth'            => true,
+            'secure'          => 'tls',
+            'username'        => '',
+            'password'        => '',
+            'smtp_debug'      => 4,
+            'message_options' => [
+                'CharSet'   => 'UTF-8',
+                'isHtml'    => true,
+                'Timeout'   => 15,
+            ],
+        ];
+
+        // Set dependencies services
+        $config = m::mock(Config::class);
+        $config->shouldReceive('get')->with('mail')->andReturn($mailConfig);
+        $config->shouldReceive('get')->with('debug.smtp')->andReturn(false); // TODO : Test true...
+        $ci->set(Config::class, $config);
+
+        // Set dependencies services
+        $logger = m::mock(Logger::class);
+        $ci->set('mailLogger', $logger);
+
+        // Assertions
+        $this->assertInstanceOf(Mailer::class, $ci->get(Mailer::class));
     }
 }

@@ -29,6 +29,7 @@ class ConfigService implements ServicesProviderInterface
     {
         return [
             // TODO : Use interface & Implement request ?
+            // TODO : Inject Dotenv & others classes
             Config::class => function (ResourceLocatorInterface $locator) {
                 // Grab any relevant dotenv variables from the .env file
                 // located at the locator base path

@@ -17,7 +17,7 @@ use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Log\MixedFormatter;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
-// TODO Implement interface and untangle each one
+// TODO Implement interface and untangle each one. Each Logger could probably extend the main one to define what it needs compared to the others.
 class LoggersService implements ServicesProviderInterface
 {
     public function register(): array
@@ -30,6 +30,7 @@ class LoggersService implements ServicesProviderInterface
             *
             * @return \Monolog\Logger
             */
+            // TODO : Requires more injections && Interface/class
             'debugLogger' => function (ResourceLocatorInterface $locator) {
                 $logger = new Logger('debug');
 
@@ -52,6 +53,7 @@ class LoggersService implements ServicesProviderInterface
             *
             * @return \Monolog\Logger
             */
+            // TODO : Requires more injections && Interface/class
             'errorLogger' => function (ResourceLocatorInterface $locator) {
                 $log = new Logger('errors');
 
@@ -75,6 +77,7 @@ class LoggersService implements ServicesProviderInterface
              *
              * @return \Monolog\Logger
              */
+            // TODO : Requires more injections && Interface/class
             'mailLogger' => function (ResourceLocatorInterface $locator) {
                 $log = new Logger('mail');
 
@@ -96,6 +99,7 @@ class LoggersService implements ServicesProviderInterface
              *
              * @return \Monolog\Logger
              */
+            // TODO : Requires more injections && Interface/class
             'queryLogger' => function (ResourceLocatorInterface $locator) {
                 $logger = new Logger('query');
 

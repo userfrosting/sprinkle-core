@@ -28,7 +28,7 @@ class DbService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            // TODO Inject Query logger
+            // TODO Inject Query logger & Capsule & Dispatcher...
             Capsule::class => function (Config $config) {
                 $capsule = new Capsule();
 

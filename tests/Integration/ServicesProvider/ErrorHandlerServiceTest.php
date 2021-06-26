@@ -17,18 +17,19 @@ use PHPUnit\Framework\TestCase;
  * Integration tests for `errorHandler` service.
  * Check to see if service returns what it's supposed to return
  */
+// TODO : Disabled for now, requires re-implementation of the service.
 class ErrorHandlerServiceTest extends TestCase
 {
-    public function testService()
+    /*public function testService()
     {
         $this->assertInstanceOf(ExceptionHandlerManager::class, $this->ci->errorHandler);
-    }
+    }*/
 
     /**
      * @depends testService
      */
-    public function testphpErrorHandlerService()
+    /*public function testphpErrorHandlerService()
     {
         $this->assertInstanceOf(ExceptionHandlerManager::class, $this->ci->phpErrorHandler);
-    }
+    }*/
 }

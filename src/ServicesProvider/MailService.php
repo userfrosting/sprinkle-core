@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
+use DI\Container;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Mail\Mailer;
 use UserFrosting\Support\Repository\Repository as Config;
@@ -22,12 +23,14 @@ class MailService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            // TODO Inject mailLogger
-            Mailer::class => function (Config $config) {
-                $mailer = new Mailer($c->mailLogger, $config['mail']);
+            // TODO Inject mailLogger properly once it has it's own class
+            //      Config should probably be injected too
+            Mailer::class => function (Config $config, Container $c) {
+                $mailer = new Mailer($c->get('mailLogger'), $config->get('mail'));
 
                 // Use UF debug settings to override any service-specific log settings.
-                if (!$config['debug.smtp']) {
+                // TODO : Should probably be done in Mailer ?
+                if (!$config->get('debug.smtp')) {
                     $mailer->getPhpMailer()->SMTPDebug = 0;
                 }
 
