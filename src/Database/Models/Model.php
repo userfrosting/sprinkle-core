@@ -102,7 +102,7 @@ abstract class Model extends LaravelModel
         // So the class is hardcoded for now
         // Would be:
         // return $ci->make(EloquentBuilder::class, [$query]);
-        
+
         return new EloquentBuilder($query);
     }
 
@@ -114,7 +114,7 @@ abstract class Model extends LaravelModel
     protected function newBaseQueryBuilder()
     {
         $connection = $this->getConnection();
-        
+
         // TODO : To keep classmapper feature here, it would be the next line, But need the $ci... And I don't like the way it was done (in event)
         // Ci would replace classmapper here, but it would need to be injected, so created by the container... always... A Trait would be better...
         // So the class is hardcoded for now
@@ -124,7 +124,7 @@ abstract class Model extends LaravelModel
         //     $connection->getQueryGrammar(),
         //     $connection->getPostProcessor()
         // ]);
-        
+
         return new Builder(
             $connection,
             $connection->getQueryGrammar(),

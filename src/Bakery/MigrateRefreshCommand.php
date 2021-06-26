@@ -13,7 +13,6 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 
 /**
@@ -21,7 +20,7 @@ use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
  * Refresh the database by rolling back the last migrations and running them up again.
  */
 class MigrateRefreshCommand extends MigrateCommand
-{   
+{
     /**
      * {@inheritdoc}
      */

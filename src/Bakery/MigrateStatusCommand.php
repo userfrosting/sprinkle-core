@@ -28,7 +28,7 @@ class MigrateStatusCommand extends Command
 
     /** @Inject */
     protected Migrator $migrator;
-    
+
     /**
      * {@inheritdoc}
      */
