@@ -23,7 +23,7 @@ class AssetService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            // TODO : Might be able to autowrite this one
+            // TODO : Might be able to autowire this one
             AssetLoader::class => function (Assets $assets) {
                 return new AssetLoader($assets);
             },
