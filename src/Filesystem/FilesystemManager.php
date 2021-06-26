@@ -10,32 +10,23 @@
 
 namespace UserFrosting\Sprinkle\Core\Filesystem;
 
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager as LaravelFilesystemManager;
 use League\Flysystem\FilesystemInterface;
-use UserFrosting\Support\Repository\Repository as ConfigRepository;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Filesystem disk manager service.
- *
- * @author Louis Charette
  */
 class FilesystemManager extends LaravelFilesystemManager
 {
     /**
-     * The config service.
-     *
-     * @var \UserFrosting\Support\Repository\Repository
-     */
-    protected $config;
-
-    /**
      * Create a new filesystem manager instance.
      *
-     * @param \UserFrosting\Support\Repository\Repository $config
+     * @param Config $config
      */
-    public function __construct(ConfigRepository $config)
+    public function __construct(protected Config $config)
     {
-        $this->config = $config;
     }
 
     /**
@@ -43,9 +34,9 @@ class FilesystemManager extends LaravelFilesystemManager
      *
      * @param array $config
      *
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return Filesystem
      */
-    protected function callCustomCreator(array $config)
+    protected function callCustomCreator(array $config): Filesystem
     {
         $driver = $this->customCreators[$config['driver']]($this->config, $config);
 
@@ -63,9 +54,9 @@ class FilesystemManager extends LaravelFilesystemManager
      *
      * @return array
      */
-    protected function getConfig($name)
+    protected function getConfig($name): array
     {
-        return $this->config["filesystems.disks.{$name}"];
+        return $this->config->get("filesystems.disks.{$name}");
     }
 
     /**
@@ -73,9 +64,9 @@ class FilesystemManager extends LaravelFilesystemManager
      *
      * @return string
      */
-    public function getDefaultDriver()
+    public function getDefaultDriver(): string
     {
-        return $this->config['filesystems.default'];
+        return $this->config->get('filesystems.default');
     }
 
     /**
@@ -83,8 +74,8 @@ class FilesystemManager extends LaravelFilesystemManager
      *
      * @return string
      */
-    public function getDefaultCloudDriver()
+    public function getDefaultCloudDriver(): string
     {
-        return $this->config['filesystems.cloud'];
+        return $this->config->get('filesystems.cloud');
     }
 }

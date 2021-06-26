@@ -16,19 +16,24 @@ use League\Flysystem\Filesystem;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use UserFrosting\Sprinkle\Core\Filesystem\FilesystemManager;
 use UserFrosting\Sprinkle\Core\Facades\Storage;
-use PHPUnit\Framework\TestCase;
+// use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * FilesystemTest class.
  * Tests a basic filesystem.
  */
+// TODO : Most could be moved to a Unit Test.
 class FilesystemTest extends TestCase
 {
     /** @var string Testing storage path */
-    private $testDir;
+    private string $testDir;
 
     /** @var string Test disk name */
-    private $testDisk = 'testing';
+    private string $testDisk = 'testing';
+
+    protected Config $config;
 
     /**
      * Setup TestDatabase
@@ -38,19 +43,21 @@ class FilesystemTest extends TestCase
         // Boot parent TestCase, which will set up the database and connections for us.
         parent::setUp();
 
-        $this->testDir = $this->ci->config["filesystems.disks.{$this->testDisk}.root"];
+        $this->config = $this->ci->get(Config::class);
+
+        $this->testDir = $this->config->get("filesystems.disks.{$this->testDisk}.root");
     }
 
     /**
      * Test the service and FilesystemManager
      */
-    public function testService()
+    public function testService(): FilesystemAdapter
     {
         // Force this test to use the testing disk
-        $this->ci->config['filesystems.default'] = $this->testDisk;
+        $this->config->set('filesystems.default', $this->testDisk);
 
         // Filesystem service will return an instance of FilesystemManger
-        $filesystem = $this->ci->filesystem;
+        $filesystem = $this->ci->get(FilesystemManager::class);
         $this->assertInstanceOf(FilesystemManager::class, $filesystem);
 
         // Main aspect of our FilesystemManager is to adapt our config structure
@@ -67,16 +74,17 @@ class FilesystemTest extends TestCase
     /**
      * @depends testService
      */
-    public function testFacade()
+    // TODO : Requires reimplementation of Facade
+    /*public function testFacade(): void
     {
         $this->assertInstanceOf(FilesystemAdapter::class, Storage::disk($this->testDisk));
-    }
+    }*/
 
     /**
      * @param FilesystemAdapter $files
      * @depends testService
      */
-    public function testAdapter(FilesystemAdapter $files)
+    public function testAdapter(FilesystemAdapter $files): void
     {
         // Test basic "put"
         $this->assertTrue($files->put('file.txt', 'Something inside'));
@@ -98,7 +106,8 @@ class FilesystemTest extends TestCase
      * NOTE : The `download` method was introduced in Laravel 5.5.
      * We'll need to enable this once we can upgrade to newer version of Laravel
      */
-    /*public function testDownload(FilesystemAdapter $files)
+    // TODO : Should be good to add now
+    /*public function testDownload(FilesystemAdapter $files): void
     {
         // We'll test the file download feature
         $response = $files->download('file.txt', 'hello.txt');
@@ -110,7 +119,7 @@ class FilesystemTest extends TestCase
      * @param FilesystemAdapter $files
      * @depends testService
      */
-    public function testUrl(FilesystemAdapter $files)
+    public function testUrl(FilesystemAdapter $files): void
     {
         // Test the URL
         $this->assertTrue($files->put('file.txt', 'Blah!'));
@@ -123,9 +132,9 @@ class FilesystemTest extends TestCase
     /**
      * Test to make sure we can still add custom adapter
      */
-    public function testNonExistingAdapter()
+    public function testNonExistingAdapter(): void
     {
-        $filesystemManager = $this->ci->filesystem;
+        $filesystemManager = $this->ci->get(FilesystemManager::class);
 
         // InvalidArgumentException
         $this->expectException('InvalidArgumentException');
@@ -136,9 +145,9 @@ class FilesystemTest extends TestCase
      * @depends testNonExistingAdapter
      * @see https://github.com/thephpleague/flysystem/blob/13352d2303b67ecfc1306ef1fdb507df1a0fc79f/src/Adapter/Local.php#L47
      */
-    public function testAddingAdapter()
+    public function testAddingAdapter(): void
     {
-        $filesystemManager = $this->ci->filesystem;
+        $filesystemManager = $this->ci->get(FilesystemManager::class);
 
         $filesystemManager->extend('localTest', function ($configService, $config) {
             $adapter = new LocalAdapter($config['root']);
