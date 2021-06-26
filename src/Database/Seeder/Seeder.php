@@ -13,21 +13,17 @@ namespace UserFrosting\Sprinkle\Core\Database\Seeder;
 use Illuminate\Support\Str;
 use Psr\Container\ContainerInterface;
 use UserFrosting\UniformResourceLocator\Resource as ResourceInstance;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * Seeder Class.
  *
  * Finds all seeds class across sprinkles
- *
- * @author Louis Charette
  */
+// TODO : Get rid of main ContainerInterface & locator... Seeds will need to be defined and "created" by PHP-DI.
+//        This requires a complete rewrite.
 class Seeder
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $ci;
-
     /**
      * @var string The resource locator scheme
      */
@@ -38,9 +34,10 @@ class Seeder
      *
      * @param ContainerInterface $ci
      */
-    public function __construct(ContainerInterface $ci)
-    {
-        $this->ci = $ci;
+    public function __construct(
+        protected ContainerInterface $ci, // TODO !
+        protected ResourceLocatorInterface $locator,
+    ) {
     }
 
     /**
@@ -50,7 +47,7 @@ class Seeder
      */
     public function getSeeds()
     {
-        $seeds = $this->ci->locator->listResources($this->scheme, false, false);
+        $seeds = $this->locator->listResources($this->scheme, false, false);
 
         return $this->loadSeeders($seeds);
     }
@@ -67,7 +64,7 @@ class Seeder
     public function getSeed($name)
     {
         // Get seed resource
-        $seedResource = $this->ci->locator->getResource($this->scheme . $name . '.php');
+        $seedResource = $this->locator->getResource($this->scheme . $name . '.php');
 
         // Make sure we found something
         if (!$seedResource) {
