@@ -11,30 +11,18 @@
 namespace UserFrosting\Sprinkle\Core\Twig;
 
 use Illuminate\Filesystem\Filesystem;
-use Psr\Container\ContainerInterface;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * Provides helper function to delete the Twig cache directory.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class CacheHelper
 {
     /**
-     * @var ContainerInterface The global container object, which holds all your services.
-     *
-     * @todo Change this, only the locator service is required
+     * @param ResourceLocatorInterface $locator The lcoator service
      */
-    protected $ci;
-
-    /**
-     * Constructor.
-     *
-     * @param ContainerInterface $ci The global container object, which holds all your services.
-     */
-    public function __construct(ContainerInterface $ci)
+    public function __construct(protected ResourceLocatorInterface $locator)
     {
-        $this->ci = $ci;
     }
 
     /**
@@ -42,10 +30,10 @@ class CacheHelper
      *
      * @return bool true/false if operation is successful
      */
-    public function clearCache()
+    public function clearCache(): bool
     {
         // Get location
-        $path = $this->ci->locator->findResource('cache://twig', true, true);
+        $path = $this->locator->findResource('cache://twig', true, true);
 
         // Get Filesystem instance
         $fs = new Filesystem();

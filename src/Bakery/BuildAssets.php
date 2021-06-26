@@ -213,6 +213,7 @@ class BuildAssets extends Command
     protected function getBuildPath(): string
     {
         // TODO : See if locator could be better fit here.
-        return $this->sprinkleManager->getMainSprinkle()::getPath() . \UserFrosting\DS . \UserFrosting\BUILD_DIR_NAME;
+        //        Another way / place for the build dir seams required.
+        return $this->sprinkleManager->getMainSprinkle()::getPath() . '\..\build'; //  \UserFrosting\DS . \UserFrosting\BUILD_DIR_NAME;
     }
 }

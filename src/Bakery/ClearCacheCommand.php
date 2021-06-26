@@ -14,14 +14,26 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Twig\CacheHelper;
 use Symfony\Component\Console\Command\Command;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * ClearCache CLI Command.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class ClearCacheCommand extends Command
 {
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected Config $config;
+
+    /** @Inject */
+    protected ResourceLocatorInterface $locator;
+
+    /** @Inject */
+    protected CacheHelper $cacheHelper;
+
     /**
      * {@inheritdoc}
      */
@@ -34,7 +46,7 @@ class ClearCacheCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io->title('Clearing cache');
 
@@ -50,13 +62,14 @@ class ClearCacheCommand extends Command
         }
 
         // Clear router cache
-        $this->io->writeln('<info> > Clearing Router cache file</info>', OutputInterface::VERBOSITY_VERBOSE);
+        // TODO : Requires rewrite of RouteServices
+        /*$this->io->writeln('<info> > Clearing Router cache file</info>', OutputInterface::VERBOSITY_VERBOSE);
         if (!$this->clearRouterCache()) {
-            $filename = $this->ci->config['settings.routerCacheFile'];
-            $file = $this->ci->locator->findResource("cache://$filename", true, true);
+            $filename = $this->config->get('settings.routerCacheFile');
+            $file = $this->locator->findResource("cache://$filename", true, true);
             $this->io->error("Failed to delete Router cache file. Make sure you have write access to the `$file` file.");
             exit(1);
-        }
+        }*/
 
         $this->io->success('Cache cleared !');
 
@@ -66,7 +79,7 @@ class ClearCacheCommand extends Command
     /**
      * Flush the cached data from the cache service.
      */
-    protected function clearIlluminateCache()
+    protected function clearIlluminateCache(): void
     {
         $this->ci->cache->flush();
     }
@@ -76,11 +89,9 @@ class ClearCacheCommand extends Command
      *
      * @return bool true/false if operation is successful
      */
-    protected function clearTwigCache()
+    protected function clearTwigCache(): bool
     {
-        $cacheHelper = new CacheHelper($this->ci);
-
-        return $cacheHelper->clearCache();
+        return $this->cacheHelper->clearCache();
     }
 
     /**
@@ -88,8 +99,9 @@ class ClearCacheCommand extends Command
      *
      * @return bool true/false if operation is successful
      */
-    protected function clearRouterCache()
-    {
-        return $this->ci->router->clearCache();
-    }
+    // TODO : Requires rewrite of RouteServices
+    // protected function clearRouterCache()
+    // {
+    //     return $this->ci->router->clearCache();
+    // }
 }

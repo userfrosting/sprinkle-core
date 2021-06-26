@@ -13,19 +13,20 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
+use UserFrosting\Bakery\WithSymfonyStyle;
 
 /**
  * Bake command.
  * Shortcut to run multiple commands at once.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class BakeCommand extends Command
 {
+    use WithSymfonyStyle;
+
     /**
      * @var string The UserFrosting ASCII art.
      */
-    public $title = "
+    public string $title = "
  _   _              ______             _   _
 | | | |             |  ___|           | | (_)
 | | | |___  ___ _ __| |_ _ __ ___  ___| |_ _ _ __   __ _
@@ -48,7 +49,7 @@ class BakeCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io->writeln("<info>{$this->title}</info>");
 
@@ -67,7 +68,7 @@ class BakeCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
-    protected function executeSetup(InputInterface $input, OutputInterface $output)
+    protected function executeSetup(InputInterface $input, OutputInterface $output): void
     {
         $command = $this->getApplication()->find('setup:db');
         $command->run($input, $output);
@@ -82,7 +83,7 @@ class BakeCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
-    protected function executeDebug(InputInterface $input, OutputInterface $output)
+    protected function executeDebug(InputInterface $input, OutputInterface $output): void
     {
         $command = $this->getApplication()->find('debug');
         $command->run($input, $output);
@@ -94,7 +95,7 @@ class BakeCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
-    protected function executeConfiguration(InputInterface $input, OutputInterface $output)
+    protected function executeConfiguration(InputInterface $input, OutputInterface $output): void
     {
         $command = $this->getApplication()->find('migrate');
         $command->run($input, $output);
@@ -106,7 +107,7 @@ class BakeCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
-    protected function executeAsset(InputInterface $input, OutputInterface $output)
+    protected function executeAsset(InputInterface $input, OutputInterface $output): void
     {
         $command = $this->getApplication()->find('build-assets');
         $command->run($input, $output);
@@ -118,7 +119,7 @@ class BakeCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
-    protected function executeCleanup(InputInterface $input, OutputInterface $output)
+    protected function executeCleanup(InputInterface $input, OutputInterface $output): void
     {
         $command = $this->getApplication()->find('clear-cache');
         $command->run($input, $output);
