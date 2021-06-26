@@ -29,20 +29,28 @@ class CacheService implements ServicesProviderInterface
     public function register(): array
     {
         return [
+            // TODO : Custom exception should be used.
+            // TODO : Container could be used to instantiate *Store and limit the number of dependencies required. Plus Locator is only required in 1 of 3 cases...
+            //        (but would depend on the whole container... PHP-DI docs should be consulted to find the best way to do this).
             Cache::class => function (Config $config, ResourceLocatorInterface $locator) {
-                if ($config['cache.driver'] == 'file') {
-                    $path = $locator->findResource('cache://', true, true);
-                    $cacheStore = new TaggableFileStore($path);
-                } elseif ($config['cache.driver'] == 'memcached') {
-                    // We need to inject the prefix in the memcached config
-                    $config = array_merge($config['cache.memcached'], ['prefix' => $config['cache.prefix']]);
-                    $cacheStore = new MemcachedStore($config);
-                } elseif ($config['cache.driver'] == 'redis') {
-                    // We need to inject the prefix in the redis config
-                    $config = array_merge($config['cache.redis'], ['prefix' => $config['cache.prefix']]);
-                    $cacheStore = new RedisStore($config);
-                } else {
-                    throw new \Exception("Bad cache store type '{$config['cache.driver']}' specified in configuration file.");
+                switch ($config->get('cache.driver')) {
+                    case 'file':
+                        $path = $locator->findResource('cache://', true, true);
+                        $cacheStore = new TaggableFileStore($path);
+                    break;
+                    case 'memcached':
+                        // We need to inject the prefix in the memcached config
+                        $config = array_merge($config->get('cache.memcached'), ['prefix' => $config->get('cache.prefix')]);
+                        $cacheStore = new MemcachedStore($config);
+                    break;
+                    case 'redis':
+                        // We need to inject the prefix in the redis config
+                        $config = array_merge($config->get('cache.redis'), ['prefix' => $config->get('cache.prefix')]);
+                        $cacheStore = new RedisStore($config);
+                    break;
+                    default:
+                        throw new \Exception("Bad cache store type '{$config->get('cache.driver')}' specified in configuration file.");
+                    break;
                 }
 
                 return $cacheStore->instance();
