@@ -14,14 +14,18 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;
 use UserFrosting\Support\Exception\BadRequestException;
-use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
+use UserFrosting\Support\Repository\Repository as Config;
 
 class DatabaseTests extends TestCase
 {
+    use TestDatabase;
+    
     /**
      * @var string
      */
-    protected $schemaName = 'test_integration';
+    protected string $schemaName;
 
     /**
      * Setup the database schema.
@@ -31,8 +35,11 @@ class DatabaseTests extends TestCase
         // Boot parent TestCase, which will set up the database and connections for us.
         parent::setUp();
 
-        // Boot database
-        $this->ci->db;
+        // Fetch services from CI
+        $config = $this->ci->get(Config::class);
+
+        // Set Schema name property from config
+        $this->schemaName = $config->get('testing.dbConnection');
 
         $this->createSchema();
     }

@@ -53,7 +53,7 @@ class CoreOld extends Sprinkle
     public function onSprinklesInitialized()
     {
         // Set container for data model
-        Model::$ci = $this->ci;
+        // Model::$ci = $this->ci;
 
         // Set container for environment info class
         EnvironmentInfo::$ci = $this->ci;

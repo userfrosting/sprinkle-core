@@ -11,7 +11,6 @@
 namespace UserFrosting\Sprinkle\Core\Bakery\Helper;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Database Test Trait. Include method to test the db connection
@@ -20,7 +19,7 @@ trait DatabaseTest
 {
     /** @Inject */
     protected Capsule $capsule;
-    
+
     /**
      * Function to test the db connection.
      *
