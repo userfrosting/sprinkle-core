@@ -11,6 +11,7 @@
 namespace UserFrosting\Sprinkle\Core\Bakery\Helper;
 
 use UserFrosting\I18n\Locale;
+use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 
 /**
  * Locale Helper.
@@ -21,6 +22,9 @@ use UserFrosting\I18n\Locale;
  */
 trait LocaleOption
 {
+    /** @Inject */
+    protected SiteLocale $locale;
+
     /**
      * Display locale selection question.
      *
@@ -28,13 +32,10 @@ trait LocaleOption
      */
     protected function askForLocale(string $name, bool $default = true): string
     {
-        /** @var \UserFrosting\Sprinkle\Core\I18n\SiteLocale */
-        $localeService = $this->ci->locale;
-
-        $availableLocales = $localeService->getAvailableIdentifiers();
+        $availableLocales = $this->locale->getAvailableIdentifiers();
 
         if ($default) {
-            $defaultLocale = $localeService->getDefaultLocale();
+            $defaultLocale = $this->locale->getDefaultLocale();
         } else {
             $defaultLocale = null;
         }
@@ -46,11 +47,8 @@ trait LocaleOption
 
     protected function getLocale(?string $option): Locale
     {
-        /** @var \UserFrosting\Sprinkle\Core\I18n\SiteLocale */
-        $localeService = $this->ci->locale;
-
         $identifier = ($option) ?: $this->askForLocale('locale');
-        if (!$localeService->isAvailable($identifier)) {
+        if (!$this->locale->isAvailable($identifier)) {
             $this->io->error("Locale `$identifier` is not available");
             exit(1);
         }

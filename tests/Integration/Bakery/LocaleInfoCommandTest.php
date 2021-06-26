@@ -10,39 +10,47 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
-use UserFrosting\Sprinkle\Core\Bakery\LocaleInfoCommand;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
+use UserFrosting\Sprinkle\Core\Bakery\LocaleInfoCommand;
+use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\Testing\BakeryTester;
+use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * Test for LocaleInfoCommand (locale:info)
  */
 class LocaleInfoCommandTest extends TestCase
 {
-    use Helper\runCommand;
-
-    /**
-     * @var string Command to test
-     */
-    protected $commandToTest = LocaleInfoCommand::class;
+    protected Command $command;
 
     /**
      * {@inheritdoc}
      */
+    // TODO : Could be moved to Unit with improvement in Locale class.
     public function setUp(): void
     {
         parent::setUp();
 
+        $ci = ContainerStub::create();
+
+        // Use test locale data
+        $locator = new ResourceLocator(__DIR__ . '/data');
+        $locator->registerStream('locale', '', null, true);
+        $ci->set(ResourceLocatorInterface::class, $locator);
+
         // Force config to only three locales
-        $this->ci->config->set('site.locales.available', [
+        $config = $ci->get(Config::class);
+        $config->set('site.locales.available', [
             'en_US' => true,
             'es_ES' => false,
             'fr_FR' => true,
         ]);
 
-        // Use test locale data
-        $this->ci->locator = new ResourceLocator(__DIR__ . '/data');
-        $this->ci->locator->registerStream('locale', '', null, true);
+        // Command to test
+        $this->command = $ci->get(LocaleInfoCommand::class);
     }
 
     /**
@@ -50,9 +58,10 @@ class LocaleInfoCommandTest extends TestCase
      */
     public function testCommand(): void
     {
-        $result = $this->runCommand();
+        $result = BakeryTester::runCommand($this->command);
+        
+        // Assertions
         $this->assertSame(0, $result->getStatusCode());
-
         $output = $result->getDisplay();
         $this->assertStringNotContainsString('Spanish', $output);
         $this->assertStringContainsString('English', $output);

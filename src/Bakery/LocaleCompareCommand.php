@@ -20,16 +20,20 @@ use UserFrosting\I18n\Dictionary;
 use UserFrosting\I18n\DictionaryInterface;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\LocaleOption;
 use Symfony\Component\Console\Command\Command;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * locale:missing-keys command.
  * Find missing keys in locale translation files.
- *
- * @author Amos Folz
  */
 class LocaleCompareCommand extends Command
 {
     use LocaleOption;
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected ResourceLocatorInterface $locator;
 
     /**
      * {@inheritdoc}
@@ -58,8 +62,8 @@ class LocaleCompareCommand extends Command
         $this->io->section("Comparing `{$leftLocale->getIdentifier()}` with `{$rightLocale->getIdentifier()}`");
 
         // Get dictionary for both locales
-        $leftDictionary = new Dictionary($leftLocale, $this->ci->locator);
-        $rightDictionary = new Dictionary($rightLocale, $this->ci->locator);
+        $leftDictionary = new Dictionary($leftLocale, $this->locator);
+        $rightDictionary = new Dictionary($rightLocale, $this->locator);
 
         // Display all relevant tables
         $this->compareDictionaries($leftDictionary, $rightDictionary);

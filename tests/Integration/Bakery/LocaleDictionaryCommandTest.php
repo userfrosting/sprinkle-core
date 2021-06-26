@@ -10,48 +10,57 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
-use UserFrosting\Sprinkle\Core\Bakery\LocaleDictionaryCommand;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
+use UserFrosting\Sprinkle\Core\Bakery\LocaleDictionaryCommand;
+use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\Testing\BakeryTester;
+use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * Test for LocaleDictionaryCommand (locale:dictionary)
  */
 class LocaleDictionaryCommandTest extends TestCase
 {
-    use Helper\runCommand;
-
-    /**
-     * @var string Command to test
-     */
-    protected $commandToTest = LocaleDictionaryCommand::class;
+    protected Command $command;
 
     /**
      * {@inheritdoc}
      */
+    // TODO : Could be moved to Unit with improvement in Locale class.
     public function setUp(): void
     {
         parent::setUp();
 
+        $ci = ContainerStub::create();
+
+        // Use test locale data
+        $locator = new ResourceLocator(__DIR__ . '/data');
+        $locator->registerStream('locale', '', null, true);
+        $ci->set(ResourceLocatorInterface::class, $locator);
+
         // Force config to only three locales
-        $this->ci->config->set('site.locales.available', [
+        $config = $ci->get(Config::class);
+        $config->set('site.locales.available', [
             'en_US' => true,
             'es_ES' => false,
             'fr_FR' => true,
         ]);
 
-        // Use test locale data
-        $this->ci->locator = new ResourceLocator(__DIR__ . '/data');
-        $this->ci->locator->registerStream('locale', '', null, true);
+        // Command to test
+        $this->command = $ci->get(LocaleDictionaryCommand::class);
     }
 
     public function testCommandWithArguments(): void
     {
-        $result = $this->runCommand([
+        $result = BakeryTester::runCommand($this->command, [
             '--locale' => 'fr_FR',
         ]);
+        
+        // Assertions
         $this->assertSame(0, $result->getStatusCode());
-
         $output = $result->getDisplay();
         $this->assertStringNotContainsString('Dictionary for English locale', $output);
         $this->assertStringContainsString('Dictionary for French locale', $output);
@@ -59,11 +68,13 @@ class LocaleDictionaryCommandTest extends TestCase
 
     public function testCommand(): void
     {
-        $result = $this->runCommand([], [
-            'fr_FR',
-        ]);
+        $result = BakeryTester::runCommand(
+            command: $this->command, 
+            userInput: ['fr_FR']
+        );
+           
+        // Assertions
         $this->assertSame(0, $result->getStatusCode());
-
         $output = $result->getDisplay();
         $this->assertStringNotContainsString('Dictionary for English locale', $output);
         $this->assertStringContainsString('Dictionary for French locale', $output);

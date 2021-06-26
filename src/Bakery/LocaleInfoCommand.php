@@ -14,6 +14,8 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 
 /**
  * locale:info command.
@@ -23,6 +25,11 @@ use Symfony\Component\Console\Command\Command;
  */
 class LocaleInfoCommand extends Command
 {
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected SiteLocale $locale;
+
     /**
      * {@inheritdoc}
      */
@@ -40,12 +47,9 @@ class LocaleInfoCommand extends Command
     {
         $this->io->title('Available locales');
 
-        /** @var \UserFrosting\Sprinkle\Core\I18n\SiteLocale */
-        $localeService = $this->ci->locale;
-
         // Get available locales
         /** @var \UserFrosting\I18n\Locale[] $available */
-        $available = $localeService->getAvailable();
+        $available = $this->locale->getAvailable();
 
         // Prepare table headers and lines array
         $table = new Table($output);
@@ -57,7 +61,7 @@ class LocaleInfoCommand extends Command
                 $locale->getName(),
                 $locale->getRegionalName(),
                 implode(', ', $locale->getDependentLocalesIdentifier()),
-                ($locale->getIdentifier() === $localeService->getDefaultLocale()) ? 'Yes' : '',
+                ($locale->getIdentifier() === $this->locale->getDefaultLocale()) ? 'Yes' : '',
             ]);
         }
 

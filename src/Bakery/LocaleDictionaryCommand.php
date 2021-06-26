@@ -17,6 +17,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\I18n\Dictionary;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\LocaleOption;
 use Symfony\Component\Console\Command\Command;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * locale:dictionary command.
@@ -27,6 +29,10 @@ use Symfony\Component\Console\Command\Command;
 class LocaleDictionaryCommand extends Command
 {
     use LocaleOption;
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected ResourceLocatorInterface $locator;
 
     /**
      * {@inheritdoc}
@@ -50,7 +56,7 @@ class LocaleDictionaryCommand extends Command
         $this->io->title("Dictionary for {$locale->getName()} locale");
 
         // Get dictionary for both locales
-        $dictionary = new Dictionary($locale, $this->ci->locator);
+        $dictionary = new Dictionary($locale, $this->locator);
 
         $table = new Table($output);
         $table->setHeaders(['Key', 'Value']);
