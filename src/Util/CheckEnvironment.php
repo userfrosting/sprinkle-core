@@ -22,6 +22,7 @@ use UserFrosting\UniformResourceLocator\ResourceLocator;
  *
  * @author Alex Weissman (https://alexanderweissman.com)
  */
+// TODO ::: DELETE THIS FILE and replace with something better
 class CheckEnvironment
 {
     /**

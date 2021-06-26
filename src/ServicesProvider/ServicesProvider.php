@@ -20,9 +20,8 @@ use UserFrosting\Sprinkle\Core\Util\ClassMapper;
  * Registers core services for UserFrosting, such as config, database, asset manager, translator, etc.
  *
  * @author Alex Weissman (https://alexanderweissman.com)
- *
- * TODO ::: DELETE THIS FILE
  */
+// TODO ::: DELETE THIS FILE
 class ServicesProvider
 {
     /**
