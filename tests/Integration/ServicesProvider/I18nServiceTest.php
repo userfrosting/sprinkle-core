@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\I18n;
+namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use UserFrosting\I18n\Translator;
 use UserFrosting\Support\Repository\Repository as Config;
@@ -17,7 +17,7 @@ use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 /**
  * Tests AccountController
  */
-class TranslatorServicesProviderTest extends TestCase
+class I18nServiceTest extends TestCase
 {
     /**
      * @var bool[] Available locale for test
