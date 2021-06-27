@@ -10,12 +10,12 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Controller;
 
-use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
+use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
  * Tests AlertsController class.
  */
-class AlertsControllerTest extends CoreTestCase
+class AlertsControllerTest extends TestCase
 {
     public function testJsonAlerts(): void
     {
@@ -23,10 +23,10 @@ class AlertsControllerTest extends CoreTestCase
         $request = $this->createRequest('GET', '/alerts');
         $response = $this->handleRequest($request);
 
-        // Assert 404 response
+        // Assert 200 response
         $this->assertSame($response->getStatusCode(), 200);
 
         // Assert response body
-        $this->assertJson((string) $response->getBody()->getContents());
+        $this->assertResponseJson([], $response);
     }
 }
