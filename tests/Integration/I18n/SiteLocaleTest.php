@@ -129,7 +129,7 @@ class SiteLocaleTest extends TestCase
     /**
      * Will return en_US
      */
-    public function testGetLocaleIdentifierWithDefaultIndentifier(): void
+    public function testGetLocaleIdentifierWithDefaultIdentifier(): void
     {
         $this->config->set('site.locales.default', '');
         $this->assertSame('en_US', $this->locale->getLocaleIdentifier());
@@ -138,7 +138,7 @@ class SiteLocaleTest extends TestCase
     /**
      * Will return en_US
      */
-    public function testGetLocaleIdentifierWithNonStringIndentifier(): void
+    public function testGetLocaleIdentifierWithNonStringIdentifier(): void
     {
         $this->config->set('site.locales.default', ['foo', 'bar']);
         $this->assertSame('en_US', $this->locale->getLocaleIdentifier());

@@ -58,7 +58,7 @@ class I18nServiceTest extends TestCase
     /**
      * Will return en_US
      */
-    public function testActualServiceWithDefaultIndentifier(): void
+    public function testActualServiceWithDefaultIdentifier(): void
     {
         $this->config->set('site.locales.default', '');
         $translator = $this->ci->get(Translator::class);
@@ -69,7 +69,7 @@ class I18nServiceTest extends TestCase
     /**
      * Will return en_US
      */
-    public function testActualServiceWithNonStringIndentifier(): void
+    public function testActualServiceWithNonStringIdentifier(): void
     {
         $this->config->set('site.locales.default', ['foo', 'bar']);
         $translator = $this->ci->get(Translator::class);
