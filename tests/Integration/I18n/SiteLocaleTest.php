@@ -120,49 +120,49 @@ class SiteLocaleTest extends TestCase
     /**
      * Will return the default locale (fr_FR)
      */
-    public function testGetLocaleIndentifier(): void
+    public function testGetLocaleIdentifier(): void
     {
         $this->config->set('site.locales.default', 'fr_FR');
-        $this->assertSame('fr_FR', $this->locale->getLocaleIndentifier());
+        $this->assertSame('fr_FR', $this->locale->getLocaleIdentifier());
     }
 
     /**
      * Will return en_US
      */
-    public function testGetLocaleIndentifierWithDefaultIndentifier(): void
+    public function testGetLocaleIdentifierWithDefaultIndentifier(): void
     {
         $this->config->set('site.locales.default', '');
-        $this->assertSame('en_US', $this->locale->getLocaleIndentifier());
+        $this->assertSame('en_US', $this->locale->getLocaleIdentifier());
     }
 
     /**
      * Will return en_US
      */
-    public function testGetLocaleIndentifierWithNonStringIndentifier(): void
+    public function testGetLocaleIdentifierWithNonStringIndentifier(): void
     {
         $this->config->set('site.locales.default', ['foo', 'bar']);
-        $this->assertSame('en_US', $this->locale->getLocaleIndentifier());
+        $this->assertSame('en_US', $this->locale->getLocaleIdentifier());
     }
 
     /**
      * Test old method of defining the default locale
      */
-    public function testGetLocaleIndentifierWithCommaSeparatedString(): void
+    public function testGetLocaleIdentifierWithCommaSeparatedString(): void
     {
         $this->config->set('site.locales.default', 'fr_FR, en_US');
-        $this->assertSame('fr_FR, en_US', $this->locale->getLocaleIndentifier());
+        $this->assertSame('fr_FR, en_US', $this->locale->getLocaleIdentifier());
     }
 
     /**
      * Test old method of defining the default locale
      */
-    public function testGetLocaleIndentifierWithCommaSeparatedStringReverseOrder(): void
+    public function testGetLocaleIdentifierWithCommaSeparatedStringReverseOrder(): void
     {
         $this->config->set('site.locales.default', 'en_US,fr_FR');
-        $this->assertSame('en_US,fr_FR', $this->locale->getLocaleIndentifier());
+        $this->assertSame('en_US,fr_FR', $this->locale->getLocaleIdentifier());
     }
 
-    public function testGetLocaleIndentifierWithBrowserAndNoHeader(): void
+    public function testGetLocaleIdentifierWithBrowserAndNoHeader(): void
     {
         // Define mock
         $request = m::mock(\Psr\Http\Message\ServerRequestInterface::class);
@@ -175,13 +175,13 @@ class SiteLocaleTest extends TestCase
         $this->locale->defineBrowserLocale($request);
 
         // Get locale
-        $locale = $this->locale->getLocaleIndentifier();
+        $locale = $this->locale->getLocaleIdentifier();
 
         // Assertions
         $this->assertSame('fr_FR', $locale);
     }
 
-    public function testGetLocaleIndentifierWithBrowserAndComplexLocale(): void
+    public function testGetLocaleIdentifierWithBrowserAndComplexLocale(): void
     {
         // Define mock
         $request = m::mock(\Psr\Http\Message\ServerRequestInterface::class);
@@ -195,14 +195,14 @@ class SiteLocaleTest extends TestCase
         $this->locale->defineBrowserLocale($request);
 
         // Get locale
-        $locale = $this->locale->getLocaleIndentifier();
+        $locale = $this->locale->getLocaleIdentifier();
 
         // Assertions
         $this->assertSame('en_US', $locale);
         $this->assertTrue($this->locale->isAvailable($locale));
     }
 
-    public function testGetLocaleIndentifierWithBrowserAndComplexLocaleInLowerCase(): void
+    public function testGetLocaleIdentifierWithBrowserAndComplexLocaleInLowerCase(): void
     {
         // Define mock
         $request = m::mock(\Psr\Http\Message\ServerRequestInterface::class);
@@ -216,14 +216,14 @@ class SiteLocaleTest extends TestCase
         $this->locale->defineBrowserLocale($request);
 
         // Get locale
-        $locale = $this->locale->getLocaleIndentifier();
+        $locale = $this->locale->getLocaleIdentifier();
 
         // Assertions
         $this->assertSame('en_US', $locale);
         $this->assertTrue($this->locale->isAvailable($locale));
     }
 
-    public function testGetLocaleIndentifierWithBrowserAndMultipleLocale(): void
+    public function testGetLocaleIdentifierWithBrowserAndMultipleLocale(): void
     {
         // Define mock
         $request = m::mock(\Psr\Http\Message\ServerRequestInterface::class);
@@ -237,10 +237,10 @@ class SiteLocaleTest extends TestCase
         $this->locale->defineBrowserLocale($request);
 
         // Assertions
-        $this->assertSame('en_US', $this->locale->getLocaleIndentifier());
+        $this->assertSame('en_US', $this->locale->getLocaleIdentifier());
     }
 
-    public function testGetLocaleIndentifierWithBrowserAndLocaleInSecondPlace(): void
+    public function testGetLocaleIdentifierWithBrowserAndLocaleInSecondPlace(): void
     {
         // Define mock
         $request = m::mock(\Psr\Http\Message\ServerRequestInterface::class);
@@ -254,10 +254,10 @@ class SiteLocaleTest extends TestCase
         $this->locale->defineBrowserLocale($request);
 
         // Assertions
-        $this->assertSame('en_US', $this->locale->getLocaleIndentifier());
+        $this->assertSame('en_US', $this->locale->getLocaleIdentifier());
     }
 
-    public function testGetLocaleIndentifierWithBrowserAndInvalidLocale(): void
+    public function testGetLocaleIdentifierWithBrowserAndInvalidLocale(): void
     {
         // Define mock
         $request = m::mock(\Psr\Http\Message\ServerRequestInterface::class);
@@ -271,10 +271,10 @@ class SiteLocaleTest extends TestCase
         $this->locale->defineBrowserLocale($request);
 
         // Assertions
-        $this->assertSame('fr_FR', $this->locale->getLocaleIndentifier());
+        $this->assertSame('fr_FR', $this->locale->getLocaleIdentifier());
     }
 
-    public function testGetLocaleIndentifierWithBrowserAndNonExistingLocale(): void
+    public function testGetLocaleIdentifierWithBrowserAndNonExistingLocale(): void
     {
         // Define mock
         $request = m::mock(\Psr\Http\Message\ServerRequestInterface::class);
@@ -288,7 +288,7 @@ class SiteLocaleTest extends TestCase
         $this->locale->defineBrowserLocale($request);
 
         // Assertions
-        $this->assertSame('fr_FR', $this->locale->getLocaleIndentifier());
+        $this->assertSame('fr_FR', $this->locale->getLocaleIdentifier());
     }
 
     public function testMiddlewareWithSimulatedBrowserLocaleControl(): void 
@@ -334,7 +334,7 @@ class ControllerStub
 {
     public function __invoke(Response $response, SiteLocale $siteLocale): Response
     {
-        $response->getBody()->write($siteLocale->getLocaleIndentifier());
+        $response->getBody()->write($siteLocale->getLocaleIdentifier());
             
         return $response;
     }

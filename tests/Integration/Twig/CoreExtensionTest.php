@@ -75,7 +75,7 @@ class CoreExtensionTest extends TestCase
 
     public function testCurrentLocaleGlobal(): void
     {
-        $this->ci->locale = Mockery::mock(SiteLocale::class)->shouldReceive('getLocaleIndentifier')->once()->andReturn('zz-ZZ')->getMock();
+        $this->ci->locale = Mockery::mock(SiteLocale::class)->shouldReceive('getLocaleIdentifier')->once()->andReturn('zz-ZZ')->getMock();
 
         $this->assertSame('zz-ZZ', $this->ci->view->fetchFromString('{{ currentLocale }}'));
     }

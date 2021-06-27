@@ -130,7 +130,7 @@ class SiteLocale
      *
      * @todo This should accept the request service as argument, or null, in which case the `getBrowserLocale` method would be skipped
      */
-    public function getLocaleIndentifier(): string
+    public function getLocaleIdentifier(): string
     {
         // Get default locales as specified in configurations.
         $browserLocale = $this->getBrowserLocale();

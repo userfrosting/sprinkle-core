@@ -125,7 +125,7 @@ class CoreExtension extends AbstractExtension implements GlobalsInterface
         return [
             'site'          => $site,
             'assets'        => new AssetsTemplatePlugin($this->assets),
-            'currentLocale' => $this->locale->getLocaleIndentifier(),
+            'currentLocale' => $this->locale->getLocaleIdentifier(),
         ];
     }
 }

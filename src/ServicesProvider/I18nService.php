@@ -30,8 +30,8 @@ class I18nService implements ServicesProviderInterface
         return [
             // TODO : Locale and Dictionary should be injected somehow...
             //        Dictionary should be easier to get in it's own service.
-            Translator::class => function (SiteLocale $locale, ResourceLocatorInterface $locator) {
-                $locale = new Locale($locale->getLocaleIndentifier());
+            Translator::class => function (SiteLocale $siteLocale, ResourceLocatorInterface $locator) {
+                $locale = new Locale($siteLocale->getLocaleIdentifier());
                 $dictionary = new Dictionary($locale, $locator);
                 $translator = new Translator($dictionary);
 
