@@ -41,7 +41,7 @@ class ViewServiceTest extends TestCase
 
         // Set dependencies services
         $this->ci->set(CoreExtension::class, m::mock(CoreExtension::class));
-    }    
+    }
     
     public function testService()
     {

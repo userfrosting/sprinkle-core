@@ -25,6 +25,7 @@ use UserFrosting\Support\Repository\Repository as Config;
 /**
  * Extends Twig functionality for the Core sprinkle.
  */
+// TODO : This should be separated in multiple Extension and registered in CoreRecipe
 class CoreExtension extends AbstractExtension implements GlobalsInterface
 {
     /**
