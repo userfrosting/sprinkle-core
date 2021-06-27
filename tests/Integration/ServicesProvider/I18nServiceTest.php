@@ -17,6 +17,8 @@ use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 /**
  * Tests AccountController
  */
+// TODO : Test disabled for now, might delete later. Testing the Config is a valid concern, 
+//        but shouldn't matter here as the Translator is not dependent on Config, SiteLocale is. And this should be tested there.
 class I18nServiceTest extends TestCase
 {
     /**
@@ -47,33 +49,33 @@ class I18nServiceTest extends TestCase
     /**
      * Will return the default locale (fr_FR)
      */
-    public function testActualService(): void
+    /*public function testActualService(): void
     {
         $this->config->set('site.locales.default', 'fr_FR');
         $translator = $this->ci->get(Translator::class);
         $this->assertInstanceOf(Translator::class, $translator);
         $this->assertSame('fr_FR', $translator->getLocale()->getIdentifier());
-    }
+    }*/
 
     /**
      * Will return en_US
      */
-    public function testActualServiceWithDefaultIdentifier(): void
+    /*public function testActualServiceWithDefaultIdentifier(): void
     {
         $this->config->set('site.locales.default', '');
         $translator = $this->ci->get(Translator::class);
         $this->assertInstanceOf(Translator::class, $translator);
         $this->assertSame('en_US', $translator->getLocale()->getIdentifier());
-    }
+    }*/
 
     /**
      * Will return en_US
      */
-    public function testActualServiceWithNonStringIdentifier(): void
+    /*public function testActualServiceWithNonStringIdentifier(): void
     {
         $this->config->set('site.locales.default', ['foo', 'bar']);
         $translator = $this->ci->get(Translator::class);
         $this->assertInstanceOf(Translator::class, $translator);
         $this->assertSame('en_US', $translator->getLocale()->getIdentifier());
-    }
+    }*/
 }
