@@ -110,6 +110,8 @@ class MigratorTest extends TestCase
         ], $ran);
     }
 
+    // TODO : This didn't worked on GH Actions... testing.dbConnection might not be working because db is initialized before.
+    // https://github.com/userfrosting/sprinkle-core/runs/2925978557?check_suite_focus=true#step:11:709
     public function testRepository(): void
     {
         $ran = $this->migrator->run();
@@ -236,6 +238,8 @@ class MigratorTest extends TestCase
         $this->assertEquals('\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable', $migrated[2]);
     }
 
+    // TODO : This didn't worked on GH Actions... testing.dbConnection might not be working because db is initialized before.
+    // https://github.com/userfrosting/sprinkle-core/runs/2925978557?check_suite_focus=true#step:11:720
     public function testDependableMigrationsWithInstalled(): void
     {
         // Run the `one` migrations

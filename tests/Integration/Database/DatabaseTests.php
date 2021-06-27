@@ -18,6 +18,7 @@ use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Support\Repository\Repository as Config;
 
+// TODO : Somehow tables are not created on CI. Migration might not be run up or bad schemaName used somewhere ?
 class DatabaseTests extends TestCase
 {
     use TestDatabase;
