@@ -10,6 +10,10 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests;
 
+use DI\Container;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
+
 /**
  * Trait enabling wrapping of each test case in a database transaction
  * Based on Laravel `RefreshDatabase` Traits
@@ -28,9 +32,11 @@ trait RefreshDatabase
      */
     public function refreshDatabase()
     {
-        $this->usingInMemoryDatabase()
-                        ? $this->refreshInMemoryDatabase()
-                        : $this->refreshTestDatabase();
+        if (!isset($this->ci) || !$this->ci instanceof Container) {
+            throw new \Exception('CI/Container not available. Make sure you extend the correct TestCase');
+        }
+        
+        $this->usingInMemoryDatabase() ? $this->refreshInMemoryDatabase() : $this->refreshTestDatabase();
     }
 
     /**
@@ -40,7 +46,7 @@ trait RefreshDatabase
      */
     public function usingInMemoryDatabase()
     {
-        $connection = $this->ci->db->getConnection();
+        $connection = $this->ci->get(Capsule::class)->connection();
 
         return $connection->getDatabaseName() == ':memory:';
     }
@@ -50,7 +56,7 @@ trait RefreshDatabase
      */
     protected function refreshInMemoryDatabase()
     {
-        $this->ci->migrator->run();
+        $this->ci->get(Migrator::class)->run();
     }
 
     /**
@@ -61,8 +67,8 @@ trait RefreshDatabase
         if (!self::$migrated) {
 
             // Refresh the Database. Rollback all migrations and start over
-            $this->ci->migrator->reset();
-            $this->ci->migrator->run();
+            $this->ci->get(Migrator::class)->reset();
+            $this->ci->get(Migrator::class)->run();
 
             self::$migrated = true;
         }
@@ -75,7 +81,7 @@ trait RefreshDatabase
      */
     protected function beginDatabaseTransaction()
     {
-        $database = $this->ci->db;
+        $database = $this->ci->get(Capsule::class);
 
         foreach ($this->connectionsToTransact() as $name) {
             $database->connection($name)->beginTransaction();

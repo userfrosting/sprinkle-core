@@ -14,14 +14,13 @@ use Illuminate\Session\DatabaseSessionHandler;
 
 /**
  * Trait used to run test against the `test_integration` db connection
- *
- * @author Louis Charette
  */
 trait withDatabaseSessionHandler
 {
     /**
      * Reset CI with database session handler
      */
+    // TODO : Require session service...
     public function useDatabaseSessionHandler()
     {
         // Skip test if using in-memory database.
@@ -36,6 +35,7 @@ trait withDatabaseSessionHandler
         putenv('TEST_SESSION_HANDLER=database');
 
         // Unset the env when test is done to avoid conflict
+        // TODO : This doesn't exist anymore... 
         $this->beforeApplicationDestroyedCallbacks[] = function () {
             putenv('TEST_SESSION_HANDLER');
 

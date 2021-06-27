@@ -22,3 +22,7 @@ vendor/*
 
 # Ignore api doc
 api/
+
+# Ignore test artifact
+tests/Integration/Session/data/*
+!tests/Integration/Session/data/.gitkeep

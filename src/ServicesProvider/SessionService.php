@@ -33,21 +33,26 @@ class SessionService implements ServicesProviderInterface
             Session::class => function (Capsule $db, Config $config, ResourceLocatorInterface $locator) {
 
                 // Create appropriate handler based on config
-                if ($config['session.handler'] == 'file') {
-                    $fs = new Filesystem();
-                    $handler = new FileSessionHandler($fs, $locator->findResource('session://'), $config['session.minutes']);
-                } elseif ($config['session.handler'] == 'database') {
-                    $connection = $db->connection();
-                    // Table must exist, otherwise an exception will be thrown
-                    $handler = new DatabaseSessionHandler($connection, $config['session.database.table'], $config['session.minutes']);
-                } elseif ($config['session.handler'] == 'array') {
-                    $handler = new NullSessionHandler();
-                } else {
-                    throw new \Exception("Bad session handler type '{$config['session.handler']}' specified in configuration file.");
+                switch ($config->get('session.handler')) {
+                    case 'file';
+                        $fs = new Filesystem(); // TODO : Should be injected
+                        $handler = new FileSessionHandler($fs, $locator->findResource('session://'), $config->get('session.minutes'));
+                    break;
+                    case 'database':
+                        $connection = $db->connection();
+                        // Table must exist, otherwise an exception will be thrown
+                        $handler = new DatabaseSessionHandler($connection, $config->get('session.database.table'), $config->get('session.minutes'));
+                    break;
+                    case 'array':
+                        $handler = new NullSessionHandler();
+                    break;
+                    default:
+                        throw new \Exception("Bad session handler type '{$config['session.handler']}' specified in configuration file.");
+                    break;
                 }
 
                 // Create, start and return a new wrapper for $_SESSION
-                $session = new Session($handler, $config['session']);
+                $session = new Session($handler, $config->get('session'));
                 $session->start();
 
                 return $session;

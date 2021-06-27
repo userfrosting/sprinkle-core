@@ -12,26 +12,42 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Session;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Session\FileSessionHandler;
+use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Session\Session;
-use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * Integration tests for the session service.
  */
+// TODO : This whole test needs a rewrite using Mockery, not integration. Injection should be preferred for *SessionHandler.
+//        The service itself should be tested in a separate test case and focus only on the logic used to determine which Handler is used.
 class SessionFileHandlerTest extends TestCase
 {
+    protected ResourceLocatorInterface $locator;
+    
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // Set service alias
+        $this->setTestLocator();
+    }
+    
     /**
      * Test FileSessionHandler works with our locator
      */
+    // TODO : Needs to setup a tes location for the locator
     public function testSessionWrite()
     {
         $fs = new Filesystem();
 
         // Define random session ID
+        // TODO : Use md5 of datetime to avoid duplicate
         $session_id = 'test' . rand(1, 100000);
 
         // Get session dir
-        $session_dir = $this->ci->locator->findResource('session://');
+        $session_dir = $this->locator->findResource('session://');
 
         // Define session filename
         $session_file = "$session_dir/$session_id";
@@ -74,33 +90,38 @@ class SessionFileHandlerTest extends TestCase
     /**
      * @depends testSessionWrite
      */
+    // TODO : Require session service
     public function testUsingSessionDouble()
     {
-        $this->ci->session->destroy();
+        $this->ci->get(Session::class)->destroy();
         $this->sessionTests($this->getSession());
     }
 
     /**
      * @depends testUsingSessionDouble
      */
-    public function testUsingSessionService()
+    // TODO : This whole test needs a rewrite using Mockery.
+    /*public function testUsingSessionService()
     {
         // Force test to use database session handler
         putenv('TEST_SESSION_HANDLER=file');
 
         // Refresh app to use new setup
-        $this->ci->session->destroy();
+        $this->ci->get(Session::class)->destroy();
         $this->refreshApplication();
 
+        // Needs to reset the locator stream
+        $this->setTestLocator();
+
         // Check setting is ok
-        $this->assertSame('file', $this->ci->config['session.handler']);
+        $this->assertSame('file', $this->ci->get(Config::class)->get('session.handler'));
 
         // Make sure config is set
-        $this->sessionTests($this->ci->session);
+        $this->sessionTests($this->ci->get(Session::class));
 
         // Unset the env when test is done to avoid conflict
         putenv('TEST_SESSION_HANDLER');
-    }
+    }*/
 
     /**
      * Simulate session service with database handler.
@@ -111,9 +132,11 @@ class SessionFileHandlerTest extends TestCase
      */
     protected function getSession()
     {
-        $config = $this->ci->config;
+        $config = $this->ci->get(Config::class);
+        $locator = $this->ci->get(ResourceLocatorInterface::class);
+        
         $fs = new Filesystem();
-        $handler = new FileSessionHandler($fs, $this->ci->locator->findResource('session://'), 120);
+        $handler = new FileSessionHandler($fs, $locator->findResource('session://'), 120);
         $session = new Session($handler, $config['session']);
 
         $this->assertInstanceOf(Session::class, $session);
@@ -151,11 +174,18 @@ class SessionFileHandlerTest extends TestCase
         session_write_close();
 
         // Make sure file was filled with something
-        $session_dir = $this->ci->locator->findResource('session://');
+        $session_dir = $this->locator->findResource('session://');
         $session_file = "$session_dir/$session_id";
 
         $fs = new Filesystem();
         $this->assertTrue($fs->exists($session_file));
         $this->assertSame('foo|s:3:"bar";', $fs->get($session_file));
+    }
+
+    protected function setTestLocator(): void 
+    {
+        // Set service alias
+        $this->locator = $this->ci->get(ResourceLocatorInterface::class);
+        $this->locator->removeStream('session')->registerStream('session', '', __DIR__ . '/data', true);
     }
 }
