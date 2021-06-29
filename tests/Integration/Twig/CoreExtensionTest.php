@@ -13,26 +13,18 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Twig;
 use DI\Container;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use UserFrosting\Alert\AlertStream;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 use PHPUnit\Framework\TestCase;
 use Slim\Views\Twig;
 use UserFrosting\Sprinkle\Core\Twig\CoreExtension;
 use UserFrosting\Testing\ContainerStub;
 
-use UserFrosting\Assets\Assets;
-use UserFrosting\Assets\AssetsTemplatePlugin;
-use UserFrosting\I18n\Translator;
-use UserFrosting\Sprinkle\Core\Util\Util;
-use UserFrosting\Support\Repository\Repository as Config;
-
-
 /**
  * CoreExtensionTest class.
  * Tests Core twig extensions
  */
 // TODO : CoreExtension should be separated in multiple Extension and registered in CoreRecipe.
-// TODO : Could be revised similar to TwigRuntimeExtension. Then each sub function / filter / etc.  can be tested individually. 
+// TODO : Could be revised similar to TwigRuntimeExtension. Then each sub function / filter / etc.  can be tested individually.
 //        We would only need to test here that the Extensions are really loaded (by mocking the Extension probably).
 class CoreExtensionTest extends TestCase
 {
@@ -52,39 +44,6 @@ class CoreExtensionTest extends TestCase
         // Set dependencies services
         $this->view = Twig::create(__DIR__);
     }
-
-    // TODO : 
-    /*public function testGetAlerts(): void
-    {
-        $alerts = Mockery::mock(AlertStream::class)->shouldReceive('getAndClearMessages')->once()->andReturn([
-            ['message' => 'foo'],
-            ['message' => 'bar'],
-        ])->getMock();
-        $this->ci->set(AlertStream::class, $alerts);
-        $this->ci->set(Assets::class, Mockery::mock(Assets::class));
-        $config = Mockery::mock(Config::class)->shouldReceive('get')->with('site')->once()->andReturn([])->getMock();
-        $this->ci->set(Config::class, $config);
-        $this->ci->set(SiteLocale::class, Mockery::mock(SiteLocale::class));
-        // TODO : Mock the rest... but we just want to test alerts! This needs a rewrite...
-        $this->ci->set(Translator::class, Mockery::mock(Translator::class));
-
-        // TODO : This is probably fine. But it need to be separated per Extension 
-        $this->view->addExtension($this->ci->get(CoreExtension::class));
-
-        $result = $this->view->fetchFromString('{% for alert in getAlerts() %}{{alert.message}}{% endfor %}');
-        $this->assertSame('foobar', $result);
-    }*/
-
-    /*public function testGetAlertsNoClear(): void
-    {
-        $this->ci->alerts = Mockery::mock(AlertStream::class)->shouldReceive('messages')->once()->andReturn([
-            ['message' => 'foo'],
-            ['message' => 'bar'],
-        ])->getMock();
-
-        $result = $this->ci->view->fetchFromString('{% for alert in getAlerts(false) %}{{alert.message}}{% endfor %}');
-        $this->assertSame('foobar', $result);
-    }*/
 
     /**
      * @see https://github.com/userfrosting/UserFrosting/issues/1090

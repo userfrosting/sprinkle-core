@@ -10,14 +10,15 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
-use UserFrosting\ServicesProvider\ServicesProviderInterface;
-use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
-use Slim\Views\Twig;
-use Twig\Extension\DebugExtension;
-use UserFrosting\Sprinkle\Core\Twig\CoreExtension;
-use UserFrosting\Support\Repository\Repository as Config;
 use Slim\App;
+use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use Twig\Extension\DebugExtension;
+use UserFrosting\ServicesProvider\ServicesProviderInterface;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\TwigAlertsExtension;
+use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /*
  * Set up Twig as the view, adding template paths for all sprinkles and the Slim Twig extension.
@@ -29,7 +30,12 @@ class TwigService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            Twig::class => function (ResourceLocatorInterface $locator, Config $config, CoreExtension $coreExtension) {
+            Twig::class => function (
+                ResourceLocatorInterface $locator,
+                Config $config,
+                CoreExtension $coreExtension,
+                TwigAlertsExtension $alertExtension
+            ) {
                 $templatePaths = $locator->getResources('templates://');
                 $view = Twig::create(array_map('strval', $templatePaths));
                 $loader = $view->getLoader();
@@ -52,6 +58,7 @@ class TwigService implements ServicesProviderInterface
 
                 // Register the core UF extension with Twig
                 $view->addExtension($coreExtension);
+                $view->addExtension($alertExtension);
 
                 return $view;
             },

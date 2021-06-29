@@ -31,6 +31,7 @@ class I18nService implements ServicesProviderInterface
             // TODO : Locale should be injected somehow... SiteLocale should probably extend Locale...
             DictionaryInterface::class => function (SiteLocale $siteLocale, ResourceLocatorInterface $locator) {
                 $locale = new Locale($siteLocale->getLocaleIdentifier());
+
                 return new Dictionary($locale, $locator);
             },
         ];

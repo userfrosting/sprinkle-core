@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Twig;
+namespace UserFrosting\Sprinkle\Core\Twig\Extensions;
 
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
@@ -36,7 +36,6 @@ class CoreExtension extends AbstractExtension implements GlobalsInterface
      * @param Translator  $translator The translator service
      */
     public function __construct(
-        protected AlertStream $alertStream,
         protected Assets $assets,
         protected Config $config,
         protected SiteLocale $locale,
@@ -53,14 +52,6 @@ class CoreExtension extends AbstractExtension implements GlobalsInterface
     public function getFunctions()
     {
         return [
-            // Add Twig function for fetching alerts
-            new TwigFunction('getAlerts', function ($clear = true) {
-                if ($clear) {
-                    return $this->alertStream->getAndClearMessages();
-                } else {
-                    return $this->alertStream->messages();
-                }
-            }),
             // Add Twig translator function
             new TwigFunction('translate', function (string $hook, $params = []) {
                 return $this->translator->translate($hook, $params);

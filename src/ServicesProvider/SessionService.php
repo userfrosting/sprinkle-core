@@ -34,7 +34,7 @@ class SessionService implements ServicesProviderInterface
 
                 // Create appropriate handler based on config
                 switch ($config->get('session.handler')) {
-                    case 'file';
+                    case 'file':
                         $fs = new Filesystem(); // TODO : Should be injected
                         $handler = new FileSessionHandler($fs, $locator->findResource('session://'), $config->get('session.minutes'));
                     break;
