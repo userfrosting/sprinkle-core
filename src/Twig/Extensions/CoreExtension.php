@@ -13,11 +13,9 @@ namespace UserFrosting\Sprinkle\Core\Twig\Extensions;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 use Twig\TwigFilter;
-use Twig\TwigFunction;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Assets\Assets;
 use UserFrosting\Assets\AssetsTemplatePlugin;
-use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 use UserFrosting\Sprinkle\Core\Util\Util;
 use UserFrosting\Support\Repository\Repository as Config;
@@ -33,32 +31,12 @@ class CoreExtension extends AbstractExtension implements GlobalsInterface
      * @param Assets      $assets     The assets service
      * @param Config      $config     The config service
      * @param SiteLocale  $locale     The site locale service
-     * @param Translator  $translator The translator service
      */
     public function __construct(
         protected Assets $assets,
         protected Config $config,
         protected SiteLocale $locale,
-        protected Translator $translator,
     ) {
-    }
-
-    /**
-     * Adds Twig functions `getAlerts` and `translate`.
-     *
-     * @return TwigFunction[]
-     */
-    // TODO : Could be revised similar to TwigRuntimeExtension
-    public function getFunctions()
-    {
-        return [
-            // Add Twig translator function
-            new TwigFunction('translate', function (string $hook, $params = []) {
-                return $this->translator->translate($hook, $params);
-            }, [
-                'is_safe' => ['html'],
-            ]),
-        ];
     }
 
     /**

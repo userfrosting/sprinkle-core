@@ -13,10 +13,9 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Twig;
 use DI\Container;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 use PHPUnit\Framework\TestCase;
 use Slim\Views\Twig;
-use UserFrosting\Sprinkle\Core\Twig\CoreExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
 use UserFrosting\Testing\ContainerStub;
 
 /**
@@ -44,15 +43,6 @@ class CoreExtensionTest extends TestCase
         // Set dependencies services
         $this->view = Twig::create(__DIR__);
     }
-
-    /**
-     * @see https://github.com/userfrosting/UserFrosting/issues/1090
-     */
-    /*public function testTranslateFunction(): void
-    {
-        $result = $this->ci->view->fetchFromString('{{ translate("USER", 2) }}');
-        $this->assertSame('Users', $result);
-    }*/
 
     /*public function testPhoneFilter(): void
     {

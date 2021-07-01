@@ -39,11 +39,11 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AssetService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
-use UserFrosting\Sprinkle\Core\ServicesProvider\VersionsService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CsrfService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\DbService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ErrorHandlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\FactoryService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\I18nService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\LocatorService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\LoggersService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\MailService;
@@ -52,11 +52,15 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\RouterService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\SeederService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\SessionService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
-use UserFrosting\Sprinkle\Core\ServicesProvider\I18nService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\VersionsService;
+use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\TwigAlertsExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\TwigI18nExtension;
 use UserFrosting\Sprinkle\SprinkleRecipe;
 
-class Core implements SprinkleRecipe
+class Core implements SprinkleRecipe, TwigExtensionRecipe
 {
     /**
      * {@inheritdoc}
@@ -165,6 +169,20 @@ class Core implements SprinkleRecipe
         return [
             LocaleMiddleware::class,
             TwigMiddleware::class,
+        ];
+    }
+
+    /**
+     * Return an array of all registered Twig Extensions.
+     *
+     * @return \Twig\Extension\ExtensionInterface[]
+     */
+    public static function getTwigExtensions(): array
+    {
+        return [
+            CoreExtension::class,
+            TwigAlertsExtension::class,
+            TwigI18nExtension::class,
         ];
     }
 }
