@@ -10,15 +10,14 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
-use DI\Container;
-use ReflectionClass;
 use Slim\App;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Twig\Extension\DebugExtension;
+use Twig\Extension\ExtensionInterface;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
-use UserFrosting\Sprinkle\SprinkleManager;
+use UserFrosting\Sprinkle\RecipeExtensionLoader;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
@@ -35,11 +34,11 @@ class TwigService implements ServicesProviderInterface
             Twig::class => function (
                 ResourceLocatorInterface $locator,
                 Config $config,
-                SprinkleManager $sprinkleManager,
-                Container $ci,
+                RecipeExtensionLoader $extensionLoader,
             ) {
                 $templatePaths = $locator->getResources('templates://');
-                $twig = Twig::create(array_map('strval', $templatePaths));
+                $templatePathsStrings = array_map('strval', $templatePaths);
+                $twig = Twig::create($templatePathsStrings);
                 $loader = $twig->getLoader();
 
                 // Add Sprinkles' templates namespaces
@@ -58,8 +57,8 @@ class TwigService implements ServicesProviderInterface
                     $twig->addExtension(new DebugExtension());
                 }
 
-                // Register the core UF extension with Twig
-                $this->registerTwigExtensions($twig, $sprinkleManager, $ci);
+                // Register Twig extensions
+                $this->registerTwigExtensions($twig, $extensionLoader);
 
                 return $twig;
             },
@@ -73,36 +72,16 @@ class TwigService implements ServicesProviderInterface
     /**
      * Register all Twig Extensions defined in Sprinkles TwigExtensionRecipe.
      */
-    protected function registerTwigExtensions(Twig $twig, SprinkleManager $sprinkleManager, Container $ci): void
+    protected function registerTwigExtensions(Twig $twig, RecipeExtensionLoader $extensionLoader): void
     {
-        foreach ($sprinkleManager->getSprinkles() as $sprinkle) {
-            if ($this->validateClassIsTwigExtensionRecipe($sprinkle)) {
-                foreach ($sprinkle::getTwigExtensions() as $extension) {
-                    $instance = $ci->get($extension);
-                    $twig->addExtension($instance);
-                }
-            }
-        }
-    }
+        $extensions = $extensionLoader->getInstances(
+            method: 'getTwigExtensions',
+            recipeInterface: TwigExtensionRecipe::class,
+            extensionInterface: ExtensionInterface::class,
+        );
 
-    /**
-     * Validate the class implements SprinkleRecipe.
-     *
-     * @param string $class
-     *
-     * @return bool True/False if class implements SprinkleRecipe
-     */
-    protected function validateClassIsTwigExtensionRecipe(string $class): bool
-    {
-        if (!class_exists($class)) {
-            return false;
+        foreach ($extensions as $extension) {
+            $twig->addExtension($extension);
         }
-
-        $class = new ReflectionClass($class);
-        if ($class->implementsInterface(TwigExtensionRecipe::class)) {
-            return true;
-        }
-
-        return false;
     }
 }
