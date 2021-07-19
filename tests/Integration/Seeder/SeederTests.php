@@ -10,14 +10,14 @@
 
 namespace UserFrosting\Tests\Integration\Seeder;
 
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use UserFrosting\UniformResourceLocator\ResourceLocator;
-use UserFrosting\Sprinkle\Core\Database\Seeder\Seeder;
-use UserFrosting\Sprinkle\Core\Database\Seeder\SeedInterface;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Seeder\BaseSeed;
+use UserFrosting\Sprinkle\Core\Database\Seeder\Seeder;
+use UserFrosting\Sprinkle\Core\Database\Seeder\SeedInterface;
 use UserFrosting\Testing\ContainerStub;
+use UserFrosting\UniformResourceLocator\ResourceLocator;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 // TODO : See notes in Seeder Class. This could be improved by mocking the class / locator (but locator also need to be removed here)

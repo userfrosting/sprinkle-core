@@ -11,9 +11,9 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use DI\Container;
-use Mockery as m;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Illuminate\Cache\Repository as Cache;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
 use UserFrosting\Support\Repository\Repository as Config;

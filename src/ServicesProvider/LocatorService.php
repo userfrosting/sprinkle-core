@@ -12,8 +12,8 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\SprinkleManager;
-use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 class LocatorService implements ServicesProviderInterface
 {

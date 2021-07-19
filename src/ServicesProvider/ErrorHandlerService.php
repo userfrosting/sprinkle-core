@@ -12,11 +12,11 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerManager;
-use UserFrosting\Support\Exception\HttpException;
-use UserFrosting\Support\Exception\NotFoundException;
 use UserFrosting\Sprinkle\Core\Error\Handler\HttpExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Handler\NotFoundExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Handler\PhpMailerExceptionHandler;
+use UserFrosting\Support\Exception\HttpException;
+use UserFrosting\Support\Exception\NotFoundException;
 
 class ErrorHandlerService implements ServicesProviderInterface
 {

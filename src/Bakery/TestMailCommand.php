@@ -11,12 +11,12 @@
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Carbon\Carbon;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Mail\EmailRecipient;
 use UserFrosting\Sprinkle\Core\Mail\TwigMailMessage;
-use Symfony\Component\Console\Command\Command;
 
 /**
  * TestMail CLI Command.

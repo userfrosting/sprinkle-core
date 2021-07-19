@@ -35,7 +35,7 @@ trait withDatabaseSessionHandler
         putenv('TEST_SESSION_HANDLER=database');
 
         // Unset the env when test is done to avoid conflict
-        // TODO : This doesn't exist anymore... 
+        // TODO : This doesn't exist anymore...
         $this->beforeApplicationDestroyedCallbacks[] = function () {
             putenv('TEST_SESSION_HANDLER');
 

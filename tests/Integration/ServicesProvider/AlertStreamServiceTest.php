@@ -12,17 +12,17 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use DI\Container;
 use Illuminate\Cache\Repository as Cache;
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Alert\CacheAlertStream;
 use UserFrosting\Alert\SessionAlertStream;
-use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
-use UserFrosting\Testing\ContainerStub;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Session\Session;
+use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
+use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\Testing\ContainerStub;
 
 /**
  * Integration tests for `alerts` service.

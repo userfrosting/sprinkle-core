@@ -25,7 +25,7 @@ use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 class LocaleCompareCommandTest extends TestCase
 {
     protected Command $command;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -74,7 +74,7 @@ class LocaleCompareCommandTest extends TestCase
             '--left'  => 'en_US',
             '--right' => 'en_US',
         ]);
-        
+
         // Assert results
         $this->assertSame(0, $result->getStatusCode());
         $output = $result->getDisplay();
@@ -90,10 +90,10 @@ class LocaleCompareCommandTest extends TestCase
     public function testCommand(): void
     {
         $result = BakeryTester::runCommand(
-            command: $this->command, 
-            userInput: ['en_US', 'fr_FR',]
+            command: $this->command,
+            userInput: ['en_US', 'fr_FR']
         );
-        
+
         // Assert results
         $this->assertSame(0, $result->getStatusCode());
         $output = $result->getDisplay();

@@ -11,11 +11,11 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use DI\Container;
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use UserFrosting\Support\Repository\Repository as Config;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
+use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
@@ -42,7 +42,7 @@ class ConfigServiceTest extends TestCase
         $locator->shouldReceive('getBasePath')->andReturn('');
         $this->ci->set(ResourceLocatorInterface::class, $locator);
     }
-    
+
     // TODO : Requires Service to be reworked with more injection
     /*public function testService()
     {

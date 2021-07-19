@@ -10,9 +10,9 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
+use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationDependencyAnalyser;
 use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
-use PHPUnit\Framework\TestCase;
 
 class MigrationDependencyAnalyserTest extends TestCase
 {

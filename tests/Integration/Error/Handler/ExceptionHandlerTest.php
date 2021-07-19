@@ -10,12 +10,12 @@
 
 namespace UserFrosting\Tests\Integration\Error\Handler;
 
-use Psr\Container\ContainerInterface;
-use RuntimeException;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use UserFrosting\Sprinkle\Core\Error\Handler\ExceptionHandler;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
+use UserFrosting\Sprinkle\Core\Error\Handler\ExceptionHandler;
 
 class ExceptionHandlerTest extends TestCase
 {

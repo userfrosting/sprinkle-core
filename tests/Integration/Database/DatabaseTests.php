@@ -13,16 +13,16 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;
-use UserFrosting\Support\Exception\BadRequestException;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
+use UserFrosting\Support\Exception\BadRequestException;
 use UserFrosting\Support\Repository\Repository as Config;
 
 // TODO : Somehow tables are not created on CI. Migration might not be run up or bad schemaName used somewhere ?
 class DatabaseTests extends TestCase
 {
     use TestDatabase;
-    
+
     /**
      * @var string
      */

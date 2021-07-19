@@ -32,7 +32,7 @@ abstract class AbstractVersionValidatorTester extends TestCase
     public function testValidator(string $version, string $sanitized, bool $valid): void
     {
         $validator = new $this->validator($version, $this->required);
-        
+
         // Assert installed version is sanitized
         $this->assertSame($sanitized, $validator->getInstalled());
 

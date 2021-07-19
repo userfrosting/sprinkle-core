@@ -10,18 +10,18 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\I18n;
 
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use Psr\Http\Message\ResponseInterface as Response;
 use UserFrosting\I18n\Locale;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
-use UserFrosting\UniformResourceLocator\ResourceLocator;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\UniformResourceLocator\ResourceLocator;
 
 /**
  * Tests SiteLocale.
- * 
+ *
  * N.B.: This requires the full App stack, since locale files will be loaded.
  */
 class SiteLocaleTest extends TestCase
@@ -66,7 +66,7 @@ class SiteLocaleTest extends TestCase
      * @depends testFakeConfig
      */
     public function testGetAvailableIdentifiers(): void
-    {        
+    {
         $this->assertSame([
             'fr_FR',
             'en_US',
@@ -111,7 +111,7 @@ class SiteLocaleTest extends TestCase
      * @depends testGetAvailableIdentifiers
      */
     public function testIsAvailable(): void
-    {        
+    {
         $this->assertFalse($this->locale->isAvailable('ZZ_zz'));
         $this->assertFalse($this->locale->isAvailable('es_ES'));
         $this->assertTrue($this->locale->isAvailable('en_US'));
@@ -211,7 +211,7 @@ class SiteLocaleTest extends TestCase
 
         // Define default locale
         $this->config['site.locales.default'] = 'fr_FR';
-        
+
         // Define browser locale
         $this->locale->defineBrowserLocale($request);
 
@@ -232,7 +232,7 @@ class SiteLocaleTest extends TestCase
 
         // Define default locale
         $this->config['site.locales.default'] = 'fr_FR';
-        
+
         // Define browser locale
         $this->locale->defineBrowserLocale($request);
 
@@ -249,7 +249,7 @@ class SiteLocaleTest extends TestCase
 
         // Define default locale
         $this->config['site.locales.default'] = 'fr_FR';
-        
+
         // Define browser locale
         $this->locale->defineBrowserLocale($request);
 
@@ -266,7 +266,7 @@ class SiteLocaleTest extends TestCase
 
         // Define default locale
         $this->config['site.locales.default'] = 'fr_FR';
-        
+
         // Define browser locale
         $this->locale->defineBrowserLocale($request);
 
@@ -283,7 +283,7 @@ class SiteLocaleTest extends TestCase
 
         // Define default locale
         $this->config['site.locales.default'] = 'fr_FR';
-        
+
         // Define browser locale
         $this->locale->defineBrowserLocale($request);
 
@@ -291,11 +291,11 @@ class SiteLocaleTest extends TestCase
         $this->assertSame('fr_FR', $this->locale->getLocaleIdentifier());
     }
 
-    public function testMiddlewareWithSimulatedBrowserLocaleControl(): void 
+    public function testMiddlewareWithSimulatedBrowserLocaleControl(): void
     {
         // Define default locale
         $this->config['site.locales.default'] = 'fr_FR';
-        
+
         // Add test route
         $this->app->get('/testMiddlewareWithSimulatedBrowserLocale', ControllerStub::class);
 
@@ -311,11 +311,11 @@ class SiteLocaleTest extends TestCase
     /**
      * @depends testMiddlewareWithSimulatedBrowserLocaleControl
      */
-    public function testMiddlewareWithSimulatedBrowserLocale(): void 
+    public function testMiddlewareWithSimulatedBrowserLocale(): void
     {
         // Define default locale
         $this->config['site.locales.default'] = 'fr_FR';
-        
+
         // Add test route
         $this->app->get('/testMiddlewareWithSimulatedBrowserLocale', ControllerStub::class);
 
@@ -335,7 +335,7 @@ class ControllerStub
     public function __invoke(Response $response, SiteLocale $siteLocale): Response
     {
         $response->getBody()->write($siteLocale->getLocaleIdentifier());
-            
+
         return $response;
     }
 }

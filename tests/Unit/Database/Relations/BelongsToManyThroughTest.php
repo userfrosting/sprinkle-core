@@ -12,8 +12,8 @@ namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Relations;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Builder as QueryBuilder;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;

@@ -10,8 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Sprunje;
 
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Builder as Builder;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;

@@ -10,8 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Mail\Mailer;

@@ -15,8 +15,8 @@ use UserFrosting\Alert\AlertStream;
 use UserFrosting\Alert\CacheAlertStream;
 use UserFrosting\Alert\SessionAlertStream;
 use UserFrosting\I18n\Translator;
-use UserFrosting\Session\Session;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
+use UserFrosting\Session\Session;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /*

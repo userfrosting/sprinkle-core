@@ -10,9 +10,9 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
-use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use League\FactoryMuffin\FactoryMuffin;
 use League\FactoryMuffin\Faker\Facade as Faker;
+use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /*

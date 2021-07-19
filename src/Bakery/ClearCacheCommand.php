@@ -10,11 +10,11 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use UserFrosting\Sprinkle\Core\Twig\CacheHelper;
-use Symfony\Component\Console\Command\Command;
 use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Twig\CacheHelper;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 

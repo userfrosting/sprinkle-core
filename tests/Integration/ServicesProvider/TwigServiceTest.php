@@ -23,7 +23,6 @@ use Twig\Extension\ExtensionInterface;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
-use UserFrosting\Sprinkle\Core\Tests\Integration\TestSprinkle;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\TwigAlertsExtension;
 use UserFrosting\Sprinkle\RecipeExtensionLoader;
 use UserFrosting\Sprinkle\SprinkleManager;
@@ -55,7 +54,7 @@ class TwigServiceTest extends TestCase
     public function testMiddleware(): void
     {
         // Set App Mock
-        $RouteParserInterface = Mockery::mock(RouteParserInterface::class); 
+        $RouteParserInterface = Mockery::mock(RouteParserInterface::class);
         $RouteCollectorInterface = Mockery::mock(RouteCollectorInterface::class)
             ->shouldReceive('getRouteParser')->andReturn($RouteParserInterface)
             ->getMock();
@@ -67,7 +66,7 @@ class TwigServiceTest extends TestCase
 
         $twig = Mockery::mock(Twig::class);
         $this->ci->set(Twig::class, $twig);
-        
+
         $this->assertInstanceOf(TwigMiddleware::class, $this->ci->get(TwigMiddleware::class));
     }
 

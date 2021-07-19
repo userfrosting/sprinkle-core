@@ -58,7 +58,7 @@ class LocaleDictionaryCommandTest extends TestCase
         $result = BakeryTester::runCommand($this->command, [
             '--locale' => 'fr_FR',
         ]);
-        
+
         // Assertions
         $this->assertSame(0, $result->getStatusCode());
         $output = $result->getDisplay();
@@ -69,10 +69,10 @@ class LocaleDictionaryCommandTest extends TestCase
     public function testCommand(): void
     {
         $result = BakeryTester::runCommand(
-            command: $this->command, 
+            command: $this->command,
             userInput: ['fr_FR']
         );
-           
+
         // Assertions
         $this->assertSame(0, $result->getStatusCode());
         $output = $result->getDisplay();

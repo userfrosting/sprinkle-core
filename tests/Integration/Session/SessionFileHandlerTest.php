@@ -12,9 +12,9 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Session;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Session\FileSessionHandler;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Session\Session;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
@@ -25,7 +25,7 @@ use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 class SessionFileHandlerTest extends TestCase
 {
     protected ResourceLocatorInterface $locator;
-    
+
     public function setUp(): void
     {
         parent::setUp();
@@ -33,7 +33,7 @@ class SessionFileHandlerTest extends TestCase
         // Set service alias
         $this->setTestLocator();
     }
-    
+
     /**
      * Test FileSessionHandler works with our locator
      */
@@ -134,7 +134,7 @@ class SessionFileHandlerTest extends TestCase
     {
         $config = $this->ci->get(Config::class);
         $locator = $this->ci->get(ResourceLocatorInterface::class);
-        
+
         $fs = new Filesystem();
         $handler = new FileSessionHandler($fs, $locator->findResource('session://'), 120);
         $session = new Session($handler, $config['session']);
@@ -182,7 +182,7 @@ class SessionFileHandlerTest extends TestCase
         $this->assertSame('foo|s:3:"bar";', $fs->get($session_file));
     }
 
-    protected function setTestLocator(): void 
+    protected function setTestLocator(): void
     {
         // Set service alias
         $this->locator = $this->ci->get(ResourceLocatorInterface::class);

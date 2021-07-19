@@ -10,10 +10,10 @@
 
 namespace UserFrosting\Tests\Integration\Error\Renderer;
 
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use UserFrosting\Sprinkle\Core\Error\Renderer\WhoopsRenderer;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use UserFrosting\Sprinkle\Core\Error\Renderer\WhoopsRenderer;
 use Whoops\Exception\Inspector;
 
 class WhoopsRendererTest extends TestCase

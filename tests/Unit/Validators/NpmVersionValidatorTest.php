@@ -15,7 +15,7 @@ use UserFrosting\Sprinkle\Core\Validators\NpmVersionValidator;
 /**
  * Unit tests for NpmVersionValidator trait.
  */
-class NpmNpmVersionValidatorTest extends AbstractVersionValidatorTester
+class NpmVersionValidatorTest extends AbstractVersionValidatorTester
 {
     protected string $required = '>=6.14.4';
 

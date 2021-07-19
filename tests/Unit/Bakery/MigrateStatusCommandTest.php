@@ -10,8 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
@@ -30,7 +30,7 @@ class MigrateStatusCommandTest extends TestCase
         // Define dummy data
         $available = ['foo', 'bar', 'oof', 'rab'];
         $pending = ['oof', 'rab'];
-        
+
         // Setup repository mock
         $repository = m::mock(DatabaseMigrationRepository::class);
         $repository->shouldReceive('getMigrations')->once()->andReturn($this->getInstalledMigrationStub());
@@ -42,7 +42,6 @@ class MigrateStatusCommandTest extends TestCase
         $migrator->shouldReceive('getRepository')->once()->andReturn($repository);
         $migrator->shouldReceive('getAvailableMigrations')->once()->andReturn($available);
         $migrator->shouldReceive('getPendingMigrations')->once()->andReturn($pending);
-
 
         // Run command
         $ci = ContainerStub::create();

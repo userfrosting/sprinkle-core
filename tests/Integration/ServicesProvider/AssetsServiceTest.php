@@ -12,8 +12,8 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Assets\Assets;
-use UserFrosting\Testing\ContainerStub;
 use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\Testing\ContainerStub;
 
 /**
  * Integration tests for `assets` service.

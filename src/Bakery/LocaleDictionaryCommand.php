@@ -10,14 +10,14 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\I18n\Dictionary;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\LocaleOption;
-use Symfony\Component\Console\Command\Command;
-use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**

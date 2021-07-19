@@ -59,7 +59,7 @@ class LocaleInfoCommandTest extends TestCase
     public function testCommand(): void
     {
         $result = BakeryTester::runCommand($this->command);
-        
+
         // Assertions
         $this->assertSame(0, $result->getStatusCode());
         $output = $result->getDisplay();

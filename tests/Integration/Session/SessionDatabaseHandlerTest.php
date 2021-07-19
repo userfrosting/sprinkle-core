@@ -10,16 +10,16 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Session;
 
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Session\DatabaseSessionHandler;
 use UserFrosting\Session\Session;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Sprinkle\Core\Database\Models\Session as SessionTable;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
-use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Sprinkle\Core\Tests\RefreshDatabase;
+use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Sprinkle\Core\Tests\withDatabaseSessionHandler;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Integration tests for the session service.
@@ -116,7 +116,7 @@ class SessionDatabaseHandlerTest extends TestCase
     // TODO : Require Migration definitions
     /*public function testUsingSessionDouble()
     {
-        
+
         $this->ci->get(Session::class)->destroy();
 
         $handler = new DatabaseSessionHandler($this->connection, $this->config->get('session.database.table'), $this->config->get('session.minutes'));

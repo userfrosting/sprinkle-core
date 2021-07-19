@@ -15,8 +15,8 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Session\DatabaseSessionHandler;
 use Illuminate\Session\FileSessionHandler;
 use Illuminate\Session\NullSessionHandler;
-use UserFrosting\Session\Session;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
+use UserFrosting\Session\Session;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 

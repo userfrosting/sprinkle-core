@@ -11,13 +11,13 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use UserFrosting\I18n\Translator;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Tests AccountController
  */
-// TODO : Test disabled for now, might delete later. Testing the Config is a valid concern, 
+// TODO : Test disabled for now, might delete later. Testing the Config is a valid concern,
 //        but shouldn't matter here as the Translator is not dependent on Config, SiteLocale is. And this should be tested there.
 class I18nServiceTest extends TestCase
 {

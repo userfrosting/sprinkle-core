@@ -10,9 +10,9 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use UserFrosting\Support\Repository\Repository as Config;
 
 class TestDatabaseTraitTest extends TestCase

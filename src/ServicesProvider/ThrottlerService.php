@@ -11,9 +11,9 @@
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Sprinkle\Core\Throttle\Throttler;
 use UserFrosting\Sprinkle\Core\Throttle\ThrottleRule;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /*
 * Request throttler.

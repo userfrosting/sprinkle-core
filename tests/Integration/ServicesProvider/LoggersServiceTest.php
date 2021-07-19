@@ -10,9 +10,9 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
-use Mockery as m;
 use DI\Container;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\ServicesProvider\LoggersService;
@@ -44,7 +44,7 @@ class LoggersServiceTest extends TestCase
 
         // TODO : Main service requires more injections. Once this is done, better mocking is required to properly test each features.
     }
-    
+
     public function testDebugLogger()
     {
         $this->assertInstanceOf(Logger::class, $this->ci->get('debugLogger'));

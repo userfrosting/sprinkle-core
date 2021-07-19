@@ -10,8 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
-use UserFrosting\Sprinkle\Core\Router;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Router;
 
 /**
  * Integration tests for `router` service.

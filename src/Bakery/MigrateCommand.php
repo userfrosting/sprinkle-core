@@ -11,13 +11,13 @@
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\ConfirmableTrait;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
-use Symfony\Component\Console\Command\Command;
-use UserFrosting\Bakery\WithSymfonyStyle;
 
 /**
  * migrate Bakery Command

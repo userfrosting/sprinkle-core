@@ -10,8 +10,6 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Validators;
 
-use PHPUnit\Framework\TestCase;
-use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
 use UserFrosting\Sprinkle\Core\Validators\PhpVersionValidator;
 
 /**

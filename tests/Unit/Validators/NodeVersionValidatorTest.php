@@ -15,7 +15,7 @@ use UserFrosting\Sprinkle\Core\Validators\NodeVersionValidator;
 /**
  * Unit tests for NodeVersionValidator trait.
  */
-class NodeNodeVersionValidatorTest extends AbstractVersionValidatorTester
+class NodeVersionValidatorTest extends AbstractVersionValidatorTester
 {
     protected string $required = '^12.17.0 || >=14.0.0';
 

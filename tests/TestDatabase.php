@@ -27,7 +27,7 @@ trait TestDatabase
         if (!isset($this->ci) || !$this->ci instanceof Container) {
             throw new \Exception('CI/Container not available. Make sure you extend the correct TestCase');
         }
-        
+
         // Fetch services from CI
         $config = $this->ci->get(Config::class);
         $db = $this->ci->get(Capsule::class);

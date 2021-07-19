@@ -10,11 +10,11 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit;
 
-use stdClass;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 use UserFrosting\Sprinkle\Core\Database\Relations\HasManySyncable;
 
 /**

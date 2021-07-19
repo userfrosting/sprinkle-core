@@ -10,8 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
-use UserFrosting\Sprinkle\Core\Throttle\Throttler;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Throttle\Throttler;
 
 /**
  * Integration tests for `throttler` service.

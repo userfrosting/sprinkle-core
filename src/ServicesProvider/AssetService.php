@@ -10,9 +10,9 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
+use UserFrosting\Assets\AssetBundles\GulpBundleAssetsCompiledBundles as CompiledAssetBundles;
 use UserFrosting\Assets\AssetLoader;
 use UserFrosting\Assets\Assets;
-use UserFrosting\Assets\AssetBundles\GulpBundleAssetsCompiledBundles as CompiledAssetBundles;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Util\RawAssetBundles;
 use UserFrosting\Support\Repository\Repository as Config;
