@@ -15,13 +15,13 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use Slim\Views\Twig;
 use UserFrosting\Alert\AlertStream;
-use UserFrosting\Sprinkle\Core\Twig\Extensions\TwigAlertsExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
 
 /**
  * TwigAlertsExtensionTest class.
  * Tests Alerts twig extensions
  */
-class TwigAlertsExtensionTest extends TestCase
+class AlertsExtensionTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
@@ -43,7 +43,7 @@ class TwigAlertsExtensionTest extends TestCase
                     ->getMock();
 
         // Create and assert
-        $extensions = new TwigAlertsExtension($alertStream);
+        $extensions = new AlertsExtension($alertStream);
         $this->assertSame($results, $extensions->getAlerts());
     }
 
@@ -65,7 +65,7 @@ class TwigAlertsExtensionTest extends TestCase
                     ->getMock();
 
         // Create and assert
-        $extensions = new TwigAlertsExtension($alertStream);
+        $extensions = new AlertsExtension($alertStream);
         $this->assertSame($results, $extensions->getAlerts());
     }
 
@@ -87,7 +87,7 @@ class TwigAlertsExtensionTest extends TestCase
                     ->getMock();
 
         // Create and add to extensions.
-        $extensions = new TwigAlertsExtension($alertStream);
+        $extensions = new AlertsExtension($alertStream);
 
         // Create dumb Twig and test adding extension
         $view = Twig::create('');

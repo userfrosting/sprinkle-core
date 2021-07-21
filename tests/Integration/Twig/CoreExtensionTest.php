@@ -10,13 +10,13 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Twig;
 
-use DI\Container;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use Slim\Views\Twig;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
-use UserFrosting\Testing\ContainerStub;
+
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * CoreExtensionTest class.
@@ -29,40 +29,41 @@ class CoreExtensionTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    protected Container $ci;
-    protected CoreExtension $extension;
     protected Twig $view;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        // Create stub container
-        $this->ci = ContainerStub::create();
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('site')->andReturn(['foo' => 'bar'])
+            ->getMock();
 
-        // Set dependencies services
-        $this->view = Twig::create(__DIR__);
+        // Create and add to extensions.
+        $extensions = new CoreExtension($config);
+
+        // Create dumb Twig and test adding extension
+        $this->view = Twig::create('');
+        $this->view->addExtension($extensions);
     }
 
-    /*public function testPhoneFilter(): void
+    public function testPhoneFilter(): void
     {
-        $result = $this->ci->view->fetchFromString('{{ data|phone }}', ['data' => '5551234567']);
+        $result = $this->view->fetchFromString('{{ data|phone }}', ['data' => '5551234567']);
         $this->assertSame('(555) 123-4567', $result);
-    }*/
+    }
 
-    /*public function testUnescapeFilter(): void
+    public function testUnescapeFilter(): void
     {
         $string = "I'll \"walk\" the <b>dog</b> now";
-        $this->assertNotSame($string, $this->ci->view->fetchFromString('{{ foo }}', ['foo' => htmlentities($string)]));
-        $this->assertNotSame($string, $this->ci->view->fetchFromString('{{ foo|unescape }}', ['foo' => htmlentities($string)]));
-        $this->assertNotSame($string, $this->ci->view->fetchFromString('{{ foo|raw }}', ['foo' => htmlentities($string)]));
-        $this->assertSame($string, $this->ci->view->fetchFromString('{{ foo|unescape|raw }}', ['foo' => htmlentities($string)]));
-    }*/
+        $this->assertNotSame($string, $this->view->fetchFromString('{{ foo }}', ['foo' => htmlentities($string)]));
+        $this->assertNotSame($string, $this->view->fetchFromString('{{ foo|unescape }}', ['foo' => htmlentities($string)]));
+        $this->assertNotSame($string, $this->view->fetchFromString('{{ foo|raw }}', ['foo' => htmlentities($string)]));
+        $this->assertSame($string, $this->view->fetchFromString('{{ foo|unescape|raw }}', ['foo' => htmlentities($string)]));
+    }
 
-    /*public function testCurrentLocaleGlobal(): void
+    public function testGlobal(): void
     {
-        $this->ci->locale = Mockery::mock(SiteLocale::class)->shouldReceive('getLocaleIdentifier')->once()->andReturn('zz-ZZ')->getMock();
-
-        $this->assertSame('zz-ZZ', $this->ci->view->fetchFromString('{{ currentLocale }}'));
-    }*/
+        $this->assertSame('bar', $this->view->fetchFromString('{{ site.foo }}'));
+    }
 }

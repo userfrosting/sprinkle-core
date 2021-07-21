@@ -16,7 +16,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use UserFrosting\Alert\AlertStream;
 
-class TwigAlertsExtension extends AbstractExtension
+class AlertsExtension extends AbstractExtension
 {
     /**
      * @param AlertStream $alertStream

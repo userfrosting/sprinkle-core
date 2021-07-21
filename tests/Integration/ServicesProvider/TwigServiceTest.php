@@ -23,7 +23,7 @@ use Twig\Extension\ExtensionInterface;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
-use UserFrosting\Sprinkle\Core\Twig\Extensions\TwigAlertsExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
 use UserFrosting\Sprinkle\RecipeExtensionLoader;
 use UserFrosting\Sprinkle\SprinkleManager;
 use UserFrosting\Support\Repository\Repository as Config;
@@ -36,6 +36,7 @@ use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
  * Integration tests for `view` service.
  * Check to see if service returns what it's supposed to return
  */
+// TODO : Move to Unit test
 class TwigServiceTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
@@ -80,6 +81,7 @@ class TwigServiceTest extends TestCase
         $this->ci->set(Config::class, $config);
 
         // Set Locator Mock
+        // TODO : templatePaths are mocked here, but an integration test with a Stub template would be best.
         $location = Mockery::mock(ResourceLocationInterface::class)
                 ->shouldReceive('getName')->andReturn('foobar')
                 ->getMock();
@@ -105,7 +107,7 @@ class TwigServiceTest extends TestCase
                 ->getMock();
 
         // Init TwigAlertsExtension
-        $extension = new TwigAlertsExtension($alertStream);
+        $extension = new AlertsExtension($alertStream);
 
         // Set SprinkleManager Mock
         $manager = Mockery::mock(RecipeExtensionLoader::class)

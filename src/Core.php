@@ -55,9 +55,11 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\VersionsService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\AssetsExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
-use UserFrosting\Sprinkle\Core\Twig\Extensions\TwigAlertsExtension;
-use UserFrosting\Sprinkle\Core\Twig\Extensions\TwigI18nExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\CsrfExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
 use UserFrosting\Sprinkle\SprinkleRecipe;
 
 class Core implements SprinkleRecipe, TwigExtensionRecipe
@@ -180,9 +182,11 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe
     public static function getTwigExtensions(): array
     {
         return [
+            AssetsExtension::class,
             CoreExtension::class,
-            TwigAlertsExtension::class,
-            TwigI18nExtension::class,
+            // CsrfExtension::class,
+            I18nExtension::class,
+            AlertsExtension::class,
         ];
     }
 }
