@@ -116,7 +116,7 @@ class BuildAssets extends Command
 
         // Ensure extraneous dependencies are cleared out
         $exitCode = 0;
-        passthru('npm prune');
+        passthru('npm prune --production');
 
         if ($exitCode !== 0) {
             $this->io->error('npm dependency installation has failed');
@@ -125,7 +125,7 @@ class BuildAssets extends Command
 
         // Install the new dependencies
         $exitCode = 0;
-        passthru('npm install', $exitCode);
+        passthru('npm install --production', $exitCode);
 
         if ($exitCode !== 0) {
             $this->io->error('npm dependency installation has failed');
