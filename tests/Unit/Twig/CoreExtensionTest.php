@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\Twig;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Twig;
 
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -22,9 +22,6 @@ use UserFrosting\Support\Repository\Repository as Config;
  * CoreExtensionTest class.
  * Tests Core twig extensions
  */
-// TODO : CoreExtension should be separated in multiple Extension and registered in CoreRecipe.
-// TODO : Could be revised similar to TwigRuntimeExtension. Then each sub function / filter / etc.  can be tested individually.
-//        We would only need to test here that the Extensions are really loaded (by mocking the Extension probably).
 class CoreExtensionTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
