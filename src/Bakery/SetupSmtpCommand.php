@@ -34,22 +34,22 @@ class SetupSmtpCommand extends Command
     /**
      * @var string SMTP setup string
      */
-    const Setup_SMTP = 'SMTP Server';
+    public const Setup_SMTP = 'SMTP Server';
 
     /**
      * @var string Gmail setup string
      */
-    const Setup_Gmail = 'Gmail';
+    public const Setup_Gmail = 'Gmail';
 
     /**
      * @var string Native mail setup string
      */
-    const Setup_Native = 'Native Mail';
+    public const Setup_Native = 'Native Mail';
 
     /**
      * @var string No email setup string
      */
-    const Setup_None = 'No email support';
+    public const Setup_None = 'No email support';
 
     /**
      * {@inheritdoc}
