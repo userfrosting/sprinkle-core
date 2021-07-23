@@ -10,111 +10,94 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
+use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Database\Migration;
+use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
-use UserFrosting\UniformResourceLocator\Resource;
-use UserFrosting\UniformResourceLocator\ResourceLocation;
-use UserFrosting\UniformResourceLocator\ResourceLocator;
-use UserFrosting\UniformResourceLocator\ResourceStream;
+use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
+use UserFrosting\Sprinkle\Core\ServicesProvider\MigratorService;
+use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
+use UserFrosting\Sprinkle\RecipeExtensionLoader;
+use UserFrosting\Testing\ContainerStub;
 
 /**
- * MigrationLocator Tests
+ * Migration Locator Tests
  */
 class MigrationLocatorTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
     /**
-     * Make sure no error is thrown if the Migration dir doesn't exist
+     * @dataProvider migrationDataProvider
      */
-    public function testGetMigrationsWithNoMigrationDir()
+    public function testGetMigrations(array $migrations): void
     {
-        // Setup mock locator
-        $resourceLocator = m::mock(ResourceLocator::class);
+        $manager = Mockery::mock(RecipeExtensionLoader::class)
+                ->shouldReceive('getInstances')
+                ->with('getMigrations', MigrationRecipe::class, MigrationInterface::class)
+                ->once()
+                ->andReturn($migrations)
+                ->getMock();
 
-        // Setup mock stream
-        $resourceStream = m::mock(ResourceStream::class);
-        $resourceStream->shouldReceive('getPath')->andReturn('src/Database/Migrations');
+        $locator = new MigrationLocator($manager);
 
-        // Setup mock locations
-        $resourceCoreLocation = m::mock(ResourceLocation::class);
-        $resourceCoreLocation->shouldReceive('getName')->andReturn('Core');
-        $resourceCoreLocation->shouldReceive('getPath')->andReturn('app/sprinkles/Core');
-        $resourceAccountLocation = m::mock(ResourceLocation::class);
-        $resourceAccountLocation->shouldReceive('getName')->andReturn('account');
-        $resourceAccountLocation->shouldReceive('getPath')->andReturn('app/sprinkles/Account');
-
-        // When `MigrationLocator` will ask the resource locator to `listResources`, we simulate returning no Resources
-        $resourceLocator->shouldReceive('listResources')->once()->andReturn([]);
-        $locator = new MigrationLocator($resourceLocator);
-        $results = $locator->getMigrations();
-
-        // Test results match expectations
-        $this->assertCount(0, $results);
-        $this->assertEquals([], $results);
+        $this->assertInstanceOf(MigrationLocatorInterface::class, $locator);
+        $this->assertSame($migrations, $locator->getMigrations());
     }
 
     /**
-     * Make sure migrations can be returned for all sprinkles
+     * @dataProvider migrationDataProvider
      */
-    public function testGetMigrations()
+    public function testGetMigrationsService(array $migrations): void
     {
-        // Setup mock locator
-        $resourceLocator = m::mock(ResourceLocator::class);
+        // Create container with provider to test
+        $provider = new MigratorService();
+        $ci = ContainerStub::create($provider->register());
 
-        // Setup mock stream
-        $resourceStream = m::mock(ResourceStream::class);
-        $resourceStream->shouldReceive('getPath')->andReturn('src/Database/Migrations');
+        $manager = Mockery::mock(RecipeExtensionLoader::class)
+                ->shouldReceive('getInstances')
+                ->with('getMigrations', MigrationRecipe::class, MigrationInterface::class)
+                ->once()
+                ->andReturn($migrations)
+                ->getMock();
+        $ci->set(RecipeExtensionLoader::class, $manager);
 
-        // Setup mock locations
-        $resourceCoreLocation = m::mock(ResourceLocation::class);
-        $resourceCoreLocation->shouldReceive('getName')->andReturn('Core');
-        $resourceCoreLocation->shouldReceive('getPath')->andReturn('app/sprinkles/Core');
+        /** @var MigrationLocatorInterface */
+        $locator = $ci->get(MigrationLocatorInterface::class);
 
-        $resourceAccountLocation = m::mock(ResourceLocation::class);
-        $resourceAccountLocation->shouldReceive('getName')->andReturn('account');
-        $resourceAccountLocation->shouldReceive('getPath')->andReturn('app/sprinkles/Account');
+        $this->assertInstanceOf(MigrationLocatorInterface::class, $locator);
+        $this->assertSame($migrations, $locator->getMigrations());
+    }
 
-        // When `MigrationLocator` will ask the resource locator to `listResources`, we simulate returning Resources
-        $resourceLocator->shouldReceive('listResources')->once()->andReturn([
-            new Resource($resourceStream, $resourceCoreLocation, 'one/CreateUsersTable.php'),
-            new Resource($resourceStream, $resourceCoreLocation, 'one/CreatePasswordResetsTable.php'),
-            new Resource($resourceStream, $resourceCoreLocation, 'two/CreateFlightsTable.php'),
-            new Resource($resourceStream, $resourceCoreLocation, 'CreateMainTable.php'),
-            new Resource($resourceStream, $resourceAccountLocation, 'one/CreateUsersTable.php'),
-            new Resource($resourceStream, $resourceAccountLocation, 'one/CreatePasswordResetsTable.php'),
-            new Resource($resourceStream, $resourceAccountLocation, 'two/CreateFlightsTable.php'),
-            new Resource($resourceStream, $resourceAccountLocation, 'CreateMainTable.php'),
-
-            // Theses shouldn't be returned by the migrator
-            new Resource($resourceStream, $resourceAccountLocation, 'README.md'),
-            new Resource($resourceStream, $resourceAccountLocation, 'php.md'),
-            new Resource($resourceStream, $resourceAccountLocation, 'foo.foophp'),
-            new Resource($resourceStream, $resourceAccountLocation, 'blah.phpphp'),
-            new Resource($resourceStream, $resourceAccountLocation, 'bar.phpbar'),
-        ]);
-
-        // Create a new MigrationLocator instance with our simulated ResourceLocation
-        $locator = new MigrationLocator($resourceLocator);
-        $results = $locator->getMigrations();
-
-        // The `getMigration` method should return this
-        $expected = [
-            '\\UserFrosting\\Sprinkle\\Core\\Database\\Migrations\\one\\CreateUsersTable',
-            '\\UserFrosting\\Sprinkle\\Core\\Database\\Migrations\\one\\CreatePasswordResetsTable',
-            '\\UserFrosting\\Sprinkle\\Core\\Database\\Migrations\\two\\CreateFlightsTable',
-            '\\UserFrosting\\Sprinkle\\Core\\Database\\Migrations\\CreateMainTable',
-            '\\UserFrosting\\Sprinkle\\Account\\Database\\Migrations\\one\\CreateUsersTable',
-            '\\UserFrosting\\Sprinkle\\Account\\Database\\Migrations\\one\\CreatePasswordResetsTable',
-            '\\UserFrosting\\Sprinkle\\Account\\Database\\Migrations\\two\\CreateFlightsTable',
-            '\\UserFrosting\\Sprinkle\\Account\\Database\\Migrations\\CreateMainTable',
+    public function migrationDataProvider(): array
+    {
+        return [
+            [[]],
+            [[StubMigrationA::class, StubMigrationB::class]],
         ];
+    }
+}
 
-        // Test results match expectations
-        $this->assertEquals($expected, $results);
+class StubMigrationA extends Migration
+{
+    public function up()
+    {
+    }
 
-        return $locator;
+    public function down()
+    {
+    }
+}
+
+class StubMigrationB extends Migration
+{
+    public function up()
+    {
+    }
+
+    public function down()
+    {
     }
 }

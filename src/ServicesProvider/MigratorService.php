@@ -14,9 +14,11 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
+use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
+use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
+use UserFrosting\Sprinkle\RecipeExtensionLoader;
 use UserFrosting\Support\Repository\Repository as Config;
-use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /*
  * Migrator service.
@@ -30,11 +32,15 @@ class MigratorService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            Migrator::class => function (Capsule $db, Config $config, ResourceLocatorInterface $locator) {
+            Migrator::class => function (
+                Capsule $db,
+                MigrationRepositoryInterface $migrationRepository,
+                MigrationLocatorInterface $migrationLocator
+            ) {
                 $migrator = new Migrator(
                     $db,
-                    new DatabaseMigrationRepository($db, $config['migrations.repository_table']),
-                    new MigrationLocator($locator)
+                    $migrationRepository,
+                    $migrationLocator,
                 );
 
                 // Make sure repository exist
@@ -44,6 +50,12 @@ class MigratorService implements ServicesProviderInterface
 
                 return $migrator;
             },
+
+            MigrationRepositoryInterface::class => function (Capsule $db, Config $config) {
+                return new DatabaseMigrationRepository($db, $config->get('migrations.repository_table'));
+            },
+
+            MigrationLocatorInterface::class => \DI\autowire(MigrationLocator::class),
         ];
     }
 }

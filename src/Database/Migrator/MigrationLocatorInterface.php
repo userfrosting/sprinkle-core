@@ -11,18 +11,16 @@
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 /**
- * MigrationLocatorInterface.
+ * Migration Locator Interface.
  *
- * All MigrationLocator handlers must implement this interface.
- *
- * @author Louis Charette
+ * Migration Locator handlers must implement this interface.
  */
 interface MigrationLocatorInterface
 {
     /**
      * Loop all the available sprinkles and return a list of their migrations.
      *
-     * @return array A list of all the migration files found for every sprinkle
+     * @return \UserFrosting\Sprinkle\Core\Database\MigrationInterface[] A list of all the migration files found for every sprinkle
      */
-    public function getMigrations();
+    public function getMigrations(): array;
 }

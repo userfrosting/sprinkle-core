@@ -10,79 +10,35 @@
 
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
-use Illuminate\Support\Str;
-use UserFrosting\UniformResourceLocator\Resource as ResourceInstance;
-use UserFrosting\UniformResourceLocator\ResourceLocator;
+use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
+use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
+use UserFrosting\Sprinkle\RecipeExtensionLoader;
 
 /**
- * MigrationLocator Class.
+ * Migration Locator Class.
  *
  * Finds all migrations class in a given sprinkle
- *
- * @author Louis Charette
  */
 class MigrationLocator implements MigrationLocatorInterface
 {
     /**
-     * @var ResourceLocator The locator service
+     * @param RecipeExtensionLoader $extensionLoader
      */
-    protected $locator;
-
-    /**
-     * @var string The resource locator migration scheme
-     */
-    protected $scheme = 'migrations://';
-
-    /**
-     * Class Constructor.
-     *
-     * @param ResourceLocator $locator The locator services
-     */
-    public function __construct(ResourceLocator $locator)
+    public function __construct(protected RecipeExtensionLoader $extensionLoader)
     {
-        $this->locator = $locator;
     }
 
     /**
-     * Loop all the available sprinkles and return a list of their migrations.
-     *
-     * @return array A list of all the migration files found for every sprinkle
+     * {@inheritDoc}
      */
-    public function getMigrations()
+    public function getMigrations(): array
     {
-        $migrationFiles = $this->locator->listResources($this->scheme, false, false);
-
-        $migrations = [];
-        foreach ($migrationFiles as $migrationFile) {
-            // Note that PSR4 insists that all php files must end in PHP, so ignore all
-            // files that don't end in PHP.
-            if ($migrationFile->getExtension() == 'php') {
-                $migrations[] = $this->getMigrationDetails($migrationFile);
-            }
-        }
+        $migrations = $this->extensionLoader->getInstances(
+            method: 'getMigrations',
+            recipeInterface: MigrationRecipe::class,
+            extensionInterface: MigrationInterface::class,
+        );
 
         return $migrations;
-    }
-
-    /**
-     * Return an array of migration details including the class name and the sprinkle name.
-     *
-     * @param ResourceInstance $file The migration file
-     *
-     * @return string The migration full class path
-     */
-    protected function getMigrationDetails(ResourceInstance $file)
-    {
-        // Format the sprinkle name for the namespace
-        $sprinkleName = $file->getLocation()->getName();
-        $sprinkleName = Str::studly($sprinkleName);
-
-        // Getting base path, name and class name
-        $basePath = str_replace($file->getBasename(), '', $file->getBasePath());
-        $name = $basePath . $file->getFilename();
-        $className = str_replace('/', '\\', $basePath) . $file->getFilename();
-
-        // Build the class name and namespace
-        return "\\UserFrosting\\Sprinkle\\$sprinkleName\\Database\\Migrations\\$className";
     }
 }

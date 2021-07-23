@@ -12,18 +12,18 @@ namespace UserFrosting\Sprinkle\Core\Database;
 
 /**
  * Migration Interfaces class.
- *
- * @author Louis Charette
  */
 interface MigrationInterface
 {
     /**
      * Method to apply changes to the database.
      */
+    // TODO : Return type ?
     public function up();
 
     /**
      * Method to revert changes applied by the `up` method.
      */
+    // TODO : Return type ?
     public function down();
 }
