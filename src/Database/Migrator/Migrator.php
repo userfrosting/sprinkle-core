@@ -27,21 +27,6 @@ use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
 class Migrator
 {
     /**
-     * @var MigrationRepositoryInterface The migration repository implementation.
-     */
-    protected $repository;
-
-    /**
-     * @var Capsule
-     */
-    protected $db;
-
-    /**
-     * @var MigrationLocatorInterface The Migration locator instance
-     */
-    protected $locator;
-
-    /**
      * @var string The connection name
      */
     protected $connection;
@@ -58,11 +43,12 @@ class Migrator
      * @param MigrationRepositoryInterface $repository The migration repository
      * @param MigrationLocatorInterface    $locator    The Migration locator
      */
-    public function __construct(Capsule $db, MigrationRepositoryInterface $repository, MigrationLocatorInterface $locator)
+    public function __construct(
+        protected Capsule $db,
+        protected MigrationRepositoryInterface $repository,
+        protected MigrationLocatorInterface $locator
+    )
     {
-        $this->db = $db;
-        $this->repository = $repository;
-        $this->locator = $locator;
     }
 
     /**
@@ -561,7 +547,7 @@ class Migrator
      */
     public function setConnection($name)
     {
-        $this->repository->setSource($name);
+        $this->repository->setConnectionName($name);
         $this->connection = $name;
     }
 

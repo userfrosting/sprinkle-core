@@ -17,20 +17,18 @@ use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 /**
  * Trait enabling wrapping of each test case in a database transaction
  * Based on Laravel `RefreshDatabase` Traits
- *
- * @author Louis Charette
  */
 trait RefreshDatabase
 {
     /**
      * @var bool Indicates if the test database has been migrated.
      */
-    public static $migrated = false;
+    public static bool $migrated = false;
 
     /**
      * Define hooks to migrate the database before and after each test.
      */
-    public function refreshDatabase()
+    public function refreshDatabase(): void
     {
         if (!isset($this->ci) || !$this->ci instanceof Container) {
             throw new \Exception('CI/Container not available. Make sure you extend the correct TestCase');
@@ -44,7 +42,7 @@ trait RefreshDatabase
      *
      * @return bool
      */
-    public function usingInMemoryDatabase()
+    public function usingInMemoryDatabase(): bool
     {
         $connection = $this->ci->get(Capsule::class)->connection();
 
@@ -54,7 +52,7 @@ trait RefreshDatabase
     /**
      * Refresh the in-memory database.
      */
-    protected function refreshInMemoryDatabase()
+    protected function refreshInMemoryDatabase(): void
     {
         $this->ci->get(Migrator::class)->run();
     }
@@ -62,7 +60,7 @@ trait RefreshDatabase
     /**
      * Refresh a conventional test database.
      */
-    protected function refreshTestDatabase()
+    protected function refreshTestDatabase(): void
     {
         if (!self::$migrated) {
 
@@ -79,7 +77,7 @@ trait RefreshDatabase
     /**
      * Handle database transactions on the specified connections.
      */
-    protected function beginDatabaseTransaction()
+    protected function beginDatabaseTransaction(): void
     {
         $database = $this->ci->get(Capsule::class);
 
@@ -87,6 +85,7 @@ trait RefreshDatabase
             $database->connection($name)->beginTransaction();
         }
 
+        // TODO : Not used anymore !
         $this->beforeApplicationDestroyed(function () use ($database) {
             foreach ($this->connectionsToTransact() as $name) {
                 $database->connection($name)->rollBack();
@@ -99,7 +98,7 @@ trait RefreshDatabase
      *
      * @return array
      */
-    protected function connectionsToTransact()
+    protected function connectionsToTransact(): array
     {
         return property_exists($this, 'connectionsToTransact')
                             ? $this->connectionsToTransact : [null];

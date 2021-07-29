@@ -11,89 +11,81 @@
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 /**
- * MigrationRepository Interface.
- *
- * @author Louis Charette
+ * Migration Repository Interface.
  */
 interface MigrationRepositoryInterface
 {
     /**
      * Get the list of ran migrations.
      *
-     * @param int    $steps Number of batch to return
-     * @param string $order asc|desc
+     * @param int|null $steps Number of batch to return. Null to return all.
+     * @param bool     $asc   True for ascending order, false for descending.
      *
-     * @return array An array of migration class names in the order they where ran
+     * @return string[] An array of migration class names in the order they where ran
      */
-    public function getMigrationsList($steps = -1, $order = 'asc');
+    public function getMigrationsList(?int $steps = null, bool $asc = true): array;
 
     /**
-     * Get list of migrations.
+     * Get details about a specific migration.
      *
-     * @param int    $steps Number of batch to return
-     * @param string $order asc|desc
+     * @param string $migration The migration
      *
-     * @return array
+     * @return object The migration object
      */
-    public function getMigrations($steps = -1, $order = 'asc');
+    public function getMigration(string $migration): object;
 
     /**
-     * Get the last migration batch.
+     * Get the last migration batch in reserve order they were ran (last one first).
      *
-     * @return array
+     * @return string[]
      */
-    public function getLast();
+    public function getLast(): array;
 
     /**
      * Log that a migration was run.
      *
-     * @param string $file
+     * @param string $migration
      * @param int    $batch
+     *
+     * @return bool True if success
      */
-    public function log($file, $batch);
+    public function log(string $migration, int $batch): bool;
 
     /**
      * Remove a migration from the log.
      *
      * @param string $migration
      */
-    public function delete($migration);
+    public function delete(string $migration): void;
 
     /**
      * Get the next migration batch number.
      *
      * @return int
      */
-    public function getNextBatchNumber();
+    public function getNextBatchNumber(): int;
 
     /**
      * Get the last migration batch number.
      *
      * @return int
      */
-    public function getLastBatchNumber();
+    public function getLastBatchNumber(): int;
 
     /**
      * Create the migration repository data store.
      */
-    public function createRepository();
+    public function createRepository(): void;
 
     /**
      * Delete the migration repository data store.
      */
-    public function deleteRepository();
+    public function deleteRepository(): void;
 
     /**
      * Determine if the migration repository exists.
      *
-     * @return bool
+     * @return bool True for success, false for error.
      */
-    public function repositoryExists();
-
-    /**
-     * Set the information source to gather data.
-     *
-     * @param string $name The source name
-     */
-    public function setSource($name);
+    public function repositoryExists(): bool;
 }

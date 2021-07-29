@@ -11,75 +11,63 @@
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
+use Illuminate\Support\Collection;
 
 /**
- * MigrationRepository Class.
- *
  * Repository used to store all migrations run against the database
- *
- * @author Louis Charette
  */
 class DatabaseMigrationRepository implements MigrationRepositoryInterface
 {
     /**
-     * @var Capsule
+     * @var string|null The connection name (default: null)
      */
-    protected $db;
-
-    /**
-     * @var string The name of the migration table.
-     */
-    protected $table;
-
-    /**
-     * @var string The connection name
-     */
-    protected $connection;
+    protected ?string $connection = null;
 
     /**
      * Create a new database migration repository instance.
      *
      * @param Capsule $db
-     * @param string  $table
+     * @param string  $tableName
      */
-    public function __construct(Capsule $db, $table = 'migrations')
-    {
-        $this->table = $table;
-        $this->db = $db;
-    }
-
-    /**
-     * Get the list of ran migrations.
-     *
-     * @param int    $steps Number of batch to return
-     * @param string $order asc|desc
-     *
-     * @return array An array of migration class names in the order they where ran
-     */
-    public function getMigrationsList($steps = -1, $order = 'asc')
-    {
-        return $this->getMigrations($steps, $order)->pluck('migration')->all();
+    public function __construct(
+        protected Capsule $db,
+        protected string $tableName = 'migrations'
+    ) {
     }
 
     /**
      * Get list of migrations.
      *
-     * @param int    $steps Number of batch to return
-     * @param string $order asc|desc
+     * @param int|null $steps Number of batch to return. Null to return all.
+     * @param bool     $asc   True for ascending order, false for descending.
      *
-     * @return array
+     * @return Collection Collection of migration from db in the order they where ran
      */
-    public function getMigrations($steps = -1, $order = 'asc')
+    public function getMigrations(?int $steps = null, bool $asc = true): Collection
     {
-        $query = $this->table();
+        $query = $this->getTable();
 
-        if ($steps > 0) {
+        if (!is_null($steps)) {
             $batch = max($this->getNextBatchNumber() - $steps, 1);
             $query = $query->where('batch', '>=', $batch);
         }
 
+        $order = ($asc) ? 'asc' : 'desc';
+
         return $query->orderBy('id', $order)->get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMigrationsList(?int $steps = null, bool $asc = true): array
+    {
+        return $this->getMigrations($steps, $asc)->pluck('migration')->all();
     }
 
     /**
@@ -87,101 +75,95 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      *
      * @param string $migration The migration class
      *
-     * @return \stdClass The migration info
+     * @return object The migration object from the db
      */
-    public function getMigration($migration)
+    public function getMigration(string $migration): object
     {
-        return $this->table()->where('migration', $migration)->first();
+        return $this->getTable()->where('migration', $migration)->first();
     }
 
     /**
-     * Get the last migration batch in reserve order they were ran (last one first).
-     *
-     * @return array
+     * {@inheritDoc}
      */
-    public function getLast()
+    public function getLast(): array
     {
-        $query = $this->table()->where('batch', $this->getLastBatchNumber());
+        $query = $this->getTable()->where('batch', $this->getLastBatchNumber());
 
         return $query->orderBy('id', 'desc')->get()->pluck('migration')->all();
     }
 
     /**
-     * Log that a migration was run.
-     *
-     * @param string $file
-     * @param int    $batch
-     * @param string $sprinkle
+     * {@inheritDoc}
      */
-    public function log($file, $batch, $sprinkle = '')
+    public function log(string $migration, int $batch): bool
     {
-        $record = ['migration' => $file, 'batch' => $batch, 'sprinkle' => $sprinkle];
-
-        $this->table()->insert($record);
+        return $this->getTable()->insert([
+            'migration' => $migration,
+            'batch'     => $batch,
+        ]);
     }
 
     /**
-     * Remove a migration from the log.
-     *
-     * @param string $migration
+     * {@inheritDoc}
      */
-    public function delete($migration)
+    public function delete(string $migration): void
     {
-        $this->table()->where('migration', $migration)->delete();
+        $this->getTable()->where('migration', $migration)->delete();
     }
 
     /**
-     * Get the next migration batch number.
-     *
-     * @return int
+     * {@inheritDoc}
      */
-    public function getNextBatchNumber()
+    public function getNextBatchNumber(): int
     {
         return $this->getLastBatchNumber() + 1;
     }
 
     /**
-     * Get the last migration batch number.
-     *
-     * @return int
+     * {@inheritDoc}
      */
-    public function getLastBatchNumber()
+    public function getLastBatchNumber(): int
     {
-        return $this->table()->max('batch');
+        $batch = $this->getTable()->max('batch');
+
+        // Default to 0 if it's null (empty table)
+        return $batch ?: 0;
     }
 
     /**
-     * Create the migration repository data store.
+     * {@inheritDoc}
      */
-    public function createRepository()
+    public function createRepository(): void
     {
-        $this->getSchemaBuilder()->create($this->table, function (Blueprint $table) {
+        $this->getSchemaBuilder()->create($this->getTableName(), function (Blueprint $table) {
             // The migrations table is responsible for keeping track of which of the
             // migrations have actually run for the application. We'll create the
             // table to hold the migration file's path as well as the batch ID.
             $table->increments('id');
-            $table->string('sprinkle');
+            // $table->string('sprinkle'); // TODO : Still required? No... But will it work with old install? require upgrade ?
             $table->string('migration');
             $table->integer('batch');
         });
     }
 
     /**
-     * Delete the migration repository data store.
+     * {@inheritDoc}
      */
-    public function deleteRepository()
+    public function deleteRepository(): void
     {
-        $this->getSchemaBuilder()->drop($this->table);
+        $this->getSchemaBuilder()->drop($this->getTableName());
     }
 
     /**
-     * Determine if the migration repository exists.
-     *
-     * @return bool
+     * {@inheritDoc}
      */
-    public function repositoryExists()
+    public function repositoryExists(): bool
     {
-        return $this->getSchemaBuilder()->hasTable($this->table);
+        try {
+            return $this->getSchemaBuilder()->hasTable($this->getTableName());
+        } catch (QueryException $e) {
+            return false;
+        }
     }
 
     /**
@@ -189,9 +171,14 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function table()
+    public function getTable(): QueryBuilder
     {
-        return $this->getConnection()->table($this->table);
+        // Make sure repository exist
+        if (!$this->repositoryExists()) {
+            $this->createRepository();
+        }
+
+        return $this->getConnection()->table($this->getTableName());
     }
 
     /**
@@ -199,7 +186,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      *
      * @return \Illuminate\Database\Schema\Builder
      */
-    public function getSchemaBuilder()
+    public function getSchemaBuilder(): Builder
     {
         return $this->getConnection()->getSchemaBuilder();
     }
@@ -209,18 +196,52 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      *
      * @return \Illuminate\Database\Connection
      */
-    public function getConnection()
+    public function getConnection(): Connection
     {
-        return $this->db->getConnection($this->connection);
+        return $this->db->getConnection($this->getConnectionName());
+    }
+
+    /**
+     * Resolve the database connection instance.
+     *
+     * @return string|null The connection name (default: null)
+     */
+    public function getConnectionName(): ?string
+    {
+        return $this->connection;
     }
 
     /**
      * Set the information source to gather data.
      *
-     * @param string $name The source name
+     * @param string|null $name The source name
      */
-    public function setSource($name)
+    public function setConnectionName(?string $name): void
     {
         $this->connection = $name;
+    }
+
+    /**
+     * Get the migration table name
+     *
+     * @return string
+     */
+    public function getTableName(): string
+    {
+        return $this->tableName;
+    }
+
+    /**
+     * Set the migration table name
+     *
+     * @param string $tableName The migration table name
+     *
+     * @return self
+     */
+    public function setTableName(string $tableName)
+    {
+        $this->tableName = $tableName;
+
+        return $this;
     }
 }

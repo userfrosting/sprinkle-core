@@ -13,13 +13,9 @@ namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
 
 /**
- * MigrationDependencyAnalyser Class.
- *
  * Helper class used to analyse migrations dependencies and return the
  * migrations classes in the correct order for migration to be run up without
  * dependency collisions.
- *
- * @author Louis Charette
  */
 class MigrationDependencyAnalyser
 {
@@ -49,11 +45,11 @@ class MigrationDependencyAnalyser
     protected $analysed = false;
 
     /**
-     * Constructor.
-     *
      * @param array $pending   The pending migrations
      * @param array $installed The installed migrations
      */
+    // TODO Move those to setter/getter, or move analyse to ctor ?
+    // TODO : Depends on Localiser & Repo
     public function __construct(array $pending = [], array $installed = [])
     {
         $this->pending = collect($this->normalizeClasses($pending));
@@ -63,6 +59,7 @@ class MigrationDependencyAnalyser
     /**
      * Analyse the dependencies.
      */
+    // TODO : No bueno anymore
     public function analyse(): void
     {
         // Reset fulfillable/unfulfillable lists
@@ -91,6 +88,7 @@ class MigrationDependencyAnalyser
      *
      * @return bool True/False if the migration is fulfillable
      */
+    // TODO : Building a tree just like the sprinkle, then (or in the process of) remove installed might be simpler ?
     protected function validateClassDependencies(string $migrationName): bool
     {
         // If it's already marked as fulfillable, it's fulfillable
@@ -201,13 +199,17 @@ class MigrationDependencyAnalyser
      *
      * @return array The dependency list
      */
+    // TODO : Might be worth splitting this outside. Aka, type hint on MigrationInterfaces instead of random Strings ?
     protected function getMigrationDependencies(string $migration): array
     {
         // Make sure class exists
+        // TODO Use Locator `has` instead. It needs to be registered, not any class
         if (!class_exists($migration)) {
+            // TODO : The command reference in the message should be moved in a try/catch in the Bakery command
             throw new BadClassNameException("Unable to find the migration class '$migration'. Run 'php bakery migrate:clean' to remove stale migrations.");
         }
 
+        // TODO : Should be handled by interface, but since it a property, might  not... so should still be kept in case.
         // If the `dependencies` property exist, use it
         if (property_exists($migration, 'dependencies')) {
             return $this->normalizeClasses($migration::$dependencies);

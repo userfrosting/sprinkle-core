@@ -17,7 +17,6 @@ use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
-use UserFrosting\Sprinkle\RecipeExtensionLoader;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /*
@@ -32,28 +31,28 @@ class MigratorService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            Migrator::class => function (
-                Capsule $db,
-                MigrationRepositoryInterface $migrationRepository,
-                MigrationLocatorInterface $migrationLocator
-            ) {
-                $migrator = new Migrator(
-                    $db,
-                    $migrationRepository,
-                    $migrationLocator,
-                );
+            // Migrator::class => function (
+            //     Capsule $db,
+            //     MigrationRepositoryInterface $migrationRepository,
+            //     MigrationLocatorInterface $migrationLocator
+            // ) {
+            //     $migrator = new Migrator(
+            //         $db,
+            //         $migrationRepository,
+            //         $migrationLocator,
+            //     );
 
-                // Make sure repository exist
-                if (!$migrator->repositoryExists()) {
-                    $migrator->getRepository()->createRepository();
-                }
+            //     return $migrator;
+            // },
 
-                return $migrator;
-            },
-
+            // TODO : Should probably depend on a service, not a string ? 
             MigrationRepositoryInterface::class => function (Capsule $db, Config $config) {
-                return new DatabaseMigrationRepository($db, $config->get('migrations.repository_table'));
+                $repository = new DatabaseMigrationRepository($db, $config->get('migrations.repository_table'));
+
+                return $repository;
             },
+
+            // TODO : Autowire Analyser here from interface
 
             MigrationLocatorInterface::class => \DI\autowire(MigrationLocator::class),
         ];

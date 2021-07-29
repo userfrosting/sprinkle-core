@@ -11,12 +11,8 @@
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 /**
- * MigrationRollbackDependencyAnalyser Class.
- *
  * Helper class used to analyse migrations rollback dependencies and return the
  * list of migrations classes that prevent the specified migrations to be rolledback
- *
- * @author Louis Charette
  */
 class MigrationRollbackDependencyAnalyser extends MigrationDependencyAnalyser
 {
