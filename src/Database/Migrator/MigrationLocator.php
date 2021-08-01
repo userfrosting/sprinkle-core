@@ -30,7 +30,7 @@ class MigrationLocator implements MigrationLocatorInterface
     /**
      * {@inheritDoc}
      */
-    public function getAll(): array
+    public function all(): array
     {
         $migrations = $this->extensionLoader->getInstances(
             method: 'getMigrations',
@@ -44,13 +44,23 @@ class MigrationLocator implements MigrationLocatorInterface
     /**
      * {@inheritDoc}
      */
+    public function list(): array
+    {
+        return array_map(function ($m) {
+            return get_class($m);
+        }, $this->all());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function get(string $migration): MigrationInterface
     {
         if (!$this->has($migration)) {
             throw new NotFoundException("Migration `$migration` not found.");
         }
 
-        $results = array_filter($this->getAll(), function ($m) use ($migration) {
+        $results = array_filter($this->all(), function ($m) use ($migration) {
             return get_class($m) == $migration;
         });
 
@@ -62,10 +72,6 @@ class MigrationLocator implements MigrationLocatorInterface
      */
     public function has(string $migration): bool
     {
-        $migrations = array_map(function ($m) {
-            return get_class($m);
-        }, $this->getAll());
-
-        return in_array($migration, $migrations);
+        return in_array($migration, $this->list());
     }
 }

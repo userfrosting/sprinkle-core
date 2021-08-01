@@ -142,7 +142,7 @@ class MigratorTest extends TestCase
         // Make sure the data returned from migrator is accurate.
         // N.B.: The order returned by the rollback method is ordered by which
         // migration was rolled back first (reversed from the order they where ran up)
-        $this->assertEquals(array_reverse($this->migrationLocator->getAll()), $rolledBack);
+        $this->assertEquals(array_reverse($this->migrationLocator->all()), $rolledBack);
     }
 
     public function testMigrationsCanBeReset(): void
@@ -157,7 +157,7 @@ class MigratorTest extends TestCase
         $this->assertFalse($this->schema->hasTable('password_resets'));
 
         // Make sure the data returned from migrator is accurate.
-        $this->assertEquals(array_reverse($this->migrationLocator->getAll()), $rolledBack);
+        $this->assertEquals(array_reverse($this->migrationLocator->all()), $rolledBack);
     }
 
     public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist(): void
@@ -322,7 +322,7 @@ class MigratorTest extends TestCase
 
 class MigrationLocatorStub extends MigrationLocator
 {
-    public function getAll(): array
+    public function all(): array
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
@@ -333,7 +333,7 @@ class MigrationLocatorStub extends MigrationLocator
 
 class FlightsTableMigrationLocatorStub extends MigrationLocator
 {
-    public function getAll(): array
+    public function all(): array
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
@@ -346,7 +346,7 @@ class FlightsTableMigrationLocatorStub extends MigrationLocator
  */
 class InvalidMigrationLocatorStub extends MigrationLocator
 {
-    public function getAll(): array
+    public function all(): array
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\Foo',
@@ -361,7 +361,7 @@ class InvalidMigrationLocatorStub extends MigrationLocator
  */
 class DependableMigrationLocatorStub extends MigrationLocator
 {
-    public function getAll(): array
+    public function all(): array
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
@@ -377,7 +377,7 @@ class DependableMigrationLocatorStub extends MigrationLocator
  */
 class UnfulfillableMigrationLocatorStub extends MigrationLocator
 {
-    public function getAll(): array
+    public function all(): array
     {
         return [
             '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',

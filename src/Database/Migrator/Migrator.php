@@ -440,7 +440,7 @@ class Migrator
      */
     public function getAvailableMigrations()
     {
-        return $this->locator->getAll();
+        return $this->locator->all();
     }
 
     /**

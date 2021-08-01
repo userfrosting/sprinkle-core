@@ -59,7 +59,7 @@ class MigrationLocatorTest extends TestCase
      */
     public function testGetAll(MigrationLocator $locator): void
     {
-        $migrations = $locator->getAll();
+        $migrations = $locator->all();
 
         $this->assertIsArray($migrations);
         $this->assertCount(2, $migrations);
@@ -93,7 +93,7 @@ class MigrationLocatorTest extends TestCase
         $this->assertInstanceOf(MigrationLocatorInterface::class, $locator);
 
         // Get all migrations assertions
-        $migrations = $locator->getAll();
+        $migrations = $locator->all();
         $this->assertIsArray($migrations);
         $this->assertCount(2, $migrations);
         $this->assertInstanceOf(StubMigrationA::class, $migrations[0]);
@@ -103,6 +103,18 @@ class MigrationLocatorTest extends TestCase
     /**
      * @depends testConstruct
      * @depends testGetAll
+     */
+    public function testList(MigrationLocator $locator): void
+    {
+        $this->assertSame([
+            StubMigrationA::class,
+            StubMigrationB::class,
+        ], $locator->list());
+    }
+
+    /**
+     * @depends testConstruct
+     * @depends testList
      */
     public function testHas(MigrationLocator $locator): void
     {

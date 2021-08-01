@@ -20,9 +20,16 @@ interface MigrationLocatorInterface
     /**
      * Loop all the available sprinkles and return all available migrations across the whole app.
      *
-     * @return MigrationInterface[] A list of all the migration files found across every sprinkle
+     * @return MigrationInterface[] A list of all the migration instances found across every sprinkle
      */
-    public function getAll(): array;
+    public function all(): array;
+
+    /**
+     * Returns the same as getAll, but as a list of class names for management by the analyser.
+     *
+     * @return string[] A list of all the migration class found across every sprinkle
+     */
+    public function list(): array;
 
     /**
      * Return the migration class based on the migration string reference.
