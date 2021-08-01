@@ -10,16 +10,20 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
+use DI\Container;
+use Illuminate\Database\Schema\Builder;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Migration;
-use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
 use UserFrosting\Sprinkle\Core\ServicesProvider\MigratorService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
+use UserFrosting\Sprinkle\Core\Tests\Integration\TestSprinkle;
 use UserFrosting\Sprinkle\RecipeExtensionLoader;
+use UserFrosting\Sprinkle\SprinkleManager;
+use UserFrosting\Support\Exception\NotFoundException;
 use UserFrosting\Testing\ContainerStub;
 
 /**
@@ -29,54 +33,101 @@ class MigrationLocatorTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    /**
-     * @dataProvider migrationDataProvider
-     */
-    public function testGetMigrations(array $migrations): void
+    public function testConstruct(): MigrationLocator
     {
-        $manager = Mockery::mock(RecipeExtensionLoader::class)
-                ->shouldReceive('getInstances')
-                ->with('getMigrations', MigrationRecipe::class, MigrationInterface::class)
-                ->once()
-                ->andReturn($migrations)
-                ->getMock();
+        $builder = Mockery::mock(Builder::class);
 
-        $locator = new MigrationLocator($manager);
+        $ci = Mockery::mock(Container::class)
+            ->shouldReceive('get')->with(StubMigrationA::class)->andReturn(new StubMigrationA($builder))
+            ->shouldReceive('get')->with(StubMigrationB::class)->andReturn(new StubMigrationB($builder))
+            ->getMock();
+
+        $manager = Mockery::mock(SprinkleManager::class)
+            ->shouldReceive('getSprinkles')->andReturn([MigrationsSprinkleStub::class])
+            ->getMock();
+
+        $loader = new RecipeExtensionLoader($manager, $ci);
+        $locator = new MigrationLocator($loader);
 
         $this->assertInstanceOf(MigrationLocatorInterface::class, $locator);
-        $this->assertSame($migrations, $locator->getMigrations());
+
+        return $locator;
     }
 
     /**
-     * @dataProvider migrationDataProvider
+     * @depends testConstruct
      */
-    public function testGetMigrationsService(array $migrations): void
+    public function testGetAll(MigrationLocator $locator): void
+    {
+        $migrations = $locator->getAll();
+
+        $this->assertIsArray($migrations);
+        $this->assertCount(2, $migrations);
+        $this->assertInstanceOf(StubMigrationA::class, $migrations[0]);
+        $this->assertInstanceOf(StubMigrationB::class, $migrations[1]);
+    }
+
+    /**
+     * @depends testConstruct
+     * @depends testGetAll
+     */
+    public function testConstructAndGetAllThroughService(): void
     {
         // Create container with provider to test
         $provider = new MigratorService();
         $ci = ContainerStub::create($provider->register());
 
-        $manager = Mockery::mock(RecipeExtensionLoader::class)
-                ->shouldReceive('getInstances')
-                ->with('getMigrations', MigrationRecipe::class, MigrationInterface::class)
-                ->once()
-                ->andReturn($migrations)
-                ->getMock();
-        $ci->set(RecipeExtensionLoader::class, $manager);
+        // Mock builder for migration creation
+        $builder = Mockery::mock(Builder::class);
+        $ci->set(Builder::class, $builder);
+
+        // Mock Sprinkle Manager so it return the Migration stub
+        $sprinkleManager = Mockery::mock(SprinkleManager::class)
+            ->shouldReceive('getSprinkles')->andReturn([MigrationsSprinkleStub::class])
+            ->getMock();
+        $ci->set(SprinkleManager::class, $sprinkleManager);
 
         /** @var MigrationLocatorInterface */
         $locator = $ci->get(MigrationLocatorInterface::class);
 
         $this->assertInstanceOf(MigrationLocatorInterface::class, $locator);
-        $this->assertSame($migrations, $locator->getMigrations());
+
+        // Get all migrations assertions
+        $migrations = $locator->getAll();
+        $this->assertIsArray($migrations);
+        $this->assertCount(2, $migrations);
+        $this->assertInstanceOf(StubMigrationA::class, $migrations[0]);
+        $this->assertInstanceOf(StubMigrationB::class, $migrations[1]);
     }
 
-    public function migrationDataProvider(): array
+    /**
+     * @depends testConstruct
+     * @depends testGetAll
+     */
+    public function testHas(MigrationLocator $locator): void
     {
-        return [
-            [[]],
-            [[StubMigrationA::class, StubMigrationB::class]],
-        ];
+        $this->assertTrue($locator->has(StubMigrationA::class));
+        $this->assertFalse($locator->has(StubMigrationC::class));
+    }
+
+    /**
+     * @depends testConstruct
+     * @depends testHas
+     */
+    public function testGet(MigrationLocator $locator): void
+    {
+        $migration = $locator->get(StubMigrationA::class);
+        $this->assertInstanceOf(StubMigrationA::class, $migration);
+    }
+
+    /**
+     * @depends testConstruct
+     * @depends testHas
+     */
+    public function testGetWithNotFound(MigrationLocator $locator): void
+    {
+        $this->expectException(NotFoundException::class);
+        $locator->get(StubMigrationC::class);
     }
 }
 
@@ -99,5 +150,16 @@ class StubMigrationB extends Migration
 
     public function down()
     {
+    }
+}
+
+class MigrationsSprinkleStub extends TestSprinkle implements MigrationRecipe
+{
+    public static function getMigrations(): array
+    {
+        return [
+            StubMigrationA::class,
+            StubMigrationB::class,
+        ];
     }
 }

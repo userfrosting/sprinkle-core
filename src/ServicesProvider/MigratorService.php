@@ -45,7 +45,7 @@ class MigratorService implements ServicesProviderInterface
             //     return $migrator;
             // },
 
-            // TODO : Should probably depend on a service, not a string ? 
+            // TODO : Should probably depend on a service, not a string ?
             MigrationRepositoryInterface::class => function (Capsule $db, Config $config) {
                 $repository = new DatabaseMigrationRepository($db, $config->get('migrations.repository_table'));
 

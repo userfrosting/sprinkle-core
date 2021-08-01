@@ -13,11 +13,10 @@ namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\RecipeExtensionLoader;
+use UserFrosting\Support\Exception\NotFoundException;
 
 /**
- * Migration Locator Class.
- *
- * Finds all migrations class in a given sprinkle
+ * Find and returns all registered MigrationInterface across all sprinkles, using MigrationRecipe.
  */
 class MigrationLocator implements MigrationLocatorInterface
 {
@@ -31,7 +30,7 @@ class MigrationLocator implements MigrationLocatorInterface
     /**
      * {@inheritDoc}
      */
-    public function getMigrations(): array
+    public function getAll(): array
     {
         $migrations = $this->extensionLoader->getInstances(
             method: 'getMigrations',
@@ -40,5 +39,33 @@ class MigrationLocator implements MigrationLocatorInterface
         );
 
         return $migrations;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function get(string $migration): MigrationInterface
+    {
+        if (!$this->has($migration)) {
+            throw new NotFoundException("Migration `$migration` not found.");
+        }
+
+        $results = array_filter($this->getAll(), function ($m) use ($migration) {
+            return get_class($m) == $migration;
+        });
+
+        return $results[0];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function has(string $migration): bool
+    {
+        $migrations = array_map(function ($m) {
+            return get_class($m);
+        }, $this->getAll());
+
+        return in_array($migration, $migrations);
     }
 }

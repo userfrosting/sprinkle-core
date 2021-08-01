@@ -10,17 +10,35 @@
 
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
+use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
+
 /**
- * Migration Locator Interface.
- *
- * Migration Locator handlers must implement this interface.
+ * Find and returns all migrations.
  */
 interface MigrationLocatorInterface
 {
     /**
-     * Loop all the available sprinkles and return a list of their migrations.
+     * Loop all the available sprinkles and return all available migrations across the whole app.
      *
-     * @return \UserFrosting\Sprinkle\Core\Database\MigrationInterface[] A list of all the migration files found for every sprinkle
+     * @return MigrationInterface[] A list of all the migration files found across every sprinkle
      */
-    public function getMigrations(): array;
+    public function getAll(): array;
+
+    /**
+     * Return the migration class based on the migration string reference.
+     *
+     * @param string $migration Migration class as a string, as saved in the log probably.
+     *
+     * @return MigrationInterface
+     */
+    public function get(string $migration): MigrationInterface;
+
+    /**
+     * Validate if a specific migration exist.
+     *
+     * @param string $migration Migration class as a string, as saved in the log probably.
+     *
+     * @return bool
+     */
+    public function has(string $migration): bool;
 }

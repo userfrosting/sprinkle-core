@@ -47,8 +47,7 @@ class Migrator
         protected Capsule $db,
         protected MigrationRepositoryInterface $repository,
         protected MigrationLocatorInterface $locator
-    )
-    {
+    ) {
     }
 
     /**
@@ -441,7 +440,7 @@ class Migrator
      */
     public function getAvailableMigrations()
     {
-        return $this->locator->getMigrations();
+        return $this->locator->getAll();
     }
 
     /**
