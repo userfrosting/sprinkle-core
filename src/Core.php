@@ -40,7 +40,7 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\AssetService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CsrfService;
-use UserFrosting\Sprinkle\Core\ServicesProvider\DbService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\DatabaseService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ErrorHandlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\FactoryService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\I18nService;
@@ -54,6 +54,7 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\SessionService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\VersionsService;
+use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\AssetsExtension;
@@ -62,7 +63,7 @@ use UserFrosting\Sprinkle\Core\Twig\Extensions\CsrfExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
 use UserFrosting\Sprinkle\SprinkleRecipe;
 
-class Core implements SprinkleRecipe, TwigExtensionRecipe
+class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe
 {
     /**
      * {@inheritdoc}
@@ -144,7 +145,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe
             CacheService::class,
             ConfigService::class,
             // CsrfService::class,
-            DbService::class,
+            DatabaseService::class,
             ErrorHandlerService::class,
             // FactoryService::class,
             I18nService::class,
@@ -188,5 +189,10 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe
             I18nExtension::class,
             AlertsExtension::class,
         ];
+    }
+
+    public static function getMigrations(): array
+    {
+        return [];
     }
 }

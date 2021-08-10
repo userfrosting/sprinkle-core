@@ -64,7 +64,7 @@ class MigrationLocator implements MigrationLocatorInterface
             return get_class($m) == $migration;
         });
 
-        return $results[0];
+        return array_values($results)[0]; // TODO : Test array_values with filter not being on key 0
     }
 
     /**
@@ -72,6 +72,8 @@ class MigrationLocator implements MigrationLocatorInterface
      */
     public function has(string $migration): bool
     {
-        return in_array($migration, $this->list());
+        $list = $this->list();
+
+        return in_array($migration, $list);
     }
 }

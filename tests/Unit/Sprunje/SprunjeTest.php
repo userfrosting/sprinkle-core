@@ -46,9 +46,9 @@ class SprunjeTest extends TestCase
         // See https://stackoverflow.com/questions/20701679/mocking-callbacks-in-laravel-4-mockery
         $builder->shouldReceive('newQuery')->andReturn(
             $subBuilder = m::mock(Builder::class, function ($subQuery) {
-                    $subQuery->makePartial();
-                    $subQuery->shouldReceive('orLike')->with('species', 'Tyto')->once()->andReturn($subQuery);
-                })
+                $subQuery->makePartial();
+                $subQuery->shouldReceive('orLike')->with('species', 'Tyto')->once()->andReturn($subQuery);
+            })
         );
 
         $sprunje->applyFilters($builder);

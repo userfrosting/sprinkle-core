@@ -10,7 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
-use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
+use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 
 /**
  * Helper class used to analyse migrations dependencies and return the
@@ -20,219 +21,129 @@ use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
 class MigrationDependencyAnalyser
 {
     /**
-     * @var \Illuminate\Support\Collection List of fulfillable migrations
+     * @param MigrationRepositoryInterface $repository
+     * @param MigrationLocatorInterface    $locator
      */
-    protected $fulfillable;
-
-    /**
-     * @var \Illuminate\Support\Collection List of unfulfillable migration (Migration that needs to be run and their dependencies are NOT met)
-     */
-    protected $unfulfillable;
-
-    /**
-     * @var \Illuminate\Support\Collection List of installed migration
-     */
-    protected $installed;
-
-    /**
-     * @var \Illuminate\Support\Collection List of migration to install
-     */
-    protected $pending;
-
-    /**
-     * @var bool True/false if the analyse method has been called
-     */
-    protected $analysed = false;
-
-    /**
-     * @param array $pending   The pending migrations
-     * @param array $installed The installed migrations
-     */
-    // TODO Move those to setter/getter, or move analyse to ctor ?
-    // TODO : Depends on Localiser & Repo
-    public function __construct(array $pending = [], array $installed = [])
-    {
-        $this->pending = collect($this->normalizeClasses($pending));
-        $this->installed = collect($this->normalizeClasses($installed));
+    public function __construct(
+        protected MigrationRepositoryInterface $repository,
+        protected MigrationLocatorInterface $locator,
+    ) {
     }
 
     /**
-     * Analyse the dependencies.
+     * Get installed migrations
+     *
+     * @return string[] An array of migration class names in the order they where ran.
      */
-    // TODO : No bueno anymore
-    public function analyse(): void
+    public function getInstalled(): array
     {
-        // Reset fulfillable/unfulfillable lists
-        $this->analysed = false;
-        $this->fulfillable = collect([]);
-        $this->unfulfillable = collect([]);
-
-        // Loop pending and check for dependencies
-        foreach ($this->pending as $migration) {
-            $this->validateClassDependencies($migration);
-        }
-
-        $this->analysed = true;
+        return $this->repository->getMigrationsList();
     }
 
     /**
-     * Validate if a migration is fulfillable.
-     * N.B.: The key element here is the recursion while validating the
-     * dependencies. This is very important as the order the migrations needs
-     * to be run is defined by this recursion. By waiting for the dependency
-     * to be marked as fulfillable to mark the parent as fulfillable, the
-     * parent class will be automatically placed after it's dependencies
-     * in the `fulfillable` property.
+     * Get migrations available and registered to be run.
      *
-     * @param string $migrationName The migration class name
-     *
-     * @return bool True/False if the migration is fulfillable
+     * @return string[] An array of migration class names.
      */
-    // TODO : Building a tree just like the sprinkle, then (or in the process of) remove installed might be simpler ?
-    protected function validateClassDependencies(string $migrationName): bool
+    public function getAvailable(): array
     {
-        // If it's already marked as fulfillable, it's fulfillable
-        // Return true directly (it's already marked)
-        if ($this->fulfillable->contains($migrationName)) {
-            return true;
+        return $this->locator->list();
+    }
+
+    /**
+     * Returns migration that are installed, but not available.
+     *
+     * @return string[] An array of migration class names.
+     */
+    public function getStale(): array
+    {
+        $stale = array_diff($this->getInstalled(), $this->getAvailable());
+
+        return array_values($stale);
+    }
+
+    /**
+     * Returns migration that are available, but not installed, in the order
+     * they need to be run.
+     *
+     * @return string[] An array of migration class names.
+     */
+    public function getPending(): array
+    {
+        $pending = array_diff($this->getAvailable(), $this->getInstalled());
+
+        $migrations = [];
+
+        // We need to validate the dependencies of each pending migration.
+        foreach ($pending as $migration) {
+            $dependencies = $this->getDependencies($migration);
+            $migrations = array_merge($migrations, $dependencies);
         }
 
-        // If it's already marked as unfulfillable, it's unfulfillable
-        // Return false directly (it's already marked)
-        if ($this->unfulfillable->contains($migrationName)) {
-            return false;
-        }
+        // Remove duplicate and re-index.
+        // Duplicate migrations will be removed, preserving the correct order.
+        $migrations = array_unique($migrations);
+        $migrations = array_values($migrations);
 
-        // If it's already run, it's fulfillable
-        // Mark it as such for next time it comes up in this point
-        if ($this->installed->contains($migrationName)) {
-            return $this->markAsFulfillable($migrationName);
-        }
+        return $migrations;
+    }
 
-        // Get migration dependencies
-        $dependencies = $this->getMigrationDependencies($migrationName);
+    /**
+     * We run across all step even if it's not required, as this is run
+     * recursively across all dependencies.
+     *
+     * @param string $migrationClass
+     *
+     * @return string[] This migration and it's dependencies.
+     */
+    protected function getDependencies(string $migrationClass): array
+    {
+        // Get migration instance
+        $migration = $this->locator->get($migrationClass);
 
-        // Loop dependencies. If one is not fulfillable, then this migration is not either
-        foreach ($dependencies as $dependency) {
+        // Start with the migration in the return.
+        // This allows the main migration to be placed in the correct order
+        // When doing a nested call.
+        $dependencies = [$migrationClass];
 
-            // The dependency might already be installed. Check that first
-            if ($this->installed->contains($dependency)) {
+        // Loop dependencies and validate them
+        foreach ($this->getDependenciesProperty($migration) as $dependency) {
+
+            // The dependency might already be installed. Check that first.
+            // Skip if it's the case (we don't want it pending again).
+            // This allows to accept stale (installed, but not available
+            // migration) as valid dependencies.
+            if (in_array($dependency, $this->getInstalled())) {
                 continue;
             }
 
-            // Check is the dependency is pending installation. If so, check for it's dependencies.
-            // If the dependency is not fulfillable, then this one isn't either
-            if (!$this->pending->contains($dependency) || !$this->validateClassDependencies($dependency)) {
-                return $this->markAsUnfulfillable($migrationName, $dependency);
+            // Make sure dependency exist. Otherwise it's a dead end.
+            if (!$this->locator->has($dependency)) {
+                throw new MigrationDependencyNotMetException("$migrationClass depends on $dependency, but it's not available.");
             }
+
+            // Loop dependency's dependencies. Add them BEFORE the main migration and previous dependencies.
+            $dependencies = array_merge($this->getDependencies($dependency), $dependencies);
         }
 
-        // If no dependencies returned false, it's fulfillable
-        return $this->markAsFulfillable($migrationName);
-    }
-
-    /**
-     * Return the fulfillable list. Analyse the stack if not done already.
-     *
-     * @return array
-     */
-    public function getFulfillable(): array
-    {
-        if (!$this->analysed) {
-            $this->analyse();
-        }
-
-        return $this->fulfillable->toArray();
-    }
-
-    /**
-     * Return the fulfillable list. Analyse the stack if not done already.
-     *
-     * @return array
-     */
-    public function getUnfulfillable(): array
-    {
-        if (!$this->analysed) {
-            $this->analyse();
-        }
-
-        return $this->unfulfillable->toArray();
-    }
-
-    /**
-     * Mark a dependency as fulfillable. Removes it from the pending list and add it to the fulfillable list.
-     *
-     * @param string $migration The migration class name
-     *
-     * @return bool True, it's fulfillable
-     */
-    protected function markAsFulfillable(string $migration): bool
-    {
-        $this->fulfillable->push($migration);
-
-        return true;
-    }
-
-    /**
-     * Mark a dependency as unfulfillable. Removes it from the pending list and add it to the unfulfillable list.
-     *
-     * @param string       $migration  The migration class name
-     * @param string|array $dependency The problematic dependency
-     *
-     * @return bool False, it's not fulfillable
-     */
-    protected function markAsUnfulfillable(string $migration, $dependency): bool
-    {
-        if (is_array($dependency)) {
-            $dependency = implode(', ', $dependency);
-        }
-
-        $this->unfulfillable->put($migration, $dependency);
-
-        return false;
+        return $dependencies;
     }
 
     /**
      * Returns the migration dependency list.
      *
-     * @param string $migration The migration class
+     * @param MigrationInterface $migration The migration instance
      *
-     * @return array The dependency list
+     * @return string[] The dependency list
      */
-    // TODO : Might be worth splitting this outside. Aka, type hint on MigrationInterfaces instead of random Strings ?
-    protected function getMigrationDependencies(string $migration): array
+    protected function getDependenciesProperty(MigrationInterface $migration): array
     {
-        // Make sure class exists
-        // TODO Use Locator `has` instead. It needs to be registered, not any class
-        if (!class_exists($migration)) {
-            // TODO : The command reference in the message should be moved in a try/catch in the Bakery command
-            throw new BadClassNameException("Unable to find the migration class '$migration'. Run 'php bakery migrate:clean' to remove stale migrations.");
-        }
-
-        // TODO : Should be handled by interface, but since it a property, might  not... so should still be kept in case.
+        // Should be handled by interface, but since it a property, it's not... so should still be kept in case.
         // If the `dependencies` property exist, use it
         if (property_exists($migration, 'dependencies')) {
-            return $this->normalizeClasses($migration::$dependencies);
+            return $migration::$dependencies;
         } else {
             return [];
         }
-    }
-
-    /**
-     * Normalize class so all class starts with '/'.
-     *
-     * @param string[] $classes
-     *
-     * @return string[]
-     */
-    protected function normalizeClasses(array $classes): array
-    {
-        return array_map(function (string $class) {
-            if ($class[0] !== '\\') {
-                return '\\' . $class;
-            }
-
-            return $class;
-        }, $classes);
     }
 }

@@ -12,7 +12,9 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Events\Dispatcher;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Support\Repository\Repository as Config;
@@ -23,7 +25,7 @@ use UserFrosting\Support\Repository\Repository as Config;
  * @todo construct the individual objects rather than using the facade
  * @return \Illuminate\Database\Capsule\Manager
 */
-class DbService implements ServicesProviderInterface
+class DatabaseService implements ServicesProviderInterface
 {
     public function register(): array
     {
@@ -65,6 +67,14 @@ class DbService implements ServicesProviderInterface
                 }*/
 
                 return $capsule;
+            },
+
+            Builder::class => function (Connection $connection) {
+                return $connection->getSchemaBuilder();
+            },
+
+            Connection::class => function (Capsule $db, Config $config) {
+                return $db->getConnection(/* TODO Add connection here from config */);
             },
         ];
     }
