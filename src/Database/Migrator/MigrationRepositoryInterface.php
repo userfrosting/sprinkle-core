@@ -30,9 +30,20 @@ interface MigrationRepositoryInterface
      *
      * @param string $migration The migration
      *
+     * @throws MigrationNotFoundException Should be thrown if migration isn't found.
+     *
      * @return object The migration object
      */
     public function getMigration(string $migration): object;
+
+    /**
+     * Check if the requested migration exist in the repository.
+     *
+     * @param string $migration The migration
+     *
+     * @return bool
+     */
+    public function hasMigration(string $migration): bool;
 
     /**
      * Get the last migration batch in reserve order they were ran (last one first).

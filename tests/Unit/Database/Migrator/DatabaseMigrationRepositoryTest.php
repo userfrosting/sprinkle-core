@@ -21,6 +21,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException;
 
 /**
  * DatabaseMigrationRepository Test
@@ -271,7 +272,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
     /**
      * @depends testGetMigrationsAndGetMigrationsList
-     * Warning: This test should to be completed with an actual integration test
+     * This test should to be completed with an actual integration test
      */
     public function testGetMigration(): void
     {
@@ -279,16 +280,37 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $result = new \stdClass(['migration' => 'foo', 'batch' => 1]);
 
         $this->queryBuilder
-            ->shouldReceive('where')->with('migration', 'foo')->once()->andReturn($this->queryBuilder)
-            ->shouldReceive('first')->once()->andReturn($result);
+            ->shouldReceive('where')->with('migration', 'foo')->twice()->andReturn($this->queryBuilder)
+            ->shouldReceive('first')->once()->andReturn($result)
+            ->shouldReceive('exists')->once()->andReturn(true);
 
         // Get new repo with above expectations
         $repository = $this->getRepo();
 
-        // Warning : This is mostly mock expectations check. See Integration test
+        // This is mostly mock expectations check. See Integration test
+        $this->assertTrue($repository->hasMigration('foo'));
         $migration = $repository->getMigration('foo');
         $this->assertIsObject($migration);
         $this->assertSame($result, $migration);
+    }
+
+    /**
+     * @depends testGetMigration
+     */
+    public function testGetMigrationWithNull(): void
+    {
+        $this->queryBuilder
+            ->shouldReceive('where')->with('migration', 'foo')->twice()->andReturn($this->queryBuilder)
+            ->shouldReceive('first')->once()->andReturn(null)
+            ->shouldReceive('exists')->once()->andReturn(false);
+
+        // Get new repo with above expectations
+        $repository = $this->getRepo();
+
+        // Mock first() return a null
+        $this->assertFalse($repository->hasMigration('foo'));
+        $this->expectException(MigrationNotFoundException::class);
+        $repository->getMigration('foo');
     }
 
     public function testGetLast(): void

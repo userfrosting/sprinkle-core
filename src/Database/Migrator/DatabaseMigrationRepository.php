@@ -17,6 +17,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Collection;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException;
 
 /**
  * Repository used to store all migrations run against the database
@@ -71,15 +72,26 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
-     * Get details about a specific migration.
-     *
-     * @param string $migration The migration class
-     *
-     * @return object The migration object from the db
+     * {@inheritDoc}
      */
     public function getMigration(string $migration): object
     {
-        return $this->getTable()->where('migration', $migration)->first();
+        $result = $this->getTable()->where('migration', $migration)->first();
+
+        // Throw error if null
+        if ($result === null) {
+            throw new MigrationNotFoundException();
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasMigration(string $migration): bool
+    {
+        return $this->getTable()->where('migration', $migration)->exists();
     }
 
     /**

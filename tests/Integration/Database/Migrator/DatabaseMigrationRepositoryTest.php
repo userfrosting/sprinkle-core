@@ -63,6 +63,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertSame(5, $repository->getNextBatchNumber());
 
         // Get single Migration
+        $this->assertTrue($repository->hasMigration('foobar'));
         $migration = $repository->getMigration('foobar');
         $this->assertSame('foobar', $migration->migration);
         $this->assertSame('3', $migration->batch);
