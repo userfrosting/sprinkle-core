@@ -18,6 +18,7 @@ use UserFrosting\Support\Exception\NotFoundException;
 /**
  * Find and returns all registered MigrationInterface across all sprinkles, using MigrationRecipe.
  */
+// TODO : Could be worth renaming to "SprinkleMigrationLocator"
 class MigrationLocator implements MigrationLocatorInterface
 {
     /**

@@ -322,7 +322,7 @@ class Migrator
         // "empty" state and ready to be migrated "up" again.
         //
         // !TODO :: Should compare to the install list to make sure no outstanding migration (ran, but with no migration class anymore) still exist in the db
-        $migrations = array_reverse($this->getRanMigrations());
+        $migrations = array_reverse($this->getRanMigrations()); // GetInstalled
 
         if (count($migrations) === 0) {
             return [];

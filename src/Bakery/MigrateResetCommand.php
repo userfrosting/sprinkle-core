@@ -64,7 +64,7 @@ class MigrateResetCommand extends MigrateCommand
         $migrator = $this->setupMigrator($input);
 
         // Get pending migrations
-        $ran = $migrator->getRanMigrations();
+        $ran = $migrator->getRanMigrations(); // getInstalled
 
         // Don't go further if no migration is ran
         if (empty($ran)) {

@@ -13,7 +13,7 @@ namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 
 /**
- * Find and returns all migrations.
+ * Find and returns all migrations definitions (classes) registered and available.
  */
 interface MigrationLocatorInterface
 {
@@ -34,7 +34,7 @@ interface MigrationLocatorInterface
     /**
      * Return the migration class based on the migration string reference.
      *
-     * @param string $migration Migration class as a string, as saved in the log probably.
+     * @param string $migration Migration class as a string.
      *
      * @return MigrationInterface
      */
@@ -43,7 +43,7 @@ interface MigrationLocatorInterface
     /**
      * Validate if a specific migration exist.
      *
-     * @param string $migration Migration class as a string, as saved in the log probably.
+     * @param string $migration Migration class as a string.
      *
      * @return bool
      */

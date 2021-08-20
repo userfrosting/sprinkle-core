@@ -96,6 +96,7 @@ class MigrationDependencyAnalyser
      *
      * @return string[] This migration and it's dependencies.
      */
+    // TODO : Rename `GetPendingDependencies`
     protected function getDependencies(string $migrationClass): array
     {
         // Get migration instance

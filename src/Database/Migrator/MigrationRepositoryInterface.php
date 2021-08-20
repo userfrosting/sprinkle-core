@@ -11,7 +11,7 @@
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 /**
- * Migration Repository Interface.
+ * Logs all migrations that have been run.
  */
 interface MigrationRepositoryInterface
 {
@@ -23,6 +23,7 @@ interface MigrationRepositoryInterface
      *
      * @return string[] An array of migration class names in the order they where ran
      */
+    // TODO : Rename to List
     public function getMigrationsList(?int $steps = null, bool $asc = true): array;
 
     /**
@@ -34,6 +35,7 @@ interface MigrationRepositoryInterface
      *
      * @return object The migration object
      */
+    // TODO : Rename to Get
     public function getMigration(string $migration): object;
 
     /**
@@ -43,6 +45,7 @@ interface MigrationRepositoryInterface
      *
      * @return bool
      */
+    // TODO : Rename to has
     public function hasMigration(string $migration): bool;
 
     /**
@@ -50,6 +53,7 @@ interface MigrationRepositoryInterface
      *
      * @return string[]
      */
+    // TODO : Rename to last
     public function getLast(): array;
 
     /**
@@ -86,11 +90,13 @@ interface MigrationRepositoryInterface
     /**
      * Create the migration repository data store.
      */
+    // TODO : Rename to create
     public function createRepository(): void;
 
     /**
      * Delete the migration repository data store.
      */
+    // TODO : Rename to delete
     public function deleteRepository(): void;
 
     /**
@@ -98,5 +104,6 @@ interface MigrationRepositoryInterface
      *
      * @return bool True for success, false for error.
      */
+    // TODO : Rename to exist (or better?)
     public function repositoryExists(): bool;
 }
