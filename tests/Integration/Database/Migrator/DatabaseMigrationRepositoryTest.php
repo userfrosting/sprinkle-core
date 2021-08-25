@@ -46,7 +46,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repository->log('foo', 2);
         $repository->log('bar', 2);
         $repository->log('foobar', 3);
-        $repository->log('barfoo', 4);
+        $repository->log('barfoo');
 
         // Get Lists
         $this->assertSame([

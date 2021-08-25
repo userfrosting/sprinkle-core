@@ -107,8 +107,13 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function log(string $migration, int $batch): bool
+    public function log(string $migration, ?int $batch = null): bool
     {
+        // If no batch number is provided, use next batch number.
+        if ($batch === null) {
+            $batch = $this->getNextBatchNumber();
+        }
+
         return $this->getTable()->insert([
             'migration' => $migration,
             'batch'     => $batch,

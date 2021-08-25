@@ -59,12 +59,12 @@ interface MigrationRepositoryInterface
     /**
      * Log that a migration was run.
      *
-     * @param string $migration
-     * @param int    $batch
+     * @param string   $migration
+     * @param int|null $batch     Batch number to use for logging. Null (default) to use next batch number.
      *
      * @return bool True if success
      */
-    public function log(string $migration, int $batch): bool;
+    public function log(string $migration, ?int $batch = null): bool;
 
     /**
      * Remove a migration from the log.

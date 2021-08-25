@@ -10,52 +10,162 @@
 
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
+
 /**
  * Helper class used to analyse migrations rollback dependencies and return the
- * list of migrations classes that prevent the specified migrations to be rolledback
+ * list of migrations classes that prevent the specified migrations to be rollback
  */
 class MigrationRollbackDependencyAnalyser extends MigrationDependencyAnalyser
 {
     /**
-     * Received each installed migrations and determine if it depends on the
-     * migrations we want to delete (rollback). It can if no other installed
-     * migrations depends on it. In this context, fulfillable/unfulfillable
-     * represent the same thing as "up" dependencies. fulfillable can be
-     * rolledback, unfulfillable cannot.
+     * Returns the migrations to be rollback.
      *
-     * @param string $migrationName The migration class name
+     * MigrationRollbackException will be thrown if something prevent the
+     * migrations from being executed. If the array is returned, everything is
+     * fine to proceed.
      *
-     * @return bool True/False if the migration is fulfillable
+     * @param int $steps Number of steps to rollback. Default to 1 (last ran migration)
+     *
+     * @return string[] An array of migration class to be rolled down.
      */
-    protected function validateClassDependencies(string $migrationName): bool
+    public function getMigrationsForRollback(int $steps = 1): array
     {
-        // If it's already marked as fulfillable, it's fulfillable
-        // Return true directly (it's already marked)
-        if ($this->fulfillable->contains($migrationName)) {
-            return true;
-        }
+        $migrations = $this->repository->getMigrationsList(steps: $steps, asc: false);
 
-        // If it's already marked as unfulfillable, it's unfulfillable
-        // Return false directly (it's already marked)
-        if ($this->unfulfillable->contains($migrationName)) {
+        $this->checkRollbackDependencies($migrations);
+
+        return $migrations;
+    }
+
+    /**
+     * Returns the migrations to be reset (all of them).
+     *
+     * MigrationRollbackException will be thrown if something prevent the
+     * migrations from being executed. If the array is returned, everything is
+     * fine to proceed.
+     *
+     * @return string[] An array of migration class to be rolled down.
+     */
+    public function getMigrationsForReset(): array
+    {
+        $migrations = $this->repository->getMigrationsList(asc: false);
+
+        $this->checkRollbackDependencies($migrations);
+
+        return $migrations;
+    }
+
+    /**
+     * Return if the specified migration class can be rollback or not.
+     *
+     * @param string $migration
+     *
+     * @return bool True if can rollback, false if not.
+     */
+    public function canRollbackMigration(string $migration): bool
+    {
+        try {
+            $this->testRollbackMigration($migration, $this->getInstalled());
+        } catch (MigrationRollbackException $e) {
             return false;
         }
 
-        // If it's in the list of migration to rollback (installed), it's ok to delete this one
-        if ($this->installed->contains($migrationName)) {
-            return $this->markAsFulfillable($migrationName);
+        return true;
+    }
+
+    /**
+     * Test if a migration can be rollback.
+     *
+     * @param  string                     $migration
+     * @param  array                      $installs
+     * @throws MigrationRollbackException If something prevent migration to be rollback
+     */
+    protected function testRollbackMigration(string $migration, array $installs): void
+    {
+        // Can't rollback if migration is not installed
+        if (!$this->repository->hasMigration($migration)) {
+            throw new MigrationRollbackException('Migration is not installed : ' . $migration);
         }
 
-        // Get migration dependencies
-        $dependencies = $this->getMigrationDependencies($migrationName);
-
-        // If this migration has a dependencies for one of the migration to
-        // rollback (installed), we can't perform the rollback
-        if ($missing = array_intersect($this->installed->toArray(), $dependencies)) {
-            return $this->markAsUnfulfillable($migrationName, $missing);
+        // Can't rollback anything if there's any stale migration
+        if (!empty($stale = $this->getStale())) {
+            throw new MigrationRollbackException('Stale migration detected : ' . implode(', ', $stale));
         }
 
-        // If no dependencies returned false, it's fulfillable
-        return $this->markAsFulfillable($migrationName);
+        // We need to validate the dependencies of each installed migration
+        // To make sure any of them doesn't depends on the one we wan to rollback.
+        foreach ($installs as $installed) {
+
+            // Skip the $migration itself
+            if ($installed === $migration) {
+                continue;
+            }
+
+            // Get all dependencies for $installed, make sure $migrations is not in them
+            $dependencies = $this->getInstalledDependencies($installed);
+            if (in_array($migration, $dependencies)) {
+                throw new MigrationRollbackException("$migration cannot be rolled back since $installed depends on it.");
+            }
+        }
+    }
+
+    /**
+     * We run across all step even if it's not required, as this is run
+     * recursively across all dependencies.
+     *
+     * @param string $migrationClass
+     *
+     * @return string[] This migration and it's dependencies.
+     */
+    protected function getInstalledDependencies(string $migrationClass): array
+    {
+        // Get migration instance
+        $migration = $this->locator->get($migrationClass);
+
+        // Return variable
+        $dependencies = [];
+
+        // Loop dependencies and validate them
+        foreach ($this->getDependenciesProperty($migration) as $dependency) {
+
+            // Make sure dependency exist. Otherwise it's a dead end.
+            if (!$this->locator->has($dependency)) {
+                throw new MigrationRollbackException("$migrationClass depends on $dependency, but it's not available.");
+            }
+
+            // Loop dependency's dependencies. Add them BEFORE the main migration and previous dependencies.
+            $dependencies = array_merge($this->getDependencies($dependency), $dependencies);
+        }
+
+        return $dependencies;
+    }
+
+    /**
+     * Loop all migrations and test each one for rollback, recursively passing
+     * the remaining migrations, simulating the removal of each migration as
+     * each loop is parsed.
+     *
+     * N.B.: The `installed` migration stack are NOT passed to `testRollbackMigration`
+     * here, only the array of migrations passed as argument. By design, all
+     * migrations received, in this class, will be in reverse order they have been
+     * run. It works because it's theoretically impossible for an older batch to
+     * depend on a newer batch. The only way would be for a definition to have
+     * changed. To avoid this, both install should cloned, then remove from this,
+     * but the current solution is more optimized.
+     *
+     * @param string[] $migrations
+     */
+    protected function checkRollbackDependencies(array $migrations): void
+    {
+        foreach ($migrations as $migration) {
+
+            // Exception will be thrown if can't rollback.
+            $this->testRollbackMigration($migration, $migrations);
+
+            // Remove the migration form the list, to simulate it's been
+            // rollback for the next pass.
+            $migrations = array_filter($migrations, fn ($m) => $m != $migration);
+        }
     }
 }

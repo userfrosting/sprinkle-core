@@ -347,4 +347,14 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertTrue($repository->log('foo', 2));
         $this->assertNull($repository->delete('foobar'));
     }
+
+    public function testLogNoBatchNumber(): void
+    {
+        $this->queryBuilder
+            ->shouldReceive('insert')->once()->with(['migration' => 'foo', 'batch' => 2])->andReturn(true)
+            ->shouldReceive('max')->once()->with('batch')->andReturn(1);
+        $repository = $this->getRepo();
+
+        $this->assertTrue($repository->log('foo'));
+    }
 }
