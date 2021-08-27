@@ -66,7 +66,7 @@ class MigrationRollbackDependencyAnalyser extends MigrationDependencyAnalyser
     public function canRollbackMigration(string $migration): bool
     {
         try {
-            $this->testRollbackMigration($migration, $this->getInstalled());
+            $this->validateRollbackMigration($migration);
         } catch (MigrationRollbackException $e) {
             return false;
         }
@@ -78,10 +78,10 @@ class MigrationRollbackDependencyAnalyser extends MigrationDependencyAnalyser
      * Test if a migration can be rollback.
      *
      * @param  string                     $migration
-     * @param  array                      $installs
+     * @param  string[]                   $installed
      * @throws MigrationRollbackException If something prevent migration to be rollback
      */
-    protected function testRollbackMigration(string $migration, array $installs): void
+    public function validateRollbackMigration(string $migration, ?array $installed = null): void
     {
         // Can't rollback if migration is not installed
         if (!$this->repository->hasMigration($migration)) {
@@ -93,19 +93,19 @@ class MigrationRollbackDependencyAnalyser extends MigrationDependencyAnalyser
             throw new MigrationRollbackException('Stale migration detected : ' . implode(', ', $stale));
         }
 
+        // If no installed, use the whole stack of installed
+        if ($installed === null) {
+            $installed = $this->getInstalled();
+        }
+
         // We need to validate the dependencies of each installed migration
         // To make sure any of them doesn't depends on the one we wan to rollback.
-        foreach ($installs as $installed) {
-
-            // Skip the $migration itself
-            if ($installed === $migration) {
-                continue;
-            }
+        foreach ($installed as $installedMigration) {
 
             // Get all dependencies for $installed, make sure $migrations is not in them
-            $dependencies = $this->getInstalledDependencies($installed);
+            $dependencies = $this->getInstalledDependencies($installedMigration);
             if (in_array($migration, $dependencies)) {
-                throw new MigrationRollbackException("$migration cannot be rolled back since $installed depends on it.");
+                throw new MigrationRollbackException("$migration cannot be rolled back since $installedMigration depends on it.");
             }
         }
     }
@@ -161,7 +161,7 @@ class MigrationRollbackDependencyAnalyser extends MigrationDependencyAnalyser
         foreach ($migrations as $migration) {
 
             // Exception will be thrown if can't rollback.
-            $this->testRollbackMigration($migration, $migrations);
+            $this->validateRollbackMigration($migration, $migrations);
 
             // Remove the migration form the list, to simulate it's been
             // rollback for the next pass.
