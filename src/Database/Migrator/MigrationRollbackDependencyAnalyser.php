@@ -135,7 +135,7 @@ class MigrationRollbackDependencyAnalyser extends MigrationDependencyAnalyser
             }
 
             // Loop dependency's dependencies. Add them BEFORE the main migration and previous dependencies.
-            $dependencies = array_merge($this->getDependencies($dependency), $dependencies);
+            $dependencies = array_merge($this->getPendingDependencies($dependency), $dependencies);
         }
 
         return $dependencies;

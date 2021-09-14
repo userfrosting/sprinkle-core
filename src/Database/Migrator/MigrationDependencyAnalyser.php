@@ -76,7 +76,7 @@ class MigrationDependencyAnalyser
 
         // We need to validate the dependencies of each pending migration.
         foreach ($pending as $migration) {
-            $dependencies = $this->getDependencies($migration);
+            $dependencies = $this->getPendingDependencies($migration);
             $migrations = array_merge($migrations, $dependencies);
         }
 
@@ -96,8 +96,7 @@ class MigrationDependencyAnalyser
      *
      * @return string[] This migration and it's dependencies.
      */
-    // TODO : Rename `GetPendingDependencies`
-    protected function getDependencies(string $migrationClass): array
+    protected function getPendingDependencies(string $migrationClass): array
     {
         // Get migration instance
         $migration = $this->locator->get($migrationClass);
@@ -124,7 +123,7 @@ class MigrationDependencyAnalyser
             }
 
             // Loop dependency's dependencies. Add them BEFORE the main migration and previous dependencies.
-            $dependencies = array_merge($this->getDependencies($dependency), $dependencies);
+            $dependencies = array_merge($this->getPendingDependencies($dependency), $dependencies);
         }
 
         return $dependencies;
