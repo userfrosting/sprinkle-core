@@ -23,8 +23,7 @@ interface MigrationRepositoryInterface
      *
      * @return string[] An array of migration class names in the order they where ran
      */
-    // TODO : Rename to List
-    public function getMigrationsList(?int $steps = null, bool $asc = true): array;
+    public function list(?int $steps = null, bool $asc = true): array;
 
     /**
      * Get details about a specific migration.
@@ -35,8 +34,7 @@ interface MigrationRepositoryInterface
      *
      * @return object The migration object
      */
-    // TODO : Rename to Get
-    public function getMigration(string $migration): object;
+    public function get(string $migration): object;
 
     /**
      * Check if the requested migration exist in the repository.
@@ -45,16 +43,14 @@ interface MigrationRepositoryInterface
      *
      * @return bool
      */
-    // TODO : Rename to has
-    public function hasMigration(string $migration): bool;
+    public function has(string $migration): bool;
 
     /**
      * Get the last migration batch in reserve order they were ran (last one first).
      *
      * @return string[]
      */
-    // TODO : Rename to last
-    public function getLast(): array;
+    public function last(): array;
 
     /**
      * Log that a migration was run.
@@ -71,7 +67,7 @@ interface MigrationRepositoryInterface
      *
      * @param string $migration
      */
-    public function delete(string $migration): void;
+    public function remove(string $migration): void;
 
     /**
      * Get the next migration batch number.
@@ -90,20 +86,17 @@ interface MigrationRepositoryInterface
     /**
      * Create the migration repository data store.
      */
-    // TODO : Rename to create
-    public function createRepository(): void;
+    public function create(): void;
 
     /**
      * Delete the migration repository data store.
      */
-    // TODO : Rename to delete
-    public function deleteRepository(): void;
+    public function delete(): void;
 
     /**
      * Determine if the migration repository exists.
      *
      * @return bool True for success, false for error.
      */
-    // TODO : Rename to exist (or better?)
-    public function repositoryExists(): bool;
+    public function exists(): bool;
 }

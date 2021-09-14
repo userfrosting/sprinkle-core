@@ -54,7 +54,7 @@ class MigrateStatusCommand extends Command
         if (!$this->migrator->repositoryExists()) {
             $ran = collect();
         } else {
-            $ran = $this->migrator->getRepository()->getMigrations();
+            $ran = $this->migrator->getRepository()->getMigrations(); // TODO : Should be list, not getMigrations in Interface
         }
 
         // Get available migrations and calculate pending one

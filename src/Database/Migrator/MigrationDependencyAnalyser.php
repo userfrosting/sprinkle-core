@@ -37,7 +37,7 @@ class MigrationDependencyAnalyser
      */
     public function getInstalled(): array
     {
-        return $this->repository->getMigrationsList();
+        return $this->repository->list();
     }
 
     /**

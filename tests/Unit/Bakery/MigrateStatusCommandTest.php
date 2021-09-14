@@ -14,6 +14,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
+use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;

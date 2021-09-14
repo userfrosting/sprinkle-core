@@ -126,7 +126,7 @@ class MigrateCommand extends Command
         // Make sure repository exist. Should be done in ServicesProvider,
         // but if we change connection, it might not exist
         if (!$this->migrator->repositoryExists()) {
-            $this->migrator->getRepository()->createRepository();
+            $this->migrator->getRepository()->create();
         }
 
         // Show note if pretending

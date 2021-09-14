@@ -87,8 +87,8 @@ class MigratorTest extends TestCase
         // Get schema Builder
         $this->schema = $this->migrator->getSchemaBuilder();
 
-        if (!$this->repository->repositoryExists()) {
-            $this->repository->createRepository();
+        if (!$this->repository->exists()) {
+            $this->repository->create();
         }
     }
 
@@ -122,10 +122,10 @@ class MigratorTest extends TestCase
     //     ];
 
     //     // Theses assertions makes sure the repository and the migration returns the same format
-    //     // N.B.: getLast return the migrations in reverse order (last ran first)
+    //     // N.B.: last return the migrations in reverse order (last ran first)
     //     $this->assertEquals($expected, $ran);
-    //     $this->assertEquals(array_reverse($expected), $this->repository->getLast());
-    //     $this->assertEquals($expected, $this->repository->getMigrationsList());
+    //     $this->assertEquals(array_reverse($expected), $this->repository->last());
+    //     $this->assertEquals($expected, $this->repository->list());
     // }
 
     // public function testMigrationsCanBeRolledBack(): void

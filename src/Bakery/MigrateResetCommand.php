@@ -99,7 +99,7 @@ class MigrateResetCommand extends MigrateCommand
         // Delete the repository
         if (!$pretend && $migrator->repositoryExists()) {
             $this->io->writeln('<info>Deleting migration repository</info>');
-            $migrator->getRepository()->deleteRepository();
+            $migrator->getRepository()->delete();
         }
 
         // If all went well, there's no fatal errors and we have migrated

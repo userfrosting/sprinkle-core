@@ -54,7 +54,7 @@ abstract class BaseSeed implements SeedInterface
         $migrator = $this->ci->migrator;
 
         // Get ran migrations list
-        $ranMigrations = $migrator->getRepository()->getMigrationsList();
+        $ranMigrations = $migrator->getRepository()->list();
 
         // Make sure required migrations are in the ran list. Throw exception if it isn't.
         foreach ($migrations as $migration) {

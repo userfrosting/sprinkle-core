@@ -31,7 +31,7 @@ class MigrationRollbackDependencyAnalyser extends MigrationDependencyAnalyser
      */
     public function getMigrationsForRollback(int $steps = 1): array
     {
-        $migrations = $this->repository->getMigrationsList(steps: $steps, asc: false);
+        $migrations = $this->repository->list(steps: $steps, asc: false);
 
         $this->checkRollbackDependencies($migrations);
 
@@ -49,7 +49,7 @@ class MigrationRollbackDependencyAnalyser extends MigrationDependencyAnalyser
      */
     public function getMigrationsForReset(): array
     {
-        $migrations = $this->repository->getMigrationsList(asc: false);
+        $migrations = $this->repository->list(asc: false);
 
         $this->checkRollbackDependencies($migrations);
 
@@ -84,7 +84,7 @@ class MigrationRollbackDependencyAnalyser extends MigrationDependencyAnalyser
     public function validateRollbackMigration(string $migration, ?array $installed = null): void
     {
         // Can't rollback if migration is not installed
-        if (!$this->repository->hasMigration($migration)) {
+        if (!$this->repository->has($migration)) {
             throw new MigrationRollbackException('Migration is not installed : ' . $migration);
         }
 

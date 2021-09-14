@@ -53,7 +53,7 @@ class MigrateCleanCommand extends MigrateCommand
         if (!$migrator->repositoryExists()) {
             $ran = collect();
         } else {
-            $ran = $migrator->getRepository()->getMigrations();
+            $ran = $migrator->getRepository()->getMigrations(); // TODO : Should be list, not getMigrations in Interface
         }
 
         // Get available migrations

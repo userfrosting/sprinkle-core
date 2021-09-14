@@ -88,7 +88,7 @@ class MigratorTest extends TestCase
     //     $this->locator->shouldReceive('getMigrations')->once()->andReturn([]);
 
     //     // Repository will be asked to return the ran migrations
-    //     $this->repository->shouldReceive('getMigrationsList')->once()->andReturn([]);
+    //     $this->repository->shouldReceive('list')->once()->andReturn([]);
 
     //     $migrations = $this->migrator->run();
     //     $this->assertEmpty($migrations);
@@ -110,7 +110,7 @@ class MigratorTest extends TestCase
     //     $this->locator->shouldReceive('getMigrations')->andReturn($testMigrations);
 
     //     // Repository will be asked to return the ran migrations, the next batch number and will log 3 new migrations
-    //     $this->repository->shouldReceive('getMigrationsList')->andReturn([]);
+    //     $this->repository->shouldReceive('list')->andReturn([]);
     //     $this->repository->shouldReceive('getNextBatchNumber')->andReturn(1);
     //     $this->repository->shouldReceive('log')->times(3)->andReturn(null);
 
@@ -142,7 +142,7 @@ class MigratorTest extends TestCase
     //     ]);
 
     //     // Repository will be asked to return the ran migrations (one), the next batch number and will log 2 new migrations
-    //     $this->repository->shouldReceive('getMigrationsList')->andReturn([
+    //     $this->repository->shouldReceive('list')->andReturn([
     //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
     //     ]);
     //     $this->repository->shouldReceive('getNextBatchNumber')->andReturn(2);
@@ -182,7 +182,7 @@ class MigratorTest extends TestCase
     //     $this->locator->shouldReceive('getMigrations')->andReturn($testMigrations);
 
     //     // Repository will be asked to return the ran migrations (one), the next batch number and will log 2 new migrations
-    //     $this->repository->shouldReceive('getMigrationsList')->andReturn($testMigrations);
+    //     $this->repository->shouldReceive('list')->andReturn($testMigrations);
     //     $this->repository->shouldNotReceive('getNextBatchNumber');
     //     $this->repository->shouldNotReceive('log');
 
@@ -207,7 +207,7 @@ class MigratorTest extends TestCase
     // public function testMigratorRollbackWithNoInstalledMigrations()
     // {
     //     // Repository will be asked to return the last batch of ran migrations
-    //     $this->repository->shouldReceive('getLast')->andReturn([]);
+    //     $this->repository->shouldReceive('last')->andReturn([]);
 
     //     // Run migrations up
     //     $migrations = $this->migrator->rollback();
@@ -232,8 +232,8 @@ class MigratorTest extends TestCase
     //     $this->locator->shouldReceive('getMigrations')->once()->andReturn($testMigrations);
 
     //     // Repository will be asked to return the ran migrations (one), the next batch number and will log 2 new migrations
-    //     $this->repository->shouldReceive('getLast')->once()->andReturn($testMigrations);
-    //     $this->repository->shouldReceive('getMigrationsList')->once()->andReturn($testMigrations);
+    //     $this->repository->shouldReceive('last')->once()->andReturn($testMigrations);
+    //     $this->repository->shouldReceive('list')->once()->andReturn($testMigrations);
     //     $this->repository->shouldReceive('delete')->times(3)->andReturn([]);
 
     //     // SchemaBuilder will only create 2 tables
@@ -267,8 +267,8 @@ class MigratorTest extends TestCase
     //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
     //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
     //     ];
-    //     $this->repository->shouldReceive('getLast')->once()->andReturn($installed);
-    //     $this->repository->shouldReceive('getMigrationsList')->once()->andReturn($installed);
+    //     $this->repository->shouldReceive('last')->once()->andReturn($installed);
+    //     $this->repository->shouldReceive('list')->once()->andReturn($installed);
     //     $this->repository->shouldReceive('delete')->times(1)->andReturn([]);
 
     //     // SchemaBuilder will only drop one of the 2 tables
@@ -310,8 +310,8 @@ class MigratorTest extends TestCase
     //     $this->locator->shouldReceive('getMigrations')->once()->andReturn($testMigrations);
 
     //     // Repository will be asked to return the ran migrations and delete one
-    //     $this->repository->shouldReceive('getMigration')->once()->andReturn($migrationObject);
-    //     $this->repository->shouldReceive('getMigrationsList')->once()->andReturn($testMigrations);
+    //     $this->repository->shouldReceive('get')->once()->andReturn($migrationObject);
+    //     $this->repository->shouldReceive('list')->once()->andReturn($testMigrations);
     //     $this->repository->shouldReceive('delete')->times(1)->andReturn([]);
 
     //     // SchemaBuilder will delete 1 table
@@ -351,8 +351,8 @@ class MigratorTest extends TestCase
     //     $this->locator->shouldReceive('getMigrations')->once()->andReturn($testMigrations);
 
     //     // Repository will be asked to return the ran migrations and delete one
-    //     $this->repository->shouldReceive('getMigration')->once()->andReturn($migrationObject);
-    //     $this->repository->shouldReceive('getMigrationsList')->once()->andReturn($testMigrations);
+    //     $this->repository->shouldReceive('get')->once()->andReturn($migrationObject);
+    //     $this->repository->shouldReceive('list')->once()->andReturn($testMigrations);
     //     $this->repository->shouldNotReceive('delete');
 
     //     // SchemaBuilder will delete 1 table
@@ -385,7 +385,7 @@ class MigratorTest extends TestCase
 
     //     // Repository will be asked to return the ran migrations (all of them),
     //     // then asked to delete all 3 of them
-    //     $this->repository->shouldReceive('getMigrationsList')->twice()->andReturn($testMigrations);
+    //     $this->repository->shouldReceive('list')->twice()->andReturn($testMigrations);
     //     $this->repository->shouldReceive('delete')->times(3)->andReturn([]);
 
     //     // SchemaBuilder will drop all 3 tables

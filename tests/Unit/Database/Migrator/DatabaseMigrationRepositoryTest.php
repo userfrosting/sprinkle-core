@@ -143,12 +143,12 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // Get new repo with above expectations
         $repository = $this->getRepo();
 
-        $this->assertTrue($repository->repositoryExists());
+        $this->assertTrue($repository->exists());
 
         // Warning : No assertions done here, only mock expectations check.
         // See Integration test for exception handling.
-        $repository->createRepository();
-        $repository->deleteRepository();
+        $repository->create();
+        $repository->delete();
     }
 
     /**
@@ -175,7 +175,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // Get new repo with above expectations
         $repository = $this->getRepo();
 
-        $this->assertFalse($repository->repositoryExists());
+        $this->assertFalse($repository->exists());
     }
 
     /**
@@ -191,7 +191,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // Get new repo with above expectations
         $repository = $this->getRepo();
 
-        $this->assertFalse($repository->repositoryExists());
+        $this->assertFalse($repository->exists());
     }
 
     /**
@@ -230,7 +230,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     /**
      * @depends testGetTable
      */
-    public function testGetMigrationsAndGetMigrationsList(): void
+    public function testGetMigrationsAndList(): void
     {
         // Set mock expectations
         $result = new Collection([
@@ -244,11 +244,11 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // Get new repo with above expectations
         $repository = $this->getRepo();
 
-        $this->assertSame(['bar'], $repository->getMigrationsList());
+        $this->assertSame(['bar'], $repository->list());
     }
 
     /**
-     * @depends testGetMigrationsAndGetMigrationsList
+     * @depends testGetMigrationsAndList
      */
     public function testGetMigrationsWithStepsAndDesc(): void
     {
@@ -267,14 +267,14 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // Get new repo with above expectations
         $repository = $this->getRepo();
 
-        $this->assertSame(['bar', 'foo'], $repository->getMigrationsList(1, false));
+        $this->assertSame(['bar', 'foo'], $repository->list(1, false));
     }
 
     /**
-     * @depends testGetMigrationsAndGetMigrationsList
+     * @depends testGetMigrationsAndList
      * This test should to be completed with an actual integration test
      */
-    public function testGetMigration(): void
+    public function testGet(): void
     {
         // Set mock expectations
         $result = new \stdClass(['migration' => 'foo', 'batch' => 1]);
@@ -288,16 +288,16 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repository = $this->getRepo();
 
         // This is mostly mock expectations check. See Integration test
-        $this->assertTrue($repository->hasMigration('foo'));
-        $migration = $repository->getMigration('foo');
+        $this->assertTrue($repository->has('foo'));
+        $migration = $repository->get('foo');
         $this->assertIsObject($migration);
         $this->assertSame($result, $migration);
     }
 
     /**
-     * @depends testGetMigration
+     * @depends testGet
      */
-    public function testGetMigrationWithNull(): void
+    public function testGetWithNull(): void
     {
         $this->queryBuilder
             ->shouldReceive('where')->with('migration', 'foo')->twice()->andReturn($this->queryBuilder)
@@ -308,12 +308,12 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repository = $this->getRepo();
 
         // Mock first() return a null
-        $this->assertFalse($repository->hasMigration('foo'));
+        $this->assertFalse($repository->has('foo'));
         $this->expectException(MigrationNotFoundException::class);
-        $repository->getMigration('foo');
+        $repository->get('foo');
     }
 
-    public function testGetLast(): void
+    public function testLast(): void
     {
         // Set mock expectations
         $result = new Collection([
@@ -330,7 +330,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // Get new repo with above expectations
         $repository = $this->getRepo();
 
-        $this->assertSame(['foo', 'bar'], $repository->getLast());
+        $this->assertSame(['foo', 'bar'], $repository->last());
     }
 
     /**
@@ -345,7 +345,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repository = $this->getRepo();
 
         $this->assertTrue($repository->log('foo', 2));
-        $this->assertNull($repository->delete('foobar'));
+        $this->assertNull($repository->remove('foobar'));
     }
 
     public function testLogNoBatchNumber(): void

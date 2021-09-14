@@ -52,7 +52,7 @@ class MigrateCommandTest extends TestCase
         $migrator->shouldReceive('run')->once()->with(['pretend' => false, 'step' => false])->andReturn([]);
         $migrator->shouldReceive('getNotes');
 
-        $repository->shouldReceive('createRepository')->once();
+        $repository->shouldReceive('create')->once();
 
         // Run command
         $ci = ContainerStub::create();

@@ -108,7 +108,7 @@ class MigrationDependencyAnalyserTest extends TestCase
     public function testGetPendingWithUnmatchedDependencies(): void
     {
         // Remove D from installed, then E will fail
-        $this->repository->delete(StubAnalyserMigrationD::class);
+        $this->repository->remove(StubAnalyserMigrationD::class);
 
         // Get analyser back
         $analyser = $this->ci->get(MigrationDependencyAnalyser::class);

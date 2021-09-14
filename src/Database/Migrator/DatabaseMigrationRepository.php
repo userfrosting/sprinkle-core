@@ -66,7 +66,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function getMigrationsList(?int $steps = null, bool $asc = true): array
+    public function list(?int $steps = null, bool $asc = true): array
     {
         return $this->getMigrations($steps, $asc)->pluck('migration')->all();
     }
@@ -74,7 +74,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function getMigration(string $migration): object
+    public function get(string $migration): object
     {
         $result = $this->getTable()->where('migration', $migration)->first();
 
@@ -89,7 +89,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function hasMigration(string $migration): bool
+    public function has(string $migration): bool
     {
         return $this->getTable()->where('migration', $migration)->exists();
     }
@@ -97,7 +97,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function getLast(): array
+    public function last(): array
     {
         $query = $this->getTable()->where('batch', $this->getLastBatchNumber());
 
@@ -123,7 +123,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function delete(string $migration): void
+    public function remove(string $migration): void
     {
         $this->getTable()->where('migration', $migration)->delete();
     }
@@ -150,7 +150,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function createRepository(): void
+    public function create(): void
     {
         $this->getSchemaBuilder()->create($this->getTableName(), function (Blueprint $table) {
             // The migrations table is responsible for keeping track of which of the
@@ -166,7 +166,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function deleteRepository(): void
+    public function delete(): void
     {
         $this->getSchemaBuilder()->drop($this->getTableName());
     }
@@ -174,7 +174,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function repositoryExists(): bool
+    public function exists(): bool
     {
         try {
             return $this->getSchemaBuilder()->hasTable($this->getTableName());
@@ -191,8 +191,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     public function getTable(): QueryBuilder
     {
         // Make sure repository exist
-        if (!$this->repositoryExists()) {
-            $this->createRepository();
+        if (!$this->exists()) {
+            $this->create();
         }
 
         return $this->getConnection()->table($this->getTableName());

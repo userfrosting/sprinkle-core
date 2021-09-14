@@ -14,6 +14,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateResetCommand;
+use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;
@@ -29,7 +30,7 @@ class MigrateResetCommandTest extends TestCase
     {
         // Setup repository mock
         $repository = m::mock(DatabaseMigrationRepository::class);
-        $repository->shouldReceive('deleteRepository')->andReturn(null);
+        $repository->shouldReceive('delete')->andReturn(null);
 
         // Setup migrator mock
         $migrator = m::mock(Migrator::class);
@@ -50,7 +51,7 @@ class MigrateResetCommandTest extends TestCase
     {
         // Setup repository mock
         $repository = m::mock(DatabaseMigrationRepository::class);
-        $repository->shouldReceive('deleteRepository')->andReturn(null);
+        $repository->shouldReceive('delete')->andReturn(null);
 
         // Setup migrator mock
         $migrator = m::mock(Migrator::class);

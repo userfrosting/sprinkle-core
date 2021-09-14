@@ -14,6 +14,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateRollbackCommand;
+use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;
@@ -52,7 +53,7 @@ class MigrateRollbackCommandTest extends TestCase
         $migrator->shouldReceive('rollback')->once()->with(['pretend' => false, 'steps' => 1])->andReturn([]);
         $migrator->shouldReceive('getNotes');
 
-        $repository->shouldReceive('createRepository')->once();
+        $repository->shouldReceive('create')->once();
 
         // Run command
         $ci = ContainerStub::create();

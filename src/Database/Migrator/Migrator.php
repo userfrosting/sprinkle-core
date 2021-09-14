@@ -14,6 +14,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Arr;
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationDependencyAnalyser as Analyser;
+use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRollbackDependencyAnalyser as RollbackAnalyser;
 use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
 
@@ -203,7 +204,7 @@ class Migrator
         $this->notes = [];
 
         // Get the migration detail from the repository
-        $migration = $this->repository->getMigration($migrationClassName);
+        $migration = $this->repository->get($migrationClassName);
 
         // Make sure the migration was found. If not, return same empty array
         // as the main rollback method
@@ -226,9 +227,9 @@ class Migrator
     {
         $steps = Arr::get($options, 'steps', 0);
         if ($steps > 0) {
-            return $this->repository->getMigrationsList($steps, 'desc');
+            return $this->repository->list($steps, 'desc');
         } else {
-            return $this->repository->getLast();
+            return $this->repository->last();
         }
     }
 
@@ -352,7 +353,7 @@ class Migrator
         // Once we have successfully run the migration "down" we will remove it from
         // the migration repository so it will be considered to have not been run
         // by the application then will be able to fire by any later operation.
-        $this->repository->delete($migrationClassName);
+        $this->repository->remove($migrationClassName);
 
         $this->note("<info>Rolled back:</info>  {$migrationClassName}");
     }
@@ -453,7 +454,7 @@ class Migrator
      */
     public function getRanMigrations($steps = -1, $order = 'asc')
     {
-        return $this->repository->getMigrationsList($steps, $order);
+        return $this->repository->list($steps, $order);
     }
 
     /**
@@ -472,9 +473,9 @@ class Migrator
     /**
      * Get the migration repository instance.
      *
-     * @return \Illuminate\Database\Migrations\MigrationRepositoryInterface
+     * @return MigrationRepositoryInterface
      */
-    public function getRepository()
+    public function getRepository(): MigrationRepositoryInterface
     {
         return $this->repository;
     }
@@ -496,7 +497,7 @@ class Migrator
      */
     public function repositoryExists()
     {
-        return $this->repository->repositoryExists();
+        return $this->repository->exists();
     }
 
     /**
