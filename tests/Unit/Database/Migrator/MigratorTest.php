@@ -18,7 +18,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
-use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
+use UserFrosting\Sprinkle\Core\Database\Migrator\SprinkleMigrationLocator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 
 /**
@@ -42,9 +42,9 @@ class MigratorTest extends TestCase
     protected Migrator $migrator;
 
     /**
-     * @var MigrationLocator The migration locator instance.
+     * @var SprinkleMigrationLocator The migration locator instance.
      */
-    protected MigrationLocator $locator;
+    protected SprinkleMigrationLocator $locator;
 
     /**
      * @var DatabaseMigrationRepository The migration repository instance.
@@ -67,7 +67,7 @@ class MigratorTest extends TestCase
         // Create mock objects
         $this->schema = m::mock(Builder::class);
         $this->repository = m::mock(DatabaseMigrationRepository::class);
-        $this->locator = m::mock(MigrationLocator::class);
+        $this->locator = m::mock(SprinkleMigrationLocator::class);
         $capsule = m::mock(Capsule::class);
         $this->connection = m::mock(Connection::class);
 

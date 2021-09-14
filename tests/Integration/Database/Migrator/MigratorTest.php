@@ -13,7 +13,7 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Builder;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
-use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
+use UserFrosting\Sprinkle\Core\Database\Migrator\SprinkleMigrationLocator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
@@ -46,9 +46,9 @@ class MigratorTest extends TestCase
     protected Migrator $migrator;
 
     /**
-     * @var MigrationLocator The migration locator instance.
+     * @var SprinkleMigrationLocator The migration locator instance.
      */
-    protected MigrationLocator $migrationLocator;
+    protected SprinkleMigrationLocator $migrationLocator;
 
     /**
      * @var DatabaseMigrationRepository The migration repository instance.
@@ -320,7 +320,7 @@ class MigratorTest extends TestCase
     }
 }
 
-class MigrationLocatorStub extends MigrationLocator
+class MigrationLocatorStub extends SprinkleMigrationLocator
 {
     public function all(): array
     {
@@ -331,7 +331,7 @@ class MigrationLocatorStub extends MigrationLocator
     }
 }
 
-class FlightsTableMigrationLocatorStub extends MigrationLocator
+class FlightsTableMigrationLocatorStub extends SprinkleMigrationLocator
 {
     public function all(): array
     {
@@ -344,7 +344,7 @@ class FlightsTableMigrationLocatorStub extends MigrationLocator
 /**
  *    This stub contain migration which file doesn't exists
  */
-class InvalidMigrationLocatorStub extends MigrationLocator
+class InvalidMigrationLocatorStub extends SprinkleMigrationLocator
 {
     public function all(): array
     {
@@ -359,7 +359,7 @@ class InvalidMigrationLocatorStub extends MigrationLocator
  *    than the order the file are returned because of dependencies management.
  *    The `two` migration should be run last since it depends on the other two
  */
-class DependableMigrationLocatorStub extends MigrationLocator
+class DependableMigrationLocatorStub extends SprinkleMigrationLocator
 {
     public function all(): array
     {
@@ -375,7 +375,7 @@ class DependableMigrationLocatorStub extends MigrationLocator
  *    This stub contain migration which order they need to be run is different
  *    than the order the file are returned because of dependencies management
  */
-class UnfulfillableMigrationLocatorStub extends MigrationLocator
+class UnfulfillableMigrationLocatorStub extends SprinkleMigrationLocator
 {
     public function all(): array
     {

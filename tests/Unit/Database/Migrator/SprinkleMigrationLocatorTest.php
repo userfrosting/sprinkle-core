@@ -16,7 +16,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Migration;
-use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocator;
+use UserFrosting\Sprinkle\Core\Database\Migrator\SprinkleMigrationLocator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
 use UserFrosting\Sprinkle\Core\ServicesProvider\MigratorService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
@@ -29,11 +29,11 @@ use UserFrosting\Testing\ContainerStub;
 /**
  * Migration Locator Tests
  */
-class MigrationLocatorTest extends TestCase
+class SprinkleMigrationLocatorTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    public function testConstruct(): MigrationLocator
+    public function testConstruct(): SprinkleMigrationLocator
     {
         $builder = Mockery::mock(Builder::class);
 
@@ -47,7 +47,7 @@ class MigrationLocatorTest extends TestCase
             ->getMock();
 
         $loader = new RecipeExtensionLoader($manager, $ci);
-        $locator = new MigrationLocator($loader);
+        $locator = new SprinkleMigrationLocator($loader);
 
         $this->assertInstanceOf(MigrationLocatorInterface::class, $locator);
 
@@ -57,7 +57,7 @@ class MigrationLocatorTest extends TestCase
     /**
      * @depends testConstruct
      */
-    public function testGetAll(MigrationLocator $locator): void
+    public function testGetAll(SprinkleMigrationLocator $locator): void
     {
         $migrations = $locator->all();
 
@@ -104,7 +104,7 @@ class MigrationLocatorTest extends TestCase
      * @depends testConstruct
      * @depends testGetAll
      */
-    public function testList(MigrationLocator $locator): void
+    public function testList(SprinkleMigrationLocator $locator): void
     {
         $this->assertSame([
             StubMigrationA::class,
@@ -116,7 +116,7 @@ class MigrationLocatorTest extends TestCase
      * @depends testConstruct
      * @depends testList
      */
-    public function testHas(MigrationLocator $locator): void
+    public function testHas(SprinkleMigrationLocator $locator): void
     {
         $this->assertTrue($locator->has(StubMigrationA::class));
         $this->assertFalse($locator->has(StubMigrationC::class));
@@ -126,7 +126,7 @@ class MigrationLocatorTest extends TestCase
      * @depends testConstruct
      * @depends testHas
      */
-    public function testGet(MigrationLocator $locator): void
+    public function testGet(SprinkleMigrationLocator $locator): void
     {
         $migration = $locator->get(StubMigrationA::class);
         $this->assertInstanceOf(StubMigrationA::class, $migration);
@@ -136,7 +136,7 @@ class MigrationLocatorTest extends TestCase
      * @depends testConstruct
      * @depends testHas
      */
-    public function testGetWithNotFound(MigrationLocator $locator): void
+    public function testGetWithNotFound(SprinkleMigrationLocator $locator): void
     {
         $this->expectException(NotFoundException::class);
         $locator->get(StubMigrationC::class);
