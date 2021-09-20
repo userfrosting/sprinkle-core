@@ -14,16 +14,20 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
-use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationDependencyAnalyser;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 
-class MigrationDependencyAnalyserTest extends TestCase
+/**
+ * Sub test for Migrator. 
+ * Tests dependencies management related methods.
+ */
+class MigratoerDependencyTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    public function testConstruct(): MigrationDependencyAnalyser
+    public function testConstruct(): Migrator
     {
         $installed = Mockery::mock(MigrationRepositoryInterface::class)
             ->shouldReceive('list')->andReturn([
@@ -50,9 +54,9 @@ class MigrationDependencyAnalyserTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserMigrationE::class)->andReturn(new StubAnalyserMigrationE())
             ->getMock();
 
-        $analyser = new MigrationDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
-        $this->assertInstanceOf(MigrationDependencyAnalyser::class, $analyser);
+        $this->assertInstanceOf(Migrator::class, $analyser);
 
         return $analyser;
     }
@@ -60,9 +64,9 @@ class MigrationDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetInstalled(MigrationDependencyAnalyser $analyser): void
+    public function testGetInstalled(Migrator $analyser): void
     {
         $this->assertSame([
             StubAnalyserMigrationA::class,
@@ -73,9 +77,9 @@ class MigrationDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetAvailable(MigrationDependencyAnalyser $analyser): void
+    public function testGetAvailable(Migrator $analyser): void
     {
         $this->assertSame([
             StubAnalyserMigrationA::class,
@@ -90,9 +94,9 @@ class MigrationDependencyAnalyserTest extends TestCase
      * @depends testGetInstalled
      * @depends testGetAvailable
      *
-     * @param MigrationDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetPending(MigrationDependencyAnalyser $analyser): void
+    public function testGetPending(Migrator $analyser): void
     {
         $this->assertSame([
             StubAnalyserMigrationC::class, // C is before B because B depend on C
@@ -106,9 +110,9 @@ class MigrationDependencyAnalyserTest extends TestCase
      * @depends testGetInstalled
      * @depends testGetAvailable
      *
-     * @param MigrationDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetStale(MigrationDependencyAnalyser $analyser): void
+    public function testGetStale(Migrator $analyser): void
     {
         $this->assertSame([
             StubAnalyserMigrationD::class,
@@ -147,7 +151,7 @@ class MigrationDependencyAnalyserTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserMigrationH::class)->andReturn(new StubAnalyserMigrationH())
             ->getMock();
 
-        $analyser = new MigrationDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
         $this->assertSame([
             StubAnalyserMigrationC::class, // C is before B because B depend on C
@@ -174,7 +178,7 @@ class MigrationDependencyAnalyserTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserMigrationG::class)->andReturn(new StubAnalyserMigrationG())
             ->getMock();
 
-        $analyser = new MigrationDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
         $this->expectException(MigrationDependencyNotMetException::class);
         $this->expectExceptionMessage(StubAnalyserMigrationG::class . ' depends on ' . StubAnalyserMigrationF::class . ", but it's not available.");

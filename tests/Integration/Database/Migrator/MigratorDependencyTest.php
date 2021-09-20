@@ -12,13 +12,17 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 
 use UserFrosting\Sprinkle\Core\Core;
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
-use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationDependencyAnalyser;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Testing\TestCase;
 
-class MigrationDependencyAnalyserTest extends TestCase
+/**
+ * Sub test for Migrator. 
+ * Tests dependencies management related methods.
+ */
+class MigratorDependencyTest extends TestCase
 {
     use TestDatabase;
 
@@ -40,10 +44,10 @@ class MigrationDependencyAnalyserTest extends TestCase
         $this->repository->log(StubAnalyserMigrationD::class, 2);
     }
 
-    public function testConstruct(): MigrationDependencyAnalyser
+    public function testConstruct(): Migrator
     {
-        $analyser = $this->ci->get(MigrationDependencyAnalyser::class);
-        $this->assertInstanceOf(MigrationDependencyAnalyser::class, $analyser);
+        $analyser = $this->ci->get(Migrator::class);
+        $this->assertInstanceOf(Migrator::class, $analyser);
 
         return $analyser;
     }
@@ -51,9 +55,9 @@ class MigrationDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetInstalled(MigrationDependencyAnalyser $analyser): void
+    public function testGetInstalled(Migrator $analyser): void
     {
         $this->assertSame([
             StubAnalyserMigrationA::class,
@@ -64,9 +68,9 @@ class MigrationDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetAvailable(MigrationDependencyAnalyser $analyser): void
+    public function testGetAvailable(Migrator $analyser): void
     {
         $this->assertSame([
             StubAnalyserMigrationA::class,
@@ -79,9 +83,9 @@ class MigrationDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetPending(MigrationDependencyAnalyser $analyser): void
+    public function testGetPending(Migrator $analyser): void
     {
         $this->assertSame([
             StubAnalyserMigrationC::class, // C is before B because B depend on C
@@ -93,9 +97,9 @@ class MigrationDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetStale(MigrationDependencyAnalyser $analyser): void
+    public function testGetStale(Migrator $analyser): void
     {
         $this->assertSame([
             StubAnalyserMigrationD::class, // Installed, not available
@@ -111,7 +115,7 @@ class MigrationDependencyAnalyserTest extends TestCase
         $this->repository->remove(StubAnalyserMigrationD::class);
 
         // Get analyser back
-        $analyser = $this->ci->get(MigrationDependencyAnalyser::class);
+        $analyser = $this->ci->get(Migrator::class);
 
         // Make sure installed is right
         $this->assertSame([

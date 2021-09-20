@@ -13,12 +13,16 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 use UserFrosting\Sprinkle\Core\Core;
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
-use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRollbackDependencyAnalyser;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
 use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Testing\TestCase;
 
-class MigrationRollbackDependencyAnalyserTest extends TestCase
+/**
+ * Sub test for Migrator. 
+ * Tests rollback related methods.
+ */
+class MigratorRollbackTest extends TestCase
 {
     use TestDatabase;
 
@@ -42,10 +46,10 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
         $this->repository->log(StubAnalyserRollbackMigrationD::class, 3);
     }
 
-    public function testConstruct(): MigrationRollbackDependencyAnalyser
+    public function testConstruct(): Migrator
     {
-        $analyser = $this->ci->get(MigrationRollbackDependencyAnalyser::class);
-        $this->assertInstanceOf(MigrationRollbackDependencyAnalyser::class, $analyser);
+        $analyser = $this->ci->get(Migrator::class);
+        $this->assertInstanceOf(Migrator::class, $analyser);
 
         return $analyser;
     }
@@ -53,9 +57,9 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationRollbackDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testCanRollbackMigration(MigrationRollbackDependencyAnalyser $analyser): void
+    public function testCanRollbackMigration(Migrator $analyser): void
     {
         // "D" and "A" are clear for rollback
         $this->assertTrue($analyser->canRollbackMigration(StubAnalyserRollbackMigrationD::class));
@@ -74,9 +78,9 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationRollbackDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetMigrationsForRollbackForLast(MigrationRollbackDependencyAnalyser $analyser): void
+    public function testGetMigrationsForRollbackForLast(Migrator $analyser): void
     {
         $resultA = $analyser->getMigrationsForRollback();
         $resultB = $analyser->getMigrationsForRollback(1);
@@ -89,9 +93,9 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationRollbackDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetMigrationsForRollbackForStep2(MigrationRollbackDependencyAnalyser $analyser): void
+    public function testGetMigrationsForRollbackForStep2(Migrator $analyser): void
     {
         $result = $analyser->getMigrationsForRollback(2);
 
@@ -105,9 +109,9 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationRollbackDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetMigrationsForReset(MigrationRollbackDependencyAnalyser $analyser): void
+    public function testGetMigrationsForReset(Migrator $analyser): void
     {
         $result = $analyser->getMigrationsForReset();
 
@@ -122,9 +126,9 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationRollbackDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetMigrationsForRollbackForTooManyStep(MigrationRollbackDependencyAnalyser $analyser): void
+    public function testGetMigrationsForRollbackForTooManyStep(Migrator $analyser): void
     {
         // Will do same as reset in this case
         $result = $analyser->getMigrationsForRollback(99);
@@ -140,15 +144,15 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
     /**
      * @depends testConstruct
      *
-     * @param MigrationRollbackDependencyAnalyser $analyser
+     * @param Migrator $analyser
      */
-    public function testGetMigrationsForRollbackForStaleError(MigrationRollbackDependencyAnalyser $analyser): void
+    public function testGetMigrationsForRollbackForStaleError(Migrator $analyser): void
     {
         // Add "E" as installed. It's gonna be stale
         $this->repository->log(StubAnalyserRollbackMigrationE::class, 1);
 
         // Get analyser back to propagate changes
-        $analyser = $this->ci->get(MigrationRollbackDependencyAnalyser::class);
+        $analyser = $this->ci->get(Migrator::class);
 
         // Expect exception because of stale migration.
         $this->expectException(MigrationRollbackException::class);

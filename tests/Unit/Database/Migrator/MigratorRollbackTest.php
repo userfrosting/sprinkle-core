@@ -16,10 +16,14 @@ use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
-use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRollbackDependencyAnalyser;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
 
-class MigrationRollbackDependencyAnalyserTest extends TestCase
+/**
+ * Sub test for Migrator. 
+ * Tests rollback related methods.
+ */
+class MigratorRollbackTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
@@ -42,7 +46,7 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserRollbackMigrationD::class)->once()->andReturn(new StubAnalyserRollbackMigrationD())
             ->getMock();
 
-        $analyser = new MigrationRollbackDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
         $result = $analyser->getMigrationsForRollback(1);
         $this->assertSame([StubAnalyserRollbackMigrationD::class], $result);
@@ -67,7 +71,7 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserRollbackMigrationD::class)->once()->andReturn(new StubAnalyserRollbackMigrationD())
             ->getMock();
 
-        $analyser = new MigrationRollbackDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
         $result = $analyser->getMigrationsForReset();
         $this->assertSame([StubAnalyserRollbackMigrationD::class], $result);
@@ -102,7 +106,7 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserRollbackMigrationC::class)->times(4)->andReturn(new StubAnalyserRollbackMigrationC()) // Once for main, one as a dependency
             ->shouldReceive('get')->with(StubAnalyserRollbackMigrationD::class)->twice()->andReturn(new StubAnalyserRollbackMigrationD())
             ->getMock();
-        $analyser = new MigrationRollbackDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
         // Run command
         $this->assertNull($analyser->validateRollbackMigration(StubAnalyserRollbackMigrationD::class));
@@ -120,7 +124,7 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
             ->shouldReceive('has')->with(StubAnalyserRollbackMigrationD::class)->twice()->andReturn(false)
             ->getMock();
         $available = Mockery::mock(MigrationLocatorInterface::class);
-        $analyser = new MigrationRollbackDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
         // Start by testing false
         $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationD::class));
@@ -155,7 +159,7 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
                 StubAnalyserRollbackMigrationD::class,
             ])
             ->getMock();
-        $analyser = new MigrationRollbackDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
         // Start by testing false
         $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationD::class));
@@ -195,7 +199,7 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserRollbackMigrationB::class)->twice()->andReturn(new StubAnalyserRollbackMigrationB())
             ->shouldReceive('get')->with(StubAnalyserRollbackMigrationC::class)->twice()->andReturn(new StubAnalyserRollbackMigrationC())
             ->getMock();
-        $analyser = new MigrationRollbackDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
         // Run command
         $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationC::class));
@@ -234,7 +238,7 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserRollbackMigrationA::class)->twice()->andReturn(new StubAnalyserRollbackMigrationA())
             ->shouldReceive('get')->with(StubAnalyserRollbackMigrationB::class)->twice()->andReturn(new StubAnalyserRollbackMigrationB())
             ->getMock();
-        $analyser = new MigrationRollbackDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
         // Run command
         $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationA::class));
@@ -269,7 +273,7 @@ class MigrationRollbackDependencyAnalyserTest extends TestCase
             ->shouldReceive('has')->with(StubAnalyserRollbackMigrationC::class)->twice()->andReturn(false)
             ->shouldReceive('get')->with(StubAnalyserRollbackMigrationB::class)->twice()->andReturn(new StubAnalyserRollbackMigrationB())
             ->getMock();
-        $analyser = new MigrationRollbackDependencyAnalyser($installed, $available);
+        $analyser = new Migrator($installed, $available);
 
         // Run command
         $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationB::class));

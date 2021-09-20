@@ -15,9 +15,11 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
+use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
+use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\SprinkleMigrationLocator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 
@@ -31,30 +33,9 @@ class MigratorTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    /**
-     * @var Builder
-     */
-    protected Builder $schema;
-
-    /**
-     * @var Migrator The migrator instance.
-     */
-    protected Migrator $migrator;
-
-    /**
-     * @var SprinkleMigrationLocator The migration locator instance.
-     */
-    protected SprinkleMigrationLocator $locator;
-
-    /**
-     * @var DatabaseMigrationRepository The migration repository instance.
-     */
-    protected DatabaseMigrationRepository $repository;
-
-    /**
-     * @var Connection
-     */
-    protected Connection $connection;
+    protected Capsule | \Mockery\MockInterface $db;
+    protected MigrationRepositoryInterface | \Mockery\MockInterface $repository;
+    protected MigrationLocatorInterface | \Mockery\MockInterface $locator;
 
     /**
      * Setup base mock and migrator instance.
@@ -65,18 +46,66 @@ class MigratorTest extends TestCase
         parent::setUp();
 
         // Create mock objects
-        $this->schema = m::mock(Builder::class);
-        $this->repository = m::mock(DatabaseMigrationRepository::class);
-        $this->locator = m::mock(SprinkleMigrationLocator::class);
-        $capsule = m::mock(Capsule::class);
-        $this->connection = m::mock(Connection::class);
+        $this->db = Mockery::mock(Capsule::class);
+        $this->repository = Mockery::mock(MigrationRepositoryInterface::class);
+        $this->locator = Mockery::mock(MigrationLocatorInterface::class);
+    }
 
-        // Set global expectations for $capsule and $connection
-        $capsule->shouldReceive('getConnection')->andReturn($this->connection);
-        $this->connection->shouldReceive('getSchemaBuilder')->andReturn($this->schema);
+    protected function getMigrator(): Migrator
+    {
+       return new Migrator($this->db, $this->repository, $this->locator);
+    }
 
-        // Setup the migrator instance
-        $this->migrator = new Migrator($capsule, $this->repository, $this->locator);
+    // public function testConstructor(): Migrator
+    // {
+    //     $migrator = $this->getMigrator();
+    //     $this->assertInstanceOf(Migrator::class, $migrator);
+
+    //     return $migrator;
+    // }
+
+    /**
+     * @depends testConstructor
+     *
+     * @param Migrator $migrator
+     */
+    public function testRepositoryMethods(Migrator $migrator): void
+    {
+        // Assert get repo from the main one
+        $this->assertInstanceOf(MigrationRepositoryInterface::class, $migrator->getRepository());
+
+        // Get mock
+        $repository = Mockery::mock(MigrationRepositoryInterface::class)
+            ->shouldReceive('exists')->twice()->andReturn(true, false)
+            ->getMock();
+        
+        // Set mock and test change
+        $this->assertNotSame($repository, $migrator->getRepository());
+        $migrator->setRepository($repository);
+        $this->assertSame($repository, $migrator->getRepository());
+
+        // Assert `repositoryExists` mock
+        $this->assertTrue($migrator->repositoryExists());
+        $this->assertFalse($migrator->repositoryExists());
+    }
+
+    /**
+     * @depends testConstructor
+     *
+     * @param Migrator $migrator
+     */
+    public function testLocatorMethods(Migrator $migrator): void
+    {
+        // Assert get locator from the main one
+        $this->assertInstanceOf(MigrationLocatorInterface::class, $migrator->getLocator());
+        
+        // Get mock
+        $locator = Mockery::mock(MigrationLocatorInterface::class);
+        
+        // Set mock and test change
+        $this->assertNotSame($locator, $migrator->getLocator());
+        $migrator->setLocator($locator);
+        $this->assertSame($locator, $migrator->getLocator());
     }
 
     /**
