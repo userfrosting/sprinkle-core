@@ -23,7 +23,7 @@ use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
  * Sub test for Migrator. 
  * Tests dependencies management related methods.
  */
-class MigratoerDependencyTest extends TestCase
+class MigratorDependencyTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
