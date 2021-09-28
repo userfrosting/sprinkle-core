@@ -27,6 +27,7 @@
         }
     ],
     "require": {
+        "php": "^8.0",
         "composer/semver": "^3.2.4",
         "doctrine/dbal": "^2.5",
         "filp/whoops": "^2.14.0",

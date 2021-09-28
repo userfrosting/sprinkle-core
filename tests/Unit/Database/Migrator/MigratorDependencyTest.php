@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
+use Illuminate\Database\Connection;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +21,7 @@ use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 
 /**
- * Sub test for Migrator. 
+ * Sub test for Migrator.
  * Tests dependencies management related methods.
  */
 class MigratorDependencyTest extends TestCase
@@ -54,7 +55,9 @@ class MigratorDependencyTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserMigrationE::class)->andReturn(new StubAnalyserMigrationE())
             ->getMock();
 
-        $analyser = new Migrator($installed, $available);
+        $connection = Mockery::mock(Connection::class);
+
+        $analyser = new Migrator($installed, $available, $connection);
 
         $this->assertInstanceOf(Migrator::class, $analyser);
 
@@ -151,7 +154,9 @@ class MigratorDependencyTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserMigrationH::class)->andReturn(new StubAnalyserMigrationH())
             ->getMock();
 
-        $analyser = new Migrator($installed, $available);
+        $connection = Mockery::mock(Connection::class);
+
+        $analyser = new Migrator($installed, $available, $connection);
 
         $this->assertSame([
             StubAnalyserMigrationC::class, // C is before B because B depend on C
@@ -178,7 +183,9 @@ class MigratorDependencyTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserMigrationG::class)->andReturn(new StubAnalyserMigrationG())
             ->getMock();
 
-        $analyser = new Migrator($installed, $available);
+        $connection = Mockery::mock(Connection::class);
+
+        $analyser = new Migrator($installed, $available, $connection);
 
         $this->expectException(MigrationDependencyNotMetException::class);
         $this->expectExceptionMessage(StubAnalyserMigrationG::class . ' depends on ' . StubAnalyserMigrationF::class . ", but it's not available.");

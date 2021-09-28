@@ -10,10 +10,10 @@
 
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Support\Arr;
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
-use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
 use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
@@ -24,27 +24,16 @@ use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
 class Migrator
 {
     /**
-     * @var string The connection name
-     */
-    protected $connection;
-
-    /**
-     * @var array The notes for the current operation.
-     */
-    protected $notes = [];
-
-    /**
      * Constructor.
      *
-     * @param Capsule                      $db         The database instance
      * @param MigrationRepositoryInterface $repository The migration repository
      * @param MigrationLocatorInterface    $locator    The Migration locator
+     * @param Connection                   $connection The database Connection
      */
-    // TODO : Might be more helpful to send connection directly here
     public function __construct(
-        // protected Capsule $db,
         protected MigrationRepositoryInterface $repository,
         protected MigrationLocatorInterface $locator,
+        protected Connection $connection,
     ) {
     }
 
@@ -164,7 +153,7 @@ class Migrator
             return [];
         }
     }
-    
+
     /**
      * Returns the migrations to be rollback.
      *
@@ -316,134 +305,98 @@ class Migrator
         }
     }
 
-
-
-
-
-
-
     /**
      * Run all the specified migrations up. Check that dependencies are met before running.
      *
-     * @param array $options Options for the current operations [step, pretend]
+     * @param bool $step Migrations will be run in individual step so they can be rolled back individually (default = false)
      *
-     * @return array The list of ran migrations
+     * @throws MigrationDependencyNotMetException if a dependencies is not met among pending migration.
+     *
+     * @return array The list of ran migrations // MigrationInterface[] // TODO
      */
-    public function run(array $options = [])
+    public function migrate(bool $step = false): array
     {
-        $this->notes = [];
+        // Get pending migrations.
+        // MigrationDependencyNotMetException will be thrown here if a dependency is not met.
+        $pending = $this->getPending();
 
-        // Get outstanding migrations classes that requires to be run up
-        $pendingMigrations = $this->getPendingMigrations();
-
-        // First we will just make sure that there are any migrations to run. If there
-        // aren't, we will just make a note of it to the developer so they're aware
-        // that all of the migrations have been run against this database system.
-        if (count($pendingMigrations) == 0) {
+        // Don't go further if no pending migration.
+        if (count($pending) == 0) {
             return [];
         }
 
-        // Next we need to validate that all pending migration dependencies are met or WILL BE MET
-        // This operation is important as it's the one that place the outstanding migrations
-        // in the correct order, making sure a migration script won't fail because the table
-        // it depends on has not been created yet (for example).
-        // TODO : Inject analysers
-        $analyser = new Analyser($pendingMigrations, $this->getRanMigrations());
-
-        // Any migration without a fulfilled dependency will cause this script to throw an exception
-        // TODO : Exception is now thrown by Analyser
-        if ($unfulfillable = $analyser->getUnfulfillable()) {
-            $messages = ['Unfulfillable migrations found :: '];
-            foreach ($unfulfillable as $migration => $dependency) {
-                $messages[] = "=> $migration (Missing dependency : $dependency)";
-            }
-
-            throw new \Exception(implode("\n", $messages));
-        }
-
-        // Run pending migration up
-        // TODO : No need for two methods, merge pending here
-        return $this->runPending($analyser->getFulfillable(), $options);
-    }
-
-    /**
-     * Get the migration classes that have not yet run.
-     *
-     * @param array $available The available migrations returned by the migration locator
-     * @param array $ran       The list of already ran migrations returned by the migration repository
-     *
-     * @return array The list of pending migrations, ie the available migrations not ran yet
-     */
-    // TODO : Should be replaced by method in analyser
-    // protected function pendingMigrations(array $available, array $ran)
-    // {
-    //     return collect($available)->reject(function ($migration) use ($ran) {
-    //         return collect($ran)->contains($migration);
-    //     })->values()->all();
-    // }
-
-    /**
-     * Run an array of migrations.
-     *
-     * @param array $migrations An array of migrations classes names to be run (unsorted, unvalidated)
-     * @param array $options    The options for the current operation [step, pretend]
-     */
-    protected function runPending(array $migrations, array $options = [])
-    {
-        // Next, we will get the next batch number for the migrations so we can insert
-        // correct batch number in the database migrations repository when we store
-        // each migration's execution.
+        // Get the next batch number.
         $batch = $this->repository->getNextBatchNumber();
 
-        // We extract a few of the options.
-        // TODO : Pretend and Step need to be argument of this method, instead of $options
-        $pretend = Arr::get($options, 'pretend', false);
-        $step = Arr::get($options, 'step', 0);
+        // Spin through ordered pending migrations, apply the changes to the
+        // databases and log them to the repository.
+        foreach ($pending as $migrationClass) {
 
-        // We now have an ordered array of migrations, we will spin through them and run the
-        // migrations "up" so the changes are made to the databases. We'll then log
-        // that the migration was run so we don't repeat it next time we execute.
-        foreach ($migrations as $migrationClassName) {
-            $this->runUp($migrationClassName, $batch, $pretend);
+            // Get the migration instance
+            $migration = $this->locator->get($migrationClass);
+
+            // Run the actual migration
+            $callback = function () use ($migration) {
+                $migration->up();
+            };
+
+            // TODO : See if Transaction still needs to be used
+            if ($this->getSchemaGrammar()->supportsSchemaTransactions()) {
+                $this->getConnection()->transaction($callback);
+            } else {
+                $callback();
+            }
+
+            // Log migration to the repository.
+            $this->repository->log($migrationClass, $batch);
 
             if ($step) {
                 $batch++;
             }
         }
 
-        return $migrations;
+        return $pending;
     }
 
     /**
-     * Run "up" a migration class.
+     * Pretend to migrate, return would be queries for debugging purpose.
      *
-     * @param string $migrationClassName The migration class name
-     * @param int    $batch              The current batch number
-     * @param bool   $pretend            If this operation should be pretended / faked
+     * @throws MigrationDependencyNotMetException if a dependencies is not met among pending migration.
+     *
+     * @return array The list of ran migrations // MigrationInterface[] // TODO
      */
-    protected function runUp($migrationClassName, $batch, $pretend)
+    public function pretendToMigrate(): array
     {
-        // First we will resolve a "real" instance of the migration class from
-        // the class name. Once we have the instances we can run the actual
-        // command such as "up" or "down", or we can just simulate the action.
-        $migration = $this->resolve($migrationClassName);
+        // Get pending migrations.
+        // MigrationDependencyNotMetException will be thrown here if a dependency is not met.
+        $pending = $this->getPending();
 
-        // Move into pretend mode if requested
-        if ($pretend) {
-            return $this->pretendToRun($migration, 'up');
+        // Don't go further if no pending migration.
+        if (count($pending) == 0) {
+            return [];
         }
 
-        // Run the actual migration
-        // TODO : Move code from "runMigration" here, to remove string argument
-        $this->runMigration($migration, 'up');
+        // Prepare return log
+        $log = [];
 
-        // Once we have run a migrations class, we will log that it was run in this
-        // repository so that we don't try to run it next time we do a migration
-        // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($migrationClassName, $batch);
+        // Spin through ordered pending migrations, apply the changes to the
+        // databases and log them to the repository.
+        foreach ($pending as $migrationClass) {
+            $migration = $this->locator->get($migrationClass);
 
-        // TODO : Remove. Duplicate the return of "run"
-        $this->note("<info>Migrated:</info>  {$migrationClassName}");
+            // Get the connection instance
+            $connection = $this->getConnection();
+
+            // Get the queries
+            $queries = $connection->pretend(function () use ($migration) {
+                $migration->up();
+            });
+
+            // Add queries to log
+            $log[$migrationClass] = $queries;
+        }
+
+        return $log;
     }
 
     /**
@@ -465,7 +418,7 @@ class Migrator
 
         if (count($migrations) === 0) {
             return [];
-        } 
+        }
 
         // TODO : `rollbackMigrations` can stay apart, as reset and single rollback also use it
         // TODO : Use Analyser here, then loop them and "runDown"
@@ -641,7 +594,17 @@ class Migrator
             return $this->pretendToRun($instance, 'down');
         }
 
-        $this->runMigration($instance, 'down');
+        // $this->runMigration($instance, 'down');
+        $callback = function () use ($instance) {
+            $instance->down();
+        };
+
+        // TODO : See if Transaction still needs to be used
+        if ($this->getSchemaGrammar()->supportsSchemaTransactions()) {
+            $this->getConnection()->transaction($callback);
+        } else {
+            $callback();
+        }
 
         // Once we have successfully run the migration "down" we will remove it from
         // the migration repository so it will be considered to have not been run
@@ -652,45 +615,6 @@ class Migrator
     }
 
     /**
-     * Run a migration inside a transaction if the database supports it.
-     * Note : As of Laravel 5.4, only PostgresGrammar supports it.
-     *
-     * @param MigrationInterface $migration The migration instance
-     * @param string             $method    The method used [up, down]
-     */
-    // TODO : REmove this and Use up and down directly to avoid using the string arg
-    // TODO : See if Transaction still needs to be used
-    protected function runMigration(MigrationInterface $migration, $method)
-    {
-        $callback = function () use ($migration, $method) {
-            $migration->{$method}();
-        };
-
-        if ($this->getSchemaGrammar()->supportsSchemaTransactions()) {
-            $this->getConnection()->transaction($callback);
-        } else {
-            $callback();
-        }
-    }
-
-    /**
-     * Pretend to run the migrations.
-     *
-     * @param MigrationInterface $migration The migration instance
-     * @param string             $method    The method used [up, down]
-     */
-    // TODO : Output will need to be managed
-    protected function pretendToRun(MigrationInterface $migration, $method)
-    {
-        $name = get_class($migration);
-        $this->note("\n<info>$name</info>");
-
-        foreach ($this->getQueries($migration, $method) as $query) {
-            $this->note("> {$query['query']}");
-        }
-    }
-
-    /**
      * Get all of the queries that would be run for a migration.
      *
      * @param MigrationInterface $migration The migration instance
@@ -698,15 +622,15 @@ class Migrator
      *
      * @return array The queries executed by the processed schema
      */
-    protected function getQueries(MigrationInterface $migration, $method)
-    {
-        // Get the connection instance
-        $connection = $this->getConnection();
+    // protected function getQueries(MigrationInterface $migration, $method)
+    // {
+    //     // Get the connection instance
+    //     $connection = $this->getConnection();
 
-        return $connection->pretend(function () use ($migration, $method) {
-            $migration->{$method}();
-        });
-    }
+    //     return $connection->pretend(function () use ($migration, $method) {
+    //         $migration->{$method}();
+    //     });
+    // }
 
     /**
      * Resolve a migration instance from it's class name.
@@ -736,11 +660,11 @@ class Migrator
      *
      * @return array The list of migration classes found in the filesystem
      */
-    // TODO 
-    public function getAvailableMigrations()
-    {
-        return $this->locator->all();
-    }
+    // TODO
+    // public function getAvailableMigrations()
+    // {
+    //     return $this->locator->all();
+    // }
 
     /**
      * Get a list of all ran migrations.
@@ -750,11 +674,11 @@ class Migrator
      *
      * @return array
      */
-    // TODO 
-    public function getRanMigrations($steps = -1, $order = 'asc')
-    {
-        return $this->repository->list($steps, $order);
-    }
+    // TODO
+    // public function getRanMigrations($steps = -1, $order = 'asc')
+    // {
+    //     return $this->repository->list($steps, $order);
+    // }
 
     /**
      * Get a list of pending migrations.
@@ -762,13 +686,13 @@ class Migrator
      * @return array
      */
     // TODO : Use Analyser directly
-    public function getPendingMigrations()
-    {
-        $available = $this->getAvailableMigrations();
-        $ran = $this->getRanMigrations();
+    // public function getPendingMigrations()
+    // {
+    //     $available = $this->getAvailableMigrations();
+    //     $ran = $this->getRanMigrations();
 
-        return $this->pendingMigrations($available, $ran);
-    }
+    //     return $this->pendingMigrations($available, $ran);
+    // }
 
     /**
      * Get the migration repository instance.
@@ -815,70 +739,42 @@ class Migrator
      *
      * @param MigrationLocatorInterface $locator
      */
-    public function setLocator(MigrationLocatorInterface $locator): void
+    public function setLocator(MigrationLocatorInterface $locator): static
     {
         $this->locator = $locator;
+
+        return $this;
     }
 
     /**
-     * Get the schema builder.
+     * Return the database connection instance.
      *
-     * @return \Illuminate\Database\Schema\Builder
+     * @return Connection
      */
-    // Don't need anymore in resolve
-    // public function getSchemaBuilder()
-    // {
-    //     return $this->getConnection()->getSchemaBuilder();
-    // }
-
-    /**
-     * Return the connection instance.
-     *
-     * @return \Illuminate\Database\Connection
-     */
-    public function getConnection()
+    public function getConnection(): Connection
     {
-        return $this->db->getConnection($this->connection);
+        return $this->connection;
     }
 
     /**
-     * Define which connection to use.
+     * Set database connection.
      *
-     * @param string $name The connection name
+     * @param Connection $connection
      */
-    public function setConnection($name)
+    public function setConnection(Connection $connection): static
     {
-        $this->repository->setConnectionName($name);
-        $this->connection = $name;
+        $this->connection = $connection;
+
+        return $this;
     }
 
     /**
-     * Get instance of Grammar.
+     * Get instance of Schema Grammar.
      *
-     * @return \Illuminate\Database\Schema\Grammars\Grammar
+     * @return Grammar
      */
-    protected function getSchemaGrammar()
+    protected function getSchemaGrammar(): Grammar
     {
         return $this->getConnection()->getSchemaGrammar();
-    }
-
-    /**
-     * Raise a note event for the migrator.
-     *
-     * @param string $message The message
-     */
-    protected function note($message)
-    {
-        $this->notes[] = $message;
-    }
-
-    /**
-     * Get the notes for the last operation.
-     *
-     * @return array An array of notes
-     */
-    public function getNotes()
-    {
-        return $this->notes;
     }
 }

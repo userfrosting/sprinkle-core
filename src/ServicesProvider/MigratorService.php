@@ -13,10 +13,10 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
-use UserFrosting\Sprinkle\Core\Database\Migrator\SprinkleMigrationLocator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
+use UserFrosting\Sprinkle\Core\Database\Migrator\SprinkleMigrationLocator;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /*
@@ -51,8 +51,6 @@ class MigratorService implements ServicesProviderInterface
 
                 return $repository;
             },
-
-            // TODO : Autowire Analyser here from interface
 
             MigrationLocatorInterface::class => \DI\autowire(SprinkleMigrationLocator::class),
         ];

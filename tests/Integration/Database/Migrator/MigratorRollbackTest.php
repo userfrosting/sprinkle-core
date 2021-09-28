@@ -19,7 +19,7 @@ use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Testing\TestCase;
 
 /**
- * Sub test for Migrator. 
+ * Sub test for Migrator.
  * Tests rollback related methods.
  */
 class MigratorRollbackTest extends TestCase

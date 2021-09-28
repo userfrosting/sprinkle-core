@@ -29,7 +29,7 @@ use UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException;
 class DatabaseMigrationRepositoryTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
-    
+
     protected Builder | \Mockery\MockInterface $schemaBuilder;
     protected QueryBuilder | \Mockery\MockInterface $queryBuilder;
     protected Connection | \Mockery\MockInterface $connection;

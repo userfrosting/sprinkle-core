@@ -63,7 +63,7 @@ class MigrateCommand extends Command
         $migrator = $this->setupMigrator($input);
 
         // Get pending migrations
-        $pending = $migrator->getPendingMigrations();
+        $pending = $migrator->getPending();
 
         // Don't go further if no migration is pending
         if (empty($pending)) {
@@ -74,7 +74,7 @@ class MigrateCommand extends Command
 
         // Show migrations about to be ran when in production mode
         //TODO : Reimplement production status
-        /*if ($this->isProduction()) {
+        // if ($this->isProduction()) {
             $this->io->section('Pending migrations');
             $this->io->listing($pending);
 
@@ -82,19 +82,32 @@ class MigrateCommand extends Command
             if (!$this->confirmToProceed($input->getOption('force'))) {
                 exit(1);
             }
-        }*/
+        // }
 
         // Run migration
         try {
-            $migrated = $migrator->run(['pretend' => $pretend, 'step' => $step]);
+            if ($pretend) {
+                $migrated = $migrator->migrate($step);
+            } else {
+                $migrated = $migrator->pretendToMigrate();
+            }
         } catch (\Exception $e) {
-            $this->displayNotes($migrator);
+            // $this->displayNotes($migrator);
             $this->io->error($e->getMessage());
             exit(1);
+
+            /*
+            $messages = ['Unfulfillable migrations found :: '];
+            foreach ($unfulfillable as $migration => $dependency) {
+                $messages[] = "=> $migration (Missing dependency : $dependency)";
+            }
+
+            throw new \Exception(implode("\n", $messages));
+            */
         }
 
         // Get notes and display them
-        $this->displayNotes($migrator);
+        // $this->displayNotes($migrator);
 
         // If all went well, there's no fatal errors and we have migrated
         // something, show some success

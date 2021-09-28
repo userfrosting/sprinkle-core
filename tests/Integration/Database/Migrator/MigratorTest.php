@@ -10,55 +10,31 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
-use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
-use UserFrosting\Sprinkle\Core\Database\Migrator\SprinkleMigrationLocator;
+use UserFrosting\Sprinkle\Core\Core;
+use UserFrosting\Sprinkle\Core\Database\Migration;
+use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
+use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
-use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
 use UserFrosting\Support\Repository\Repository as Config;
-use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
+use UserFrosting\Testing\TestCase;
 
 /**
  * Migrator Tests
  */
 class MigratorTest extends TestCase
 {
-    /**
-     * @var string The db connection to use for the test.
-     */
-    protected string $connection;
+    use TestDatabase;
 
-    /**
-     * @var string The migration table name
-     */
-    protected string $migrationTable = 'migrations';
+    protected string $mainSprinkle = TestMigrateSprinkle::class;
 
     /**
      * @var Builder
      */
     protected Builder $schema;
-
-    /**
-     * @var Migrator The migrator instance.
-     */
-    protected Migrator $migrator;
-
-    /**
-     * @var SprinkleMigrationLocator The migration locator instance.
-     */
-    protected SprinkleMigrationLocator $migrationLocator;
-
-    /**
-     * @var DatabaseMigrationRepository The migration repository instance.
-     */
-    protected DatabaseMigrationRepository $repository;
-
-    /**
-     * @var ResourceLocatorInterface The migration locator instance.
-     */
-    protected ResourceLocatorInterface $locator;
 
     /**
      * Setup migration instances used for all tests
@@ -68,34 +44,66 @@ class MigratorTest extends TestCase
         // Boot parent TestCase, which will set up the database and connections for us.
         parent::setUp();
 
-        // Fetch services from CI
-        $db = $this->ci->get(Capsule::class);
-        $config = $this->ci->get(Config::class);
-        $this->locator = $this->ci->get(ResourceLocatorInterface::class);
+        // Setup test database
+        $this->setupTestDatabase();
 
-        // Set db connection name property from config
-        $this->connection = $config->get('testing.dbConnection');
-
-        // Get the repository and locator instances
-        $this->repository = new DatabaseMigrationRepository($db, $this->migrationTable);
-        $this->migrationLocator = new MigrationLocatorStub($this->locator);
-
-        // Get the migrator instance and setup right connection
-        $this->migrator = new Migrator($db, $this->repository, $this->migrationLocator);
-        $this->migrator->setConnection($this->connection);
-
-        // Get schema Builder
-        $this->schema = $this->migrator->getSchemaBuilder();
-
-        if (!$this->repository->exists()) {
-            $this->repository->create();
-        }
+        // Alias schema Builder
+        $this->schema = $this->ci->get(Builder::class);
     }
 
-    // public function testMigrationRepositoryCreated(): void
-    // {
-    //     $this->assertTrue($this->schema->hasTable($this->migrationTable));
-    // }
+    public function testConstructor(): Migrator
+    {
+        /** @var Migrator */
+        $migrator = $this->ci->get(Migrator::class);
+
+        // Test Constructor
+        $this->assertInstanceOf(Migrator::class, $migrator);
+        $this->assertInstanceOf(MigrationRepositoryInterface::class, $migrator->getRepository());
+        $this->assertInstanceOf(MigrationLocatorInterface::class, $migrator->getLocator());
+
+        // Test repository exist for next assertions
+        $config = $this->ci->get(Config::class);
+        $migrationTable = $config->get('migrations.repository_table');
+        $this->assertFalse($this->schema->hasTable($migrationTable));
+        $this->assertFalse($migrator->getRepository()->exists());
+        $migrator->getRepository()->create();
+        $this->assertTrue($this->schema->hasTable($migrationTable));
+        $this->assertTrue($migrator->getRepository()->exists());
+
+        return $migrator;
+    }
+
+    /**
+     * @depends testConstructor
+     */
+    public function testPretendToMigrate(Migrator $migrator): void
+    {
+        $result = $migrator->pretendToMigrate();
+
+        // Assert results
+        // N.B.: Don't assert exact string here, because it could change depending
+        //       of DB, we only assert structure for now.
+        $this->assertIsArray($result);
+        $this->assertCount(1, $result);
+        $this->assertIsString($result[StubMigrationA::class][0]['query']);
+    }
+
+    /**
+     * @depends testConstructor
+     */
+    public function testMigrate(Migrator $migrator): void
+    {
+        $result = $migrator->migrate();
+
+        // Assert results
+        $this->assertSame([StubMigrationA::class], $result);
+
+        // Assert table has been created
+        // N.B.: Requires to get schema from connection, as otherwise it might
+        // not work (different :memory: instance)
+        $schema = $migrator->getConnection()->getSchemaBuilder();
+        $this->assertTrue($schema->hasTable('test'));
+    }
 
     // public function testBasicMigration(): void
     // {
@@ -320,69 +328,31 @@ class MigratorTest extends TestCase
     // }
 }
 
-class MigrationLocatorStub extends SprinkleMigrationLocator
+class TestMigrateSprinkle extends Core
 {
-    public function all(): array
+    /**
+     * Replace core migration with our dumb ones.
+     */
+    public static function getMigrations(): array
     {
         return [
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
+            StubMigrationA::class,
         ];
     }
 }
 
-class FlightsTableMigrationLocatorStub extends SprinkleMigrationLocator
+class StubMigrationA extends Migration
 {
-    public function all(): array
+    public function up()
     {
-        return [
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
-        ];
+        $this->schema->create('test', function (Blueprint $table) {
+            $table->id();
+            $table->string('foo');
+        });
     }
-}
 
-/**
- *    This stub contain migration which file doesn't exists
- */
-class InvalidMigrationLocatorStub extends SprinkleMigrationLocator
-{
-    public function all(): array
+    public function down()
     {
-        return [
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\Foo',
-        ];
-    }
-}
-
-/**
- *    This stub contain migration which order they need to be run is different
- *    than the order the file are returned because of dependencies management.
- *    The `two` migration should be run last since it depends on the other two
- */
-class DependableMigrationLocatorStub extends SprinkleMigrationLocator
-{
-    public function all(): array
-    {
-        return [
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-        ];
-    }
-}
-
-/**
- *    This stub contain migration which order they need to be run is different
- *    than the order the file are returned because of dependencies management
- */
-class UnfulfillableMigrationLocatorStub extends SprinkleMigrationLocator
-{
-    public function all(): array
-    {
-        return [
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-            '\\UserFrosting\\Tests\\Integration\\Migrations\\UnfulfillableTable',
-        ];
+        $this->schema->drop('test');
     }
 }

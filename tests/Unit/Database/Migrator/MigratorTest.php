@@ -10,18 +10,16 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
-use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
+use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
-use UserFrosting\Sprinkle\Core\Database\Migrator\SprinkleMigrationLocator;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 
 /**
  * Tests for the Migrator Class
@@ -33,9 +31,10 @@ class MigratorTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    protected Capsule | \Mockery\MockInterface $db;
+    // Shared mock objects
     protected MigrationRepositoryInterface | \Mockery\MockInterface $repository;
     protected MigrationLocatorInterface | \Mockery\MockInterface $locator;
+    protected Connection | \Mockery\MockInterface $connection;
 
     /**
      * Setup base mock and migrator instance.
@@ -46,23 +45,23 @@ class MigratorTest extends TestCase
         parent::setUp();
 
         // Create mock objects
-        $this->db = Mockery::mock(Capsule::class);
+        $this->connection = Mockery::mock(Connection::class);
         $this->repository = Mockery::mock(MigrationRepositoryInterface::class);
         $this->locator = Mockery::mock(MigrationLocatorInterface::class);
     }
 
     protected function getMigrator(): Migrator
     {
-       return new Migrator($this->db, $this->repository, $this->locator);
+        return new Migrator($this->repository, $this->locator, $this->connection);
     }
 
-    // public function testConstructor(): Migrator
-    // {
-    //     $migrator = $this->getMigrator();
-    //     $this->assertInstanceOf(Migrator::class, $migrator);
+    public function testConstructor(): Migrator
+    {
+        $migrator = $this->getMigrator();
+        $this->assertInstanceOf(Migrator::class, $migrator);
 
-    //     return $migrator;
-    // }
+        return $migrator;
+    }
 
     /**
      * @depends testConstructor
@@ -78,7 +77,7 @@ class MigratorTest extends TestCase
         $repository = Mockery::mock(MigrationRepositoryInterface::class)
             ->shouldReceive('exists')->twice()->andReturn(true, false)
             ->getMock();
-        
+
         // Set mock and test change
         $this->assertNotSame($repository, $migrator->getRepository());
         $migrator->setRepository($repository);
@@ -98,14 +97,146 @@ class MigratorTest extends TestCase
     {
         // Assert get locator from the main one
         $this->assertInstanceOf(MigrationLocatorInterface::class, $migrator->getLocator());
-        
-        // Get mock
+
+        // Get new mock
         $locator = Mockery::mock(MigrationLocatorInterface::class);
-        
-        // Set mock and test change
+
+        // Set new mock and test change
         $this->assertNotSame($locator, $migrator->getLocator());
         $migrator->setLocator($locator);
         $this->assertSame($locator, $migrator->getLocator());
+    }
+
+    /**
+     * @depends testConstructor
+     *
+     * @param Migrator $migrator
+     */
+    public function testConnectionMethods(Migrator $migrator): void
+    {
+        // Assert get Connection from the main one
+        $this->assertInstanceOf(Connection::class, $migrator->getConnection());
+
+        // Get new mock
+        $connection = Mockery::mock(Connection::class);
+
+        // Set new mock and test change
+        $this->assertNotSame($connection, $migrator->getConnection());
+        $migrator->setConnection($connection);
+        $this->assertSame($connection, $migrator->getConnection());
+    }
+
+    /**
+     * @depends testConstructor
+     *
+     * @param Migrator $migrator
+     */
+    public function testMigrate(Migrator $migrator): void
+    {
+        // Mock a migration for locator
+        $migration = Mockery::mock(MigrationInterface::class)
+            ->shouldReceive('up')->once()->andReturn(null)
+            ->getMock();
+
+        // Create new repository mock for batch call and log
+        $repository = Mockery::mock(MigrationRepositoryInterface::class)
+            ->shouldReceive('getNextBatchNumber')->once()->andReturn(2)
+            ->shouldReceive('log')->with($migration::class, 2)->once()->andReturn(true)
+            ->getMock();
+
+        // Create new locator with our mock migration
+        $locator = Mockery::mock(MigrationLocatorInterface::class)
+            ->shouldReceive('get')->with($migration::class)->once()->andReturn($migration)
+            ->getMock();
+
+        // We mock connection and Grammar, to simulate `supportsSchemaTransactions`
+        $grammar = Mockery::mock(Grammar::class)
+            ->shouldReceive('supportsSchemaTransactions')->once()->andReturn(false)
+            ->getMock();
+        $connection = Mockery::mock(Connection::class)
+            ->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar)
+            ->getMock();
+
+        // Create partial mock of migrator, so we can spoof "getPending"
+        $migrator = Mockery::mock(Migrator::class, [$repository, $locator, $connection])->makePartial();
+        $migrator->shouldReceive('getPending')->once()->andReturn([$migration::class]);
+
+        // Pretend to migrate
+        $result = $migrator->migrate();
+
+        // Assert results
+        $this->assertSame([$migration::class], $result);
+    }
+
+    // TODO : Test with step and mocked transactions. Previous test should probably have two migrations anyway to test steps properly
+
+    public function testMigrateWithNoPending(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getPending')->once()->andReturn([]);
+
+        $result = $migrator->migrate();
+        $this->assertSame([], $result);
+    }
+
+    public function testMigrateWithPendingException(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getPending')->once()->andThrow(new MigrationDependencyNotMetException());
+
+        $this->expectException(MigrationDependencyNotMetException::class);
+        $migrator->migrate();
+    }
+
+    public function testPretendToMigrate(): void
+    {
+        // Return from Connection pretend.
+        // The actual data here is not 100% true, see Integration test for it.
+        $queries = [['query' => 'foo']];
+
+        // Mock a migration for locator
+        $migration = Mockery::mock(MigrationInterface::class);
+
+        // Create new locator with our mock migration
+        $locator = Mockery::mock(MigrationLocatorInterface::class)
+            ->shouldReceive('get')->with($migration::class)->once()->andReturn($migration)
+            ->getMock();
+
+        // Up is not called, as the callable passed to pretend is not mocked here
+        // See Integration test for a more complete test.
+        $connection = Mockery::mock(Connection::class)
+            ->shouldReceive('pretend')->once()->andReturn($queries)
+            ->getMock();
+
+        // Create partial mock of migrator, so we can spoof "getPending"
+        $migrator = Mockery::mock(Migrator::class, [$this->repository, $locator, $connection])->makePartial();
+        $migrator->shouldReceive('getPending')->once()->andReturn([$migration::class]);
+
+        // Pretend to migrate
+        $result = $migrator->pretendToMigrate();
+
+        // Assert results
+        $this->assertSame([
+            $migration::class => $queries
+        ], $result);
+    }
+
+    public function testPretendToMigrateWithNoPending(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getPending')->once()->andReturn([]);
+
+        $result = $migrator->pretendToMigrate();
+        $this->assertSame([], $result);
+    }
+
+    public function testPretendToMigrateWithPendingException(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getPending')->once()->andThrow(new MigrationDependencyNotMetException());
+
+        $this->expectException(MigrationDependencyNotMetException::class);
+        $migrator->pretendToMigrate();
     }
 
     /**
