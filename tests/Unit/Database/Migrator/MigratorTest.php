@@ -134,41 +134,91 @@ class MigratorTest extends TestCase
     public function testMigrate(Migrator $migrator): void
     {
         // Mock a migration for locator
-        $migration = Mockery::mock(MigrationInterface::class)
+        $migration1 = Mockery::mock(MigrationInterface::class)
+            ->shouldReceive('up')->once()->andReturn(null)
+            ->getMock();
+        $migration2 = Mockery::mock(MigrationInterface::class)
             ->shouldReceive('up')->once()->andReturn(null)
             ->getMock();
 
         // Create new repository mock for batch call and log
         $repository = Mockery::mock(MigrationRepositoryInterface::class)
             ->shouldReceive('getNextBatchNumber')->once()->andReturn(2)
-            ->shouldReceive('log')->with($migration::class, 2)->once()->andReturn(true)
+            ->shouldReceive('log')->with($migration1::class, 2)->once()->andReturn(true)
+            ->shouldReceive('log')->with($migration2::class, 2)->once()->andReturn(true)
             ->getMock();
 
         // Create new locator with our mock migration
         $locator = Mockery::mock(MigrationLocatorInterface::class)
-            ->shouldReceive('get')->with($migration::class)->once()->andReturn($migration)
+            ->shouldReceive('get')->with($migration1::class)->once()->andReturn($migration1)
+            ->shouldReceive('get')->with($migration2::class)->once()->andReturn($migration2)
             ->getMock();
 
         // We mock connection and Grammar, to simulate `supportsSchemaTransactions`
         $grammar = Mockery::mock(Grammar::class)
-            ->shouldReceive('supportsSchemaTransactions')->once()->andReturn(false)
+            ->shouldReceive('supportsSchemaTransactions')->times(2)->andReturn(false)
             ->getMock();
         $connection = Mockery::mock(Connection::class)
-            ->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar)
+            ->shouldReceive('getSchemaGrammar')->times(2)->andReturn($grammar)
             ->getMock();
 
         // Create partial mock of migrator, so we can spoof "getPending"
         $migrator = Mockery::mock(Migrator::class, [$repository, $locator, $connection])->makePartial();
-        $migrator->shouldReceive('getPending')->once()->andReturn([$migration::class]);
+        $migrator->shouldReceive('getPending')->once()->andReturn([$migration1::class, $migration2::class]);
 
-        // Pretend to migrate
+        // Migrate (Step = false)
         $result = $migrator->migrate();
 
         // Assert results
-        $this->assertSame([$migration::class], $result);
+        $this->assertSame([$migration1::class, $migration2::class], $result);
     }
 
-    // TODO : Test with step and mocked transactions. Previous test should probably have two migrations anyway to test steps properly
+    /**
+     * N.B.: Transaction is only tested for behavior. 
+     * 
+     * @depends testConstructor
+     * @depends testMigrate
+     *
+     * @param Migrator $migrator
+     */
+    public function testMigrateWithStepsAndTransaction(Migrator $migrator): void
+    {
+        // Mock a migration for locator
+        $migration1 = Mockery::mock(MigrationInterface::class);
+        $migration2 = Mockery::mock(MigrationInterface::class);
+
+        // Create new repository mock for batch call and log
+        $repository = Mockery::mock(MigrationRepositoryInterface::class)
+            ->shouldReceive('getNextBatchNumber')->once()->andReturn(2)
+            ->shouldReceive('log')->with($migration1::class, 2)->once()->andReturn(true)
+            ->shouldReceive('log')->with($migration2::class, 3)->once()->andReturn(true) // 3, as steps is true
+            ->getMock();
+
+        // Create new locator with our mock migration
+        $locator = Mockery::mock(MigrationLocatorInterface::class)
+            ->shouldReceive('get')->with($migration1::class)->once()->andReturn($migration1)
+            ->shouldReceive('get')->with($migration2::class)->once()->andReturn($migration2)
+            ->getMock();
+
+        // We mock connection and Grammar, to simulate `supportsSchemaTransactions`
+        $grammar = Mockery::mock(Grammar::class)
+            ->shouldReceive('supportsSchemaTransactions')->times(2)->andReturn(true)
+            ->getMock();
+        $connection = Mockery::mock(Connection::class)
+            ->shouldReceive('getSchemaGrammar')->times(2)->andReturn($grammar)
+            ->shouldReceive('transaction')->times(2)
+            ->getMock();
+
+        // Create partial mock of migrator, so we can spoof "getPending"
+        $migrator = Mockery::mock(Migrator::class, [$repository, $locator, $connection])->makePartial();
+        $migrator->shouldReceive('getPending')->once()->andReturn([$migration1::class, $migration2::class]);
+
+        // Migrate (Step = true)
+        $result = $migrator->migrate(step: true);
+
+        // Assert results
+        $this->assertSame([$migration1::class, $migration2::class], $result);
+    }
 
     public function testMigrateWithNoPending(): void
     {
