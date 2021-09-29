@@ -12,11 +12,9 @@ namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use Illuminate\Support\Arr;
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
-use UserFrosting\Sprinkle\Core\Util\BadClassNameException;
 
 /**
  * Migrator utility used to manage and run database migrations
@@ -312,7 +310,7 @@ class Migrator
      *
      * @throws MigrationDependencyNotMetException if a dependencies is not met among pending migration.
      *
-     * @return array The list of ran migrations // MigrationInterface[] // TODO
+     * @return string[] The list of ran migrations class
      */
     public function migrate(bool $step = false): array
     {
@@ -335,7 +333,7 @@ class Migrator
             // Get the migration instance
             $migration = $this->locator->get($migrationClass);
 
-            // Run the actual migration
+            // Place migration in callable for transaction
             $callback = function () use ($migration) {
                 $migration->up();
             };
@@ -363,7 +361,7 @@ class Migrator
      *
      * @throws MigrationDependencyNotMetException if a dependencies is not met among pending migration.
      *
-     * @return array The list of ran migrations // MigrationInterface[] // TODO
+     * @return string[] The list of queries, grouped by migration.
      */
     public function pretendToMigrate(): array
     {
@@ -402,27 +400,27 @@ class Migrator
     /**
      * Rollback the last migration operation.
      *
-     * @param array $options The options for the current operation [steps, pretend]
+     * @param int $steps Number of steps to rollback. Default to 1 (last ran migration batch)
+     *
+     * @throws MigrationRollbackException If something prevent migration to be rollback
      *
      * @return array The list of rolledback migration classes
      */
-    // TODO : Change option
-    public function rollback(array $options = [])
+    public function rollback(int $steps = 1): array
     {
-        $this->notes = [];
+        // Get migrations to rollback.
+        // MigrationDependencyNotMetException will be thrown here if a dependency is not met.
+        $migrations = $this->getMigrationsForRollback($steps);
 
-        // We want to pull in the last batch of migrations that ran on the previous
-        // migration operation. We'll then reverse those migrations and run each
-        // of them "down" to reverse the last migration "operation" which ran.
-        $migrations = $this->getMigrationsForRollback($options);
-
+        // Don't go further if nothing to rollback.
         if (count($migrations) === 0) {
             return [];
         }
 
-        // TODO : `rollbackMigrations` can stay apart, as reset and single rollback also use it
-        // TODO : Use Analyser here, then loop them and "runDown"
-        return $this->rollbackMigrations($migrations, $options);
+        // Apply change to database
+        $this->runDownMigrations($migrations);
+
+        return $migrations;
     }
 
     /**
@@ -434,7 +432,7 @@ class Migrator
      * @return array The list of rolledback migration classes
      */
     // TODO : Change $option for specific arguments
-    public function rollbackMigration($migrationClassName, array $options = [])
+    /*public function rollbackMigration($migrationClassName, array $options = [])
     {
         $this->notes = [];
 
@@ -452,247 +450,147 @@ class Migrator
         // TODO : `rollbackMigrations` can stay apart, as reset and single rollback also use it
         // TODO : Use Analyser here, then loop them and "runDown"
         return $this->rollbackMigrations([$migration->migration], $options);
-    }
 
-    /**
-     * Get the migrations for a rollback operation.
-     *
-     * @param array $options The options for the current operation
-     *
-     * @return array An ordered array of migrations to rollback
-     */
-    // TODO : Move back into "rollback", step as argument with default value|null
-    /*protected function getMigrationsForRollback(array $options)
-    {
-        $steps = Arr::get($options, 'steps', 0);
-        if ($steps > 0) {
-            return $this->repository->list($steps, 'desc');
-        } else {
-            return $this->repository->last();
-        }
+        // Apply change to database
+        $this->runDownMigrations([$migrations]);
     }*/
 
     /**
-     * Rollback the given migrations.
+     * Pretend to rollback, return would be queries for debugging purpose.
      *
-     * @param array $migrations An array of migrations to rollback formatted as an eloquent collection
-     * @param array $options    The options for the current operation
+     * @param int $steps Number of steps to rollback. Default to 1 (last ran migration batch)
      *
-     * @return array The list of rolledback migration classes
+     * @throws MigrationRollbackException If something prevent migration to be rollback
+     *
+     * @return string[] The list of queries, grouped by migration.
      */
-    // TODO : This is done by analyser now, except "runDown"
-    protected function rollbackMigrations(array $migrations, array $options)
+    public function pretendToRollback(int $steps = 1): array
     {
-        $rolledBack = [];
+        // Get migrations to rollback.
+        // MigrationDependencyNotMetException will be thrown here if a dependency is not met.
+        $migrations = $this->getMigrationsForRollback($steps);
 
-        // Get the available migration classes in the filesystem
-        $availableMigrations = collect($this->getAvailableMigrations());
-
-        // Extract some options
-        $pretend = Arr::get($options, 'pretend', false);
-
-        // Check for dependencies
-        $this->checkRollbackDependencies($migrations);
-
-        // Next we will run through all of the migrations and call the "down" method
-        // which will reverse each migration in order. This getLast method on the
-        // repository already returns these migration's class names in reverse order.
-        foreach ($migrations as $migration) {
-
-            // We have to make sure the class exist first
-            if (!$availableMigrations->contains($migration)) {
-                // NOTE This next was commented because if a class doesn't exist,
-                // you'll get stuck and prevent further classes to be rolledback
-                // until this class is put back in the system. Might want to
-                // display a warning instead of silently skipping it. See related "todo" in "reset" method
-                //throw new \Exception("Can't rollback migrations `$migration`. The migration class doesn't exist");
-                $this->note("<info>WARNING:</info> Can't rollback migrations `$migration`. The migration class doesn't exist");
-                continue;
-            }
-
-            // Add the migration to the list of rolledback migration
-            $rolledBack[] = $migration;
-
-            // Run the migration down
-            // TODO : This need to be kept
-            $this->runDown($migration, $pretend);
-        }
-
-        return $rolledBack;
-    }
-
-    /**
-     * Check if migrations can be rolledback.
-     *
-     * @param array $migrations The migrations classes to rollback
-     *
-     * @throws \Exception If rollback can't be performed
-     */
-    // TODO : This is done by analyser now
-    // protected function checkRollbackDependencies(array $migrations)
-    // {
-    //     // Get ran migrations
-    //     $ranMigrations = $this->getRanMigrations();
-
-    //     // Setup rollback analyser
-    //     $analyser = new RollbackAnalyser($ranMigrations, $migrations);
-
-    //     // Any rollback that creates an unfulfilled dependency will cause this script to throw an exception
-    //     if ($unfulfillable = $analyser->getUnfulfillable()) {
-    //         $messages = ["Some migrations can't be rolled back since the other migrations depends on it :: "];
-    //         foreach ($unfulfillable as $migration => $dependency) {
-    //             $messages[] = "=> $dependency is a dependency of $migration";
-    //         }
-
-    //         throw new \Exception(implode("\n", $messages));
-    //     }
-    // }
-
-    /**
-     * Rolls all of the currently applied migrations back.
-     *
-     * @param bool $pretend Should this operation be pretended
-     *
-     * @return array An array of all the rolledback migration classes
-     */
-    public function reset($pretend = false)
-    {
-        $this->notes = [];
-
-        // We get the list of all the migrations class available and reverse
-        // said list so we can run them back in the correct order for resetting
-        // this database. This will allow us to get the database back into its
-        // "empty" state and ready to be migrated "up" again.
-        //
-        // !TODO :: Should compare to the install list to make sure no outstanding migration (ran, but with no migration class anymore) still exist in the db
-        $migrations = array_reverse($this->getRanMigrations()); // GetInstalled
-
-        // TODO : This could go in "rollback Migration"
+        // Don't go further if nothing to rollback.
         if (count($migrations) === 0) {
             return [];
         }
 
-        // TODO : `rollbackMigrations` can stay apart, as reset and single rollback also use it
-        // TODO : Use Analyser in rollbackMigrations, then loop them and "runDown"
-        return $this->rollbackMigrations($migrations, compact('pretend'));
+        // Pretend to run down migrations.
+        $log = $this->pretendToRunDownMigrations($migrations);
+
+        return $log;
     }
 
     /**
-     * Run "down" a migration instance.
+     * Rolls all of the currently applied migrations back.
      *
-     * @param string $migrationClassName The migration class name
-     * @param bool   $pretend            Is the operation should be pretended
+     * @throws MigrationRollbackException If something prevent migration to be rollback
+     *
+     * @return string[] An array of all the rolledback migration classes
      */
-    // TODO : Most of this could go back into "rollbackMigrations" directly
-    protected function runDown($migrationClassName, $pretend)
+    public function reset(): array
     {
-        // We resolve an instance of the migration. Once we get an instance we can either run a
-        // pretend execution of the migration or we can run the real migration.
-        $instance = $this->resolve($migrationClassName);
+        // Get migrations to reset.
+        // MigrationDependencyNotMetException will be thrown here if a dependency is not met.
+        $migrations = $this->getMigrationsForReset();
 
-        if ($pretend) {
-            return $this->pretendToRun($instance, 'down');
+        // Don't go further if nothing to rollback.
+        if (count($migrations) === 0) {
+            return [];
         }
 
-        // $this->runMigration($instance, 'down');
-        $callback = function () use ($instance) {
-            $instance->down();
-        };
+        // Apply change to database
+        $this->runDownMigrations($migrations);
 
-        // TODO : See if Transaction still needs to be used
-        if ($this->getSchemaGrammar()->supportsSchemaTransactions()) {
-            $this->getConnection()->transaction($callback);
-        } else {
-            $callback();
-        }
-
-        // Once we have successfully run the migration "down" we will remove it from
-        // the migration repository so it will be considered to have not been run
-        // by the application then will be able to fire by any later operation.
-        $this->repository->remove($migrationClassName);
-
-        $this->note("<info>Rolled back:</info>  {$migrationClassName}");
+        return $migrations;
     }
 
     /**
-     * Get all of the queries that would be run for a migration.
+     * Pretend to roll all of the currently applied migrations back.
      *
-     * @param MigrationInterface $migration The migration instance
-     * @param string             $method    The method used [up, down]
+     * @throws MigrationRollbackException If something prevent migration to be rollback
      *
-     * @return array The queries executed by the processed schema
+     * @return string[] The list of queries, grouped by migration.
      */
-    // protected function getQueries(MigrationInterface $migration, $method)
-    // {
-    //     // Get the connection instance
-    //     $connection = $this->getConnection();
+    public function pretendToReset(): array
+    {
+        // Get migrations to reset.
+        // MigrationDependencyNotMetException will be thrown here if a dependency is not met.
+        $migrations = $this->getMigrationsForReset();
 
-    //     return $connection->pretend(function () use ($migration, $method) {
-    //         $migration->{$method}();
-    //     });
-    // }
+        // Don't go further if nothing to rollback.
+        if (count($migrations) === 0) {
+            return [];
+        }
+
+        // Pretend to run down migrations.
+        $log = $this->pretendToRunDownMigrations($migrations);
+
+        return $log;
+    }
 
     /**
-     * Resolve a migration instance from it's class name.
+     * Spin through ordered pending migrations, apply the changes to the
+     * databases and log them to the repository.
      *
-     * @param string $migrationClassName The class name
-     *
-     * @return MigrationInterface The migration class instance
+     * @param array $migrations The migrations to run down
      */
-    // Don't need anymore, as DI will handle this in Locator
-    // public function resolve($migrationClassName)
-    // {
-    //     if (!class_exists($migrationClassName)) {
-    //         throw new BadClassNameException("Unable to find the migration class '$migrationClassName'. Run 'php bakery migrate:clean' to remove stale migrations.");
-    //     }
+    protected function runDownMigrations(array $migrations): void
+    {
+        foreach ($migrations as $migrationClass) {
 
-    //     $migration = new $migrationClassName($this->getSchemaBuilder());
+            // Get the migration instance
+            $migration = $this->locator->get($migrationClass);
 
-    //     if (!$migration instanceof MigrationInterface) {
-    //         throw new \Exception('Migration must be an instance of `' . MigrationInterface::class . '`');
-    //     }
+            // Place migration in callable for transaction
+            $callback = function () use ($migration) {
+                $migration->down();
+            };
 
-    //     return $migration;
-    // }
+            // TODO : See if Transaction still needs to be used
+            if ($this->getSchemaGrammar()->supportsSchemaTransactions()) {
+                $this->getConnection()->transaction($callback);
+            } else {
+                $callback();
+            }
+
+            // Log migration removal to the repository.
+            $this->repository->remove($migrationClass);
+        }
+    }
 
     /**
-     * Get all of the migration files in a given path.
+     * Spin through ordered pending migrations, pretend to run them down and
+     * return the queries log.
      *
-     * @return array The list of migration classes found in the filesystem
+     * @param array $migrations The migrations to run down
+     *
+     * @return string[] The list of queries, grouped by migration.
      */
-    // TODO
-    // public function getAvailableMigrations()
-    // {
-    //     return $this->locator->all();
-    // }
+    protected function pretendToRunDownMigrations(array $migrations): array
+    {
+        // Prepare return log
+        $log = [];
 
-    /**
-     * Get a list of all ran migrations.
-     *
-     * @param int    $steps Number of batch to return
-     * @param string $order asc|desc
-     *
-     * @return array
-     */
-    // TODO
-    // public function getRanMigrations($steps = -1, $order = 'asc')
-    // {
-    //     return $this->repository->list($steps, $order);
-    // }
+        foreach ($migrations as $migrationClass) {
 
-    /**
-     * Get a list of pending migrations.
-     *
-     * @return array
-     */
-    // TODO : Use Analyser directly
-    // public function getPendingMigrations()
-    // {
-    //     $available = $this->getAvailableMigrations();
-    //     $ran = $this->getRanMigrations();
+            // Get the migration instance
+            $migration = $this->locator->get($migrationClass);
 
-    //     return $this->pendingMigrations($available, $ran);
-    // }
+            // Get the connection instance
+            $connection = $this->getConnection();
+
+            // Get the queries
+            $queries = $connection->pretend(function () use ($migration) {
+                $migration->down();
+            });
+
+            // Add queries to log
+            $log[$migrationClass] = $queries;
+        }
+
+        return $log;
+    }
 
     /**
      * Get the migration repository instance.

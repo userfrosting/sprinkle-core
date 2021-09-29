@@ -174,8 +174,8 @@ class MigratorTest extends TestCase
     }
 
     /**
-     * N.B.: Transaction is only tested for behavior. 
-     * 
+     * N.B.: Transaction is only tested for behavior.
+     *
      * @depends testConstructor
      * @depends testMigrate
      *
@@ -290,326 +290,278 @@ class MigratorTest extends TestCase
     }
 
     /**
-     * Basic test to make sure the base method syntax is ok
+     * @depends testConstructor
+     *
+     * @param Migrator $migrator
      */
-    // public function testMigratorUpWithNoMigrations()
-    // {
-    //     // Locator will be asked to return the available migrations
-    //     $this->locator->shouldReceive('getMigrations')->once()->andReturn([]);
+    public function testRollback(Migrator $migrator): void
+    {
+        // Mock a migration for locator
+        $migration1 = Mockery::mock(MigrationInterface::class)
+            ->shouldReceive('down')->once()->andReturn(null)
+            ->getMock();
+        $migration2 = Mockery::mock(MigrationInterface::class)
+            ->shouldReceive('down')->once()->andReturn(null)
+            ->getMock();
 
-    //     // Repository will be asked to return the ran migrations
-    //     $this->repository->shouldReceive('list')->once()->andReturn([]);
+        // Create new repository mock for batch call and log
+        $repository = Mockery::mock(MigrationRepositoryInterface::class)
+            ->shouldReceive('remove')->with($migration1::class)->once()->andReturn(true)
+            ->shouldReceive('remove')->with($migration2::class)->once()->andReturn(true)
+            ->getMock();
 
-    //     $migrations = $this->migrator->run();
-    //     $this->assertEmpty($migrations);
-    // }
+        // Create new locator with our mock migration
+        $locator = Mockery::mock(MigrationLocatorInterface::class)
+            ->shouldReceive('get')->with($migration1::class)->once()->andReturn($migration1)
+            ->shouldReceive('get')->with($migration2::class)->once()->andReturn($migration2)
+            ->getMock();
+
+        // We mock connection and Grammar, to simulate `supportsSchemaTransactions`
+        $grammar = Mockery::mock(Grammar::class)
+            ->shouldReceive('supportsSchemaTransactions')->times(2)->andReturn(false)
+            ->getMock();
+        $connection = Mockery::mock(Connection::class)
+            ->shouldReceive('getSchemaGrammar')->times(2)->andReturn($grammar)
+            ->getMock();
+
+        // Create partial mock of migrator, so we can spoof "getPending"
+        $migrator = Mockery::mock(Migrator::class, [$repository, $locator, $connection])->makePartial();
+        $migrator->shouldReceive('getMigrationsForRollback')->with(1)->once()->andReturn([$migration1::class, $migration2::class]);
+
+        // Rollback (steps = 1; default)
+        $result = $migrator->rollback();
+
+        // Assert results
+        $this->assertSame([$migration1::class, $migration2::class], $result);
+    }
 
     /**
-     * Basic test where all available migrations are pending and fulfillable
+     * N.B.: Transaction is only tested for behavior.
+     *
+     * @depends testConstructor
+     * @depends testMigrate
+     *
+     * @param Migrator $migrator
      */
-    // public function testMigratorUpWithOnlyPendingMigrations()
-    // {
-    //     // The migrations set
-    //     $testMigrations = [
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
-    //     ];
+    public function testRollbackWithStepsAndTransaction(Migrator $migrator): void
+    {
+        // Mock a migration for locator
+        $migration1 = Mockery::mock(MigrationInterface::class);
+        $migration2 = Mockery::mock(MigrationInterface::class);
 
-    //     // When running up, Locator will return all 3 migration classes
-    //     $this->locator->shouldReceive('getMigrations')->andReturn($testMigrations);
+        // Create new repository mock for batch call and log
+        $repository = Mockery::mock(MigrationRepositoryInterface::class)
+            ->shouldReceive('remove')->with($migration1::class)->once()->andReturn(true)
+            ->shouldReceive('remove')->with($migration2::class)->once()->andReturn(true)
+            ->getMock();
 
-    //     // Repository will be asked to return the ran migrations, the next batch number and will log 3 new migrations
-    //     $this->repository->shouldReceive('list')->andReturn([]);
-    //     $this->repository->shouldReceive('getNextBatchNumber')->andReturn(1);
-    //     $this->repository->shouldReceive('log')->times(3)->andReturn(null);
+        // Create new locator with our mock migration
+        $locator = Mockery::mock(MigrationLocatorInterface::class)
+            ->shouldReceive('get')->with($migration1::class)->once()->andReturn($migration1)
+            ->shouldReceive('get')->with($migration2::class)->once()->andReturn($migration2)
+            ->getMock();
 
-    //     // SchemaBuilder will create all 3 tables
-    //     $this->schema->shouldReceive('create')->times(3)->andReturn(null);
+        // We mock connection and Grammar, to simulate `supportsSchemaTransactions`
+        $grammar = Mockery::mock(Grammar::class)
+            ->shouldReceive('supportsSchemaTransactions')->times(2)->andReturn(true)
+            ->getMock();
+        $connection = Mockery::mock(Connection::class)
+            ->shouldReceive('getSchemaGrammar')->times(2)->andReturn($grammar)
+            ->shouldReceive('transaction')->times(2)
+            ->getMock();
 
-    //     // Connection will be asked for the SchemaGrammar
-    //     $grammar = m::mock(Grammar::class);
-    //     $this->connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-    //     $grammar->shouldReceive('supportsSchemaTransactions')->andReturn(false);
+        // Create partial mock of migrator, so we can spoof "getPending"
+        $migrator = Mockery::mock(Migrator::class, [$repository, $locator, $connection])->makePartial();
+        $migrator->shouldReceive('getMigrationsForRollback')->with(2)->once()->andReturn([$migration1::class, $migration2::class]);
 
-    //     // Run migrations up
-    //     $migrations = $this->migrator->run();
+        // Migrate (Step = true)
+        $result = $migrator->rollback(2);
 
-    //     // All classes should have been migrated
-    //     $this->assertEquals($testMigrations, $migrations);
-    // }
+        // Assert results
+        $this->assertSame([$migration1::class, $migration2::class], $result);
+    }
+
+    public function testRollbackWithNoPending(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getMigrationsForRollback')->once()->andReturn([]);
+
+        $result = $migrator->rollback();
+        $this->assertSame([], $result);
+    }
+
+    public function testRollbackWithPendingException(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getMigrationsForRollback')->once()->andThrow(new MigrationDependencyNotMetException());
+
+        $this->expectException(MigrationDependencyNotMetException::class);
+        $migrator->rollback();
+    }
+
+    public function testPretendToRollback(): void
+    {
+        // Return from Connection pretend.
+        // The actual data here is not 100% true, see Integration test for it.
+        $queries = [['query' => 'foo']];
+
+        // Mock a migration for locator
+        $migration = Mockery::mock(MigrationInterface::class);
+
+        // Create new locator with our mock migration
+        $locator = Mockery::mock(MigrationLocatorInterface::class)
+            ->shouldReceive('get')->with($migration::class)->once()->andReturn($migration)
+            ->getMock();
+
+        // Up is not called, as the callable passed to pretend is not mocked here
+        // See Integration test for a more complete test.
+        $connection = Mockery::mock(Connection::class)
+            ->shouldReceive('pretend')->once()->andReturn($queries)
+            ->getMock();
+
+        // Create partial mock of migrator, so we can spoof "getPending"
+        $migrator = Mockery::mock(Migrator::class, [$this->repository, $locator, $connection])->makePartial();
+        $migrator->shouldReceive('getMigrationsForRollback')->once()->andReturn([$migration::class]);
+
+        // Pretend to migrate
+        $result = $migrator->pretendToRollback();
+
+        // Assert results
+        $this->assertSame([
+            $migration::class => $queries
+        ], $result);
+    }
+
+    public function testPretendToRollbackWithNoPending(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getMigrationsForRollback')->once()->andReturn([]);
+
+        $result = $migrator->pretendToRollback();
+        $this->assertSame([], $result);
+    }
+
+    public function testPretendToRollbackWithPendingException(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getMigrationsForRollback')->once()->andThrow(new MigrationDependencyNotMetException());
+
+        $this->expectException(MigrationDependencyNotMetException::class);
+        $migrator->pretendToRollback();
+    }
 
     /**
-     * Test where one of the available migrations is already installed
+     * @depends testConstructor
+     *
+     * @param Migrator $migrator
      */
-    // public function testMigratorUpWithOneInstalledMigrations()
-    // {
-    //     // When running up, Locator will return all 3 migration classes
-    //     $this->locator->shouldReceive('getMigrations')->andReturn([
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
-    //     ]);
+    public function testReset(Migrator $migrator): void
+    {
+        // Mock a migration for locator
+        $migration1 = Mockery::mock(MigrationInterface::class)
+            ->shouldReceive('down')->once()->andReturn(null)
+            ->getMock();
+        $migration2 = Mockery::mock(MigrationInterface::class)
+            ->shouldReceive('down')->once()->andReturn(null)
+            ->getMock();
 
-    //     // Repository will be asked to return the ran migrations (one), the next batch number and will log 2 new migrations
-    //     $this->repository->shouldReceive('list')->andReturn([
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-    //     ]);
-    //     $this->repository->shouldReceive('getNextBatchNumber')->andReturn(2);
-    //     $this->repository->shouldReceive('log')->times(2)->andReturn(null);
+        // Create new repository mock for batch call and log
+        $repository = Mockery::mock(MigrationRepositoryInterface::class)
+            ->shouldReceive('remove')->with($migration1::class)->once()->andReturn(true)
+            ->shouldReceive('remove')->with($migration2::class)->once()->andReturn(true)
+            ->getMock();
 
-    //     // SchemaBuilder will only create 2 tables
-    //     $this->schema->shouldReceive('create')->times(2)->andReturn(null);
+        // Create new locator with our mock migration
+        $locator = Mockery::mock(MigrationLocatorInterface::class)
+            ->shouldReceive('get')->with($migration1::class)->once()->andReturn($migration1)
+            ->shouldReceive('get')->with($migration2::class)->once()->andReturn($migration2)
+            ->getMock();
 
-    //     // Connection will be asked for the SchemaGrammar
-    //     $grammar = m::mock(Grammar::class);
-    //     $this->connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-    //     $grammar->shouldReceive('supportsSchemaTransactions')->andReturn(false);
+        // We mock connection and Grammar, to simulate `supportsSchemaTransactions`
+        $grammar = Mockery::mock(Grammar::class)
+            ->shouldReceive('supportsSchemaTransactions')->times(2)->andReturn(false)
+            ->getMock();
+        $connection = Mockery::mock(Connection::class)
+            ->shouldReceive('getSchemaGrammar')->times(2)->andReturn($grammar)
+            ->getMock();
 
-    //     // Run migrations up
-    //     $migrations = $this->migrator->run();
+        // Create partial mock of migrator, so we can spoof "getPending"
+        $migrator = Mockery::mock(Migrator::class, [$repository, $locator, $connection])->makePartial();
+        $migrator->shouldReceive('getMigrationsForReset')->once()->andReturn([$migration1::class, $migration2::class]);
 
-    //     // The migration already ran shouldn't be in the pending ones
-    //     $this->assertEquals([
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
-    //     ], $migrations);
-    // }
+        // Reset
+        $result = $migrator->reset();
 
-    /**
-     * Test where all available migrations have been ran
-     */
-    // public function testMigratorUpWithNoPendingMigrations()
-    // {
-    //     // The migrations set
-    //     $testMigrations = [
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
-    //     ];
+        // Assert results
+        $this->assertSame([$migration1::class, $migration2::class], $result);
+    }
 
-    //     // When running up, Locator will return all 3 migration classes
-    //     $this->locator->shouldReceive('getMigrations')->andReturn($testMigrations);
+    public function testResetWithNoPending(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getMigrationsForReset')->once()->andReturn([]);
 
-    //     // Repository will be asked to return the ran migrations (one), the next batch number and will log 2 new migrations
-    //     $this->repository->shouldReceive('list')->andReturn($testMigrations);
-    //     $this->repository->shouldNotReceive('getNextBatchNumber');
-    //     $this->repository->shouldNotReceive('log');
+        $result = $migrator->reset();
+        $this->assertSame([], $result);
+    }
 
-    //     // SchemaBuilder will only create 2 tables
-    //     $this->schema->shouldNotReceive('create');
+    public function testResetWithPendingException(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getMigrationsForReset')->once()->andThrow(new MigrationDependencyNotMetException());
 
-    //     // Run migrations up
-    //     $migrations = $this->migrator->run();
+        $this->expectException(MigrationDependencyNotMetException::class);
+        $migrator->reset();
+    }
 
-    //     // The migration already ran shouldn't be in the pending ones
-    //     $this->assertEquals([], $migrations);
-    // }
+    public function testPretendToReset(): void
+    {
+        // Return from Connection pretend.
+        // The actual data here is not 100% true, see Integration test for it.
+        $queries = [['query' => 'foo']];
 
-    /**
-     * Test where one of the available migrations is missing a dependency
-     */
-    //!TODO
+        // Mock a migration for locator
+        $migration = Mockery::mock(MigrationInterface::class);
 
-    /**
-     * Test rolling back where no migrations have been ran
-     */
-    // public function testMigratorRollbackWithNoInstalledMigrations()
-    // {
-    //     // Repository will be asked to return the last batch of ran migrations
-    //     $this->repository->shouldReceive('last')->andReturn([]);
+        // Create new locator with our mock migration
+        $locator = Mockery::mock(MigrationLocatorInterface::class)
+            ->shouldReceive('get')->with($migration::class)->once()->andReturn($migration)
+            ->getMock();
 
-    //     // Run migrations up
-    //     $migrations = $this->migrator->rollback();
+        // Up is not called, as the callable passed to pretend is not mocked here
+        // See Integration test for a more complete test.
+        $connection = Mockery::mock(Connection::class)
+            ->shouldReceive('pretend')->once()->andReturn($queries)
+            ->getMock();
 
-    //     // The migration already ran shouldn't be in the pending ones
-    //     $this->assertEquals([], $migrations);
-    // }
+        // Create partial mock of migrator, so we can spoof "getPending"
+        $migrator = Mockery::mock(Migrator::class, [$this->repository, $locator, $connection])->makePartial();
+        $migrator->shouldReceive('getMigrationsForReset')->once()->andReturn([$migration::class]);
 
-    /**
-     * Test rolling back all installed migrations
-     */
-    // public function testMigratorRollbackAllInstalledMigrations()
-    // {
-    //     // The migrations set
-    //     $testMigrations = [
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
-    //     ];
+        // Pretend to migrate
+        $result = $migrator->pretendToReset();
 
-    //     // When running up, Locator will return all 3 migration classes
-    //     $this->locator->shouldReceive('getMigrations')->once()->andReturn($testMigrations);
+        // Assert results
+        $this->assertSame([
+            $migration::class => $queries
+        ], $result);
+    }
 
-    //     // Repository will be asked to return the ran migrations (one), the next batch number and will log 2 new migrations
-    //     $this->repository->shouldReceive('last')->once()->andReturn($testMigrations);
-    //     $this->repository->shouldReceive('list')->once()->andReturn($testMigrations);
-    //     $this->repository->shouldReceive('delete')->times(3)->andReturn([]);
+    public function testPretendToResetWithNoPending(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getMigrationsForReset')->once()->andReturn([]);
 
-    //     // SchemaBuilder will only create 2 tables
-    //     $this->schema->shouldReceive('dropIfExists')->times(3)->andReturn([]);
+        $result = $migrator->pretendToReset();
+        $this->assertSame([], $result);
+    }
 
-    //     // Connection will be asked for the SchemaGrammar
-    //     $grammar = m::mock(Grammar::class);
-    //     $this->connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-    //     $grammar->shouldReceive('supportsSchemaTransactions')->andReturn(false);
+    public function testPretendToResetWithPendingException(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)->makePartial();
+        $migrator->shouldReceive('getMigrationsForReset')->once()->andThrow(new MigrationDependencyNotMetException());
 
-    //     // Run migrations up
-    //     $migrations = $this->migrator->rollback();
-
-    //     // The migration already ran shouldn't be in the pending ones
-    //     $this->assertEquals($testMigrations, $migrations);
-    // }
-
-    /**
-     * Test where one of the installed migration is not in the available migration classes
-     */
-    // public function testMigratorRollbackAllInstalledMigrationsWithOneMissing()
-    // {
-    //     // Locator will only return one of the two installed migrations
-    //     $this->locator->shouldReceive('getMigrations')->once()->andReturn([
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //     ]);
-
-    //     // Repository will be asked to return the ran migrations (two of them)
-    //     // and will only be asked to delete one
-    //     $installed = [
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //     ];
-    //     $this->repository->shouldReceive('last')->once()->andReturn($installed);
-    //     $this->repository->shouldReceive('list')->once()->andReturn($installed);
-    //     $this->repository->shouldReceive('delete')->times(1)->andReturn([]);
-
-    //     // SchemaBuilder will only drop one of the 2 tables
-    //     $this->schema->shouldReceive('dropIfExists')->times(1)->andReturn([]);
-
-    //     // Connection will be asked for the SchemaGrammar
-    //     $grammar = m::mock(Grammar::class);
-    //     $this->connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-    //     $grammar->shouldReceive('supportsSchemaTransactions')->andReturn(false);
-
-    //     // Rollback migrations
-    //     $migrations = $this->migrator->rollback();
-
-    //     // The migration not available from the locator shouldn't have been run
-    //     $this->assertEquals([
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //     ], $migrations);
-    // }
-
-    /**
-     * Test a specific migration with no dependencies can be rolled back
-     */
-    // public function testMigratorRollbackSpecific()
-    // {
-    //     // The installed / available migrations
-    //     $testMigrations = [
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
-    //     ];
-
-    //     // Migration object for the one being deleted
-    //     $migration = '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable';
-    //     $migrationObject = (object) [
-    //         'migration' => $migration,
-    //     ];
-
-    //     // Locator will return all 3 migration classes as available
-    //     $this->locator->shouldReceive('getMigrations')->once()->andReturn($testMigrations);
-
-    //     // Repository will be asked to return the ran migrations and delete one
-    //     $this->repository->shouldReceive('get')->once()->andReturn($migrationObject);
-    //     $this->repository->shouldReceive('list')->once()->andReturn($testMigrations);
-    //     $this->repository->shouldReceive('delete')->times(1)->andReturn([]);
-
-    //     // SchemaBuilder will delete 1 table
-    //     $this->schema->shouldReceive('dropIfExists')->times(1)->andReturn([]);
-
-    //     // Connection will be asked for the SchemaGrammar
-    //     $grammar = m::mock(Grammar::class);
-    //     $this->connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-    //     $grammar->shouldReceive('supportsSchemaTransactions')->andReturn(false);
-
-    //     // Rollback only the Flights table. Should work as no other depends on it
-    //     $rolledback = $this->migrator->rollbackMigration($migration);
-
-    //     // The migration already ran shouldn't be in the pending ones
-    //     $this->assertEquals([$migration], $rolledback);
-    // }
-
-    /**
-     * Test a specific migration with some dependencies can be rolled back
-     */
-    // public function testMigratorRollbackSpecificWithDependencies()
-    // {
-    //     // The installed / available migrations
-    //     $testMigrations = [
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
-    //     ];
-
-    //     // Migration object for the one being deleted
-    //     $migration = '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable';
-    //     $migrationObject = (object) [
-    //         'migration' => $migration,
-    //     ];
-
-    //     // Locator will return all 3 migration classes as available
-    //     $this->locator->shouldReceive('getMigrations')->once()->andReturn($testMigrations);
-
-    //     // Repository will be asked to return the ran migrations and delete one
-    //     $this->repository->shouldReceive('get')->once()->andReturn($migrationObject);
-    //     $this->repository->shouldReceive('list')->once()->andReturn($testMigrations);
-    //     $this->repository->shouldNotReceive('delete');
-
-    //     // SchemaBuilder will delete 1 table
-    //     $this->schema->shouldNotReceive('dropIfExists');
-
-    //     // Connection will be asked for the SchemaGrammar
-    //     $grammar = m::mock(Grammar::class);
-    //     $this->connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-    //     $grammar->shouldReceive('supportsSchemaTransactions')->andReturn(false);
-
-    //     // Rollback only the user table. Should fail as the flight table depends on it
-    //     $this->expectException(\Exception::class);
-    //     $rolledback = $this->migrator->rollbackMigration($migration);
-    // }
-
-    /**
-     * Test where one of the installed migration is not in the available migration classes
-     */
-    // public function testMigratorResetAllInstalledMigrations()
-    // {
-    //     // The migrations set
-    //     $testMigrations = [
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreateUsersTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\one\\CreatePasswordResetsTable',
-    //         '\\UserFrosting\\Tests\\Integration\\Migrations\\two\\CreateFlightsTable',
-    //     ];
-
-    //     // Locator will return all 3 migration classes
-    //     $this->locator->shouldReceive('getMigrations')->once()->andReturn($testMigrations);
-
-    //     // Repository will be asked to return the ran migrations (all of them),
-    //     // then asked to delete all 3 of them
-    //     $this->repository->shouldReceive('list')->twice()->andReturn($testMigrations);
-    //     $this->repository->shouldReceive('delete')->times(3)->andReturn([]);
-
-    //     // SchemaBuilder will drop all 3 tables
-    //     $this->schema->shouldReceive('dropIfExists')->times(3)->andReturn([]);
-
-    //     // Connection will be asked for the SchemaGrammar
-    //     $grammar = m::mock(Grammar::class);
-    //     $this->connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-    //     $grammar->shouldReceive('supportsSchemaTransactions')->andReturn(false);
-
-    //     // Reset migrations
-    //     $migrations = $this->migrator->reset();
-
-    //     // All the migrations should have been rolledback
-    //     $this->assertEquals(array_reverse($testMigrations), $migrations);
-    // }
+        $this->expectException(MigrationDependencyNotMetException::class);
+        $migrator->pretendToReset();
+    }
 }
