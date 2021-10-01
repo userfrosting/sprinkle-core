@@ -16,6 +16,16 @@ namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 interface MigrationRepositoryInterface
 {
     /**
+     * Get list of migrations, with all details regarding batch and cie.
+     *
+     * @param int|null $steps Number of batch to return. Null to return all.
+     * @param bool     $asc   True for ascending order, false for descending.
+     *
+     * @return object
+     */
+    public function all(?int $steps = null, bool $asc = true): object;
+
+    /**
      * Get the list of ran migrations.
      *
      * @param int|null $steps Number of batch to return. Null to return all.

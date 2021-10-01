@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,6 +29,9 @@ class MigrateStatusCommand extends Command
 
     /** @Inject */
     protected Migrator $migrator;
+
+    /** @Inject */
+    protected Capsule $db;
 
     /**
      * {@inheritdoc}
@@ -48,26 +52,23 @@ class MigrateStatusCommand extends Command
         $this->io->title('Migration status');
 
         // Set connection to the selected database
-        $this->migrator->setConnection($input->getOption('database'));
-
-        // Get ran migrations. If repository doesn't exist, there's no ran
-        if (!$this->migrator->repositoryExists()) {
-            $ran = collect();
-        } else {
-            $ran = $this->migrator->getRepository()->getMigrations(); // TODO : Should be list, not getMigrations in Interface
+        $database = $input->getOption('database');
+        if ($database != '') {
+            $this->io->note("Running {$this->getName()} with `$database` database connection");
+            $this->db->getDatabaseManager()->setDefaultConnection($database);
         }
 
-        // Get available migrations and calculate pending one
-        $available = $this->migrator->getAvailableMigrations();
-        $pending = $this->migrator->getPendingMigrations();
+        // Get installed, available and pending migrations.
+        $installed = $this->migrator->getRepository()->all();
+        $available = $this->migrator->getAvailable();
+        $pending = $this->migrator->getPending();
 
         // Display ran migrations
         $this->io->section('Installed migrations');
-        if ($ran->count() > 0) {
-            $this->io->table(
-                ['Migration', 'Available?', 'Batch'],
-                $this->getStatusFor($ran, $available)
-            );
+        if (count($installed) > 0) {
+            $headers = ['Migration', 'Available?', 'Batch'];
+            $rows = $this->getRows($installed, $available);
+            $this->io->table($headers, $rows);
         } else {
             $this->io->note('No installed migrations');
         }
@@ -87,21 +88,21 @@ class MigrateStatusCommand extends Command
      * Return an array of [migration, available] association.
      * A migration is available if it's in the available stack (class is in the Filesystem).
      *
-     * @param Collection $ran       The ran migrations
-     * @param array      $available The available migrations
+     * @param array $installed   The ran migrations
+     * @param array $isAvailable The available migrations
      *
      * @return array An array of [migration, available] association
      */
-    protected function getStatusFor(Collection $ran, array $available)
+    protected function getRows(Collection $installed, array $isAvailable): array
     {
-        return collect($ran)->map(function ($migration) use ($available) {
-            if (in_array($migration->migration, $available)) {
-                $available = '<info>Yes</info>';
+        return $installed->map(function ($migration) use ($isAvailable) {
+            if (in_array($migration->migration, $isAvailable)) {
+                $isAvailable = '<info>Yes</info>';
             } else {
-                $available = '<fg=red>No</fg=red>';
+                $isAvailable = '<fg=red>No</fg=red>';
             }
 
-            return [$migration->migration, $available, $migration->batch];
+            return [$migration->migration, $isAvailable, $migration->batch];
         })->toArray();
     }
 }

@@ -32,6 +32,8 @@ use UserFrosting\Sprinkle\Core\Bakery\SetupEnvCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupSmtpCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
+use UserFrosting\Sprinkle\Core\Database\Migrations\v400\SessionsTable;
+use UserFrosting\Sprinkle\Core\Database\Migrations\v400\ThrottlesTable;
 use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
 use UserFrosting\Sprinkle\Core\Routes\AssetsRoutes;
@@ -193,6 +195,9 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe
 
     public static function getMigrations(): array
     {
-        return [];
+        return [
+            SessionsTable::class,
+            ThrottlesTable::class,
+        ];
     }
 }

@@ -42,14 +42,14 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
-     * Get list of migrations.
+     * Get list of migrations, with all details regarding batch and cie.
      *
      * @param int|null $steps Number of batch to return. Null to return all.
      * @param bool     $asc   True for ascending order, false for descending.
      *
      * @return Collection Collection of migration from db in the order they where ran
      */
-    public function getMigrations(?int $steps = null, bool $asc = true): Collection
+    public function all(?int $steps = null, bool $asc = true): Collection
     {
         $query = $this->getTable();
 
@@ -68,7 +68,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function list(?int $steps = null, bool $asc = true): array
     {
-        return $this->getMigrations($steps, $asc)->pluck('migration')->all();
+        return $this->all($steps, $asc)->pluck('migration')->all();
     }
 
     /**
