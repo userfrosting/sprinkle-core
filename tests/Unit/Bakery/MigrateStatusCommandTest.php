@@ -10,8 +10,10 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\DatabaseManager;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery as m;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
@@ -26,6 +28,9 @@ class MigrateStatusCommandTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
+    /**
+     * Warning: Test doesn't assert output. Only served for coverage check (line is executed)
+     */
     public function testBasicMigrationsCallMigratorWithProperArguments(): void
     {
         // Define dummy data
@@ -33,16 +38,16 @@ class MigrateStatusCommandTest extends TestCase
         $pending = ['oof', 'rab'];
 
         // Setup repository mock
-        $repository = m::mock(DatabaseMigrationRepository::class);
-        $repository->shouldReceive('getMigrations')->once()->andReturn($this->getInstalledMigrationStub());
+        $repository = Mockery::mock(DatabaseMigrationRepository::class)
+            ->shouldReceive('all')->once()->andReturn($this->getInstalledMigrationStub())
+            ->getMock();
 
         // Setup migrator mock
-        $migrator = m::mock(Migrator::class);
-        $migrator->shouldReceive('setConnection')->once()->with(null)->andReturn(null);
-        $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
-        $migrator->shouldReceive('getRepository')->once()->andReturn($repository);
-        $migrator->shouldReceive('getAvailableMigrations')->once()->andReturn($available);
-        $migrator->shouldReceive('getPendingMigrations')->once()->andReturn($pending);
+        $migrator = Mockery::mock(Migrator::class)
+            ->shouldReceive('getRepository')->once()->andReturn($repository)
+            ->shouldReceive('getAvailable')->once()->andReturn($available)
+            ->shouldReceive('getPending')->once()->andReturn($pending)
+            ->getMock();
 
         // Run command
         $ci = ContainerStub::create();
@@ -59,29 +64,107 @@ class MigrateStatusCommandTest extends TestCase
         $pending = ['oof', 'rab'];
 
         // Setup repository mock
-        $repository = m::mock(DatabaseMigrationRepository::class);
-        $repository->shouldReceive('getMigrations')->once()->andReturn($this->getInstalledMigrationStub());
+        $repository = Mockery::mock(DatabaseMigrationRepository::class)
+            ->shouldReceive('all')->once()->andReturn($this->getInstalledMigrationStub())
+            ->getMock();
 
         // Setup migrator mock
-        $migrator = m::mock(Migrator::class);
-        $migrator->shouldReceive('setConnection')->once()->with('test')->andReturn(null);
-        $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
-        $migrator->shouldReceive('getRepository')->once()->andReturn($repository);
-        $migrator->shouldReceive('getAvailableMigrations')->once()->andReturn($available);
-        $migrator->shouldReceive('getPendingMigrations')->once()->andReturn($pending);
+        $migrator = Mockery::mock(Migrator::class)
+            ->shouldReceive('getRepository')->once()->andReturn($repository)
+            ->shouldReceive('getAvailable')->once()->andReturn($available)
+            ->shouldReceive('getPending')->once()->andReturn($pending)
+            ->getMock();
+
+        // Set Capsule Mock, and expectations
+        $databaseManager = Mockery::mock(DatabaseManager::class)
+            ->shouldReceive('setDefaultConnection')->with('test')->once()
+            ->getMock();
+        $capsule = Mockery::mock(Capsule::class)
+            ->shouldReceive('getDatabaseManager')->once()->andReturn($databaseManager)
+            ->getMock();
 
         // Run command
         $ci = ContainerStub::create();
         $ci->set(Migrator::class, $migrator);
+        $ci->set(Capsule::class, $capsule);
+        $ci->set(DatabaseManager::class, $databaseManager);
         $command = $ci->get(MigrateStatusCommand::class);
-        BakeryTester::runCommand($command, ['--database' => 'test']);
+        $result = BakeryTester::runCommand($command, ['--database' => 'test']);
+
+        // Assert some output
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('Running migrate:status with `test` database connection', $result->getDisplay());
+    }
+
+    /**
+     * @depends testBasicMigrationsCallMigratorWithProperArguments
+     */
+    public function testNoMigrations(): void
+    {
+        // Define dummy data
+        $available = [];
+        $pending = [];
+
+        // Setup repository mock
+        $repository = Mockery::mock(DatabaseMigrationRepository::class)
+            ->shouldReceive('all')->once()->andReturn(collect([]))
+            ->getMock();
+
+        // Setup migrator mock
+        $migrator = Mockery::mock(Migrator::class)
+            ->shouldReceive('getRepository')->once()->andReturn($repository)
+            ->shouldReceive('getAvailable')->once()->andReturn($available)
+            ->shouldReceive('getPending')->once()->andReturn($pending)
+            ->getMock();
+
+        // Run command
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $ci->set(DatabaseMigrationRepository::class, $repository);
+        $command = $ci->get(MigrateStatusCommand::class);
+        $result = BakeryTester::runCommand($command);
+
+        // Assert some output
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('No installed migrations', $result->getDisplay());
+        $this->assertStringContainsString('No pending migrations', $result->getDisplay());
+    }
+
+    /**
+     * @depends testBasicMigrationsCallMigratorWithProperArguments
+     * Warning: Test doesn't assert output. Only served for coverage check (line is executed)
+     */
+    public function testUnavailableMigrations(): void
+    {
+        // Define dummy data
+        $available = [];
+        $pending = [];
+
+        // Setup repository mock
+        $repository = Mockery::mock(DatabaseMigrationRepository::class)
+            ->shouldReceive('all')->once()->andReturn($this->getInstalledMigrationStub())
+            ->getMock();
+
+        // Setup migrator mock
+        $migrator = Mockery::mock(Migrator::class)
+            ->shouldReceive('getRepository')->once()->andReturn($repository)
+            ->shouldReceive('getAvailable')->once()->andReturn($available)
+            ->shouldReceive('getPending')->once()->andReturn($pending)
+            ->getMock();
+
+        // Run command
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $ci->set(DatabaseMigrationRepository::class, $repository);
+        $command = $ci->get(MigrateStatusCommand::class);
+        BakeryTester::runCommand($command);
     }
 
     protected function getInstalledMigrationStub()
     {
         return collect([
-            (object) ['migration' => 'foo', 'batch' => 1, 'sprinkle' => 'foo'],
-            (object) ['migration' => 'bar', 'batch' => 2, 'sprinkle' => 'bar'],
+            (object) ['migration' => 'foo', 'batch' => 1],
+            (object) ['migration' => 'bar', 'batch' => 2],
         ]);
     }
 }
