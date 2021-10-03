@@ -16,8 +16,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
-use UserFrosting\Sprinkle\Core\Bakery\Helper\ConfirmableTrait;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * migrate Bakery Command
@@ -25,7 +27,6 @@ use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
  */
 class MigrateCommand extends Command
 {
-    use ConfirmableTrait;
     use WithSymfonyStyle;
 
     /** @Inject */
@@ -33,6 +34,9 @@ class MigrateCommand extends Command
 
     /** @Inject */
     protected Capsule $db;
+
+    /** @Inject */
+    protected Config $config;
 
     /**
      * {@inheritdoc}
@@ -53,17 +57,46 @@ class MigrateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->io->title("UserFrosting's Migrator");
+        $this->io->title('Database Migrator');
 
         // Get options
         $pretend = $input->getOption('pretend');
         $step = $input->getOption('step');
+        $force = $input->getOption('force');
 
-        // Get migrator
-        $migrator = $this->setupMigrator($input);
+        // Set connection to the selected database
+        $database = $input->getOption('database');
+        if ($database != '') {
+            $this->io->info("Running {$this->getName()} with `$database` database connection");
+            $this->db->getDatabaseManager()->setDefaultConnection($database);
+        }
 
+        // Switch to pretend if requested
+        if ($pretend) {
+            return $this->executePretendToMigrate();
+        }
+
+        return $this->executeMigrate($step, $force);
+    }
+
+    /**
+     * Run migrate.
+     *
+     * @param bool $step
+     * @param bool $force Force command to run without confirmation
+     *
+     * @return int Symfony exit code
+     */
+    protected function executeMigrate(bool $step, bool $force): int
+    {
         // Get pending migrations
-        $pending = $migrator->getPending();
+        try {
+            $pending = $this->migrator->getPending();
+        } catch (MigrationDependencyNotMetException|MigrationNotFoundException $e) {
+            $this->io->error("Database migration can't be performed. " . $e->getMessage());
+
+            return self::FAILURE;
+        }
 
         // Don't go further if no migration is pending
         if (empty($pending)) {
@@ -72,48 +105,40 @@ class MigrateCommand extends Command
             return self::SUCCESS;
         }
 
-        // Show migrations about to be ran when in production mode
-        //TODO : Reimplement production status
-        // if ($this->isProduction()) {
-            $this->io->section('Pending migrations');
-            $this->io->listing($pending);
-
-            // Confirm action when in production mode
-            if (!$this->confirmToProceed($input->getOption('force'))) {
-                exit(1);
-            }
-        // }
-
-        // Run migration
-        try {
-            if ($pretend) {
-                $migrated = $migrator->migrate($step);
-            } else {
-                $migrated = $migrator->pretendToMigrate();
-            }
-        } catch (\Exception $e) {
-            // $this->displayNotes($migrator);
-            $this->io->error($e->getMessage());
-            exit(1);
-
-            /*
-            $messages = ['Unfulfillable migrations found :: '];
-            foreach ($unfulfillable as $migration => $dependency) {
-                $messages[] = "=> $migration (Missing dependency : $dependency)";
-            }
-
-            throw new \Exception(implode("\n", $messages));
-            */
+        // Display steps in verbose mode.
+        if ($this->io->isVerbose()) {
+            $this->io->info('Using individual steps : ' . (($step) ? 'Yes' : 'No'));
         }
 
-        // Get notes and display them
-        // $this->displayNotes($migrator);
+        // Show migrations about to be ran
+        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+            $this->io->section('Pending migrations');
+            $this->io->listing($pending);
+        }
 
-        // If all went well, there's no fatal errors and we have migrated
-        // something, show some success
+        // Confirm action if required (for example in production mode).
+        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+            if (!$this->io->confirm('Do you really wish to continue ?', false)) {
+                return self::SUCCESS;
+            }
+        }
+
+        // Perform migrations.
+        try {
+            $migrated = $this->migrator->migrate($step);
+        } catch (\Exception $e) {
+            $this->io->error($e->getMessage());
+
+            return self::FAILURE;
+        }
+
         if (empty($migrated)) {
+            // N.B.: Should not happens, only if pending get empty while
+            // waiting for confirmation
             $this->io->warning('Nothing migrated !');
         } else {
+            $this->io->section('Migrations applied : ');
+            $this->io->listing($migrated);
             $this->io->success('Migration successful !');
         }
 
@@ -121,44 +146,29 @@ class MigrateCommand extends Command
     }
 
     /**
-     * Setup migrator and the shared options between other command.
+     * Run the migrate in pretend mode.
      *
-     * @param InputInterface $input
-     *
-     * @return Migrator The migrator instance
+     * @return int Symfony exit code
      */
-    protected function setupMigrator(InputInterface $input)
+    protected function executePretendToMigrate(): int
     {
-        // Set connection to the selected database
-        $database = $input->getOption('database');
-        if ($database != '') {
-            $this->io->note("Running {$this->getName()} with `$database` database connection");
-            $this->db->getDatabaseManager()->setDefaultConnection($database);
+        $this->io->note("Running {$this->getName()} in pretend mode");
+
+        // Get pretend queries
+        try {
+            $data = $this->migrator->pretendToMigrate();
+        } catch (\Exception $e) {
+            $this->io->error("Database migration can't be performed. " . $e->getMessage());
+
+            return self::FAILURE;
         }
 
-        // Make sure repository exist. Should be done in ServicesProvider,
-        // but if we change connection, it might not exist
-        if (!$this->migrator->repositoryExists()) {
-            $this->migrator->getRepository()->create();
+        // Display information
+        foreach ($data as $migration => $queries) {
+            $this->io->section($migration);
+            $this->io->listing(array_column($queries, 'query'));
         }
 
-        // Show note if pretending
-        if ($input->hasOption('pretend') && $input->getOption('pretend')) {
-            $this->io->note("Running {$this->getName()} in pretend mode");
-        }
-
-        return $this->migrator;
-    }
-
-    /**
-     * Display migrator notes.
-     *
-     * @param Migrator $migrator
-     */
-    protected function displayNotes(Migrator $migrator)
-    {
-        if (!empty($notes = $migrator->getNotes())) {
-            $this->io->writeln($notes);
-        }
+        return self::SUCCESS;
     }
 }

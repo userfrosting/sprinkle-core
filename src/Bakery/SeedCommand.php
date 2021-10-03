@@ -26,7 +26,7 @@ use UserFrosting\Sprinkle\Core\Database\Seeder\Seeder;
  */
 class SeedCommand extends Command
 {
-    use ConfirmableTrait;
+    // use ConfirmableTrait; // TODO
 
     /**
      * @var Seeder

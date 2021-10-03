@@ -63,6 +63,18 @@ return [
 
     /*
     * ----------------------------------------------------------------------
+    * Bakery Config
+    * ----------------------------------------------------------------------
+    * `confirm_sensitive_command` set to true will ask for confirmation before 
+    * running some sensitive bakery commands, such as database altering 
+    * migrations.
+    */
+    'bakery' => [
+        'confirm_sensitive_command' => false,
+    ],
+
+    /*
+    * ----------------------------------------------------------------------
     * Cache Service Config
     * ----------------------------------------------------------------------
     * Redis & Memcached driver configuration

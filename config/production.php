@@ -19,6 +19,12 @@ return [
         'use_raw' => false,
     ],
     /*
+     * `confirm_sensitive_command` in production mode
+     */
+    'bakery' => [
+        'confirm_sensitive_command' => true,
+    ],
+    /*
      * Enable Twig cache
      */
     'cache' => [

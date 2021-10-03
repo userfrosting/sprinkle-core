@@ -77,7 +77,7 @@ class DebugCommand extends Command
         $this->io->definitionList(
             ['UserFrosting version'  => \UserFrosting\VERSION], // TODO Rethink usefulness of this. Might need to move to sprinkle list, with each sprinkle having it's own version.
             ['OS Name'              => php_uname('s')],
-            ['Main Sprinkle Root'   => $this->sprinkleManager->getMainSprinkle()::getPath()],
+            ['Main Sprinkle Path'   => $this->sprinkleManager->getMainSprinkle()::getPath()],
             ['Environment mode'     => env('UF_MODE', 'default')],
             ['PHP Version'          => $this->phpVersionValidator->getInstalled()],
             ['Node Version'         => $this->nodeVersionValidator->getInstalled()],

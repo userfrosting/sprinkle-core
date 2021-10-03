@@ -12,8 +12,8 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\DatabaseManager;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
