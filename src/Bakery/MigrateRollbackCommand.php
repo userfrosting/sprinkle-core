@@ -10,16 +10,34 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * migrate:rollback Bakery Command
  * Rollback the last migrations ran against the database.
  */
-class MigrateRollbackCommand extends MigrateCommand
+class MigrateRollbackCommand extends Command
 {
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected Migrator $migrator;
+
+    /** @Inject */
+    protected Capsule $db;
+
+    /** @Inject */
+    protected Config $config;
+
     /**
      * {@inheritdoc}
      */
@@ -39,62 +57,138 @@ class MigrateRollbackCommand extends MigrateCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->io->title('Migration rollback');
+        $this->io->title('Database Migration Rollback');
 
         // Get options
-        $steps = $input->getOption('steps');
+        $steps = (int) $input->getOption('steps');
         $pretend = $input->getOption('pretend');
         $migration = $input->getOption('migration');
+        $force = $input->getOption('force');
 
-        // Get migrator
-        $migrator = $this->setupMigrator($input);
-
-        // Get pending migrations
-        $ran = $migration ? [$migration] : $migrator->getRanMigrations($steps);
-
-        // Don't go further if no migration is ran
-        if (empty($ran)) {
-            $this->io->success('Nothing to rollback');
-            exit(1);
+        // Set connection to the selected database
+        $database = $input->getOption('database');
+        if ($database != '') {
+            $this->io->info("Running {$this->getName()} with `$database` database connection");
+            $this->db->getDatabaseManager()->setDefaultConnection($database);
         }
 
-        // Show migrations about to be reset when in production mode
-        //TODO : Reimplement production status
-        /*if ($this->isProduction()) {
-            $this->io->section('Migrations to rollback');
-            $this->io->listing($ran);
+        // TODO : Do single $migration...
+        // validateRollbackMigration
 
-            // Confirm action when in production mode
-            if (!$this->confirmToProceed($input->getOption('force'))) {
-                exit(1);
-            }
-        }*/
+        // Display steps in verbose mode.
+        if ($this->io->isVerbose()) {
+            $this->io->info("Rolling back $steps step(s)");
+        }
 
-        // Rollback migrations
+        // Switch to pretend if requested
+        if ($pretend) {
+            return $this->executePretendToRollback($steps);
+        }
+
+        return $this->executeRollback($steps, $force);
+    }
+
+    /**
+     * Run migrate.
+     *
+     * @param int  $steps
+     * @param bool $force Force command to run without confirmation
+     *
+     * @return int Symfony exit code
+     */
+    protected function executeRollback(int $steps, bool $force): int
+    {
+        // Get migrations for rollback
         try {
-            // If we have a specific to rollback, do this. Otherwise, do a normal rollback
-            if ($migration) {
-                $migrated = $migrator->rollbackMigration($migration, ['pretend' => $pretend]);
-            } else {
-                $migrated = $migrator->rollback(['pretend' => $pretend, 'steps' => $steps]);
-            }
-        } catch (\Exception $e) {
-            $this->displayNotes($migrator);
-            $this->io->error($e->getMessage());
-            exit(1);
+            $migrations = $this->migrator->getMigrationsForRollback($steps);
+        } catch (MigrationDependencyNotMetException|MigrationNotFoundException $e) {
+            $this->io->error("Database rollback can't be performed. " . $e->getMessage());
+
+            return self::FAILURE;
         }
 
-        // Get notes and display them
-        $this->displayNotes($migrator);
+        // Don't go further if no migration to rollback
+        if (empty($migrations)) {
+            $this->io->success('Nothing to rollback');
 
-        // If all went well, there's no fatal errors and we have migrated
-        // something, show some success
-        if (empty($migrated)) {
-            $this->io->warning('Nothing was rolled back !');
+            return self::SUCCESS;
+        }
+
+        // Show migrations about to be rollback
+        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+            $this->io->section('Migrations to rollback');
+            $this->io->listing($migrations);
+        }
+
+        // Confirm action if required (for example in production mode).
+        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+            if (!$this->io->confirm('Do you really wish to continue ?', false)) {
+                return self::SUCCESS;
+            }
+        }
+
+        // Perform rollback.
+        try {
+            $rollbacked = $this->migrator->rollback($steps);
+        } catch (\Exception $e) {
+            $this->io->error($e->getMessage());
+
+            return self::FAILURE;
+        }
+
+        if (empty($rollbacked)) {
+            // N.B.: Should not happens, only if tow operation get executed
+            // while waiting for confirmation.
+            $this->io->warning('Nothing rollbacked !');
         } else {
+            $this->io->section('Migrations rollbacked : ');
+            $this->io->listing($rollbacked);
             $this->io->success('Rollback successful !');
         }
 
         return self::SUCCESS;
     }
+
+    // protected function executeMigrationRollback($migration): int
+    // {
+
+    // }
+
+    /**
+     * Run the migrate in pretend mode.
+     *
+     * @return int Symfony exit code
+     */
+    protected function executePretendToRollback(int $steps): int
+    {
+        $this->io->note("Running {$this->getName()} in pretend mode");
+
+        // Get pretend queries
+        try {
+            $data = $this->migrator->pretendToRollback($steps);
+        } catch (\Exception $e) {
+            $this->io->error("Database rollback can't be performed. " . $e->getMessage());
+
+            return self::FAILURE;
+        }
+
+        if (empty($data)) {
+            $this->io->success('Nothing to rollback');
+
+            return self::SUCCESS;
+        }
+
+        // Display information
+        foreach ($data as $migration => $queries) {
+            $this->io->section($migration);
+            $this->io->listing(array_column($queries, 'query'));
+        }
+
+        return self::SUCCESS;
+    }
+
+    // protected function executePretendToMigrationRollback($migration): int
+    // {
+
+    // }
 }

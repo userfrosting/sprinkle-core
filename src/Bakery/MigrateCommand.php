@@ -163,6 +163,12 @@ class MigrateCommand extends Command
             return self::FAILURE;
         }
 
+        if (empty($data)) {
+            $this->io->success('Nothing to migrate');
+
+            return self::SUCCESS;
+        }
+
         // Display information
         foreach ($data as $migration => $queries) {
             $this->io->section($migration);

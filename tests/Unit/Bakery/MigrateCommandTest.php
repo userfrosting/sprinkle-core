@@ -318,6 +318,23 @@ class MigrateCommandTest extends TestCase
         $this->assertStringContainsString('create table "foorbar"', $display);
     }
 
+    public function testPretendMigrateWithNoPending(): void
+    {
+        $migrator = Mockery::mock(Migrator::class)
+            ->shouldReceive('pretendToMigrate')->once()->andReturn([])
+            ->getMock();
+
+        // Set mock in CI and run command
+        $ci = ContainerStub::create();
+        $ci->set(Migrator::class, $migrator);
+        $command = $ci->get(MigrateCommand::class);
+        $result = BakeryTester::runCommand($command, input: ['--pretend' => true]);
+
+        // Assert some output
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('Nothing to migrate', $result->getDisplay());
+    }
+
     public function testPretendMigrateWithIssue(): void
     {
         $migrator = Mockery::mock(Migrator::class)
