@@ -42,7 +42,7 @@ class SeedCommand extends Command
              ->setDescription('Seed the database with records')
              ->setHelp('This command runs a seed to populate the database with default, random and/or test data.')
              ->addArgument('class', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The class name of the seeder. Separate multiple seeder with a space.')
-             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run when in production.');
+             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run without confirmation.');
     }
 
     /**

@@ -45,8 +45,8 @@ class MigrateRollbackCommand extends Command
     {
         $this->setName('migrate:rollback')
              ->setDescription('Rollback last database migration')
-             ->addOption('pretend', 'p', InputOption::VALUE_NONE, 'Run migrations in "dry run" mode.')
-             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run when in production.')
+             ->addOption('pretend', 'p', InputOption::VALUE_NONE, 'Run actions in "dry run" mode.')
+             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run without confirmation.')
              ->addOption('database', 'd', InputOption::VALUE_REQUIRED, 'The database connection to use.')
              ->addOption('migration', 'm', InputOption::VALUE_REQUIRED, 'The specific migration to rollback.')
              ->addOption('steps', 's', InputOption::VALUE_REQUIRED, 'Number of batch to rollback.', 1);

@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/UserFrosting/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Bakery;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\DatabaseManager;

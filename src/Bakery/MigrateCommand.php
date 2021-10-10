@@ -46,8 +46,8 @@ class MigrateCommand extends Command
         $this->setName('migrate')
              ->setDescription('Perform database migration')
              ->setHelp('This command runs all the pending database migrations.')
-             ->addOption('pretend', 'p', InputOption::VALUE_NONE, 'Run migrations in "dry run" mode.')
-             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run when in production.')
+             ->addOption('pretend', 'p', InputOption::VALUE_NONE, 'Run actions in "dry run" mode.')
+             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run without confirmation.')
              ->addOption('database', 'd', InputOption::VALUE_REQUIRED, 'The database connection to use.')
              ->addOption('step', 's', InputOption::VALUE_NONE, 'Migrations will be run so they can be rolled back individually.');
     }
@@ -63,9 +63,9 @@ class MigrateCommand extends Command
         $pretend = $input->getOption('pretend');
         $step = $input->getOption('step');
         $force = $input->getOption('force');
+        $database = $input->getOption('database');
 
         // Set connection to the selected database
-        $database = $input->getOption('database');
         if ($database != '') {
             $this->io->info("Running {$this->getName()} with `$database` database connection");
             $this->db->getDatabaseManager()->setDefaultConnection($database);

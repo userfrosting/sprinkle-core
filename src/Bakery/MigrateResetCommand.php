@@ -10,16 +10,34 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * migrate:reset Bakery Command
  * Reset the database to a clean state.
  */
-class MigrateResetCommand extends MigrateCommand
+class MigrateResetCommand extends Command
 {
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected Migrator $migrator;
+
+    /** @Inject */
+    protected Capsule $db;
+
+    /** @Inject */
+    protected Config $config;
+
     /**
      * {@inheritdoc}
      */
@@ -27,9 +45,8 @@ class MigrateResetCommand extends MigrateCommand
     {
         $this->setName('migrate:reset')
              ->setDescription('Reset the whole database to an empty state, rolling back all migrations.')
-             ->addOption('pretend', 'p', InputOption::VALUE_NONE, 'Run migrations in "dry run" mode.')
-             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run when in production.')
-             ->addOption('hard', null, InputOption::VALUE_NONE, 'Force drop all tables in the database, even if they were not created or listed by the migrator')
+             ->addOption('pretend', 'p', InputOption::VALUE_NONE, 'Run actions in "dry run" mode.')
+             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run without confirmation.')
              ->addOption('database', 'd', InputOption::VALUE_REQUIRED, 'The database connection to use.');
     }
 
@@ -38,109 +55,128 @@ class MigrateResetCommand extends MigrateCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->io->title('Migration reset');
+        $this->io->title('Database Migration Reset');
 
-        // Check if the hard option is used
-        if ($input->getOption('hard')) {
-            $this->performHardReset($input);
-        } else {
-            $this->performReset($input);
+        // Get options
+        $pretend = $input->getOption('pretend');
+        $force = $input->getOption('force');
+        $database = $input->getOption('database');
+
+        // Set connection to the selected database
+        if ($database != '') {
+            $this->io->info("Running {$this->getName()} with `$database` database connection");
+            $this->db->getDatabaseManager()->setDefaultConnection($database);
         }
 
-        return self::SUCCESS;
+        // Check if the hard option is used
+        if ($pretend) {
+            return $this->pretendReset();
+        } else {
+            return $this->performReset($force);
+        }
     }
 
     /**
      * Reset the whole database to an empty state by rolling back all migrations.
      *
-     * @param InputInterface $input
+     * @param bool $force Force command to run without confirmation.
+     *
+     * @return int Symfony exit code
      */
-    protected function performReset(InputInterface $input)
+    protected function performReset(bool $force): int
     {
-        // Get options
-        $pretend = $input->getOption('pretend');
-
-        // Get migrator
-        $migrator = $this->setupMigrator($input);
-
-        // Get pending migrations
-        $ran = $migrator->getRanMigrations(); // getInstalled
-
-        // Don't go further if no migration is ran
-        if (empty($ran)) {
-            $this->io->success('Nothing to reset');
-            exit(1);
-        }
-
-        // Show migrations about to be reset when in production mode
-        //TODO : Reimplement production status
-        /*if ($this->isProduction()) {
-            $this->io->section('Migrations to rollback');
-            $this->io->listing($ran);
-
-            // Confirm action when in production mode
-            if (!$this->confirmToProceed($input->getOption('force'))) {
-                exit(1);
-            }
-        }*/
-
-        // Reset migrator
+        // Get migrations for reset
         try {
-            $resetted = $migrator->reset($pretend);
-        } catch (\Exception $e) {
-            $this->displayNotes($migrator);
-            $this->io->error($e->getMessage());
-            exit(1);
+            $migrations = $this->migrator->getMigrationsForReset();
+        } catch (MigrationDependencyNotMetException|MigrationNotFoundException $e) {
+            $this->io->error("Database reset can't be performed. " . $e->getMessage());
+
+            return self::FAILURE;
         }
 
-        // Get notes and display them
-        $this->displayNotes($migrator);
+        // Don't go further if no migration to reset
+        if (empty($migrations)) {
+            $this->io->success('Nothing to reset');
+
+            return self::SUCCESS;
+        }
+
+        // Show migrations about to be reset
+        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+            $this->io->section('Migrations to reset');
+            $this->io->listing($migrations);
+        }
+
+        // Confirm action if required (for example in production mode).
+        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+            if (!$this->io->confirm('Do you really wish to continue ?', false)) {
+                return self::SUCCESS;
+            }
+        }
+
+        // Perform rollback.
+        try {
+            $rollbacked = $this->migrator->reset();
+        } catch (\Exception $e) {
+            $this->io->error($e->getMessage());
+
+            return self::FAILURE;
+        }
+
+        if (empty($rollbacked)) {
+            // N.B.: Should not happens, only if tow operation get executed
+            // while waiting for confirmation.
+            $this->io->warning('Nothing was reset !');
+
+            return self::SUCCESS;
+        }
 
         // Delete the repository
-        if (!$pretend && $migrator->repositoryExists()) {
-            $this->io->writeln('<info>Deleting migration repository</info>');
-            $migrator->getRepository()->delete();
+        if ($this->migrator->repositoryExists()) {
+            if ($this->io->isVerbose()) {
+                $this->io->writeln('<info>> Deleting migration repository</info>');
+            }
+            $this->migrator->getRepository()->delete();
         }
 
-        // If all went well, there's no fatal errors and we have migrated
-        // something, show some success
-        if (empty($resetted)) {
-            $this->io->warning('Nothing was reset !');
-        } else {
-            $this->io->success('Reset successful !');
-        }
+        // Show success
+        $this->io->section('Migrations reset : ');
+        $this->io->listing($rollbacked);
+        $this->io->success('Reset successful !');
+
+        return self::SUCCESS;
     }
 
     /**
-     * Hard reset the whole database to an empty state by dropping all tables.
+     * Run the migrate in pretend mode.
      *
-     * @param InputInterface $input
+     * @return int Symfony exit code
      */
-    protected function performHardReset(InputInterface $input)
+    protected function pretendReset(): int
     {
-        // Get current connection
-        $database = ($input->getOption('database')) ?: $this->db->getDatabaseManager()->getDefaultConnection();
+        $this->io->note("Running {$this->getName()} in pretend mode");
 
-        // Confirm action
-        $this->io->warning("This will drop all existing tables from the `$database` database, including tables not managed by bakery. All data will be lost! You have been warned!");
-        if (!$this->io->confirm('Do you really wish to run this command?', false)) {
-            $this->io->comment('Command Cancelled!');
-            exit(1);
+        // Get pretend queries
+        try {
+            $data = $this->migrator->pretendToReset();
+        } catch (\Exception $e) {
+            $this->io->error("Database reset can't be performed. " . $e->getMessage());
+
+            return self::FAILURE;
         }
 
-        // Get schema Builder
-        $connection = $this->db->connection($database);
-        $schema = $connection->getSchemaBuilder();
+        if (empty($data)) {
+            $this->io->success('Nothing to reset');
 
-        // Get a list of all tables
-        $tables = $connection->select('SHOW TABLES');
-        foreach (array_map('reset', $tables) as $table) {
-            $this->io->writeln("Dropping table `$table`...");
-
-            // Perform drop
-            $schema->drop($table);
+            return self::SUCCESS;
         }
 
-        $this->io->success('Hard reset successful !');
+        // Display information
+        foreach ($data as $migration => $queries) {
+            $this->io->section($migration);
+            $this->io->listing(array_column($queries, 'query'));
+        }
+
+        return self::SUCCESS;
     }
 }

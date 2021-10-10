@@ -21,6 +21,7 @@ use UserFrosting\Sprinkle\Core\Bakery\LocaleInfoCommand;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateCommand;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateRefreshCommand;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateResetCommand;
+use UserFrosting\Sprinkle\Core\Bakery\MigrateResetHardCommand;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateRollbackCommand;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
 use UserFrosting\Sprinkle\Core\Bakery\RouteListCommand;
@@ -99,6 +100,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe
             MigrateCommand::class,
             MigrateRefreshCommand::class,
             MigrateResetCommand::class,
+            MigrateResetHardCommand::class,
             MigrateRollbackCommand::class,
             MigrateStatusCommand::class,
             RouteListCommand::class,
