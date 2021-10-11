@@ -18,6 +18,7 @@ use UserFrosting\Sprinkle\Core\Bakery\DebugCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleCompareCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleDictionaryCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleInfoCommand;
+use UserFrosting\Sprinkle\Core\Bakery\MigrateCleanCommand;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateCommand;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateRefreshCommand;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateResetCommand;
@@ -98,6 +99,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe
             LocaleDictionaryCommand::class,
             LocaleInfoCommand::class,
             MigrateCommand::class,
+            MigrateCleanCommand::class,
             MigrateRefreshCommand::class,
             MigrateResetCommand::class,
             MigrateResetHardCommand::class,

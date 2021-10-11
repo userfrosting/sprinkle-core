@@ -14,24 +14,28 @@ use Illuminate\Support\Collection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 
 /**
  * migrate:clean Bakery Command
  * Remove stale migrations from the database.
- *
- * @author Amos Folz
  */
 class MigrateCleanCommand extends MigrateCommand
 {
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected Migrator $migrator;
+    
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this->setName('migrate:clean')
-             ->setDescription('Remove stale migrations from the database.')
-             ->setHelp('Removes stale migrations, which are simply migration class files that have been removed from the Filesystem. E.g. if you run a migration and then delete the migration class file prior to running `down()` for that migration it becomes stale. If a migration is a dependency of another migration you probably want to try to restore the files instead of running this command to avoid further issues.')
+             ->setDescription('Remove stale migrations from the repository.')
+             ->setHelp('Removes stale migrations from the repository that are not available as a class. E.g. if you run a migration and then delete the migration class file prior to running `down()` for that migration, it becomes stale. This should be used as a last resort. If a migration is a dependency of another migration you probably want to try to restore the files instead of running this command to avoid further issues.')
              ->addOption('database', 'd', InputOption::VALUE_REQUIRED, 'The database connection to use.')
              ->addOption('force', 'f', InputOption::VALUE_NONE, 'Do not prompt for confirmation.');
     }
@@ -43,72 +47,49 @@ class MigrateCleanCommand extends MigrateCommand
     {
         $this->io->title('Migration clean');
 
-        // Get migrator
-        $migrator = $this->ci->migrator;
+        // Get options
+        $database = $input->getOption('database');
+        $force = $input->getOption('force');
 
         // Set connection to the selected database
-        $migrator->setConnection($input->getOption('database'));
-
-        // Get ran migrations. If repository doesn't exist, there's no ran
-        if (!$migrator->repositoryExists()) {
-            $ran = collect();
-        } else {
-            $ran = $migrator->getRepository()->getMigrations(); // TODO : Should be list, not getMigrations in Interface
+        if ($database != '') {
+            $this->io->info("Running {$this->getName()} with `$database` database connection");
+            $this->db->getDatabaseManager()->setDefaultConnection($database);
         }
 
-        // Get available migrations
-        $available = $migrator->getAvailableMigrations();
+        // Get stale migrations
+        $stale = $this->migrator->getStale();
 
-        $stale = $this->getStaleRecords($ran, $available);
+        if (empty($stale)) {
+            $this->io->note('No stale migrations found');
 
-        if ($stale->count() > 0) {
-            if (!$input->getOption('force')) {
-                $this->io->section('Stale migrations');
-                $this->io->listing($stale->toArray());
+            return self::SUCCESS;
+        }
 
-                if (!$this->io->confirm('Continue and remove stale migrations?', false)) {
-                    exit;
-                }
+        // Show migrations about to be ran
+        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+            $this->io->section('Stale migrations');
+            $this->io->listing($stale);
+        }
+
+        // Confirm action if required (for example in production mode).
+        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+            if (!$this->io->confirm('Continue and remove stale migrations ?', false)) {
+                return self::SUCCESS;
             }
-            $this->io->section('Cleaned migrations');
-            $this->cleanStaleRecords($stale, $migrator);
-            $this->io->listing($stale->toArray());
-        } else {
-            $this->io->note('No stale migrations');
         }
 
-        return self::SUCCESS;
-    }
-
-    /**
-     * Delete stale migrations from the database.
-     *
-     * @param Collection $stale    Collection of stale migration classes.
-     * @param Migrator   $migrator Migrator object
-     */
-    protected function cleanStaleRecords(Collection $stale, Migrator $migrator)
-    {
-        $migrationRepository = $migrator->getRepository();
+        // Remove stale migration from repo
+        $repository = $this->migrator->getRepository();
 
         //Delete the stale migration classes from the database.
-        $stale->each(function ($class) use ($migrationRepository) {
-            $migrationRepository->delete($class);
-        });
-    }
+        foreach ($stale as $migration) {
+            $this->io->writeln("> Removing `$migration`...");
+            $repository->remove($migration);
+        }
+        
+        $this->io->section('Stale migrations removed from repository');
 
-    /**
-     * Return an array of stale migrations.
-     * A migration is stale if not found in the available stack (class is not in the Filesystem).
-     *
-     * @param Collection $ran       The ran migrations
-     * @param array      $available The available migrations
-     *
-     * @return Collection Collection of stale migration classes.
-     */
-    protected function getStaleRecords(Collection $ran, array $available)
-    {
-        return  $filtered = collect($ran)->filter(function ($migration) use ($available) {
-            return !in_array($migration->migration, $available);
-        })->pluck('migration');
+        return self::SUCCESS;
     }
 }
