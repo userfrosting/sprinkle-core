@@ -12,21 +12,20 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Support\Exception\BadRequestException;
-use UserFrosting\Support\Repository\Repository as Config;
 
-// TODO : Somehow tables are not created on CI. Migration might not be run up or bad schemaName used somewhere ?
 class DatabaseTests extends TestCase
 {
     use TestDatabase;
 
     /**
-     * @var string
+     * @var Builder
      */
-    protected string $schemaName;
+    protected Builder $schema;
 
     /**
      * Setup the database schema.
@@ -36,27 +35,28 @@ class DatabaseTests extends TestCase
         // Boot parent TestCase, which will set up the database and connections for us.
         parent::setUp();
 
-        // Fetch services from CI
-        $config = $this->ci->get(Config::class);
+        // Setup test database
+        $this->setupTestDatabase();
 
-        // Set Schema name property from config
-        $this->schemaName = $config->get('testing.dbConnection');
+        // Alias schema Builder
+        $this->schema = $this->ci->get(Builder::class);
 
+        // Create tests tables
         $this->createSchema();
     }
 
     /**
      * createSchema
      */
-    protected function createSchema()
+    protected function createSchema(): void
     {
-        $this->schema($this->schemaName)->create('users', function (Blueprint $table) {
+        $this->schema->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
         });
 
         // Users have multiple email addresses
-        $this->schema($this->schemaName)->create('emails', function (Blueprint $table) {
+        $this->schema->create('emails', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->string('label');
@@ -64,7 +64,7 @@ class DatabaseTests extends TestCase
         });
 
         // Users have multiple phones (polymorphic - other entities can have phones as well)
-        $this->schema($this->schemaName)->create('phones', function (Blueprint $table) {
+        $this->schema->create('phones', function (Blueprint $table) {
             $table->increments('id');
             $table->string('label');
             $table->string('number', 20);
@@ -72,45 +72,45 @@ class DatabaseTests extends TestCase
         });
 
         // Users have multiple roles... (m:m)
-        $this->schema($this->schemaName)->create('role_users', function (Blueprint $table) {
+        $this->schema->create('role_users', function (Blueprint $table) {
             $table->integer('user_id')->unsigned();
             $table->integer('role_id')->unsigned();
         });
 
-        $this->schema($this->schemaName)->create('roles', function (Blueprint $table) {
+        $this->schema->create('roles', function (Blueprint $table) {
             $table->increments('id');
             $table->string('slug');
         });
 
         // And Roles have multiple permissions... (m:m)
-        $this->schema($this->schemaName)->create('permission_roles', function (Blueprint $table) {
+        $this->schema->create('permission_roles', function (Blueprint $table) {
             $table->integer('permission_id')->unsigned();
             $table->integer('role_id')->unsigned();
         });
 
-        $this->schema($this->schemaName)->create('permissions', function ($table) {
+        $this->schema->create('permissions', function ($table) {
             $table->increments('id');
             $table->string('slug');
         });
 
         // A user can be assigned to a specific task at a specific location
-        $this->schema($this->schemaName)->create('tasks', function ($table) {
+        $this->schema->create('tasks', function ($table) {
             $table->increments('id');
             $table->string('name');
         });
 
-        $this->schema($this->schemaName)->create('locations', function ($table) {
+        $this->schema->create('locations', function ($table) {
             $table->increments('id');
             $table->string('name');
         });
 
-        $this->schema($this->schemaName)->create('assignments', function ($table) {
+        $this->schema->create('assignments', function ($table) {
             $table->integer('task_id')->unsigned();
             $table->integer('location_id')->unsigned();
             $table->morphs('assignable');
         });
 
-        $this->schema($this->schemaName)->create('jobs', function ($table) {
+        $this->schema->create('jobs', function ($table) {
             $table->integer('user_id')->unsigned();
             $table->integer('location_id')->unsigned();
             $table->integer('role_id')->unsigned();
@@ -123,27 +123,43 @@ class DatabaseTests extends TestCase
      */
     public function tearDown(): void
     {
-        $this->schema($this->schemaName)->drop('users');
-        $this->schema($this->schemaName)->drop('emails');
-        $this->schema($this->schemaName)->drop('phones');
-        $this->schema($this->schemaName)->drop('role_users');
-        $this->schema($this->schemaName)->drop('roles');
-        $this->schema($this->schemaName)->drop('permission_roles');
-        $this->schema($this->schemaName)->drop('permissions');
-        $this->schema($this->schemaName)->drop('tasks');
-        $this->schema($this->schemaName)->drop('locations');
-        $this->schema($this->schemaName)->drop('assignments');
-        $this->schema($this->schemaName)->drop('jobs');
+        $this->schema->drop('users');
+        $this->schema->drop('emails');
+        $this->schema->drop('phones');
+        $this->schema->drop('role_users');
+        $this->schema->drop('roles');
+        $this->schema->drop('permission_roles');
+        $this->schema->drop('permissions');
+        $this->schema->drop('tasks');
+        $this->schema->drop('locations');
+        $this->schema->drop('assignments');
+        $this->schema->drop('jobs');
 
         Relation::morphMap([], false);
 
         parent::tearDown();
     }
 
+    public function testTableCreation(): void
+    {
+        $this->assertTrue($this->schema->hasTable('users'));
+        $this->assertTrue($this->schema->hasTable('emails'));
+        $this->assertTrue($this->schema->hasTable('phones'));
+        $this->assertTrue($this->schema->hasTable('role_users'));
+        $this->assertTrue($this->schema->hasTable('roles'));
+        $this->assertTrue($this->schema->hasTable('permission_roles'));
+        $this->assertTrue($this->schema->hasTable('permissions'));
+        $this->assertTrue($this->schema->hasTable('tasks'));
+        $this->assertTrue($this->schema->hasTable('locations'));
+        $this->assertTrue($this->schema->hasTable('assignments'));
+        $this->assertTrue($this->schema->hasTable('jobs'));
+    }
+
     /**
+     * @depends testTableCreation
      * testOneToManyRelationship
      */
-    public function testOneToManyRelationship()
+    public function testOneToManyRelationship(): void
     {
         $user = EloquentTestUser::create(['name' => 'David']);
         $user->emails()->create([
@@ -164,9 +180,10 @@ class DatabaseTests extends TestCase
     }
 
     /**
+     * @depends testTableCreation
      * Tests our custom HasManySyncable class.
      */
-    public function testSyncOneToMany()
+    public function testSyncOneToMany(): void
     {
         $user = EloquentTestUser::create(['name' => 'David']);
         // Set up original emails
@@ -212,9 +229,10 @@ class DatabaseTests extends TestCase
     }
 
     /**
+     * @depends testTableCreation
      * Tests our custom MorphManySyncable class.
      */
-    public function testSyncMorphMany()
+    public function testSyncMorphMany(): void
     {
         $user = EloquentTestUser::create(['name' => 'David']);
         // Set up original phones
@@ -262,9 +280,10 @@ class DatabaseTests extends TestCase
     }
 
     /**
+     * @depends testTableCreation
      * testBelongsToManyUnique
      */
-    public function testBelongsToManyUnique()
+    public function testBelongsToManyUnique(): void
     {
         $user = EloquentTestUser::create(['name' => 'David']);
 
@@ -301,9 +320,10 @@ class DatabaseTests extends TestCase
 
     /**
      * testMorphsToManyUnique
+     * @depends testTableCreation
      * @depends testBelongsToManyUnique
      */
-    public function testMorphsToManyUnique()
+    public function testMorphsToManyUnique(): void
     {
         $user = EloquentTestUser::create(['name' => 'David']);
         $user2 = EloquentTestUser::create(['name' => 'Alex']);
@@ -343,9 +363,10 @@ class DatabaseTests extends TestCase
 
     /**
      * testMorphsToManyUniqueWithTertiary
+     * @depends testTableCreation
      * @depends testMorphsToManyUnique
      */
-    public function testMorphsToManyUniqueWithTertiary()
+    public function testMorphsToManyUniqueWithTertiary(): void
     {
         $user = EloquentTestUser::create(['name' => 'David']);
         $user2 = EloquentTestUser::create(['name' => 'Alex']);
@@ -413,9 +434,10 @@ class DatabaseTests extends TestCase
 
     /**
      * testBelongsToManyUniqueWithTertiary
+     * @depends testTableCreation
      * @depends testBelongsToManyUnique
      */
-    public function testBelongsToManyUniqueWithTertiary()
+    public function testBelongsToManyUniqueWithTertiary(): void
     {
         $user = EloquentTestUser::create(['name' => 'David']);
 
@@ -486,9 +508,10 @@ class DatabaseTests extends TestCase
 
     /**
      * testBelongsToManyUniqueWithTertiaryEagerLoad
+     * @depends testTableCreation
      * @depends testBelongsToManyUniqueWithTertiary
      */
-    public function testBelongsToManyUniqueWithTertiaryEagerLoad()
+    public function testBelongsToManyUniqueWithTertiaryEagerLoad(): void
     {
         $user1 = EloquentTestUser::create(['name' => 'David']);
         $user2 = EloquentTestUser::create(['name' => 'Alex']);
@@ -578,9 +601,10 @@ class DatabaseTests extends TestCase
     }
 
     /**
+     * @depends testTableCreation
      * Test the ability of a BelongsToManyThrough relationship to retrieve structured data on a single model or set of models.
      */
-    public function testBelongsToManyThrough()
+    public function testBelongsToManyThrough(): void
     {
         $this->generateRolesWithPermissions();
 
@@ -669,9 +693,10 @@ class DatabaseTests extends TestCase
 
     /**
      * Test the ability of a BelongsToManyThrough relationship to retrieve and count paginated queries.
+     * @depends testTableCreation
      * @depends testBelongsToManyThrough
      */
-    public function testBelongsToManyThroughPaginated()
+    public function testBelongsToManyThroughPaginated(): void
     {
         $this->generateRolesWithPermissions();
 
@@ -706,9 +731,10 @@ class DatabaseTests extends TestCase
     /**
      * Test the ability of a BelongsToManyThrough relationship to retrieve and count paginated queries,
      * when we need to reference a virtual/computed column (for example in a sort).
+     * @depends testTableCreation
      * @depends testBelongsToManyThrough
      */
-    public function testBelongsToManyThroughPaginatedWithOrderByAggregateColumn()
+    public function testBelongsToManyThroughPaginatedWithOrderByAggregateColumn(): void
     {
         $this->generateRolesWithPermissions();
 
@@ -736,9 +762,10 @@ class DatabaseTests extends TestCase
     /**
      * Test the ability of a BelongsToManyThrough relationship to retrieve structured data on a single model or set of models,
      * eager loading the "via" models at the same time.
+     * @depends testTableCreation
      * @depends testBelongsToManyThrough
      */
-    public function testBelongsToManyThroughWithVia()
+    public function testBelongsToManyThroughWithVia(): void
     {
         $this->generateRolesWithPermissions();
 
@@ -767,9 +794,10 @@ class DatabaseTests extends TestCase
     }
 
     /**
+     * @depends testTableCreation
      * testQueryExclude
      */
-    public function testQueryExclude()
+    public function testQueryExclude(): void
     {
         $this->generateRoles();
         $this->generateJobs();
@@ -783,9 +811,10 @@ class DatabaseTests extends TestCase
 
     /**
      * testQueryExcludeOnJoinedTable
+     * @depends testTableCreation
      * @depends testQueryExclude
      */
-    public function testQueryExcludeOnJoinedTable()
+    public function testQueryExcludeOnJoinedTable(): void
     {
         $this->generateRolesWithPermissions();
 
@@ -830,9 +859,10 @@ class DatabaseTests extends TestCase
 
     /**
      * testQueryExcludeUseQualifiedNamesOnJoinedTable
+     * @depends testTableCreation
      * @depends testQueryExclude
      */
-    public function testQueryExcludeUseQualifiedNamesOnJoinedTable()
+    public function testQueryExcludeUseQualifiedNamesOnJoinedTable(): void
     {
         $this->generateRolesWithPermissions();
 
@@ -873,9 +903,10 @@ class DatabaseTests extends TestCase
 
     /**
      * testQueryExcludeWildcard
+     * @depends testTableCreation
      * @depends testQueryExclude
      */
-    public function testQueryExcludeWildcard()
+    public function testQueryExcludeWildcard(): void
     {
         $this->generateRoles();
         $this->generateJobs();
@@ -899,9 +930,10 @@ class DatabaseTests extends TestCase
     }
 
     /**
+     * @depends testTableCreation
      * testFindInt
      */
-    public function testFindInt()
+    public function testFindInt(): void
     {
         $this->generateTasks();
         $task = EloquentTestTask::findInt(1);
@@ -910,9 +942,10 @@ class DatabaseTests extends TestCase
     }
 
     /**
+     * @depends testTableCreation
      * testFindIntThrowsExceptionOnNull
      */
-    public function testFindIntThrowsExceptionOnNull()
+    public function testFindIntThrowsExceptionOnNull(): void
     {
         $this->generateTasks();
         $this->expectException(BadRequestException::class);
@@ -920,9 +953,10 @@ class DatabaseTests extends TestCase
     }
 
     /**
+     * @depends testTableCreation
      * testFindIntThrowsExceptionOnNonInteger
      */
-    public function testFindIntThrowsExceptionOnNonInteger()
+    public function testFindIntThrowsExceptionOnNonInteger(): void
     {
         $this->generateTasks();
         $this->expectException(BadRequestException::class);
@@ -934,31 +968,9 @@ class DatabaseTests extends TestCase
      */
 
     /**
-     * Get a database connection instance.
-     *
-     * @param  string                          $connection [description]
-     * @return \Illuminate\Database\Connection
-     */
-    protected function connection($connection = 'test_integration')
-    {
-        return Model::getConnectionResolver()->connection($connection);
-    }
-
-    /**
-     * Get a schema builder instance.
-     *
-     * @param  string                              $connection
-     * @return \Illuminate\Database\Schema\Builder
-     */
-    protected function schema($connection = 'test_integration')
-    {
-        return $this->connection($connection)->getSchemaBuilder();
-    }
-
-    /**
      * generateRoles
      */
-    protected function generateRoles()
+    protected function generateRoles(): array
     {
         return [
             EloquentTestRole::create([
@@ -981,7 +993,7 @@ class DatabaseTests extends TestCase
     /**
      * generatePermissions
      */
-    protected function generatePermissions()
+    protected function generatePermissions(): array
     {
         return [
             EloquentTestPermission::create([
@@ -1009,7 +1021,7 @@ class DatabaseTests extends TestCase
     /**
      * generateRolesWithPermissions
      */
-    protected function generateRolesWithPermissions()
+    protected function generateRolesWithPermissions(): array
     {
         $roles = $this->generateRoles();
 
@@ -1026,7 +1038,7 @@ class DatabaseTests extends TestCase
     /**
      * generateJobs
      */
-    protected function generateJobs()
+    protected function generateJobs(): array
     {
 
         /*
@@ -1071,7 +1083,7 @@ class DatabaseTests extends TestCase
     /**
      * generateLocations
      */
-    protected function generateLocations()
+    protected function generateLocations(): array
     {
         return [
             EloquentTestLocation::create([
@@ -1089,7 +1101,7 @@ class DatabaseTests extends TestCase
     /**
      * generateTasks
      */
-    protected function generateTasks()
+    protected function generateTasks(): array
     {
         return [
             EloquentTestTask::create([
@@ -1112,7 +1124,7 @@ class DatabaseTests extends TestCase
     /**
      * generateAssignments
      */
-    protected function generateAssignments()
+    protected function generateAssignments(): array
     {
         return [
             EloquentTestAssignment::create([
@@ -1152,7 +1164,7 @@ class DatabaseTests extends TestCase
      * assertBelongsToManyThroughForDavid
      * @param array $permissions
      */
-    protected function assertBelongsToManyThroughForDavid($permissions)
+    protected function assertBelongsToManyThroughForDavid(array $permissions)
     {
         // User should have effective permissions uri_harvest, uri_spit_acid, and uri_slash.
         // We also check that the 'roles_via' relationship is properly set.
@@ -1203,7 +1215,7 @@ class DatabaseTests extends TestCase
      * assertBelongsToManyThroughForAlex
      * @param array $permissions
      */
-    protected function assertBelongsToManyThroughForAlex($permissions)
+    protected function assertBelongsToManyThroughForAlex(array $permissions)
     {
         // User should have effective permissions uri_spit_acid, uri_slash, and uri_royal_jelly.
         // We also check that the 'roles_via' relationship is properly set.
@@ -1256,7 +1268,6 @@ class DatabaseTests extends TestCase
  */
 class EloquentTestModel extends Model
 {
-    protected $connection = 'test_integration';
 }
 
 class EloquentTestUser extends EloquentTestModel
