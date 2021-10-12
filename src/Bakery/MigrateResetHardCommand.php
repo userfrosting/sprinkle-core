@@ -20,7 +20,7 @@ use UserFrosting\Bakery\WithSymfonyStyle;
 /**
  * migrate:reset:hard Bakery Command
  * Reset the database to a clean state by dropping all table instead of
- * rollback migrations
+ * rollback migrations.
  */
 class MigrateResetHardCommand extends Command
 {

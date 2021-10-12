@@ -124,7 +124,7 @@ class DebugCommand extends Command
     }
 
     /**
-     * List all sprinkles defined in the Sprinkles schema file
+     * List all sprinkles defined in the Sprinkles schema file.
      *
      * @param InputInterface  $input
      * @param OutputInterface $output

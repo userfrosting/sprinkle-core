@@ -17,7 +17,7 @@ use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
 
 /**
- * Migrator utility used to manage and run database migrations
+ * Migrator utility used to manage and run database migrations.
  */
 class Migrator
 {
@@ -36,7 +36,7 @@ class Migrator
     }
 
     /**
-     * Get installed migrations
+     * Get installed migrations.
      *
      * @return string[] An array of migration class names in the order they where ran.
      */
@@ -211,8 +211,9 @@ class Migrator
     /**
      * Test if a migration can be rollback.
      *
-     * @param  string                     $migration
-     * @param  string[]                   $installed
+     * @param string   $migration
+     * @param string[] $installed
+     *
      * @throws MigrationRollbackException If something prevent migration to be rollback
      */
     public function validateRollbackMigration(string $migration, ?array $installed = null): void

@@ -20,7 +20,7 @@ use Illuminate\Support\Collection;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException;
 
 /**
- * Repository used to store all migrations run against the database
+ * Repository used to store all migrations run against the database.
  */
 class DatabaseMigrationRepository implements MigrationRepositoryInterface
 {
@@ -240,7 +240,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
-     * Get the migration table name
+     * Get the migration table name.
      *
      * @return string
      */
@@ -250,7 +250,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
-     * Set the migration table name
+     * Set the migration table name.
      *
      * @param string $tableName The migration table name
      *
