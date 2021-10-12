@@ -96,7 +96,7 @@ class MigrateCleanCommand extends Command
             $repository->remove($migration);
         }
 
-        $this->io->section('Stale migrations removed from repository');
+        $this->io->success('Stale migrations removed from repository');
 
         return self::SUCCESS;
     }
