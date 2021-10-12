@@ -73,8 +73,8 @@ jobs:
     - name: Install Dependencies
       run: composer install --prefer-dist --no-progress
     
-    # - name: Bakery Debug
-    #   run: php bakery debug
+    - name: Bakery Debug
+      run: php bakery debug
 
     # - name: Migrate DB
     #   run: php bakery migrate
@@ -141,8 +141,8 @@ jobs:
           mkdir -p database
           touch database/database.sqlite
       
-      # - name: Bakery Debug
-      #   run: php bakery debug
+      - name: Bakery Debug
+        run: php bakery debug
 
       # - name: Migrate DB
       #   run: php bakery migrate
@@ -215,8 +215,8 @@ jobs:
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress
       
-      # - name: Bakery Debug
-      #   run: php bakery debug
+      - name: Bakery Debug
+        run: php bakery debug
 
       # - name: Migrate DB
       #   run: php bakery migrate
@@ -275,8 +275,8 @@ jobs:
         mkdir -p database
         touch database/database.sqlite
 
-    # - name: Bakery Debug
-    #   run: php bakery debug
+    - name: Bakery Debug
+      run: php bakery debug
 
     # - name: Migrate DB
     #   run: php bakery migrate
