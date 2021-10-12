@@ -10,24 +10,32 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
-use Illuminate\Support\Collection;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * migrate:clean Bakery Command
  * Remove stale migrations from the database.
  */
-class MigrateCleanCommand extends MigrateCommand
+class MigrateCleanCommand extends Command
 {
     use WithSymfonyStyle;
 
     /** @Inject */
     protected Migrator $migrator;
-    
+
+    /** @Inject */
+    protected Capsule $db;
+
+    /** @Inject */
+    protected Config $config;
+
     /**
      * {@inheritdoc}
      */
@@ -87,7 +95,7 @@ class MigrateCleanCommand extends MigrateCommand
             $this->io->writeln("> Removing `$migration`...");
             $repository->remove($migration);
         }
-        
+
         $this->io->section('Stale migrations removed from repository');
 
         return self::SUCCESS;

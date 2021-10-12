@@ -48,8 +48,8 @@ class MigrateRollbackCommand extends Command
              ->addOption('pretend', 'p', InputOption::VALUE_NONE, 'Run actions in "dry run" mode.')
              ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run without confirmation.')
              ->addOption('database', 'd', InputOption::VALUE_REQUIRED, 'The database connection to use.')
-             ->addOption('migration', 'm', InputOption::VALUE_REQUIRED, 'The specific migration to rollback.')
-             ->addOption('steps', 's', InputOption::VALUE_REQUIRED, 'Number of batch to rollback.', 1);
+             ->addOption('steps', 's', InputOption::VALUE_REQUIRED, 'Number of batch to rollback.', 1)
+             ->addOption('migration', 'm', InputOption::VALUE_REQUIRED, 'The specific migration to rollback.');
     }
 
     /**
