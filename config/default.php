@@ -133,6 +133,12 @@ return [
     *
     * Multiple connections can also be used.
     * See Laravel docs : https://laravel.com/docs/5.8/database
+    * TODO : Change reference, add config for migration table, default connection.
+    *        Rename "default" to "mysql", and other "just like Laravel". Move into "connections" thing.
+    *        Add "DB_CONNECTION" env.
+    *        Might move "develop" mode to here, with "develop" connection?
+    *        Change "testing.dbConnection" for simply the db connection.
+    *        SEE: https://github.com/laravel/laravel/blob/8.x/config/database.php
     */
     'db' => [
         'default' => [
