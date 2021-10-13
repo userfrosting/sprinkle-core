@@ -17,7 +17,6 @@ use UserFrosting\Session\Session;
 use UserFrosting\Sprinkle\Core\Database\Models\Session as SessionTable;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Sprinkle\Core\Tests\RefreshDatabase;
-use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Sprinkle\Core\Tests\withDatabaseSessionHandler;
 use UserFrosting\Support\Repository\Repository as Config;
 
@@ -28,7 +27,6 @@ use UserFrosting\Support\Repository\Repository as Config;
 //        The service itself should be tested in a separate test case and focus only on the logic used to determine which Handler is used.
 class SessionDatabaseHandlerTest extends TestCase
 {
-    use TestDatabase;
     use RefreshDatabase;
     use withDatabaseSessionHandler;
 
@@ -39,7 +37,6 @@ class SessionDatabaseHandlerTest extends TestCase
     {
         parent::setUp();
 
-        $this->setupTestDatabase();
         $this->refreshDatabase();
 
         // Set service alias

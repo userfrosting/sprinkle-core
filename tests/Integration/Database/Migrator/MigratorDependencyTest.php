@@ -15,7 +15,6 @@ use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
-use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Testing\TestCase;
 
 /**
@@ -24,8 +23,6 @@ use UserFrosting\Testing\TestCase;
  */
 class MigratorDependencyTest extends TestCase
 {
-    use TestDatabase;
-
     protected string $mainSprinkle = TestMigrationSprinkle::class;
 
     protected MigrationRepositoryInterface $repository;
@@ -33,9 +30,6 @@ class MigratorDependencyTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        // Setup test database
-        $this->setupTestDatabase();
 
         // Add installed
         /** @var MigrationRepositoryInterface */

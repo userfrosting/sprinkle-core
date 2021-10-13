@@ -24,10 +24,7 @@ return [
      * Define in memory db for testing
      */
     'db' => [
-        'test_integration' => [
-            'driver'    => 'sqlite',
-            'database'  => ':memory:',
-        ],
+        'default' => env('DB_TEST_CONNECTION', 'memory'),
     ],
     /*
      * Don't log deprecations in tests
@@ -62,11 +59,5 @@ return [
      */
     'session' => [
         'handler' => env('TEST_SESSION_HANDLER', 'array'),
-    ],
-    /*
-     * Database to use when using the TestDatabase Trait
-     */
-    'testing' => [
-        'dbConnection' => env('TEST_DB', 'test_integration'),
     ],
 ];

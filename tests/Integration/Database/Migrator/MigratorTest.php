@@ -17,7 +17,6 @@ use UserFrosting\Sprinkle\Core\Database\Migration;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
-use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\TestCase;
 
@@ -26,8 +25,6 @@ use UserFrosting\Testing\TestCase;
  */
 class MigratorTest extends TestCase
 {
-    use TestDatabase;
-
     protected string $mainSprinkle = TestMigrateSprinkle::class;
 
     /**
@@ -42,9 +39,6 @@ class MigratorTest extends TestCase
     {
         // Boot parent TestCase, which will set up the database and connections for us.
         parent::setUp();
-
-        // Setup test database
-        $this->setupTestDatabase();
 
         // Alias schema Builder
         $this->schema = $this->ci->get(Builder::class);

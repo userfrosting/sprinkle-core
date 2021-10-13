@@ -13,20 +13,14 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
-use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 
 /**
  * DatabaseMigrationRepository Test
  */
 class DatabaseMigrationRepositoryTest extends TestCase
 {
-    use TestDatabase;
-
     public function testRepository(): void
     {
-        // Setup test database
-        $this->setupTestDatabase();
-
         $db = $this->ci->get(Capsule::class);
         $repository = new DatabaseMigrationRepository($db, 'migrationTest');
 

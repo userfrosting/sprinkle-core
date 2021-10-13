@@ -15,13 +15,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
-use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Support\Exception\BadRequestException;
 
 class DatabaseTests extends TestCase
 {
-    use TestDatabase;
-
     /**
      * @var Builder
      */
@@ -34,9 +31,6 @@ class DatabaseTests extends TestCase
     {
         // Boot parent TestCase, which will set up the database and connections for us.
         parent::setUp();
-
-        // Setup test database
-        $this->setupTestDatabase();
 
         // Alias schema Builder
         $this->schema = $this->ci->get(Builder::class);

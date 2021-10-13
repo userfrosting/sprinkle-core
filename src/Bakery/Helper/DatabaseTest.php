@@ -10,7 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery\Helper;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Connection;
 
 /**
  * Database Test Trait. Include method to test the db connection
@@ -18,10 +18,10 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 trait DatabaseTest
 {
     /** @Inject */
-    protected Capsule $capsule;
+    protected Connection $connection;
 
     /**
-     * Function to test the db connection.
+     * Test database connection directly using PDO.
      *
      * TODO : Change Exception
      * @throws \Exception
@@ -29,17 +29,10 @@ trait DatabaseTest
      */
     protected function testDB(): bool
     {
-        // Check params are valid
-        $dbParams = $this->config->get('db.default');
-        if (!$dbParams) {
-            throw new \Exception("'default' database connection not found.  Please double-check your configuration.");
-        }
-
-        // Test database connection directly using PDO
         try {
-            $this->capsule::connection()->getPdo();
+            $this->connection->getPdo();
         } catch (\PDOException $e) {
-            $message = "Could not connect to the database '{$dbParams['username']}@{$dbParams['host']}/{$dbParams['database']}':" . PHP_EOL;
+            $message = "Could not connect to the database '" . $this->connection->getName() . "' connection" . PHP_EOL;
             $message .= 'Exception: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
             $message .= 'Please check your database configuration and/or google the exception shown above and run command again.';
             throw new \Exception($message);

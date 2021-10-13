@@ -12,6 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Tests;
 
 use DI\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Connection;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 
 /**
@@ -44,9 +45,9 @@ trait RefreshDatabase
      */
     public function usingInMemoryDatabase(): bool
     {
-        $connection = $this->ci->get(Capsule::class)->connection();
+        $connection = $this->ci->get(Connection::class);
 
-        return $connection->getDatabaseName() == ':memory:';
+        return $connection->getDatabaseName() === ':memory:';
     }
 
     /**

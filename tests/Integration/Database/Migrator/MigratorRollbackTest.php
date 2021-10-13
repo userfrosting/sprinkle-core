@@ -15,7 +15,6 @@ use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
-use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Testing\TestCase;
 
 /**
@@ -24,8 +23,6 @@ use UserFrosting\Testing\TestCase;
  */
 class MigratorRollbackTest extends TestCase
 {
-    use TestDatabase;
-
     protected string $mainSprinkle = TestRollbackMigrationSprinkle::class;
 
     protected MigrationRepositoryInterface $repository;
@@ -33,9 +30,6 @@ class MigratorRollbackTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        // Setup test database
-        $this->setupTestDatabase();
 
         // Add installed
         /** @var MigrationRepositoryInterface */

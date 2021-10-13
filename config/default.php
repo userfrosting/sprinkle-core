@@ -129,28 +129,66 @@ return [
     * Database Config
     * ----------------------------------------------------------------------
     * Settings for the default database connections. Actual config values
-    * should be store in environment variables
-    *
-    * Multiple connections can also be used.
-    * See Laravel docs : https://laravel.com/docs/5.8/database
-    * TODO : Change reference, add config for migration table, default connection.
-    *        Rename "default" to "mysql", and other "just like Laravel". Move into "connections" thing.
-    *        Add "DB_CONNECTION" env.
-    *        Might move "develop" mode to here, with "develop" connection?
-    *        Change "testing.dbConnection" for simply the db connection.
-    *        SEE: https://github.com/laravel/laravel/blob/8.x/config/database.php
+    * should be store in environment variables.
     */
     'db' => [
-        'default' => [
-            'driver'    => env('DB_DRIVER', 'mysql'),
-            'host'      => env('DB_HOST', 'localhost'),
-            'port'      => env('DB_PORT'),
-            'database'  => env('DB_NAME'),
-            'username'  => env('DB_USER'),
-            'password'  => env('DB_PASSWORD'),
-            'charset'   => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix'    => '',
+        'default'    => env('DB_CONNECTION', 'mysql'),
+
+        'connections' => [
+            'mysql' => [
+                'driver'    => 'mysql',
+                'url'       => env('DB_URL'),
+                'host'      => env('DB_HOST', 'localhost'),
+                'port'      => env('DB_PORT', '3306'),
+                'database'  => env('DB_NAME'),
+                'username'  => env('DB_USER'),
+                'password'  => env('DB_PASSWORD'),
+                'charset'   => 'utf8',
+                'collation' => 'utf8_unicode_ci',
+                'prefix'    => '',
+            ],
+
+            'sqlite' => [
+                'driver'                  => 'sqlite',
+                'url'                     => env('DB_URL'),
+                'database'                => env('DB_NAME', 'database.sqlite'),
+                'prefix'                  => '',
+                'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+            ],
+
+            'memory' => [
+                'driver'   => 'sqlite',
+                'database' => ':memory:',
+            ],
+
+            'pgsql' => [
+                'driver'         => 'pgsql',
+                'url'            => env('DB_URL'),
+                'host'           => env('DB_HOST', '127.0.0.1'),
+                'port'           => env('DB_PORT', '5432'),
+                'database'       => env('DB_NAME'),
+                'username'       => env('DB_USER'),
+                'password'       => env('DB_PASSWORD'),
+                'unix_socket'    => env('DB_SOCKET', ''),
+                'charset'        => 'utf8',
+                'prefix'         => '',
+                'prefix_indexes' => true,
+                'schema'         => 'public',
+                'sslmode'        => 'prefer',
+            ],
+
+            'sqlsrv' => [
+                'driver'         => 'sqlsrv',
+                'url'            => env('DATABASE_URL'),
+                'host'           => env('DB_HOST', 'localhost'),
+                'port'           => env('DB_PORT', '1433'),
+                'database'       => env('DB_NAME', 'forge'),
+                'username'       => env('DB_USER', 'forge'),
+                'password'       => env('DB_PASSWORD', ''),
+                'charset'        => 'utf8',
+                'prefix'         => '',
+                'prefix_indexes' => true,
+            ],
         ],
     ],
 

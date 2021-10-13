@@ -30,16 +30,20 @@ class DatabaseService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            // TODO Inject Query logger & Capsule & Dispatcher...
+            // TODO Inject Query logger & Dispatcher...
             Capsule::class => function (Config $config) {
                 $capsule = new Capsule();
 
-                foreach ($config['db'] as $name => $dbConfig) {
+                foreach ($config->get('db.connections') as $name => $dbConfig) {
                     $capsule->addConnection($dbConfig, $name);
                 }
 
-                $queryEventDispatcher = new Dispatcher(new Container());
+                // Set default connection
+                $connection = $config->get('db.default');
+                $capsule->getDatabaseManager()->setDefaultConnection($connection);
 
+                // Set Event Dispatcher
+                $queryEventDispatcher = new Dispatcher(new Container());
                 $capsule->setEventDispatcher($queryEventDispatcher);
 
                 // Register as global connection
@@ -73,8 +77,10 @@ class DatabaseService implements ServicesProviderInterface
                 return $connection->getSchemaBuilder();
             },
 
-            Connection::class => function (Capsule $db, Config $config) {
-                return $db->getConnection(/* TODO Add connection here from config */);
+            Connection::class => function (Capsule $db) {
+                $connection = $db->getDatabaseManager()->getDefaultConnection();
+
+                return $db->getConnection($connection);
             },
         ];
     }

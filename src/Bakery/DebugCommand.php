@@ -11,6 +11,7 @@
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
@@ -160,15 +161,20 @@ class DebugCommand extends Command
      */
     protected function showConfig(): void
     {
+        // Get connection
+        $connection = $this->config->get('db.default');
+
         // Display database info
         $this->io->title('Database config');
         $this->io->definitionList(
-            ['DRIVER'   => $this->config->get('db.default.driver')],
-            ['HOST'     => $this->config->get('db.default.host')],
-            ['PORT'     => $this->config->get('db.default.port')],
-            ['DATABASE' => $this->config->get('db.default.database')],
-            ['USERNAME' => $this->config->get('db.default.username')],
-            ['PASSWORD' => ($this->config->get('db.default.password') ? '*********' : '')]
+            ['CONNECTION'   => $connection],
+            new TableSeparator(),
+            ['DRIVER'       => $this->config->get('db.connections.' . $connection . '.driver')],
+            ['HOST'         => $this->config->get('db.connections.' . $connection . '.host')],
+            ['PORT'         => $this->config->get('db.connections.' . $connection . '.port')],
+            ['DATABASE'     => $this->config->get('db.connections.' . $connection . '.database')],
+            ['USERNAME'     => $this->config->get('db.connections.' . $connection . '.username')],
+            ['PASSWORD'     => ($this->config->get('db.connections.' . $connection . '.password') ? '*********' : '')]
         );
     }
 }

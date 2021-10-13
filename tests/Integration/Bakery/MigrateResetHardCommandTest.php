@@ -14,7 +14,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateResetHardCommand;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
-use UserFrosting\Sprinkle\Core\Tests\TestDatabase;
 use UserFrosting\Testing\BakeryTester;
 
 /**
@@ -22,20 +21,6 @@ use UserFrosting\Testing\BakeryTester;
  */
 class MigrateResetHardCommandTest extends CoreTestCase
 {
-    use TestDatabase;
-
-    /**
-     * Setup migration instances used for all tests
-     */
-    public function setUp(): void
-    {
-        // Boot parent TestCase, which will set up the database and connections for us.
-        parent::setUp();
-
-        // Setup test database
-        $this->setupTestDatabase();
-    }
-
     public function testPretendHardReset(): void
     {
         // Get and run command
