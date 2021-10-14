@@ -38,6 +38,11 @@ class MigratorDependencyTest extends TestCase
         $this->repository->log(StubAnalyserMigrationD::class, 2);
     }
 
+    public function tearDown(): void
+    {
+        $this->repository->delete();
+    }
+
     public function testConstruct(): Migrator
     {
         $analyser = $this->ci->get(Migrator::class);

@@ -67,12 +67,12 @@ trait RefreshDatabase
 
             // Refresh the Database. Rollback all migrations and start over
             $this->ci->get(Migrator::class)->reset();
-            $this->ci->get(Migrator::class)->run();
+            $this->ci->get(Migrator::class)->migrate();
 
             self::$migrated = true;
         }
 
-        $this->beginDatabaseTransaction();
+        // $this->beginDatabaseTransaction();
     }
 
     /**
