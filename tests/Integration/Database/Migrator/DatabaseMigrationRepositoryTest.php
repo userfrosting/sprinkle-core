@@ -60,7 +60,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertTrue($repository->has('foobar'));
         $migration = $repository->get('foobar');
         $this->assertSame('foobar', $migration->migration);
-        $this->assertSame('3', $migration->batch);
+        $this->assertSame(3, (int) $migration->batch);
 
         // Delete Migration
         $repository->remove('foobar');

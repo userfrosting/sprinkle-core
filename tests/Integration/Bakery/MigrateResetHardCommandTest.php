@@ -43,7 +43,6 @@ class MigrateResetHardCommandTest extends CoreTestCase
         $display = $result->getDisplay();
         $this->assertStringContainsString('Running migrate:reset:hard in pretend mode', $display);
         $this->assertStringContainsString('Dropping table `MigrateResetHardCommandTest`...', $display);
-        $this->assertStringContainsString('drop table "MigrateResetHardCommandTest"', $display);
         $this->assertTrue($schema->hasTable('MigrateResetHardCommandTest'));
 
         // Actually drop the table now
