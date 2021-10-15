@@ -42,6 +42,8 @@ class MigratorRollbackTest extends TestCase
 
     public function tearDown(): void
     {
+        parent::tearDown();
+
         $this->repository->delete();
     }
 

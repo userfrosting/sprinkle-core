@@ -40,6 +40,8 @@ class MigratorDependencyTest extends TestCase
 
     public function tearDown(): void
     {
+        parent::tearDown();
+
         $this->repository->delete();
     }
 

@@ -21,6 +21,17 @@ use UserFrosting\Testing\BakeryTester;
  */
 class MigrateResetHardCommandTest extends CoreTestCase
 {
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        // Drop table, in case test fails and table stays up.
+        $schema = $this->ci->get(Builder::class);
+        if ($schema->hasTable('migrate_reset_hard_command_test')) {
+            $schema->drop('migrate_reset_hard_command_test');
+        }
+    }
+
     public function testPretendHardReset(): void
     {
         // Get and run command
@@ -28,12 +39,12 @@ class MigrateResetHardCommandTest extends CoreTestCase
 
         // Create a table
         $schema = $this->ci->get(Builder::class);
-        $this->assertFalse($schema->hasTable('MigrateResetHardCommandTest'));
-        $schema->create('MigrateResetHardCommandTest', function (Blueprint $table) {
+        $this->assertFalse($schema->hasTable('migrate_reset_hard_command_test'));
+        $schema->create('migrate_reset_hard_command_test', function (Blueprint $table) {
             $table->id();
             $table->string('foo');
         });
-        $this->assertTrue($schema->hasTable('MigrateResetHardCommandTest'));
+        $this->assertTrue($schema->hasTable('migrate_reset_hard_command_test'));
 
         // Run command again
         $result = BakeryTester::runCommand($command, input: ['--pretend' => true]);
@@ -42,8 +53,8 @@ class MigrateResetHardCommandTest extends CoreTestCase
         $this->assertSame(0, $result->getStatusCode());
         $display = $result->getDisplay();
         $this->assertStringContainsString('Running migrate:reset:hard in pretend mode', $display);
-        $this->assertStringContainsString('Dropping table `MigrateResetHardCommandTest`...', $display);
-        $this->assertTrue($schema->hasTable('MigrateResetHardCommandTest'));
+        $this->assertStringContainsString('Dropping table `migrate_reset_hard_command_test`...', $display);
+        $this->assertTrue($schema->hasTable('migrate_reset_hard_command_test'));
 
         // Actually drop the table now
         $result = BakeryTester::runCommand($command, userInput: ['y']);
@@ -51,10 +62,10 @@ class MigrateResetHardCommandTest extends CoreTestCase
         // Assert some output
         $this->assertSame(0, $result->getStatusCode());
         $display = $result->getDisplay();
-        $this->assertStringContainsString('Dropping table `MigrateResetHardCommandTest`...', $display);
+        $this->assertStringContainsString('Dropping table `migrate_reset_hard_command_test`...', $display);
         $this->assertStringContainsString('Do you really wish to continue ?', $display);
         $this->assertStringContainsString('Hard reset successful', $display);
-        $this->assertFalse($schema->hasTable('MigrateResetHardCommandTest'));
+        $this->assertFalse($schema->hasTable('migrate_reset_hard_command_test'));
         $result = BakeryTester::runCommand($command, input: ['--pretend' => true]);
 
         // Assert some output
