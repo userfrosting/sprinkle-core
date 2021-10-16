@@ -31,6 +31,8 @@ class LocatorService implements ServicesProviderInterface
                     $locator->registerLocation($sprinkle::getName(), $sprinkle::getPath());
                 }
 
+                // TODO : Move next definition to config,
+
                 // Register core locator shared streams
                 $locator->registerStream('cache', '', \UserFrosting\CACHE_DIR_NAME, true);
                 $locator->registerStream('log', '', \UserFrosting\LOG_DIR_NAME, true);

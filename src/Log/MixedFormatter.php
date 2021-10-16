@@ -33,7 +33,7 @@ class MixedFormatter extends LineFormatter
      *
      * @return string
      */
-    protected function toJson($data, $ignoreErrors = false)
+    protected function toJson($data, bool $ignoreErrors = false): string
     {
         // suppress json_encode errors since it's twitchy with some inputs
         if ($ignoreErrors) {
@@ -54,7 +54,7 @@ class MixedFormatter extends LineFormatter
      *
      * @return string JSON encoded data or null on failure
      */
-    private function jsonEncodePretty($data)
+    private function jsonEncodePretty($data): string
     {
         return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }

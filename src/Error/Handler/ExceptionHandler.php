@@ -269,6 +269,6 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function logError($message)
     {
-        $this->ci->errorLogger->error($message);
+        $this->ci->errorLogger->error($message); // TODO
     }
 }

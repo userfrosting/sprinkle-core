@@ -10,13 +10,13 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
-use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Events\Dispatcher;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
+use UserFrosting\Sprinkle\Core\Log\QueryLogger;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /*
@@ -30,20 +30,20 @@ class DatabaseService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            // TODO Inject Query logger & Dispatcher...
-            Capsule::class => function (Config $config) {
+            Capsule::class => function (Config $config, QueryLogger $logger) {
                 $capsule = new Capsule();
 
+                // Add each defined connection in the config
                 foreach ($config->get('db.connections') as $name => $dbConfig) {
                     $capsule->addConnection($dbConfig, $name);
                 }
 
                 // Set default connection
-                $connection = $config->get('db.default');
-                $capsule->getDatabaseManager()->setDefaultConnection($connection);
+                $defaultConnection = $config->get('db.default');
+                $capsule->getDatabaseManager()->setDefaultConnection($defaultConnection);
 
                 // Set Event Dispatcher
-                $queryEventDispatcher = new Dispatcher(new Container());
+                $queryEventDispatcher = new Dispatcher();
                 $capsule->setEventDispatcher($queryEventDispatcher);
 
                 // Register as global connection
@@ -52,15 +52,8 @@ class DatabaseService implements ServicesProviderInterface
                 // Start Eloquent
                 $capsule->bootEloquent();
 
-                // TODO Inject Query logger
-                /*if ($config['debug.queries']) {
-                    $logger = $c->queryLogger;
-
-                    foreach ($config['db'] as $name => $dbConfig) {
-                        $capsule->connection($name)->enableQueryLog();
-                    }
-
-                    // Register listener
+                // Listen to QueryExecuted event and send debug to logger if required by config
+                if ($config->get('debug.queries')) {
                     $queryEventDispatcher->listen(QueryExecuted::class, function ($query) use ($logger) {
                         $logger->debug("Query executed on database [{$query->connectionName}]:", [
                             'query'    => $query->sql,
@@ -68,7 +61,7 @@ class DatabaseService implements ServicesProviderInterface
                             'time'     => $query->time . ' ms',
                         ]);
                     });
-                }*/
+                }
 
                 return $capsule;
             },

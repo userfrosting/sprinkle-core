@@ -281,11 +281,22 @@ return [
 
     /*
     * ----------------------------------------------------------------------
+    * Logger Config
+    * ----------------------------------------------------------------------
+    */
+    'logger' => [
+        'streamHandler' => [
+            'stream' => 'log://userfrosting.log',
+        ]
+    ],
+
+    /*
+    * ----------------------------------------------------------------------
     * Mail Service Config
     * ----------------------------------------------------------------------
     * See https://learn.userfrosting.com/mail/the-mailer-service
     */
-    'mail'    => [
+    'mail' => [
         'mailer'          => env('MAIL_MAILER', 'smtp'), // Set to one of 'smtp', 'mail', 'qmail', 'sendmail'
         'host'            => env('SMTP_HOST'),
         'port'            => env('SMTP_PORT', 587),
@@ -316,7 +327,7 @@ return [
     * Filesystem paths
     * ----------------------------------------------------------------------
     */
-    'path'    => [
+    'path' => [
         'document_root'     => str_replace(DIRECTORY_SEPARATOR, \UserFrosting\DS, $_SERVER['DOCUMENT_ROOT']),
         'public_relative'   => dirname($_SERVER['SCRIPT_NAME']), // The location of `index.php` relative to the document root.  Use for sites installed in subdirectories of your web server's document root.
     ],

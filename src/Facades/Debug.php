@@ -26,6 +26,6 @@ class Debug extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'debugLogger';
+        return 'debugLogger'; // TODO
     }
 }

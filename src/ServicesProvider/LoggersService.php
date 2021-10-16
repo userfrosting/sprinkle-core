@@ -14,10 +14,13 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
+use UserFrosting\Sprinkle\Core\Log\DebugLogger;
+use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
+use UserFrosting\Sprinkle\Core\Log\MailLogger;
 use UserFrosting\Sprinkle\Core\Log\MixedFormatter;
-use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
+use UserFrosting\Sprinkle\Core\Log\QueryLogger;
+use UserFrosting\Support\Repository\Repository as Config;
 
-// TODO Implement interface and untangle each one. Each Logger could probably extend the main one to define what it needs compared to the others.
 class LoggersService implements ServicesProviderInterface
 {
     public function register(): array
@@ -30,17 +33,10 @@ class LoggersService implements ServicesProviderInterface
             *
             * @return \Monolog\Logger
             */
-            // TODO : Requires more injections && Interface/class
-            'debugLogger' => function (ResourceLocatorInterface $locator) {
-                $logger = new Logger('debug');
-
-                $logFile = $locator->findResource('log://userfrosting.log', true, true);
-
-                $handler = new StreamHandler($logFile);
-
-                $formatter = new MixedFormatter(null, null, true);
-
+            DebugLogger::class => function (StreamHandler $handler, MixedFormatter $formatter) {
                 $handler->setFormatter($formatter);
+
+                $logger = new DebugLogger('debug');
                 $logger->pushHandler($handler);
 
                 return $logger;
@@ -53,20 +49,14 @@ class LoggersService implements ServicesProviderInterface
             *
             * @return \Monolog\Logger
             */
-            // TODO : Requires more injections && Interface/class
-            'errorLogger' => function (ResourceLocatorInterface $locator) {
-                $log = new Logger('errors');
-
-                $logFile = $locator->findResource('log://userfrosting.log', true, true);
-
-                $handler = new StreamHandler($logFile, Logger::WARNING);
-
-                $formatter = new LineFormatter(null, null, true);
-
+            ErrorLogger::class => function (StreamHandler $handler, LineFormatter $formatter) {
                 $handler->setFormatter($formatter);
-                $log->pushHandler($handler);
+                $handler->setLevel(Logger::WARNING);
 
-                return $log;
+                $logger = new ErrorLogger('errors');
+                $logger->pushHandler($handler);
+
+                return $logger;
             },
 
             /*
@@ -77,19 +67,13 @@ class LoggersService implements ServicesProviderInterface
              *
              * @return \Monolog\Logger
              */
-            // TODO : Requires more injections && Interface/class
-            'mailLogger' => function (ResourceLocatorInterface $locator) {
-                $log = new Logger('mail');
-
-                $logFile = $locator->findResource('log://userfrosting.log', true, true);
-
-                $handler = new StreamHandler($logFile);
-                $formatter = new LineFormatter(null, null, true);
-
+            MailLogger::class => function (StreamHandler $handler, LineFormatter $formatter) {
                 $handler->setFormatter($formatter);
-                $log->pushHandler($handler);
 
-                return $log;
+                $logger = new MailLogger('mail');
+                $logger->pushHandler($handler);
+
+                return $logger;
             },
 
             /*
@@ -99,21 +83,23 @@ class LoggersService implements ServicesProviderInterface
              *
              * @return \Monolog\Logger
              */
-            // TODO : Requires more injections && Interface/class
-            'queryLogger' => function (ResourceLocatorInterface $locator) {
-                $logger = new Logger('query');
-
-                $logFile = $locator->findResource('log://userfrosting.log', true, true);
-
-                $handler = new StreamHandler($logFile);
-
-                $formatter = new MixedFormatter(null, null, true);
-
+            QueryLogger::class => function (StreamHandler $handler, MixedFormatter $formatter) {
                 $handler->setFormatter($formatter);
+
+                $logger = new QueryLogger('query');
                 $logger->pushHandler($handler);
 
                 return $logger;
             },
+
+            // Define formatter with `allowInlineLineBreaks` by default
+            LineFormatter::class  => \DI\create()->constructor(null, null, true),
+            MixedFormatter::class => \DI\create()->constructor(null, null, true),
+
+            // Define common StreamHandler with .
+            StreamHandler::class => function (Config $config) {
+                return new StreamHandler($config->get('logger.streamHandler.stream'));
+            }
         ];
     }
 }
