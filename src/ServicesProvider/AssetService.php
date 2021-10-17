@@ -34,10 +34,11 @@ class AssetService implements ServicesProviderInterface
                 if ($config->get('assets.use_raw')) {
 
                     // Register sprinkle assets stream, plus vendor assets in shared streams
-                    $locator->registerStream('assets', 'vendor', \UserFrosting\NPM_ASSET_DIR, true);
-                    $locator->registerStream('assets', 'vendor', \UserFrosting\BROWSERIFIED_ASSET_DIR, true);
-                    $locator->registerStream('assets', 'vendor', \UserFrosting\BOWER_ASSET_DIR, true);
-                    $locator->registerStream('assets', '', \UserFrosting\ASSET_DIR_NAME);
+                    // TODO : Constant removed
+                    // $locator->registerStream('assets', 'vendor', \UserFrosting\NPM_ASSET_DIR, true);
+                    // $locator->registerStream('assets', 'vendor', \UserFrosting\BROWSERIFIED_ASSET_DIR, true);
+                    // $locator->registerStream('assets', 'vendor', \UserFrosting\BOWER_ASSET_DIR, true);
+                    // $locator->registerStream('assets', '', \UserFrosting\ASSET_DIR_NAME);
 
                     $baseUrl = $config->get('site.uri.public') . '/' . $config->get('assets.raw.path');
 
@@ -62,9 +63,10 @@ class AssetService implements ServicesProviderInterface
                 } else {
 
                     // Register compiled assets stream in public folder + alias for vendor ones + build stream for CompiledAssetBundles
-                    $locator->registerStream('assets', '', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
-                    $locator->registerStream('assets', 'vendor', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
-                    $locator->registerStream('build', '', \UserFrosting\BUILD_DIR_NAME, true);
+                    // TODO : Constant removed
+                    // $locator->registerStream('assets', '', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
+                    // $locator->registerStream('assets', 'vendor', \UserFrosting\PUBLIC_DIR_NAME . '/' . \UserFrosting\ASSET_DIR_NAME, true);
+                    // $locator->registerStream('build', '', \UserFrosting\BUILD_DIR_NAME, true);
 
                     $baseUrl = $config->get('site.uri.public') . '/' . $config->get('assets.compiled.path');
                     $assets = new Assets($locator, 'assets', $baseUrl);

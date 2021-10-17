@@ -55,9 +55,6 @@
         "league/factory-muffin-faker": "^2.0"
     },
     "autoload": {
-        "files" : [
-            "defines.php"
-        ],
         "psr-4": {
             "UserFrosting\\Sprinkle\\Core\\": "src/"
         }

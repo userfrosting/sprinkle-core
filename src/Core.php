@@ -58,6 +58,7 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\SessionService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\VersionsService;
+use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\LocatorRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
@@ -66,8 +67,9 @@ use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\CsrfExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
 use UserFrosting\Sprinkle\SprinkleRecipe;
+use UserFrosting\UniformResourceLocator\ResourceStream;
 
-class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe
+class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, LocatorRecipe
 {
     /**
      * {@inheritdoc}
@@ -202,6 +204,30 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe
         return [
             SessionsTable::class,
             ThrottlesTable::class,
+        ];
+    }
+
+    /**
+     * Return an array of all locator Resource Steams to register with locator.
+     *
+     * @return \UserFrosting\UniformResourceLocator\ResourceStreamInterface[]
+     */
+    public static function getResourceStreams(): array
+    {
+        return [
+            new ResourceStream('sprinkles'),
+            new ResourceStream('config'),
+            new ResourceStream('extra'),
+            new ResourceStream('factories'),
+            new ResourceStream('locale'),
+            new ResourceStream('routes'),
+            new ResourceStream('schema'),
+            new ResourceStream('templates'),
+
+            new ResourceStream('cache', shared: true),
+            new ResourceStream('log', shared: true),
+            new ResourceStream('session', shared: true),
+            new ResourceStream('storage', shared: true),
         ];
     }
 }

@@ -12,8 +12,8 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
-use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Log\MailLogger;
 use UserFrosting\Sprinkle\Core\Mail\Mailer;
 use UserFrosting\Sprinkle\Core\ServicesProvider\MailService;
 use UserFrosting\Support\Repository\Repository as Config;
@@ -57,8 +57,8 @@ class MailerServiceTest extends TestCase
         $ci->set(Config::class, $config);
 
         // Set dependencies services
-        $logger = m::mock(Logger::class);
-        $ci->set('mailLogger', $logger);
+        $logger = m::mock(MailLogger::class);
+        $ci->set(MailLogger::class, $logger);
 
         // Assertions
         $this->assertInstanceOf(Mailer::class, $ci->get(Mailer::class));

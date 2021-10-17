@@ -137,7 +137,8 @@ class WhoopsRenderer extends ErrorRenderer
         }
 
         // Add the default, local resource search path:
-        $this->searchPaths[] = \UserFrosting\VENDOR_DIR . '/filp/whoops/src/Whoops/Resources';
+        // TODO : Constant removed. Plus that is really dumb code
+        // $this->searchPaths[] = \UserFrosting\VENDOR_DIR . '/filp/whoops/src/Whoops/Resources';
 
         // blacklist php provided auth based values
         $this->blacklist('_SERVER', 'PHP_AUTH_PW');

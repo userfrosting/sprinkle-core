@@ -28,7 +28,8 @@ class SetupEnvCommand extends Command
      * @var string Path to the .env file
      */
     // TODO : Use locator base path
-    protected $envPath = \UserFrosting\APP_DIR . '/.env';
+    // protected $envPath = \UserFrosting\APP_DIR . '/.env';
+    protected $envPath = '.env';
 
     /**
      * @var string Key for the env mode setting
@@ -59,7 +60,8 @@ class SetupEnvCommand extends Command
         // Get an instance of the DotenvEditor
         // TODO : Use locator base path
         // TODO : Move dotenvEditor to services
-        $dotenvEditor = new DotenvEditor(\UserFrosting\APP_DIR, false);
+        // $dotenvEditor = new DotenvEditor(\UserFrosting\APP_DIR, false);
+        $dotenvEditor = new DotenvEditor('./', false);
         $dotenvEditor->load($this->envPath);
 
         // Ask for mode

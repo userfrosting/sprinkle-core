@@ -16,7 +16,6 @@ use League\Flysystem\Filesystem;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use UserFrosting\Sprinkle\Core\Facades\Storage;
 use UserFrosting\Sprinkle\Core\Filesystem\FilesystemManager;
-// use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Support\Repository\Repository as Config;
 
@@ -160,6 +159,6 @@ class FilesystemTest extends TestCase
 
         // Make sure the path was set correctly
         $path = $disk->path('');
-        $this->assertEquals(\UserFrosting\STORAGE_DIR . \UserFrosting\DS . 'testingDriver' . DIRECTORY_SEPARATOR, $path);
+        $this->assertEquals('storage/testingDriver/', $path);
     }
 }

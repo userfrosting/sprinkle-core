@@ -28,7 +28,8 @@ class SetupDbCommand extends Command
      * @var string Path to the .env file
      */
     // TODO : Use locator base path
-    protected $envPath = \UserFrosting\APP_DIR . '/.env';
+    // protected $envPath = \UserFrosting\APP_DIR . '/.env';
+    protected $envPath = '.env';
 
     /**
      * {@inheritdoc}
@@ -72,7 +73,8 @@ class SetupDbCommand extends Command
         // Get an instance of the DotenvEditor
         // TODO : Use locator base path
         // TODO : Move dotenvEditor to services
-        $dotenvEditor = new DotenvEditor(\UserFrosting\APP_DIR, false);
+        // $dotenvEditor = new DotenvEditor(\UserFrosting\APP_DIR, false);
+        $dotenvEditor = new DotenvEditor('./', false);
         $dotenvEditor->load($this->envPath);
         $dotenvEditor->save(); // Save make sure empty file is created if none exist before reading it
 
@@ -264,7 +266,8 @@ class SetupDbCommand extends Command
             [
                 'driver'        => 'sqlite',
                 'name'          => 'SQLite',
-                'defaultDBName' => \UserFrosting\DB_DIR . \UserFrosting\DS . 'userfrosting.db',
+                // 'defaultDBName' => \UserFrosting\DB_DIR . \UserFrosting\DS . 'userfrosting.db', // TODO : Constant not used anymore
+                'defaultDBName' => 'userfrosting.db', // TODO : Constant not used anymore
                 'defaultPort'   => null,
             ],
         ]);

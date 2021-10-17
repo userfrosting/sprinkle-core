@@ -29,7 +29,8 @@ class SetupSmtpCommand extends Command
      * @var string Path to the .env file
      */
     // TODO : Use locator base path
-    protected $envPath = \UserFrosting\APP_DIR . '/.env';
+    // protected $envPath = \UserFrosting\APP_DIR . '/.env';
+    protected $envPath = '.env';
 
     /**
      * @var string SMTP setup string
@@ -85,7 +86,8 @@ class SetupSmtpCommand extends Command
         // Get an instance of the DotenvEditor
         // TODO : Use locator base path
         // TODO : Move dotenvEditor to services
-        $dotenvEditor = new DotenvEditor(\UserFrosting\APP_DIR, false);
+        // $dotenvEditor = new DotenvEditor(\UserFrosting\APP_DIR, false);
+        $dotenvEditor = new DotenvEditor('./', false);
         $dotenvEditor->load($this->envPath);
         $dotenvEditor->save(); // Save make sure empty file is created if none exist before reading it
 

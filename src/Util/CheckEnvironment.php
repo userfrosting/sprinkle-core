@@ -327,10 +327,11 @@ class CheckEnvironment
 
         if ($this->isProduction() && !$this->skipPermissionsCheck()) {
             // Should be write-protected in production!
-            $shouldBeWriteable = array_merge($shouldBeWriteable, [
-                \UserFrosting\SPRINKLES_DIR => false,
-                \UserFrosting\VENDOR_DIR    => false,
-            ]);
+            // TODO : Constant removed
+            // $shouldBeWriteable = array_merge($shouldBeWriteable, [
+            //     \UserFrosting\SPRINKLES_DIR => false,
+            //     \UserFrosting\VENDOR_DIR    => false,
+            // ]);
         }
 
         // Check for essential files & perms

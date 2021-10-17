@@ -21,7 +21,7 @@ return [
     * Address Book
     * ----------------------------------------------------------------------
     * Admin is the one sending email from the system. You can set the sender
-    * email adress and name using this config.
+    * email address and name using this config.
     */
     'address_book' => [
         'admin' => [
@@ -222,23 +222,24 @@ return [
         'disks' => [
             /*
              * Default storage disk. Default path is `app/storage/`. All
-             * files are accessible throught the FilesystemManager, but not
-             * publicly accessible throught an URL. Can still be downloaded
+             * files are accessible through the FilesystemManager, but not
+             * publicly accessible through an URL. Can still be downloaded
              * using the `download` method in a custom controller
              */
             'local' => [
                 'driver' => 'local',
-                'root'   => \UserFrosting\STORAGE_DIR,
+                'root'   => 'storage', //TODO: Replace with locator; \UserFrosting\STORAGE_DIR,
             ],
             /*
-            * Public files are directly accessible throught the webserver for
+            * Public files are directly accessible through the webserver for
             * better performances, but at the expanse of all files being public.
             * Direct access from http://{url}/files/, physically located in `/public/files`
             * Great storage disk for assets (images, avatar, etc).
             */
+            // TODO : Link back to public using locator
             'public' => [
                 'driver' => 'local',
-                'root'   => \UserFrosting\STORAGE_PUBLIC_DIR,
+                'root'   => 'storage://', //\UserFrosting\STORAGE_PUBLIC_DIR,
                 'url'    => 'files/',
             ],
             /*
@@ -327,10 +328,10 @@ return [
     * Filesystem paths
     * ----------------------------------------------------------------------
     */
-    'path' => [
-        'document_root'     => str_replace(DIRECTORY_SEPARATOR, \UserFrosting\DS, $_SERVER['DOCUMENT_ROOT']),
-        'public_relative'   => dirname($_SERVER['SCRIPT_NAME']), // The location of `index.php` relative to the document root.  Use for sites installed in subdirectories of your web server's document root.
-    ],
+    // 'path' => [
+    //     'document_root'     => str_replace(DIRECTORY_SEPARATOR, \UserFrosting\DS, $_SERVER['DOCUMENT_ROOT']),
+    //     'public_relative'   => dirname($_SERVER['SCRIPT_NAME']), // The location of `index.php` relative to the document root.  Use for sites installed in subdirectories of your web server's document root.
+    // ],
 
     /*
     * ----------------------------------------------------------------------

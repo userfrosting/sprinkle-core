@@ -20,40 +20,46 @@ return [
             'default' => 'array',
         ],
     ],
+
     /*
      * Define in memory db for testing
      */
     'db' => [
         'default' => env('DB_TEST_CONNECTION', 'memory'),
     ],
+
     /*
      * Don't log deprecations in tests
      */
     'debug' => [
         'deprecation' => false,
+        'queries'     => false,
     ],
+
     /*
-     * Use testning filesystem for tests
+     * Use testing filesystem for tests
      */
     'filesystems' => [
         'disks' => [
             'testing' => [
                 'driver' => 'local',
-                'root'   => \UserFrosting\STORAGE_DIR . \UserFrosting\DS . 'testing',
+                'root'   => 'storage/testing', //TODO : Replace with locator; \UserFrosting\STORAGE_DIR . \UserFrosting\DS . 'testing',
                 'url'    => 'files/testing/',
             ],
             'testingDriver' => [
                 'driver' => 'localTest',
-                'root'   => \UserFrosting\STORAGE_DIR . \UserFrosting\DS . 'testingDriver',
+                'root'   => 'storage/testingDriver', //TODO : Replace with locator; \UserFrosting\STORAGE_DIR . \UserFrosting\DS . 'testingDriver',
             ],
         ],
     ],
+
     /*
      * Don't display error detail in test. Return the non formatted errors
      */
     'settings' => [
         'displayErrorDetails' => false,
     ],
+    
     /*
      * Disable native sessions in tests
      */
