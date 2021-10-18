@@ -159,6 +159,6 @@ class FilesystemTest extends TestCase
 
         // Make sure the path was set correctly
         $path = $disk->path('');
-        $this->assertEquals('storage/testingDriver/', $path);
+        $this->assertEquals('storage/testingDriver' . DIRECTORY_SEPARATOR, $path); // N.B.: DIRECTORY_SEPARATOR is required for windows.
     }
 }
