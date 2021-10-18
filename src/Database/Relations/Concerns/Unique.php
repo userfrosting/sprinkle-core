@@ -129,15 +129,19 @@ trait Unique
     /**
      * Add a query to load the nested tertiary models for this relationship.
      *
-     * @param string   $tertiaryRelated
-     * @param string   $tertiaryRelationName
-     * @param string   $tertiaryKey
-     * @param callable $tertiaryCallback
+     * @param string        $tertiaryRelated
+     * @param string|null   $tertiaryRelationName
+     * @param string|null   $tertiaryKey
+     * @param callable|null $tertiaryCallback
      *
      * @return self
      */
-    public function withTertiary($tertiaryRelated, $tertiaryRelationName = null, $tertiaryKey = null, $tertiaryCallback = null)
-    {
+    public function withTertiary(
+        string $tertiaryRelated,
+        ?string $tertiaryRelationName = null,
+        ?string $tertiaryKey = null,
+        ?callable $tertiaryCallback = null
+    ) {
         $this->tertiaryRelated = new $tertiaryRelated();
 
         // Try to guess the tertiary related key from the tertiaryRelated model.

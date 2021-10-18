@@ -20,15 +20,19 @@ trait Syncable
     /**
      * Synchronizes an array of data for related models with a parent model.
      *
-     * @param mixed[] $data
-     * @param bool    $deleting       Delete models from the database that are not represented in the input data.
-     * @param bool    $forceCreate    Ignore mass assignment restrictions on child models.
-     * @param string  $relatedKeyName The primary key used to determine which child models are new, updated, or deleted.
+     * @param mixed[]     $data
+     * @param bool        $deleting       Delete models from the database that are not represented in the input data.
+     * @param bool        $forceCreate    Ignore mass assignment restrictions on child models.
+     * @param string|null $relatedKeyName The primary key used to determine which child models are new, updated, or deleted.
+     *
+     * @return array List of changes (created, deleted, updated).
      */
-    public function sync($data, $deleting = true, $forceCreate = false, $relatedKeyName = null)
+    public function sync(array $data, bool $deleting = true, bool $forceCreate = false, ?string $relatedKeyName = null): array
     {
         $changes = [
-            'created' => [], 'deleted' => [], 'updated' => [],
+            'created' => [],
+            'deleted' => [],
+            'updated' => [],
         ];
 
         if (is_null($relatedKeyName)) {
@@ -111,7 +115,7 @@ trait Syncable
      *
      * @return array
      */
-    protected function castKeys(array $keys)
+    protected function castKeys(array $keys): array
     {
         return (array) array_map(function ($v) {
             return $this->castKey($v);

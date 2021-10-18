@@ -13,7 +13,7 @@
  */
 return [
     /*
-     * Don't use persistant caching in tests
+     * Don't use persistent caching in tests
      */
     'cache' => [
         'illuminate' => [

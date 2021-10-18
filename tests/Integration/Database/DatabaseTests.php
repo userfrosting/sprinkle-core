@@ -17,6 +17,9 @@ use UserFrosting\Sprinkle\Core\Database\Models\Model;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Support\Exception\BadRequestException;
 
+/**
+ * Test custom relations in `/src/Database/Relations`.
+ */
 class DatabaseTests extends TestCase
 {
     /**
@@ -180,14 +183,13 @@ class DatabaseTests extends TestCase
     public function testSyncOneToMany(): void
     {
         $user = EloquentTestUser::create(['name' => 'David']);
+
         // Set up original emails
         $user->emails()->create([
-            'id'    => 1,
             'label' => 'primary',
             'email' => 'david@owlfancy.com',
         ]);
         $user->emails()->create([
-            'id'    => 2,
             'label' => 'work',
             'email' => 'david@attenboroughsreef.com',
         ]);
@@ -204,14 +206,13 @@ class DatabaseTests extends TestCase
             ],
         ]);
 
-        $emails = $user->emails->toArray();
-
+        // Assert new state
         $this->assertEquals([
             [
-                'id'     => 1,
-                'user_id'=> 1,
-                'label'  => 'primary',
-                'email'  => 'david@aol.com',
+                'id'      => 1,
+                'user_id' => 1,
+                'label'   => 'primary',
+                'email'   => 'david@aol.com',
             ],
             [
                 'id'      => 3,
@@ -219,7 +220,7 @@ class DatabaseTests extends TestCase
                 'label'   => 'gmail',
                 'email'   => 'davidattenborough@gmail.com',
             ],
-        ], $emails);
+        ], $user->emails->toArray());
     }
 
     /**
@@ -229,14 +230,13 @@ class DatabaseTests extends TestCase
     public function testSyncMorphMany(): void
     {
         $user = EloquentTestUser::create(['name' => 'David']);
+
         // Set up original phones
         $user->phones()->create([
-            'id'     => 1,
             'label'  => 'primary',
             'number' => '5555551212',
         ]);
         $user->phones()->create([
-            'id'     => 2,
             'label'  => 'work',
             'number' => '2223334444',
         ]);
@@ -507,91 +507,93 @@ class DatabaseTests extends TestCase
      */
     public function testBelongsToManyUniqueWithTertiaryEagerLoad(): void
     {
-        $user1 = EloquentTestUser::create(['name' => 'David']);
-        $user2 = EloquentTestUser::create(['name' => 'Alex']);
-
+        // Create test data
+        EloquentTestUser::create(['name' => 'David']);
+        EloquentTestUser::create(['name' => 'Alex']);
         $this->generateLocations();
         $this->generateRoles();
         $this->generateJobs();
 
-        $users = EloquentTestUser::with('jobs')->get();
+        // Get both users from db
+        $user1 = EloquentTestUser::with('jobs')->firstWhere(['name' => 'David']);
+        $user2 = EloquentTestUser::with('jobs')->firstWhere(['name' => 'Alex']);
+
+        // Assert both users individually
+        $this->assertEquals([
+            'id'   => 1,
+            'name' => 'David',
+            'jobs' => [
+                [
+                    'id'    => 2,
+                    'slug'  => 'soldier',
+                    'pivot' => [
+                        'user_id' => 1,
+                        'role_id' => 2,
+                    ],
+                    'locations' => [
+                        [
+                            'id'    => 1,
+                            'name'  => 'Hatchery',
+                            'pivot' => [
+                                'location_id' => 1,
+                                'role_id'     => 2,
+                            ],
+                        ],
+                        [
+                            'id'    => 2,
+                            'name'  => 'Nexus',
+                            'pivot' => [
+                                'location_id' => 2,
+                                'role_id'     => 2,
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'id'    => 3,
+                    'slug'  => 'egg-layer',
+                    'pivot' => [
+                        'user_id' => 1,
+                        'role_id' => 3,
+                    ],
+                    'locations' => [
+                        [
+                            'id'    => 2,
+                            'name'  => 'Nexus',
+                            'pivot' => [
+                                'location_id' => 2,
+                                'role_id'     => 3,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], $user1->toArray());
 
         $this->assertEquals([
-            [
-                'id'   => 1,
-                'name' => 'David',
-                'jobs' => [
-                    [
-                        'id'    => 2,
-                        'slug'  => 'soldier',
-                        'pivot' => [
-                            'user_id' => 1,
-                            'role_id' => 2,
-                        ],
-                        'locations' => [
-                            [
-                                'id'    => 1,
-                                'name'  => 'Hatchery',
-                                'pivot' => [
-                                    'location_id' => 1,
-                                    'role_id'     => 2,
-                                ],
-                            ],
-                            [
-                                'id'    => 2,
-                                'name'  => 'Nexus',
-                                'pivot' => [
-                                    'location_id' => 2,
-                                    'role_id'     => 2,
-                                ],
-                            ],
-                        ],
+            'id'   => 2,
+            'name' => 'Alex',
+            'jobs' => [
+                [
+                    'id'    => 3,
+                    'slug'  => 'egg-layer',
+                    'pivot' => [
+                        'user_id' => 2,
+                        'role_id' => 3,
                     ],
-                    [
-                        'id'    => 3,
-                        'slug'  => 'egg-layer',
-                        'pivot' => [
-                            'user_id' => 1,
-                            'role_id' => 3,
-                        ],
-                        'locations' => [
-                            [
-                                'id'    => 2,
-                                'name'  => 'Nexus',
-                                'pivot' => [
-                                    'location_id' => 2,
-                                    'role_id'     => 3,
-                                ],
+                    'locations' => [
+                        [
+                            'id'    => 1,
+                            'name'  => 'Hatchery',
+                            'pivot' => [
+                                'location_id' => 1,
+                                'role_id'     => 3,
                             ],
                         ],
                     ],
                 ],
             ],
-            [
-                'id'   => 2,
-                'name' => 'Alex',
-                'jobs' => [
-                    [
-                        'id'    => 3,
-                        'slug'  => 'egg-layer',
-                        'pivot' => [
-                            'user_id' => 2,
-                            'role_id' => 3,
-                        ],
-                        'locations' => [
-                            [
-                                'id'    => 1,
-                                'name'  => 'Hatchery',
-                                'pivot' => [
-                                    'location_id' => 1,
-                                    'role_id'     => 3,
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ], $users->toArray());
+        ], $user2->toArray());
     }
 
     /**
@@ -865,8 +867,10 @@ class DatabaseTests extends TestCase
         $user->roles()->attach([1, 2]);
 
         $users = EloquentTestUser::with(['roles' => function ($query) {
-            $query->addSelect('roles.*', 'jobs.*')->leftJoin('jobs', 'jobs.role_id', '=', 'roles.id')
-                    ->exclude('slug', 'jobs.user_id', 'jobs.location_id', 'jobs.role_id');
+            $query->addSelect('roles.*', 'jobs.*')
+                    ->leftJoin('jobs', 'jobs.role_id', '=', 'roles.id')
+                    ->exclude('slug', 'jobs.user_id', 'jobs.location_id', 'jobs.role_id')
+                    ->orderBy('roles', 'asc');
         }])->get();
 
         $this->assertEquals([
@@ -1365,7 +1369,7 @@ class EloquentTestUser extends EloquentTestModel
             'jobs',
             'user_id',
             'role_id'
-        )->withTertiary(EloquentTestLocation::class, null, 'location_id');
+        )->withTertiary(EloquentTestLocation::class, tertiaryKey: 'location_id');
 
         return $relation;
     }
@@ -1447,6 +1451,8 @@ class EloquentTestAssignment extends EloquentTestModel
 {
     protected $table = 'assignments';
     protected $guarded = [];
+    protected $primaryKey = null;
+    public $incrementing = false;
 
     /**
      * Get all of the users that are assigned to this assignment.
@@ -1461,6 +1467,8 @@ class EloquentTestJob extends EloquentTestModel
 {
     protected $table = 'jobs';
     protected $guarded = [];
+    protected $primaryKey = null;
+    public $incrementing = false;
 
     /**
      * Get the role for this job.
