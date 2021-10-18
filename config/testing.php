@@ -59,7 +59,7 @@ return [
     'settings' => [
         'displayErrorDetails' => false,
     ],
-    
+
     /*
      * Disable native sessions in tests
      */

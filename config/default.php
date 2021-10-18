@@ -288,7 +288,7 @@ return [
     'logger' => [
         'streamHandler' => [
             'stream' => 'log://userfrosting.log',
-        ]
+        ],
     ],
 
     /*
