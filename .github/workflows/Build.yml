@@ -10,6 +10,54 @@ on:
   # - cron: "0 0 * * 5"
 
 jobs:
+  PHPUnit-Memory:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php_versions: ['8.0']
+
+    runs-on: ubuntu-latest
+    name: PHPUnit - PHP ${{ matrix.php_versions }} - Memory SQLite
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php_versions }}
+          extensions: mbstring, dom, fileinfo, gd, memcached, redis, pdo_sqlite
+          coverage: xdebug
+          tools: pecl, composer
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      
+      - name: Setup Redis-server
+        uses: supercharge/redis-github-action@1.1.0
+        with:
+          redis-version: 6
+      
+      - name: Setup Memcached
+        uses: niden/actions-memcached@v7
+            
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Execute tests
+        run: | 
+          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+          vendor/bin/phpunit
+      
+      - name: Upload coverage to Codecov
+        if: github.event_name != 'schedule'
+        uses: codecov/codecov-action@v2
+        with:
+          file: ./_meta/coverage.xml
+          fail_ci_if_error: true
+
   PHPUnit-MySQL:
 
     strategy:
@@ -73,13 +121,13 @@ jobs:
     - name: Execute tests
       run: | 
         echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-        vendor/bin/phpunit --coverage-clover=coverage.xml
+        vendor/bin/phpunit
     
     - name: Upload coverage to Codecov
       if: github.event_name != 'schedule'
       uses: codecov/codecov-action@v2
       with:
-        file: ./coverage.xml
+        file: ./_meta/coverage.xml
         fail_ci_if_error: true
 
   PHPUnit-SQLite:
@@ -128,13 +176,13 @@ jobs:
       - name: Execute tests
         run: | 
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-          vendor/bin/phpunit --coverage-clover=coverage.xml
+          vendor/bin/phpunit
       
       - name: Upload coverage to Codecov
         if: github.event_name != 'schedule'
         uses: codecov/codecov-action@v2
         with:
-          file: ./coverage.xml
+          file: ./_meta/coverage.xml
           fail_ci_if_error: true
   
   PHPUnit-Postgre:
@@ -189,13 +237,13 @@ jobs:
       - name: Execute tests
         run: | 
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-          vendor/bin/phpunit --coverage-clover=coverage.xml
+          vendor/bin/phpunit
       
       - name: Upload coverage to Codecov
         if: github.event_name != 'schedule'
         uses: codecov/codecov-action@v2
         with:
-          file: ./coverage.xml
+          file: ./_meta/coverage.xml
           fail_ci_if_error: true
 
   PHPUnit-Windows:
@@ -236,10 +284,10 @@ jobs:
     - name: Execute tests
       run: | 
         echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-        vendor/bin/phpunit --coverage-clover=coverage.xml
+        vendor/bin/phpunit
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
-        file: ./coverage.xml
+        file: ./_meta/coverage.xml
         fail_ci_if_error: true
