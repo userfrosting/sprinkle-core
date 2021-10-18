@@ -8,7 +8,7 @@
 
 | Branch | Version | Build | Coverage | Style |
 | ------ |:-------:|:-----:|:--------:|:-----:|
-| [5.0][sprinkle-core-develop5] | ![][sprinkle-core-version-develop5] | [![][sprinkle-core-develop5-build]][sprinkle-core-action] | [![][sprinkle-core-develop5-codecov]][sprinkle-core-develop5] | [![][sprinkle-core-style-develop5]][sprinkle-core-style] |
+| [5.0][sprinkle-core-develop5] | ![][sprinkle-core-version-develop5] | [![][sprinkle-core-develop5-build]][sprinkle-core-action] | [![][sprinkle-core-develop5-codecov]][sprinkle-core-codecov] | [![][sprinkle-core-style-develop5]][sprinkle-core-style] |
 
 <!-- Links -->
 [sprinkle-core]: https://github.com/userfrosting/sprinkle-core
