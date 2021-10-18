@@ -870,7 +870,7 @@ class DatabaseTests extends TestCase
             $query->addSelect('roles.*', 'jobs.*')
                     ->leftJoin('jobs', 'jobs.role_id', '=', 'roles.id')
                     ->exclude('slug', 'jobs.user_id', 'jobs.location_id', 'jobs.role_id')
-                    ->orderBy('roles', 'asc');
+                    ->orderBy('roles.id', 'asc');
         }])->get();
 
         $this->assertEquals([
