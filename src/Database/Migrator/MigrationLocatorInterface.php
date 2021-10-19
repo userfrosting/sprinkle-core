@@ -11,11 +11,12 @@
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
+use UserFrosting\Sprinkle\Core\Util\ClassRepository\ClassRepositoryInterface;
 
 /**
  * Find and returns all migrations definitions (classes) registered and available.
  */
-interface MigrationLocatorInterface
+interface MigrationLocatorInterface extends ClassRepositoryInterface
 {
     /**
      * Loop all the available sprinkles and return all available migrations across the whole app.
@@ -25,7 +26,7 @@ interface MigrationLocatorInterface
     public function all(): array;
 
     /**
-     * Returns the same as getAll, but as a list of class names for management by the analyser.
+     * Returns the same as all, but as a list of class names.
      *
      * @return string[] A list of all the migration class found across every sprinkle
      */

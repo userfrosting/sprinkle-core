@@ -12,13 +12,13 @@ namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
+use UserFrosting\Sprinkle\Core\Util\ClassRepository\AbstractClassRepository;
 use UserFrosting\Sprinkle\RecipeExtensionLoader;
-use UserFrosting\Support\Exception\NotFoundException;
 
 /**
- * Find and returns all registered MigrationInterface across all sprinkles, using MigrationRecipe.
+ * Find and returns all migrations definitions (classes) registered and available.
  */
-class SprinkleMigrationLocator implements MigrationLocatorInterface
+class SprinkleMigrationLocator extends AbstractClassRepository implements MigrationLocatorInterface
 {
     /**
      * @param RecipeExtensionLoader $extensionLoader
@@ -32,23 +32,11 @@ class SprinkleMigrationLocator implements MigrationLocatorInterface
      */
     public function all(): array
     {
-        $migrations = $this->extensionLoader->getInstances(
+        return $this->extensionLoader->getInstances(
             method: 'getMigrations',
             recipeInterface: MigrationRecipe::class,
             extensionInterface: MigrationInterface::class,
         );
-
-        return $migrations;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function list(): array
-    {
-        return array_map(function ($m) {
-            return get_class($m);
-        }, $this->all());
     }
 
     /**
@@ -56,24 +44,7 @@ class SprinkleMigrationLocator implements MigrationLocatorInterface
      */
     public function get(string $migration): MigrationInterface
     {
-        if (!$this->has($migration)) {
-            throw new NotFoundException("Migration `$migration` not found.");
-        }
-
-        $results = array_filter($this->all(), function ($m) use ($migration) {
-            return get_class($m) == $migration;
-        });
-
-        return array_values($results)[0]; // TODO : Test array_values with filter not being on key 0
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function has(string $migration): bool
-    {
-        $list = $this->list();
-
-        return in_array($migration, $list);
+        // Wrap around parent to satisfy interface
+        return parent::get($migration);
     }
 }
