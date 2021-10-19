@@ -47,58 +47,47 @@ class MigratorRollbackTest extends TestCase
         $this->repository->delete();
     }
 
-    public function testConstruct(): Migrator
+    public function testConstruct(): void
     {
-        $analyser = $this->ci->get(Migrator::class);
-        $this->assertInstanceOf(Migrator::class, $analyser);
-
-        return $analyser;
+        $migrator = $this->ci->get(Migrator::class);
+        $this->assertInstanceOf(Migrator::class, $migrator);
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testCanRollbackMigration(Migrator $analyser): void
+    public function testCanRollbackMigration(): void
     {
+        $migrator = $this->ci->get(Migrator::class);
+
         // "D" and "A" are clear for rollback
-        $this->assertTrue($analyser->canRollbackMigration(StubAnalyserRollbackMigrationD::class));
-        $this->assertTrue($analyser->canRollbackMigration(StubAnalyserRollbackMigrationA::class));
+        $this->assertTrue($migrator->canRollbackMigration(StubAnalyserRollbackMigrationD::class));
+        $this->assertTrue($migrator->canRollbackMigration(StubAnalyserRollbackMigrationA::class));
 
         // B can be removed, as it depend on "C", but none depend on it
-        $this->assertTrue($analyser->canRollbackMigration(StubAnalyserRollbackMigrationB::class));
+        $this->assertTrue($migrator->canRollbackMigration(StubAnalyserRollbackMigrationB::class));
 
         // But "C" can't be removed, as "B" depends on it and it's still installed
-        $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationC::class));
+        $this->assertFalse($migrator->canRollbackMigration(StubAnalyserRollbackMigrationC::class));
 
         // "E" is not installed, so can't rollback
-        $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationE::class));
+        $this->assertFalse($migrator->canRollbackMigration(StubAnalyserRollbackMigrationE::class));
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetMigrationsForRollbackForLast(Migrator $analyser): void
+    public function testGetMigrationsForRollbackForLast(): void
     {
-        $resultA = $analyser->getMigrationsForRollback();
-        $resultB = $analyser->getMigrationsForRollback(1);
+        $migrator = $this->ci->get(Migrator::class);
+
+        $resultA = $migrator->getMigrationsForRollback();
+        $resultB = $migrator->getMigrationsForRollback(1);
 
         $this->assertSame($resultA, $resultB);
         $this->assertSame([StubAnalyserRollbackMigrationD::class], $resultA);
         $this->assertSame([StubAnalyserRollbackMigrationD::class], $resultB);
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetMigrationsForRollbackForStep2(Migrator $analyser): void
+    public function testGetMigrationsForRollbackForStep2(): void
     {
-        $result = $analyser->getMigrationsForRollback(2);
+        $migrator = $this->ci->get(Migrator::class);
+
+        $result = $migrator->getMigrationsForRollback(2);
 
         $this->assertSame([
             StubAnalyserRollbackMigrationD::class,
@@ -107,14 +96,11 @@ class MigratorRollbackTest extends TestCase
         ], $result);
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetMigrationsForReset(Migrator $analyser): void
+    public function testGetMigrationsForReset(): void
     {
-        $result = $analyser->getMigrationsForReset();
+        $migrator = $this->ci->get(Migrator::class);
+
+        $result = $migrator->getMigrationsForReset();
 
         $this->assertSame([
             StubAnalyserRollbackMigrationD::class,
@@ -124,15 +110,12 @@ class MigratorRollbackTest extends TestCase
         ], $result);
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetMigrationsForRollbackForTooManyStep(Migrator $analyser): void
+    public function testGetMigrationsForRollbackForTooManyStep(): void
     {
+        $migrator = $this->ci->get(Migrator::class);
+
         // Will do same as reset in this case
-        $result = $analyser->getMigrationsForRollback(99);
+        $result = $migrator->getMigrationsForRollback(99);
 
         $this->assertSame([
             StubAnalyserRollbackMigrationD::class,
@@ -142,22 +125,19 @@ class MigratorRollbackTest extends TestCase
         ], $result);
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetMigrationsForRollbackForStaleError(Migrator $analyser): void
+    public function testGetMigrationsForRollbackForStaleError(): void
     {
+        $migrator = $this->ci->get(Migrator::class);
+
         // Add "E" as installed. It's gonna be stale
         $this->repository->log(StubAnalyserRollbackMigrationE::class, 1);
 
         // Get analyser back to propagate changes
-        $analyser = $this->ci->get(Migrator::class);
+        $migrator = $this->ci->get(Migrator::class);
 
         // Expect exception because of stale migration.
         $this->expectException(MigrationRollbackException::class);
-        $analyser->getMigrationsForRollback(1);
+        $migrator->getMigrationsForRollback(1);
     }
 }
 

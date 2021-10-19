@@ -45,66 +45,52 @@ class MigratorDependencyTest extends TestCase
         $this->repository->delete();
     }
 
-    public function testConstruct(): Migrator
+    public function testConstruct(): void
     {
-        $analyser = $this->ci->get(Migrator::class);
-        $this->assertInstanceOf(Migrator::class, $analyser);
-
-        return $analyser;
+        $migrator = $this->ci->get(Migrator::class);
+        $this->assertInstanceOf(Migrator::class, $migrator);
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetInstalled(Migrator $analyser): void
+    public function testGetInstalled(): void
     {
+        $migrator = $this->ci->get(Migrator::class);
+
         $this->assertSame([
             StubAnalyserMigrationA::class,
             StubAnalyserMigrationD::class,
-        ], $analyser->getInstalled());
+        ], $migrator->getInstalled());
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetAvailable(Migrator $analyser): void
+    public function testGetAvailable(): void
     {
+        $migrator = $this->ci->get(Migrator::class);
+
         $this->assertSame([
             StubAnalyserMigrationA::class,
             StubAnalyserMigrationB::class,
             StubAnalyserMigrationC::class,
             StubAnalyserMigrationE::class,
-        ], $analyser->getAvailable());
+        ], $migrator->getAvailable());
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetPending(Migrator $analyser): void
+    public function testGetPending(): void
     {
+        $migrator = $this->ci->get(Migrator::class);
+
         $this->assertSame([
             StubAnalyserMigrationC::class, // C is before B because B depend on C
             StubAnalyserMigrationB::class,
             StubAnalyserMigrationE::class, // Will be installed since D is installed even if not available.
-        ], $analyser->getPending());
+        ], $migrator->getPending());
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetStale(Migrator $analyser): void
+    public function testGetStale(): void
     {
+        $migrator = $this->ci->get(Migrator::class);
+
         $this->assertSame([
             StubAnalyserMigrationD::class, // Installed, not available
-        ], $analyser->getStale());
+        ], $migrator->getStale());
     }
 
     /**
@@ -115,20 +101,20 @@ class MigratorDependencyTest extends TestCase
         // Remove D from installed, then E will fail
         $this->repository->remove(StubAnalyserMigrationD::class);
 
-        // Get analyser back
-        $analyser = $this->ci->get(Migrator::class);
+        // Get migrator
+        $migrator = $this->ci->get(Migrator::class);
 
         // Make sure installed is right
         $this->assertSame([
             StubAnalyserMigrationA::class,
-        ], $analyser->getInstalled());
+        ], $migrator->getInstalled());
 
         // Set exception expectation
         $this->expectException(MigrationDependencyNotMetException::class);
         $this->expectExceptionMessage(StubAnalyserMigrationE::class . ' depends on ' . StubAnalyserMigrationD::class . ", but it's not available.");
 
         // Get pending
-        $analyser->getPending();
+        $migrator->getPending();
     }
 }
 
