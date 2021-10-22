@@ -10,23 +10,19 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
-use Psr\Container\ContainerInterface;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
-use UserFrosting\Sprinkle\Core\Database\Seeder\Seeder;
+use UserFrosting\Sprinkle\Core\Seeder\SeedRepositoryInterface;
+use UserFrosting\Sprinkle\Core\Seeder\SprinkleSeedsRepository;
 
 /*
  * Return an instance of the database seeder
  */
-class SeederService implements ServicesProviderInterface
+class SeedService implements ServicesProviderInterface
 {
     public function register(): array
     {
         return [
-            // TODO Rework injection
-            // TODO Add interface
-            Seeder::class => function (ContainerInterface $c) {
-                return new Seeder($c);
-            },
+            SeedRepositoryInterface::class => \DI\autowire(SprinkleSeedsRepository::class),
         ];
     }
 }

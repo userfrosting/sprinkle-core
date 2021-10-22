@@ -15,23 +15,23 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use UserFrosting\Sprinkle\Core\Bakery\Helper\ConfirmableTrait;
-use UserFrosting\Sprinkle\Core\Database\Seeder\Seeder;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Seeder\SeedRepositoryInterface;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * seed Bakery Command
  * Perform a database seed.
- *
- * @author Louis Charette
  */
 class SeedCommand extends Command
 {
-    // use ConfirmableTrait; // TODO
+    use WithSymfonyStyle;
 
-    /**
-     * @var Seeder
-     */
-    protected $seeder;
+    /** @Inject */
+    protected SeedRepositoryInterface $seeds;
+
+    /** @Inject */
+    protected Config $config;
 
     /**
      * {@inheritdoc}
@@ -40,8 +40,8 @@ class SeedCommand extends Command
     {
         $this->setName('seed')
              ->setDescription('Seed the database with records')
-             ->setHelp('This command runs a seed to populate the database with default, random and/or test data.')
-             ->addArgument('class', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The class name of the seeder. Separate multiple seeder with a space.')
+             ->setHelp('This command runs a seed to populate the app with default, random and/or test data.')
+             ->addArgument('class', InputArgument::IS_ARRAY, 'The class name of the seeder. Separate multiple seeder with a space.')
              ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run without confirmation.');
     }
 
@@ -50,47 +50,55 @@ class SeedCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->io->title("UserFrosting's Seeder");
-
-        // Prepare seed locator
-        $this->seeder = $this->ci->seeder;
+        $this->io->title('Seeder');
 
         // Get options
         $classes = $input->getArgument('class');
+        $force = $input->getOption('force');
 
-        // Seeds list
-        $seeds = [];
+        // If class is empty, ask to choose one.
+        if (empty($classes)) {
 
-        // Start by getting seeds
-        foreach ($classes as $className) {
+            // Abort if no registered seeds
+            if (empty($this->seeds->list())) {
+                $this->io->warning('No available seeds founds');
 
-            // Get seed class and
-            try {
-                $seedClass = $this->seeder->getSeedClass($className);
-            } catch (\Exception $e) {
-                $this->io->error($e->getMessage());
-                exit(1);
+                return self::SUCCESS;
             }
 
-            // Display the class we are going to use as info
-            $this->io->writeln('<info>Seeding database using class `' . get_class($seedClass) . '`</>');
-
-            // Add seed class to list
-            $seeds[] = $seedClass;
+            $classes = [$this->selectSeed()];
         }
 
-        // Confirm action when in production mode
-        if (!$this->confirmToProceed($input->getOption('force'))) {
-            exit(1);
+        // Validate each classes
+        foreach ($classes as $className) {
+            if (!$this->seeds->has($className)) {
+                $this->io->error("Seed `$className` is not an available seed.");
+
+                return self::FAILURE;
+            }
+        }
+
+        // Display what's about to be run
+        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+            $this->io->section('Seed(s) to apply');
+            $this->io->listing($classes);
+        }
+
+        // Confirm action if required (for example in production mode).
+        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+            if (!$this->io->confirm('Do you really wish to continue ?', false)) {
+                return self::SUCCESS;
+            }
         }
 
         // Run seeds
-        foreach ($seeds as $seed) {
+        foreach ($classes as $seed) {
             try {
-                $this->seeder->executeSeed($seed);
+                $this->seeds->get($seed)->run();
             } catch (\Exception $e) {
                 $this->io->error($e->getMessage());
-                exit(1);
+
+                return self::FAILURE;
             }
         }
 
@@ -98,5 +106,10 @@ class SeedCommand extends Command
         $this->io->success('Seed successful !');
 
         return self::SUCCESS;
+    }
+
+    protected function selectSeed(): string
+    {
+        return $this->io->choice('Select seed to run', $this->seeds->list());
     }
 }

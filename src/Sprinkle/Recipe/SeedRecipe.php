@@ -8,19 +8,17 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Database\Seeds;
-
-use UserFrosting\Sprinkle\Core\Database\Seeder\BaseSeed;
+namespace UserFrosting\Sprinkle\Core\Sprinkle\Recipe;
 
 /**
- * Seed1
+ * Sprinkle seeds definition Interface.
  */
-class Seed extends BaseSeed
+interface SeedRecipe
 {
     /**
-     *    {@inheritdoc}
+     * Return an array of all registered seeds.
+     *
+     * @return \UserFrosting\Sprinkle\Core\Database\Seeder\SeedInterface[]
      */
-    public function run()
-    {
-    }
+    public static function getSeeds(): array;
 }

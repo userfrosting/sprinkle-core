@@ -56,6 +56,6 @@ abstract class AbstractClassRepository implements ClassRepositoryInterface
         return in_array($class, $this->list());
     }
 
-    // TODO : Add Iterator interface implemantion
+    // TODO : Add Iterator interface implemantion (around, iterable, etc.)
     // https://www.php.net/manual/en/class.iterator.php
 }

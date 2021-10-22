@@ -8,19 +8,15 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Database\Seeds;
-
-use UserFrosting\Sprinkle\Core\Database\Seeder\BaseSeed;
+namespace UserFrosting\Sprinkle\Core\Seeder;
 
 /**
- * Seed1
+ * All seeds must implement this interface.
  */
-class Seed1 extends BaseSeed
+interface SeedInterface
 {
     /**
-     *    {@inheritdoc}
+     * Run the seed.
      */
-    public function run()
-    {
-    }
+    public function run(): void;
 }

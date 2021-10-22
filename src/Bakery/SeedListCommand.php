@@ -13,23 +13,28 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Seeder\SeedRepositoryInterface;
 
 /**
  * seed Bakery Command
  * Perform a database seed.
- *
- * @author Louis Charette
  */
 class SeedListCommand extends Command
 {
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected SeedRepositoryInterface $seeds;
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this->setName('seed:list')
-             ->setDescription('List all database seeds available')
-             ->setHelp('This command returns a list of database seeds that can be called using the `seed` command.');
+             ->setDescription('List all seeds available')
+             ->setHelp('This command returns a list of seeds that can be called using the `seed` command.');
     }
 
     /**
@@ -37,9 +42,13 @@ class SeedListCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->io->title('Database Seeds List');
-        $seeds = $this->ci->seeder->getSeeds();
-        $this->io->table(['Name', 'Namespace', 'Sprinkle'], $seeds);
+        $this->io->title('Seeds List');
+        $seeds = $this->seeds->list();
+        if (empty($seeds)) {
+            $this->io->note('No seeds founds');
+        } else {
+            $this->io->listing($seeds);
+        }
 
         return self::SUCCESS;
     }
