@@ -116,7 +116,7 @@ class SeedCommandTest extends TestCase
 
         // Assert some output
         $this->assertSame(1, $result->getStatusCode());
-        $this->assertStringContainsString('Seed `' . $seed::class . '` is not an available seed.', $result->getDisplay());
+        $this->assertStringContainsString('is not an available seed', $result->getDisplay());
     }
 
     public function testCommandWithClassArgumentAndRunException(): void
