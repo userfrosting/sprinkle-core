@@ -10,8 +10,10 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Util;
 
+use Countable;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use Traversable;
 use UserFrosting\Sprinkle\Core\Util\ClassRepository\AbstractClassRepository;
 use UserFrosting\Sprinkle\Core\Util\ClassRepository\ClassRepositoryInterface;
 use UserFrosting\Support\Exception\NotFoundException;
@@ -82,6 +84,29 @@ class ClassRepositoryTest extends TestCase
         $this->expectException(NotFoundException::class);
         $repository->get(StubClassC::class);
     }
+
+    /**
+     * @depends testConstruct
+     */
+    public function testArrayFunctions(ClassRepositoryInterface $repository): void
+    {
+        // Countable
+        $this->assertInstanceOf(Countable::class, $repository);
+        $this->assertCount(2, $repository);
+        $this->assertSame(count($repository), $repository->count());
+
+        // Iterable
+        // This is the only safe way to test the foreach :)
+        // Any assertions inside the foreach simply won't run if repo is empty.
+        // AssertInstanceOf is used to make sure we get the correct info.
+        $this->assertInstanceOf(Traversable::class, $repository);
+        $count = 0;
+        foreach ($repository as $class) {
+            $this->assertInstanceOf(Foo::class, $class);
+            $count++;
+        }
+        $this->assertSame(2, $count);
+    }
 }
 
 class TestClassRepository extends AbstractClassRepository
@@ -95,10 +120,14 @@ class TestClassRepository extends AbstractClassRepository
     }
 }
 
-class StubClassA
+interface Foo
 {
 }
 
-class StubClassB
+class StubClassA implements Foo
+{
+}
+
+class StubClassB implements Foo
 {
 }

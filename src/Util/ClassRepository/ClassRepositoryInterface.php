@@ -10,10 +10,13 @@
 
 namespace UserFrosting\Sprinkle\Core\Util\ClassRepository;
 
+use Countable;
+use IteratorAggregate;
+
 /**
  * Handle a PHP class repository.
  */
-interface ClassRepositoryInterface
+interface ClassRepositoryInterface extends Countable, IteratorAggregate
 {
     /**
      * Return all classes.

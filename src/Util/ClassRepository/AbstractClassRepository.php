@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Util\ClassRepository;
 
+use ArrayIterator;
 use UserFrosting\Support\Exception\NotFoundException;
 
 /**
@@ -56,6 +57,19 @@ abstract class AbstractClassRepository implements ClassRepositoryInterface
         return in_array($class, $this->list());
     }
 
-    // TODO : Add Iterator interface implemantion (around, iterable, etc.)
-    // https://www.php.net/manual/en/class.iterator.php
+    /**
+     * Countable implementation
+     */
+    public function count(): int
+    {
+        return count($this->all());
+    }
+
+    /**
+     * IteratorAggregate implementation
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->all());
+    }
 }
