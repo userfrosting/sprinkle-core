@@ -96,16 +96,8 @@ class ClassRepositoryTest extends TestCase
         $this->assertSame(count($repository), $repository->count());
 
         // Iterable
-        // This is the only safe way to test the foreach :)
-        // Any assertions inside the foreach simply won't run if repo is empty.
-        // AssertInstanceOf is used to make sure we get the correct info.
         $this->assertInstanceOf(Traversable::class, $repository);
-        $count = 0;
-        foreach ($repository as $class) {
-            $this->assertInstanceOf(Foo::class, $class);
-            $count++;
-        }
-        $this->assertSame(2, $count);
+        $this->assertIsIterable($repository);
     }
 }
 
@@ -120,14 +112,10 @@ class TestClassRepository extends AbstractClassRepository
     }
 }
 
-interface Foo
+class StubClassA
 {
 }
 
-class StubClassA implements Foo
-{
-}
-
-class StubClassB implements Foo
+class StubClassB
 {
 }

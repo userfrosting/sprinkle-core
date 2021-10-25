@@ -15,7 +15,6 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Bakery\SeedCommand;
-use UserFrosting\Sprinkle\Core\Bakery\SeedListCommand;
 use UserFrosting\Sprinkle\Core\Seeder\SeedInterface;
 use UserFrosting\Sprinkle\Core\Seeder\SeedRepositoryInterface;
 use UserFrosting\Support\Repository\Repository as Config;
@@ -115,8 +114,11 @@ class SeedCommandTest extends TestCase
         $result = BakeryTester::runCommand($command, input: ['class' => [$seed::class]]);
 
         // Assert some output
+        // Change COLUMNS to bypass issue with CI
+        // See : https://stackoverflow.com/a/40347595/445757
+        putenv('COLUMNS=144');
         $this->assertSame(1, $result->getStatusCode());
-        $this->assertStringContainsString('is not an available seed', $result->getDisplay());
+        $this->assertStringContainsString('Seed `' . $seed::class . '` is not an available seed.', $result->getDisplay());
     }
 
     public function testCommandWithClassArgumentAndRunException(): void

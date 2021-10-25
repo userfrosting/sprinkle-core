@@ -58,7 +58,7 @@ abstract class AbstractClassRepository implements ClassRepositoryInterface
     }
 
     /**
-     * Countable implementation
+     * Countable implementation.
      */
     public function count(): int
     {
@@ -66,7 +66,7 @@ abstract class AbstractClassRepository implements ClassRepositoryInterface
     }
 
     /**
-     * IteratorAggregate implementation
+     * IteratorAggregate implementation.
      */
     public function getIterator()
     {
