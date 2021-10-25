@@ -114,11 +114,8 @@ class SeedCommandTest extends TestCase
         $result = BakeryTester::runCommand($command, input: ['class' => [$seed::class]]);
 
         // Assert some output
-        // Change COLUMNS to bypass issue with CI
-        // See : https://stackoverflow.com/a/40347595/445757
-        putenv('COLUMNS=144');
         $this->assertSame(1, $result->getStatusCode());
-        $this->assertStringContainsString('Seed `' . $seed::class . '` is not an available seed.', $result->getDisplay());
+        $this->assertStringContainsString('Class is not a valid seed', $result->getDisplay());
     }
 
     public function testCommandWithClassArgumentAndRunException(): void

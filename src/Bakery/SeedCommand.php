@@ -72,7 +72,7 @@ class SeedCommand extends Command
         // Validate each classes
         foreach ($classes as $className) {
             if (!$this->seeds->has($className)) {
-                $this->io->error("Seed `$className` is not an available seed.");
+                $this->io->error("Class is not a valid seed : " . $className);
 
                 return self::FAILURE;
             }
