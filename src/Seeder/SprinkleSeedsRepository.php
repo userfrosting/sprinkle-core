@@ -17,7 +17,7 @@ use UserFrosting\Sprinkle\RecipeExtensionLoader;
 /**
  * Find and returns all registered SeedInterface across all sprinkles, using SeedRecipe.
  */
-class SprinkleSeedsRepository extends AbstractClassRepository implements SeedRepositoryInterface
+final class SprinkleSeedsRepository extends AbstractClassRepository implements SeedRepositoryInterface
 {
     /**
      * @param RecipeExtensionLoader $extensionLoader

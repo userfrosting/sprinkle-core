@@ -24,7 +24,7 @@ class SprinkleListCommand extends Command
     use WithSymfonyStyle;
 
     /**
-     * @var array The table header
+     * @var string[] The table header
      */
     protected $headers = ['Sprinkle', 'Class', 'Path'];
 

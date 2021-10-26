@@ -18,7 +18,7 @@ use UserFrosting\Sprinkle\RecipeExtensionLoader;
 /**
  * Find and returns all migrations definitions (classes) registered and available.
  */
-class SprinkleMigrationLocator extends AbstractClassRepository implements MigrationLocatorInterface
+final class SprinkleMigrationLocator extends AbstractClassRepository implements MigrationLocatorInterface
 {
     /**
      * @param RecipeExtensionLoader $extensionLoader
