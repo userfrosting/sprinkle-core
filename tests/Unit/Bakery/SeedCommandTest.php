@@ -35,7 +35,7 @@ class SeedCommandTest extends TestCase
             ->shouldReceive('run')->once()
             ->getMock();
         $seeds = Mockery::mock(SeedRepositoryInterface::class)
-            ->shouldReceive('list')->times(2)->andReturn([$seed::class])
+            ->shouldReceive('list')->once()->andReturn([$seed::class])
             ->shouldReceive('has')->with($seed::class)->once()->andReturn(true)
             ->shouldReceive('get')->with($seed::class)->once()->andReturn($seed)
             ->getMock();
@@ -229,5 +229,30 @@ class SeedCommandTest extends TestCase
         $this->assertStringContainsString('Seed(s) to apply', $result->getDisplay());
         $this->assertStringContainsString('Do you really wish to continue ?', $result->getDisplay());
         $this->assertStringNotContainsString('Seed successful !', $result->getDisplay());
+    }
+
+    public function testCommandWithDatabase(): void
+    {
+        // Setup Seeds mock
+        $seed = Mockery::mock(SeedInterface::class)
+            ->shouldReceive('run')->once()
+            ->getMock();
+        $seeds = Mockery::mock(SeedRepositoryInterface::class)
+            ->shouldReceive('list')->once()->andReturn([$seed::class])
+            ->shouldReceive('has')->with($seed::class)->once()->andReturn(true)
+            ->shouldReceive('get')->with($seed::class)->once()->andReturn($seed)
+            ->getMock();
+
+        // Set mock in CI and run command
+        $ci = ContainerStub::create();
+        $ci->set(SeedRepositoryInterface::class, $seeds);
+        $command = $ci->get(SeedCommand::class);
+        $result = BakeryTester::runCommand($command, input: ['--database' => 'foobar'], userInput: ['0']);
+
+        // Assert some output
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('Seeder', $result->getDisplay());
+        $this->assertStringContainsString('Running seed with `foobar` database connection', $result->getDisplay());
+        $this->assertStringContainsString('Seed successful !', $result->getDisplay());
     }
 }
