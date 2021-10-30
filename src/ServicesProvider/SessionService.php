@@ -30,6 +30,9 @@ class SessionService implements ServicesProviderInterface
     public function register(): array
     {
         return [
+            // TODO : Custom exception should be used.
+            // TODO : Container could be used to instantiate *AlertStream and limit the number of dependencies required (but would depend on the whole container... PHP-DI docs should be consulted to find the best way to do this).
+            //        -> *AlertStream can be defined down here, and instead of returning "new...", it return "ci->get(...)"
             Session::class => function (Capsule $db, Config $config, ResourceLocatorInterface $locator) {
 
                 // Create appropriate handler based on config
@@ -51,9 +54,8 @@ class SessionService implements ServicesProviderInterface
                     break;
                 }
 
-                // Create, start and return a new wrapper for $_SESSION
+                // Create and return a new wrapper for $_SESSION
                 $session = new Session($handler, $config->get('session'));
-                $session->start();
 
                 return $session;
             },
