@@ -10,7 +10,9 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
+use UserFrosting\Config\ConfigPathBuilder;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\Support\Repository\Loader\ArrayFileLoader;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /**
@@ -23,5 +25,7 @@ class ConfigServiceTest extends TestCase
     {
         $this->assertIsString($this->ci->get('UF_MODE'));
         $this->assertInstanceOf(Config::class, $this->ci->get(Config::class));
+        $this->assertInstanceOf(ArrayFileLoader::class, $this->ci->get(ArrayFileLoader::class));
+        $this->assertInstanceOf(ConfigPathBuilder::class, $this->ci->get(ConfigPathBuilder::class));
     }
 }

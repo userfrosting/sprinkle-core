@@ -11,6 +11,8 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use UserFrosting\Alert\AlertStream;
+use UserFrosting\Alert\CacheAlertStream;
+use UserFrosting\Alert\SessionAlertStream;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
@@ -22,5 +24,7 @@ class AlertStreamServiceTest extends TestCase
     public function testService(): void
     {
         $this->assertInstanceOf(AlertStream::class, $this->ci->get(AlertStream::class));
+        $this->assertInstanceOf(CacheAlertStream::class, $this->ci->get(CacheAlertStream::class));
+        $this->assertInstanceOf(SessionAlertStream::class, $this->ci->get(SessionAlertStream::class));
     }
 }

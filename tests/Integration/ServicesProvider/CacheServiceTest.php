@@ -11,6 +11,9 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use Illuminate\Cache\Repository as Cache;
+use UserFrosting\Cache\MemcachedStore;
+use UserFrosting\Cache\RedisStore;
+use UserFrosting\Cache\TaggableFileStore;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
@@ -22,5 +25,8 @@ class CacheServiceTest extends TestCase
     public function testService(): void
     {
         $this->assertInstanceOf(Cache::class, $this->ci->get(Cache::class));
+        $this->assertInstanceOf(TaggableFileStore::class, $this->ci->get(TaggableFileStore::class));
+        $this->assertInstanceOf(MemcachedStore::class, $this->ci->get(MemcachedStore::class));
+        $this->assertInstanceOf(RedisStore::class, $this->ci->get(RedisStore::class));
     }
 }
