@@ -18,7 +18,7 @@ use UserFrosting\Sprinkle\Core\Validators\PhpDeprecationValidator;
 use UserFrosting\Sprinkle\Core\Validators\PhpVersionValidator;
 
 /*
- * Define
+ * Define version requirements and validators.
  */
 class VersionsService implements ServicesProviderInterface
 {
