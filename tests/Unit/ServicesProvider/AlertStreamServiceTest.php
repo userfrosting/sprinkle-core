@@ -8,12 +8,12 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\ServicesProvider;
 
 use DI\Container;
 use Illuminate\Cache\Repository as Cache;
+use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Alert\CacheAlertStream;
@@ -45,16 +45,21 @@ class AlertStreamServiceTest extends TestCase
 
     public function testCacheConfig(): void
     {
-        // Set dependencies services
-        $config = m::mock(Config::class);
-        $config->shouldReceive('get')->with('alert.storage')->andReturn('cache');
-        $config->shouldReceive('get')->with('alert.key')->andReturn('foo');
+        // Create mocks
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('alert.storage')->andReturn('cache')
+            ->shouldReceive('get')->with('alert.key')->andReturn('foo')
+            ->getMock();
+
+        $session = Mockery::mock(Session::class)
+            ->shouldReceive('getId')->andReturn('foobar')
+            ->getMock();
+
+        // Set mocks in CI
         $this->ci->set(Config::class, $config);
-        $this->ci->set(Cache::class, m::mock(Cache::class));
-        $this->ci->set(Translator::class, m::mock(Translator::class));
-        $session = m::mock(Session::class);
-        $session->shouldReceive('getId')->andReturn('foobar');
         $this->ci->set(Session::class, $session);
+        $this->ci->set(Cache::class, Mockery::mock(Cache::class));
+        $this->ci->set(Translator::class, Mockery::mock(Translator::class));
 
         // Get stream and assert the right one is returned based on config
         $this->assertInstanceOf(CacheAlertStream::class, $this->ci->get(AlertStream::class));
@@ -62,14 +67,17 @@ class AlertStreamServiceTest extends TestCase
 
     public function testSessionConfig(): void
     {
-        // Set dependencies services
-        $config = m::mock(Config::class);
-        $config->shouldReceive('get')->with('alert.storage')->andReturn('session');
-        $config->shouldReceive('get')->with('alert.key')->andReturn('foo');
+        // Create mocks
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('alert.storage')->andReturn('session')
+            ->shouldReceive('get')->with('alert.key')->andReturn('foo')
+            ->getMock();
+
+        // Set mocks in CI
         $this->ci->set(Config::class, $config);
-        $this->ci->set(Cache::class, m::mock(Cache::class));
-        $this->ci->set(Translator::class, m::mock(Translator::class));
-        $this->ci->set(Session::class, m::mock(Session::class));
+        $this->ci->set(Cache::class, Mockery::mock(Cache::class));
+        $this->ci->set(Translator::class, Mockery::mock(Translator::class));
+        $this->ci->set(Session::class, Mockery::mock(Session::class));
 
         // Get stream and assert the right one is returned based on config
         $this->assertInstanceOf(SessionAlertStream::class, $this->ci->get(AlertStream::class));
@@ -77,13 +85,16 @@ class AlertStreamServiceTest extends TestCase
 
     public function testBadConfig(): void
     {
-        // Set dependencies services
-        $config = m::mock(Config::class);
-        $config->shouldReceive('get')->with('alert.storage')->andReturn('foo');
+        // Create mocks
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('alert.storage')->andReturn('foo')
+            ->getMock();
+
+        // Set mocks in CI
         $this->ci->set(Config::class, $config);
-        $this->ci->set(Cache::class, m::mock(Cache::class));
-        $this->ci->set(Translator::class, m::mock(Translator::class));
-        $this->ci->set(Session::class, m::mock(Session::class));
+        $this->ci->set(Cache::class, Mockery::mock(Cache::class));
+        $this->ci->set(Translator::class, Mockery::mock(Translator::class));
+        $this->ci->set(Session::class, Mockery::mock(Session::class));
 
         // Get stream and assert the exception is thrown.
         $this->expectException(\Exception::class);

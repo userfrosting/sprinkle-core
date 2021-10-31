@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\ServicesProvider;
 
 use DI\Container;
 use Mockery;
@@ -25,7 +25,6 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
 use UserFrosting\Sprinkle\RecipeExtensionLoader;
-use UserFrosting\Sprinkle\SprinkleManager;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceInterface;
@@ -33,10 +32,9 @@ use UserFrosting\UniformResourceLocator\ResourceLocationInterface;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
- * Integration tests for `view` service.
+ * Unit tests for `Twig` service.
  * Check to see if service returns what it's supposed to return
  */
-// TODO : Move to Unit test
 class TwigServiceTest extends TestCase
 {
     use MockeryPHPUnitIntegration;

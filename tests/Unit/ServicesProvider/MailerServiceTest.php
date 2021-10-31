@@ -8,10 +8,10 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\ServicesProvider;
 
+use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Log\MailLogger;
 use UserFrosting\Sprinkle\Core\Mail\Mailer;
@@ -51,13 +51,14 @@ class MailerServiceTest extends TestCase
         ];
 
         // Set dependencies services
-        $config = m::mock(Config::class);
-        $config->shouldReceive('get')->with('mail')->andReturn($mailConfig);
-        $config->shouldReceive('get')->with('debug.smtp')->andReturn(false); // TODO : Test true...
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('mail')->andReturn($mailConfig)
+            ->shouldReceive('get')->with('debug.smtp')->andReturn(false)
+            ->getMock(); // TODO : Test true...
         $ci->set(Config::class, $config);
 
         // Set dependencies services
-        $logger = m::mock(MailLogger::class);
+        $logger = Mockery::mock(MailLogger::class);
         $ci->set(MailLogger::class, $logger);
 
         // Assertions

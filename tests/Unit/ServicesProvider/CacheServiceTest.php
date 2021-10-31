@@ -8,12 +8,12 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\ServicesProvider;
 
 use DI\Container;
 use Illuminate\Cache\Repository as Cache;
+use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
 use UserFrosting\Support\Repository\Repository as Config;
@@ -42,13 +42,15 @@ class CacheServiceTest extends TestCase
     public function testFileConfig(): void
     {
         // Set mock Locator
-        $locator = m::mock(ResourceLocatorInterface::class);
-        $locator->shouldReceive('findResource')->withArgs(['cache://', true, true])->andReturn('foo/');
+        $locator = Mockery::mock(ResourceLocatorInterface::class)
+            ->shouldReceive('findResource')->withArgs(['cache://', true, true])->andReturn('foo/')
+            ->getMock();
         $this->ci->set(ResourceLocatorInterface::class, $locator);
 
         // Set mock Config service
-        $config = m::mock(Config::class);
-        $config->shouldReceive('get')->with('cache.driver')->once()->andReturn('file');
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('cache.driver')->once()->andReturn('file')
+            ->getMock();
         $this->ci->set(Config::class, $config);
 
         // Get stream and assert the right one is returned based on config
@@ -64,13 +66,14 @@ class CacheServiceTest extends TestCase
     public function testMemcachedConfig(): void
     {
         // Set mock Locator
-        $this->ci->set(ResourceLocatorInterface::class, m::mock(ResourceLocatorInterface::class));
+        $this->ci->set(ResourceLocatorInterface::class, Mockery::mock(ResourceLocatorInterface::class));
 
         // Set mock Config service
-        $config = m::mock(Config::class);
-        $config->shouldReceive('get')->with('cache.driver')->once()->andReturn('memcached');
-        $config->shouldReceive('get')->with('cache.memcached')->once()->andReturn([]);
-        $config->shouldReceive('get')->with('cache.prefix')->once()->andReturn('');
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('cache.driver')->once()->andReturn('memcached')
+            ->shouldReceive('get')->with('cache.memcached')->once()->andReturn([])
+            ->shouldReceive('get')->with('cache.prefix')->once()->andReturn('')
+            ->getMock();
         $this->ci->set(Config::class, $config);
 
         // Get stream and assert the right one is returned based on config
@@ -82,13 +85,14 @@ class CacheServiceTest extends TestCase
     public function testRedisConfig(): void
     {
         // Set mock Locator
-        $this->ci->set(ResourceLocatorInterface::class, m::mock(ResourceLocatorInterface::class));
+        $this->ci->set(ResourceLocatorInterface::class, Mockery::mock(ResourceLocatorInterface::class));
 
         // Set mock Config service
-        $config = m::mock(Config::class);
-        $config->shouldReceive('get')->with('cache.driver')->once()->andReturn('redis');
-        $config->shouldReceive('get')->with('cache.redis')->once()->andReturn([]);
-        $config->shouldReceive('get')->with('cache.prefix')->once()->andReturn('');
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('cache.driver')->once()->andReturn('redis')
+            ->shouldReceive('get')->with('cache.redis')->once()->andReturn([])
+            ->shouldReceive('get')->with('cache.prefix')->once()->andReturn('')
+            ->getMock();
         $this->ci->set(Config::class, $config);
 
         // Get stream and assert the right one is returned based on config
@@ -99,10 +103,13 @@ class CacheServiceTest extends TestCase
 
     public function testBadConfig(): void
     {
-        // Set dependencies services
-        $this->ci->set(ResourceLocatorInterface::class, m::mock(ResourceLocatorInterface::class));
-        $config = m::mock(Config::class);
-        $config->shouldReceive('get')->with('cache.driver')->times(2)->andReturn('foo');
+        // Set mock Locator
+        $this->ci->set(ResourceLocatorInterface::class, Mockery::mock(ResourceLocatorInterface::class));
+
+        // Set mock Config service
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('cache.driver')->times(2)->andReturn('foo')
+            ->getMock();
         $this->ci->set(Config::class, $config);
 
         // Get stream and assert the exception is thrown.
