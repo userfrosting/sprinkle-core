@@ -47,12 +47,12 @@ class AlertStreamService implements ServicesProviderInterface
                 }
             },
 
-            // TODO : If config service is passed as argument, no need for this
+            // TODO : If config service is passed as argument, no need for this. A `setKey` on the interface would help.
             CacheAlertStream::class => function (Config $config, Translator $translator, Cache $cache, Session $session) {
                 return new CacheAlertStream($config->get('alert.key'), $translator, $cache, $session->getId());
             },
 
-            // TODO : If config service is passed as argument, no need for this
+            // TODO : If config service is passed as argument, no need for this. A `setKey` on the interface would help.
             SessionAlertStream::class => function (Config $config, Translator $translator, Session $session) {
                 return new SessionAlertStream($config->get('alert.key'), $translator, $session);
             },
