@@ -14,7 +14,10 @@ use DI\Container;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Config\ConfigPathBuilder;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
+use UserFrosting\Support\Repository\Loader\ArrayFileLoader;
+use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
@@ -35,17 +38,54 @@ class ConfigServiceTest extends TestCase
         // Create container with provider to test
         $provider = new ConfigService();
         $this->ci = ContainerStub::create($provider->register());
+    }
 
+    public function testConfig(): void
+    {
         // Set mock Locator
+        $loader = Mockery::mock(ArrayFileLoader::class)
+            ->shouldReceive('load')->once()->andReturn([])
+            ->getMock();
+        $this->ci->set(ArrayFileLoader::class, $loader);
+
+        $this->assertInstanceOf(Config::class, $this->ci->get(Config::class));
+    }
+
+    // TODO : This must be properly tested...
+    // public function testUFMode(): void
+    // {
+    //     // Set mock Locator
+    //     $locator = Mockery::mock(ResourceLocatorInterface::class)
+    //         ->shouldReceive('getBasePath')->andReturn('')
+    //         ->getMock();
+    //     $this->ci->set(ResourceLocatorInterface::class, $locator);
+
+    //     $this->assertSame('foobar', $this->ci->get('UF_MODE'));
+    // }
+
+    public function testArrayFileLoader(): void
+    {
+        // Set mock Config Path Builder
+        $builder = Mockery::mock(ConfigPathBuilder::class)
+            ->shouldReceive('buildPaths')->once()->andReturn([])
+            ->getMock();
+        $this->ci->set(ConfigPathBuilder::class, $builder);
+
+        // Set mock Locator, as it's required to get "UF_MODE".
         $locator = Mockery::mock(ResourceLocatorInterface::class)
             ->shouldReceive('getBasePath')->andReturn('')
             ->getMock();
         $this->ci->set(ResourceLocatorInterface::class, $locator);
+
+        $this->assertInstanceOf(ArrayFileLoader::class, $this->ci->get(ArrayFileLoader::class));
     }
 
-    // TODO : Requires Service to be reworked with more injection
-    /*public function testService()
+    public function testConfigPathBuilder(): void
     {
-        $this->assertInstanceOf(Config::class, $this->ci->get(Config::class));
-    }*/
+        // Set mock Locator
+        $locator = Mockery::mock(ResourceLocatorInterface::class);
+        $this->ci->set(ResourceLocatorInterface::class, $locator);
+
+        $this->assertInstanceOf(ConfigPathBuilder::class, $this->ci->get(ConfigPathBuilder::class));
+    }
 }

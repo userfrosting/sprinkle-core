@@ -12,25 +12,27 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidPathException;
+use Psr\Container\ContainerInterface;
 use UserFrosting\Config\ConfigPathBuilder;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Support\Repository\Loader\ArrayFileLoader;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
-/*
+/**
  * Site config service.
  *
  * Will attempt to automatically determine which config file(s) to use based on the value of the UF_MODE environment variable.
  */
+// TODO : Config required rework in the framework. It required too much info to setup, not enough injection (bad code smell).
+// Also, DotEnv usage to get the `.env` must be properly tested. The file location must be set somewhere too.
 class ConfigService implements ServicesProviderInterface
 {
     public function register(): array
     {
         return [
-            // TODO : Use interface & Implement request ?
-            // TODO : Inject Dotenv & others classes
-            Config::class => function (ResourceLocatorInterface $locator) {
+            // Set env mode in CI
+            'UF_MODE' => function (ResourceLocatorInterface $locator) {
                 // Grab any relevant dotenv variables from the .env file
                 // located at the locator base path
                 try {
@@ -40,18 +42,16 @@ class ConfigService implements ServicesProviderInterface
                     // Skip loading the environment config file if it doesn't exist.
                 }
 
-                // Get configuration mode from environment
-                // TODO : Change to env. It doesn't looks likes it work with dotenv load above.
-                // $mode = env('UF_MODE', '');
-                $mode = getenv('UF_MODE') ?: '';
+                return env('UF_MODE') ?: '';
+            },
 
-                // Construct and load config repository
-                $builder = new ConfigPathBuilder($locator, 'config://');
-                $loader = new ArrayFileLoader($builder->buildPaths($mode));
+            Config::class => function (ArrayFileLoader $loader) {
+
+                // Load config repository
                 $config = new Config($loader->load());
 
                 // Construct base url from components, if not explicitly specified
-                // TODO : Request not in CI yet
+                // TODO : Request not in CI. Move to Middleware
                 /*if (!isset($config['site.uri.public'])) {
                       $uri = $c->get('request')->getUri();
 
@@ -69,6 +69,16 @@ class ConfigService implements ServicesProviderInterface
                 $config->set('csrf.blacklist', $csrfBlacklist);
 
                 return $config;
+            },
+
+            ArrayFileLoader::class => function (ConfigPathBuilder $builder, ContainerInterface $ci) {
+                $mode = $ci->get('UF_MODE');
+
+                return new ArrayFileLoader($builder->buildPaths($mode));
+            },
+
+            ConfigPathBuilder::class => function (ResourceLocatorInterface $locator) {
+                return new ConfigPathBuilder($locator, 'config://');
             },
         ];
     }
