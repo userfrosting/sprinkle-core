@@ -53,7 +53,7 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\LocatorService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\LoggersService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\MailService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\MigratorService;
-use UserFrosting\Sprinkle\Core\ServicesProvider\RouterService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\RoutingService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\SeedService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\SessionService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
@@ -162,7 +162,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
             LoggersService::class,
             // MailService::class,
             MigratorService::class,
-            // RouterService::class,
+            RoutingService::class,
             SeedService::class,
             SessionService::class,
             // ThrottlerService::class,

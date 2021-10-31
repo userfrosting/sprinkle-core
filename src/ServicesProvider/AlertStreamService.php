@@ -24,9 +24,9 @@ use UserFrosting\Support\Repository\Repository as Config;
  *
  * Persists error/success messages between requests in the session.
  *
- * @throws \Exception                                    If alert storage handler is not supported
+ * @throws \Exception                      If alert storage handler is not supported
  * @return \UserFrosting\Alert\AlertStream
-*/
+ */
 class AlertStreamService implements ServicesProviderInterface
 {
     public function register(): array

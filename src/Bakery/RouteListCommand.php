@@ -10,25 +10,23 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Slim\Route;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Util\RouteList;
 
 /**
  * route:list Bakery Command
- * Generate a list all registered routes
- * Inspired by Laravel `route:list` artisan command.
+ * Generate a list all registered routes.
  */
 class RouteListCommand extends Command
 {
-    /**
-     * @var array The table header
-     */
-    protected $headers = ['Method', 'URI', 'Name', 'Action'];
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected RouteList $routeList;
 
     /**
      * {@inheritdoc}
@@ -40,6 +38,7 @@ class RouteListCommand extends Command
              ->addOption('method', null, InputOption::VALUE_REQUIRED, 'Filter the routes by method.')
              ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Filter the routes by name.')
              ->addOption('uri', null, InputOption::VALUE_REQUIRED, 'Filter the routes by uri.')
+             ->addOption('action', null, InputOption::VALUE_REQUIRED, 'Filter the routes by action.')
              ->addOption('reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes.')
              ->addOption('sort', null, InputOption::VALUE_REQUIRED, 'The column (method, uri, name, action) to sort by.', 'uri');
     }
@@ -51,88 +50,31 @@ class RouteListCommand extends Command
     {
         $this->io->title('Registered Routes');
 
-        // Get routes list
-        $routes = $this->ci->router->getRoutes();
-
-        // If not route, don't go further
-        if (count($routes) === 0) {
-            $this->io->error("Your application doesn't have any routes.");
+        try {
+            $routes = $this->routeList->get(
+                $input->getOption('method'),
+                $input->getOption('name'),
+                $input->getOption('uri'),
+                $input->getOption('action'),
+                $input->getOption('reverse'),
+                $input->getOption('sort'),
+            );
+        } catch (\Exception $e) {
+            $this->io->error($e->getMessage());
 
             return self::FAILURE;
         }
 
-        // Compile the routes into a displayable format
-        $routes = collect($routes)->map(function ($route) use ($input) {
-            return $this->getRouteInformation($route, $input);
-        })->all();
+        // Display error if no routes
+        if (empty($routes)) {
+            $this->io->warning('No routes found.');
 
-        // Apply sort
-        if ($sort = $input->getOption('sort')) {
-            $routes = $this->sortRoutes($sort, $routes);
-        }
-
-        // Apply reverse if required
-        if ($input->getOption('reverse')) {
-            $routes = array_reverse($routes);
+            return self::FAILURE;
         }
 
         // Display routes
-        $this->io->table($this->headers, $routes);
+        $this->io->table(['Method', 'URI', 'Name', 'Action'], $routes);
 
         return self::SUCCESS;
-    }
-
-    /**
-     * Get the route information for a given route.
-     *
-     * @param Route          $route
-     * @param InputInterface $input [description]
-     *
-     * @return array
-     */
-    protected function getRouteInformation(Route $route, InputInterface $input)
-    {
-        $callable = is_string($route->getCallable()) ? $route->getCallable() : 'Callable';
-
-        return $this->filterRoute([
-            'method' => implode('|', $route->getMethods()),
-            'uri'    => $route->getPattern(),
-            'name'   => $route->getName(),
-            'action' => $callable,
-        ], $input);
-    }
-
-    /**
-     * Sort the routes by a given element.
-     *
-     * @param string $sort
-     * @param array  $routes
-     *
-     * @return array
-     */
-    protected function sortRoutes($sort, $routes)
-    {
-        return Arr::sort($routes, function ($route) use ($sort) {
-            return $route[$sort];
-        });
-    }
-
-    /**
-     * Filter the route by URI and / or name.
-     *
-     * @param array          $route
-     * @param InputInterface $input [description]
-     *
-     * @return array|null
-     */
-    protected function filterRoute(array $route, InputInterface $input)
-    {
-        if (($input->getOption('name') && !Str::contains($route['name'], $input->getOption('name'))) ||
-             $input->getOption('uri') && !Str::contains($route['uri'], $input->getOption('uri')) ||
-             $input->getOption('method') && !Str::contains($route['method'], strtoupper($input->getOption('method')))) {
-            return;
-        }
-
-        return $route;
     }
 }
