@@ -15,6 +15,10 @@ use Illuminate\Cache\Repository as Cache;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Cache\MemcachedStore;
+use UserFrosting\Cache\RedisStore;
+use UserFrosting\Cache\TaggableFileStore;
+use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
@@ -39,73 +43,39 @@ class CacheServiceTest extends TestCase
         $this->ci = ContainerStub::create($provider->register());
     }
 
-    public function testFileConfig(): void
-    {
-        // Set mock Locator
-        $locator = Mockery::mock(ResourceLocatorInterface::class)
-            ->shouldReceive('findResource')->withArgs(['cache://', true, true])->andReturn('foo/')
-            ->getMock();
-        $this->ci->set(ResourceLocatorInterface::class, $locator);
-
-        // Set mock Config service
-        $config = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('cache.driver')->once()->andReturn('file')
-            ->getMock();
-        $this->ci->set(Config::class, $config);
-
-        // Get stream and assert the right one is returned based on config
-        // WARNING : The service provider call TaggableFileStore, but also `instance()` which return the Cache instance from TaggableFileStore !!!
-        //           Service should be properly tested to know TaggableFileStore is called.
-        $this->assertInstanceOf(Cache::class, $this->ci->get(Cache::class));
-    }
-
     /**
-     * @requires extension Memcached
+     * Test the right store is returned depending on Config
+     *
+     * @dataProvider driverDataProvider
      */
-    // TODO : Mock MemcachedStore so the extension is no longer a requirement for this test
-    public function testMemcachedConfig(): void
+    public function testFileConfig(string $name, string $class): void
     {
-        // Set mock Locator
-        $this->ci->set(ResourceLocatorInterface::class, Mockery::mock(ResourceLocatorInterface::class));
-
         // Set mock Config service
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('cache.driver')->once()->andReturn('memcached')
-            ->shouldReceive('get')->with('cache.memcached')->once()->andReturn([])
-            ->shouldReceive('get')->with('cache.prefix')->once()->andReturn('')
+            ->shouldReceive('get')->with('cache.driver')->once()->andReturn($name)
             ->getMock();
         $this->ci->set(Config::class, $config);
 
-        // Get stream and assert the right one is returned based on config
-        // WARNING : The service provider call MemcachedStore, but also `instance()` which return the Cache instance from MemcachedStore !!!
-        //           Service should be properly tested to know MemcachedStore is called.
+        // Set mock Store
+        $store = Mockery::mock($class)
+            ->shouldReceive('instance')->once()->andReturn(Mockery::mock(Cache::class))
+            ->getMock();
+        $this->ci->set($class, $store);
+
         $this->assertInstanceOf(Cache::class, $this->ci->get(Cache::class));
     }
 
-    public function testRedisConfig(): void
+    public function driverDataProvider(): array
     {
-        // Set mock Locator
-        $this->ci->set(ResourceLocatorInterface::class, Mockery::mock(ResourceLocatorInterface::class));
-
-        // Set mock Config service
-        $config = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('cache.driver')->once()->andReturn('redis')
-            ->shouldReceive('get')->with('cache.redis')->once()->andReturn([])
-            ->shouldReceive('get')->with('cache.prefix')->once()->andReturn('')
-            ->getMock();
-        $this->ci->set(Config::class, $config);
-
-        // Get stream and assert the right one is returned based on config
-        // WARNING : The service provider call RedisStore, but also `instance()` which return the Cache instance from RedisStore !!!
-        //           Service should be properly tested to know RedisStore is called.
-        $this->assertInstanceOf(Cache::class, $this->ci->get(Cache::class));
+        return [
+            ['file', TaggableFileStore::class],
+            ['memcached', MemcachedStore::class],
+            ['redis', RedisStore::class],
+        ];
     }
 
     public function testBadConfig(): void
     {
-        // Set mock Locator
-        $this->ci->set(ResourceLocatorInterface::class, Mockery::mock(ResourceLocatorInterface::class));
-
         // Set mock Config service
         $config = Mockery::mock(Config::class)
             ->shouldReceive('get')->with('cache.driver')->times(2)->andReturn('foo')
@@ -113,7 +83,42 @@ class CacheServiceTest extends TestCase
         $this->ci->set(Config::class, $config);
 
         // Get stream and assert the exception is thrown.
-        $this->expectException(\Exception::class);
+        $this->expectException(BadConfigException::class);
         $this->ci->get(Cache::class);
+    }
+
+    public function testTaggableFileStore(): void
+    {
+        // Set mock Locator
+        $locator = Mockery::mock(ResourceLocatorInterface::class)
+            ->shouldReceive('findResource')->withArgs(['cache://', true, true])->andReturn('foo/')
+            ->getMock();
+        $this->ci->set(ResourceLocatorInterface::class, $locator);
+
+        $this->assertInstanceOf(TaggableFileStore::class, $this->ci->get(TaggableFileStore::class));
+    }
+
+    public function testMemcachedStore(): void
+    {
+        // Set mock Config service
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('cache.memcached')->once()->andReturn([])
+            ->shouldReceive('get')->with('cache.prefix')->once()->andReturn('')
+            ->getMock();
+        $this->ci->set(Config::class, $config);
+
+        $this->assertInstanceOf(MemcachedStore::class, $this->ci->get(MemcachedStore::class));
+    }
+
+    public function testRedisStore(): void
+    {
+        // Set mock Config service
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('cache.redis')->once()->andReturn([])
+            ->shouldReceive('get')->with('cache.prefix')->once()->andReturn('')
+            ->getMock();
+        $this->ci->set(Config::class, $config);
+
+        $this->assertInstanceOf(RedisStore::class, $this->ci->get(RedisStore::class));
     }
 }
