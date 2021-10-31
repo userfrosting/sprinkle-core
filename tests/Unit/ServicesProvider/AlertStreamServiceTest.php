@@ -20,6 +20,7 @@ use UserFrosting\Alert\CacheAlertStream;
 use UserFrosting\Alert\SessionAlertStream;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Session\Session;
+use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
@@ -97,7 +98,7 @@ class AlertStreamServiceTest extends TestCase
         $this->ci->set(Session::class, Mockery::mock(Session::class));
 
         // Get stream and assert the exception is thrown.
-        $this->expectException(\Exception::class);
+        $this->expectException(BadConfigException::class);
         $this->ci->get(AlertStream::class);
     }
 }

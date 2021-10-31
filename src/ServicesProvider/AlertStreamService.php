@@ -11,12 +11,14 @@
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use Illuminate\Cache\Repository as Cache;
+use Psr\Container\ContainerInterface;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Alert\CacheAlertStream;
 use UserFrosting\Alert\SessionAlertStream;
 use UserFrosting\I18n\Translator;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Session\Session;
+use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /**
@@ -24,30 +26,35 @@ use UserFrosting\Support\Repository\Repository as Config;
  *
  * Persists error/success messages between requests in the session.
  *
- * @throws \Exception If alert storage handler is not supported
- *
- * @return \UserFrosting\Alert\AlertStream
+ * @throws BadConfigException If alert handler is not supported
  */
 class AlertStreamService implements ServicesProviderInterface
 {
     public function register(): array
     {
         return [
-            // TODO : Custom exception should be used.
-            // TODO : Container could be used to instantiate *AlertStream and limit the number of dependencies required (but would depend on the whole container... PHP-DI docs should be consulted to find the best way to do this).
-            //        -> *AlertStream can be defined down here, and instead of returning "new...", it return "ci->get(...)"
-            AlertStream::class => function (Config $config, Translator $translator, Cache $cache, Session $session) {
+            AlertStream::class => function (ContainerInterface $ci, Config $config) {
                 switch ($config->get('alert.storage')) {
                     case 'cache':
-                        return new CacheAlertStream($config->get('alert.key'), $translator, $cache, $session->getId());
+                        return $ci->get(CacheAlertStream::class);
                     break;
                     case 'session':
-                        return new SessionAlertStream($config->get('alert.key'), $translator, $session);
+                        return $ci->get(SessionAlertStream::class);
                     break;
                     default:
-                        throw new \Exception("Bad alert storage handler type '{$config->get('alert.storage')}' specified in configuration file.");
+                        throw new BadConfigException("Bad alert storage handler type '{$config->get('alert.storage')}' specified in configuration file.");
                     break;
                 }
+            },
+
+            // TODO : If config service is passed as argument, no need for this
+            CacheAlertStream::class => function (Config $config, Translator $translator, Cache $cache, Session $session) {
+                return new CacheAlertStream($config->get('alert.key'), $translator, $cache, $session->getId());
+            },
+
+            // TODO : If config service is passed as argument, no need for this
+            SessionAlertStream::class => function (Config $config, Translator $translator, Session $session) {
+                return new SessionAlertStream($config->get('alert.key'), $translator, $session);
             },
         ];
     }
