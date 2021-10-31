@@ -24,6 +24,7 @@ final class RoutingService implements ServicesProviderInterface
         return [
             /**
              * Alias for Router Parser in CI for easier access.
+             *
              * @see https://www.slimframework.com/docs/v4/objects/routing.html#route-names
              */
             RouteParserInterface::class => function (App $app) {
