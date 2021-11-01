@@ -16,7 +16,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Events\Dispatcher;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
-use UserFrosting\Sprinkle\Core\Log\QueryLogger;
+use UserFrosting\Sprinkle\Core\Listeners\LogExecutedQuery;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /*
@@ -30,7 +30,7 @@ class DatabaseService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            Capsule::class => function (Config $config, QueryLogger $logger) {
+            Capsule::class => function (Config $config, LogExecutedQuery $logger) {
                 $capsule = new Capsule();
 
                 // Add each defined connection in the config
@@ -54,13 +54,7 @@ class DatabaseService implements ServicesProviderInterface
 
                 // Listen to QueryExecuted event and send debug to logger if required by config
                 if ($config->get('debug.queries')) {
-                    $queryEventDispatcher->listen(QueryExecuted::class, function ($query) use ($logger) {
-                        $logger->debug("Query executed on database [{$query->connectionName}]:", [
-                            'query'    => $query->sql,
-                            'bindings' => $query->bindings,
-                            'time'     => $query->time . ' ms',
-                        ]);
-                    });
+                    $queryEventDispatcher->listen(QueryExecuted::class, $logger);
                 }
 
                 return $capsule;
