@@ -32,14 +32,15 @@ class SessionService implements ServicesProviderInterface
     {
         return [
             /**
-             * Inject config into Session
+             * Inject config into Session.
              */
             Session::class => function (SessionHandlerInterface $handler, Config $config) {
                 return new Session($handler, $config->get('session'));
             },
 
             /**
-             * Select Handler based on Config
+             * Select Handler based on Config.
+             *
              * @throws BadConfigException
              */
             SessionHandlerInterface::class => function (ContainerInterface $ci, Config $config) {
