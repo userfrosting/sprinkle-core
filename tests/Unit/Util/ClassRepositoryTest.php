@@ -98,6 +98,14 @@ class ClassRepositoryTest extends TestCase
         // Iterable
         $this->assertInstanceOf(Traversable::class, $repository);
         $this->assertIsIterable($repository);
+
+        // Simple way to test loop, otherwise PHPUnit doesn't fail if assertion is not run.
+        $count = 0;
+        foreach ($repository as $class) {
+            $this->assertInstanceOf(FooBar::class, $class);
+            $count++;
+        }
+        $this->assertSame(2, $count);
     }
 }
 
@@ -112,10 +120,14 @@ class TestClassRepository extends AbstractClassRepository
     }
 }
 
-class StubClassA
+interface FooBar
 {
 }
 
-class StubClassB
+class StubClassA implements FooBar
+{
+}
+
+class StubClassB implements FooBar
 {
 }
