@@ -10,54 +10,69 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Connection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Session\DatabaseSessionHandler;
 use Illuminate\Session\FileSessionHandler;
 use Illuminate\Session\NullSessionHandler;
+use Psr\Container\ContainerInterface;
+use SessionHandlerInterface;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Session\Session;
+use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
-/*
- * Start the PHP session, with the name and parameters specified in the configuration file.
- *
- * @throws \Exception
+/**
+ * PHP session related services, link classes with the configuration.
  */
 class SessionService implements ServicesProviderInterface
 {
     public function register(): array
     {
         return [
-            // TODO : Custom exception should be used.
-            // TODO : Container could be used to instantiate *AlertStream and limit the number of dependencies required (but would depend on the whole container... PHP-DI docs should be consulted to find the best way to do this).
-            //        -> *AlertStream can be defined down here, and instead of returning "new...", it return "ci->get(...)"
-            Session::class => function (Capsule $db, Config $config, ResourceLocatorInterface $locator) {
+            /**
+             * Inject config into Session
+             */
+            Session::class => function (SessionHandlerInterface $handler, Config $config) {
+                return new Session($handler, $config->get('session'));
+            },
 
+            /**
+             * Select Handler based on Config
+             * @throws BadConfigException
+             */
+            SessionHandlerInterface::class => function (ContainerInterface $ci, Config $config) {
                 // Create appropriate handler based on config
                 switch ($config->get('session.handler')) {
                     case 'file':
-                        $fs = new Filesystem(); // TODO : Should be injected
-                        $handler = new FileSessionHandler($fs, $locator->findResource('session://'), $config->get('session.minutes'));
+                        return $ci->get(FileSessionHandler::class);
                     break;
                     case 'database':
-                        $connection = $db->connection();
-                        // Table must exist, otherwise an exception will be thrown
-                        $handler = new DatabaseSessionHandler($connection, $config->get('session.database.table'), $config->get('session.minutes'));
+                        return $ci->get(DatabaseSessionHandler::class);
                     break;
                     case 'array':
-                        $handler = new NullSessionHandler();
+                        return $ci->get(NullSessionHandler::class);
                     break;
                     default:
-                        throw new \Exception("Bad session handler type '{$config['session.handler']}' specified in configuration file.");
+                        throw new BadConfigException("Bad session handler type '{$config->get('session.handler')}' specified in configuration file.");
                     break;
                 }
+            },
 
-                // Create and return a new wrapper for $_SESSION
-                $session = new Session($handler, $config->get('session'));
+            /**
+             * Inject dependencies into FileSessionHandler.
+             */
+            FileSessionHandler::class => function (Filesystem $fs, Config $config, ResourceLocatorInterface $locator) {
+                return new FileSessionHandler($fs, $locator->findResource('session://'), $config->get('session.minutes'));
+            },
 
-                return $session;
+            /**
+             * Inject dependencies into DatabaseSessionHandler.
+             * Table must exist, otherwise an exception will be thrown.
+             */
+            DatabaseSessionHandler::class => function (Connection $connection, Config $config) {
+                return new DatabaseSessionHandler($connection, $config->get('session.database.table'), $config->get('session.minutes'));
             },
         ];
     }
