@@ -30,6 +30,10 @@ final class RoutingService implements ServicesProviderInterface
             RouteParserInterface::class => function (App $app) {
                 return $app->getRouteCollector()->getRouteParser();
             },
+
+            // TODO : Add caching. Problem is, having `getRouteCollector` in CI create an infinite loop
+            // This should probably be done elsewhere. Maybe in Event ?
+            // https://www.slimframework.com/docs/v4/objects/routing.html#route-expressions-caching
         ];
     }
 }
