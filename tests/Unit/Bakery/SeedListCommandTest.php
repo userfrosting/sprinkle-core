@@ -20,7 +20,7 @@ use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;
 
 /**
- * Test SeedListCommand
+ * Test seed:list command.
  */
 class SeedListCommandTest extends TestCase
 {

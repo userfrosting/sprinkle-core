@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\Sprinkle\SprinkleManager;
+use UserFrosting\Sprinkle\SprinkleRecipe;
 
 /**
  * Sprinkle:list CLI tool.
@@ -51,7 +52,7 @@ class SprinkleListCommand extends Command
         $sprinkles = $this->sprinkleManager->getSprinkles();
 
         // Compile the routes into a displayable format
-        $sprinklesTable = collect($sprinkles)->map(function ($sprinkle) {
+        $sprinklesTable = collect($sprinkles)->map(function (SprinkleRecipe $sprinkle) {
             return [
                 'sprinkle'  => $sprinkle::getName(),
                 'class'     => $sprinkle,
