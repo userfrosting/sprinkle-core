@@ -48,21 +48,29 @@ class SprinkleListCommand extends Command
     {
         $this->io->title('Loaded Sprinkles');
 
-        // Get sprinkle list
+        // Get sprinkle list and Compile the routes into a displayable format.
         $sprinkles = $this->sprinkleManager->getSprinkles();
-
-        // Compile the routes into a displayable format
-        $sprinklesTable = collect($sprinkles)->map(function (SprinkleRecipe $sprinkle) {
-            return [
-                'sprinkle'  => $sprinkle::getName(),
-                'class'     => $sprinkle,
-                'path'      => $sprinkle::getPath(),
-            ];
-        })->all();
+        $sprinklesTable = array_map([$this, 'mapSprinkle'], $sprinkles);
 
         // Display table
         $this->io->table($this->headers, $sprinklesTable);
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Map Sprinkle Class into table.
+     *
+     * @param SprinkleRecipe $sprinkle
+     *
+     * @return string[]
+     */
+    protected function mapSprinkle($sprinkle): array
+    {
+        return [
+            'sprinkle'  => $sprinkle::getName(),
+            'class'     => $sprinkle,
+            'path'      => $sprinkle::getPath(),
+        ];
     }
 }
