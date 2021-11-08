@@ -56,12 +56,12 @@
     },
     "autoload": {
         "psr-4": {
-            "UserFrosting\\Sprinkle\\Core\\": "src/"
+            "UserFrosting\\Sprinkle\\Core\\": "app/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "UserFrosting\\Sprinkle\\Core\\Tests\\": "tests/"
+            "UserFrosting\\Sprinkle\\Core\\Tests\\": "app/tests/"
         }
     }
 }

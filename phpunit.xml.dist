@@ -14,7 +14,7 @@
 >
   <coverage includeUncoveredFiles="true" processUncoveredFiles="false">
     <include>
-      <directory suffix=".php">src/</directory>
+      <directory suffix=".php">app/src/</directory>
     </include>
     <report>
       <clover outputFile="_meta/coverage.xml"/>
@@ -23,10 +23,10 @@
   </coverage>
   <testsuites>
     <testsuite name="Unit">
-      <directory suffix="Test.php">tests/Unit</directory>
+      <directory suffix="Test.php">app/tests/Unit</directory>
     </testsuite>
     <testsuite name="Integration">
-      <directory suffix=".php">tests/Integration</directory>
+      <directory suffix=".php">app/tests/Integration</directory>
     </testsuite>
   </testsuites>
   <php>

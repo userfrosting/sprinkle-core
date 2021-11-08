@@ -284,7 +284,7 @@ class CheckEnvironment
         $problemsFound = false;
 
         $directoryPaths = [
-            'logs'     => $this->locator->findResource('log://'),
+            'logs'     => $this->locator->findResource('logs://'),
             'cache'    => $this->locator->findResource('cache://'),
             'sessions' => $this->locator->findResource('session://'),
         ];
@@ -320,7 +320,7 @@ class CheckEnvironment
         $problemsFound = false;
 
         $shouldBeWriteable = [
-            $this->locator->findResource('log://')     => true,
+            $this->locator->findResource('logs://')    => true,
             $this->locator->findResource('cache://')   => true,
             $this->locator->findResource('session://') => true,
         ];
