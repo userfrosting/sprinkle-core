@@ -56,8 +56,8 @@ class DebugCommand extends Command
     protected function configure()
     {
         $this->setName('debug')
-             ->setDescription('Test the UserFrosting installation and setup the database')
-             ->setHelp("This command is used to check if the various dependencies of UserFrosting are met and display useful debugging information. \nIf any error occurs, check out the online documentation for more info about that error. \nThis command also provide the necessary tools to setup the database credentials");
+             ->setDescription('Test the UserFrosting installation and setup of the database')
+             ->setHelp("This command is used to check if the various dependencies of UserFrosting are met and display useful debugging information. \nIf any error occurs, check out the online documentation for more info about that error. \nThis command also provide the necessary tools to test the setup of the database credentials");
     }
 
     /**
@@ -68,15 +68,12 @@ class DebugCommand extends Command
         // Display header,
         $this->io->title('UserFrosting');
 
-        // Need to touch the config service first to load dotenv values
-        // $config = $this->ci->get(Config::class);
-
         // Validate PHP, Node and Npm versions.
         $this->validateVersions();
 
         // Perform tasks & display info
         $this->io->definitionList(
-            ['UserFrosting version'  => \UserFrosting\VERSION], // TODO Rethink usefulness of this. Might need to move to sprinkle list, with each sprinkle having it's own version.
+            ['UserFrosting version' => \UserFrosting\VERSION], // TODO Rethink usefulness of this. Might need to move to sprinkle list, with each sprinkle having it's own version.
             ['OS Name'              => php_uname('s')],
             ['Main Sprinkle Path'   => $this->sprinkleManager->getMainSprinkle()::getPath()],
             ['Environment mode'     => env('UF_MODE', 'default')],
@@ -93,6 +90,12 @@ class DebugCommand extends Command
 
         // Check database connection
         $this->checkDatabase();
+
+        // Show locator debug on verbose mode
+        if ($this->io->isVerbose()) {
+            $command = $this->getApplication()->find('debug:locator');
+            $command->run($input, $output);
+        }
 
         // If all went well and there's no fatal errors, we are ready to bake
         $this->io->success('Ready to bake !');
@@ -146,7 +149,7 @@ class DebugCommand extends Command
 
         try {
             $this->testDB();
-            $this->io->writeln('Database connection successful');
+            $this->io->success('Database connection successful');
 
             return;
         } catch (\Exception $e) {

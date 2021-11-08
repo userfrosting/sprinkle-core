@@ -15,6 +15,7 @@ use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
 use UserFrosting\Sprinkle\Core\Bakery\BuildAssets;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugLocatorCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleCompareCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleDictionaryCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleInfoCommand;
@@ -98,6 +99,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
             BuildAssets::class,
             ClearCacheCommand::class,
             DebugCommand::class,
+            DebugLocatorCommand::class,
             LocaleCompareCommand::class,
             LocaleDictionaryCommand::class,
             LocaleInfoCommand::class,
@@ -214,15 +216,16 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
      *
      * @return \UserFrosting\UniformResourceLocator\ResourceStreamInterface[]
      */
+    // TODO : we could move this to config probably? Don't remember why it's been made a recipe... So we can define different type of resources?
     public static function getResourceStreams(): array
     {
         return [
-            new ResourceStream('sprinkles'),
+            // new ResourceStream('assets'),
+            new ResourceStream('sprinkles'), // TODO : Not sure this is right.
             new ResourceStream('config'),
             new ResourceStream('extra'),
-            new ResourceStream('factories'),
+            new ResourceStream('factories'), // TODO Change to DI
             new ResourceStream('locale'),
-            new ResourceStream('routes'),
             new ResourceStream('schema'),
             new ResourceStream('templates'),
 
