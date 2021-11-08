@@ -216,12 +216,11 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
      *
      * @return \UserFrosting\UniformResourceLocator\ResourceStreamInterface[]
      */
-    // TODO : we could move this to config probably? Don't remember why it's been made a recipe... So we can define different type of resources?
     public static function getResourceStreams(): array
     {
         return [
             // new ResourceStream('assets'),
-            new ResourceStream('sprinkles'), // TODO : Not sure this is right.
+            new ResourceStream('sprinkles', path: ''),
             new ResourceStream('config'),
             new ResourceStream('extra'),
             new ResourceStream('factories'), // TODO Change to DI
