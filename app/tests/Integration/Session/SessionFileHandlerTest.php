@@ -47,7 +47,7 @@ class SessionFileHandlerTest extends TestCase
         $session_id = 'test' . rand(1, 100000);
 
         // Get session dir
-        $session_dir = $this->locator->findResource('session://');
+        $session_dir = $this->locator->findResource('sessions://');
 
         // Define session filename
         $session_file = "$session_dir/$session_id";
@@ -136,7 +136,7 @@ class SessionFileHandlerTest extends TestCase
         $locator = $this->ci->get(ResourceLocatorInterface::class);
 
         $fs = new Filesystem();
-        $handler = new FileSessionHandler($fs, $locator->findResource('session://'), 120);
+        $handler = new FileSessionHandler($fs, $locator->findResource('sessions://'), 120);
         $session = new Session($handler, $config['session']);
 
         $this->assertInstanceOf(Session::class, $session);
@@ -174,7 +174,7 @@ class SessionFileHandlerTest extends TestCase
         session_write_close();
 
         // Make sure file was filled with something
-        $session_dir = $this->locator->findResource('session://');
+        $session_dir = $this->locator->findResource('sessions://');
         $session_file = "$session_dir/$session_id";
 
         $fs = new Filesystem();

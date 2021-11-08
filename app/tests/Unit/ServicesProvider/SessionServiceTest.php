@@ -115,7 +115,7 @@ class SessionServiceTest extends TestCase
         // Set mock dependencies
         $this->ci->set(Filesystem::class, Mockery::mock(Filesystem::class));
         $locator = Mockery::mock(ResourceLocatorInterface::class)
-            ->shouldReceive('findResource')->with('session://')->once()->andReturn('')
+            ->shouldReceive('findResource')->with('sessions://')->once()->andReturn('')
             ->getMock();
         $this->ci->set(ResourceLocatorInterface::class, $locator);
 

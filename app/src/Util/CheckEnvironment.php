@@ -286,7 +286,7 @@ class CheckEnvironment
         $directoryPaths = [
             'logs'     => $this->locator->findResource('logs://'),
             'cache'    => $this->locator->findResource('cache://'),
-            'sessions' => $this->locator->findResource('session://'),
+            'sessions' => $this->locator->findResource('sessions://'),
         ];
 
         foreach ($directoryPaths as $directory => $path) {
@@ -320,9 +320,9 @@ class CheckEnvironment
         $problemsFound = false;
 
         $shouldBeWriteable = [
-            $this->locator->findResource('logs://')    => true,
-            $this->locator->findResource('cache://')   => true,
-            $this->locator->findResource('session://') => true,
+            $this->locator->findResource('logs://')     => true,
+            $this->locator->findResource('cache://')    => true,
+            $this->locator->findResource('sessions://') => true,
         ];
 
         if ($this->isProduction() && !$this->skipPermissionsCheck()) {

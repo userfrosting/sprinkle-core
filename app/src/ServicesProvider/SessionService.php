@@ -65,7 +65,13 @@ class SessionService implements ServicesProviderInterface
              * Inject dependencies into FileSessionHandler.
              */
             FileSessionHandler::class => function (Filesystem $fs, Config $config, ResourceLocatorInterface $locator) {
-                return new FileSessionHandler($fs, $locator->findResource('session://'), $config->get('session.minutes'));
+                $path = $locator->findResource('sessions://');
+
+                if ($path === false) {
+                    throw new \Exception('Session resource not found. Make sure directory exist.');
+                }
+
+                return new FileSessionHandler($fs, $path, $config->get('session.minutes'));
             },
 
             /**

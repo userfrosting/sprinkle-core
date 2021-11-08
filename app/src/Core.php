@@ -230,7 +230,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
 
             new ResourceStream('cache', shared: true),
             new ResourceStream('logs', shared: true),
-            new ResourceStream('session', shared: true),
+            new ResourceStream('sessions', shared: true),
             new ResourceStream('storage', shared: true),
         ];
     }
