@@ -72,6 +72,8 @@ class DebugLocatorCommandTest extends TestCase
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(ResourceLocatorInterface::class, $locator);
+
+        /** @var DebugLocatorCommand */
         $command = $ci->get(DebugLocatorCommand::class);
         $result = BakeryTester::runCommand($command);
 

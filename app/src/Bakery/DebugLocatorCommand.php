@@ -141,7 +141,7 @@ class DebugLocatorCommand extends Command
     {
         $resources = $this->locator->getResources($scheme . '://');
 
-        if (empty($resources)) {
+        if (count($resources) === 0) {
             return ['<comment>No resources found</comment>'];
         }
 
