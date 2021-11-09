@@ -35,7 +35,7 @@ class DebugLocatorCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('debug:locator')
              ->setDescription('List all locations and streams, with their respective path, to help debugging.');
@@ -93,16 +93,16 @@ class DebugLocatorCommand extends Command
     /**
      * Map of ResourceStreamInterface, arranged by prefix, into table for display.
      *
-     * @param array $prefixedStreams
+     * @param ResourceStreamInterface[][][] $prefixedStreams
      *
-     * @return string[]
+     * @return string[][]
      */
     protected function mapStreams(array $prefixedStreams): array
     {
         $rows = [];
 
         // Move into each prefix
-        foreach ($prefixedStreams as $prefix => $streamsForPrefix) {
+        foreach ($prefixedStreams as $streamsForPrefix) {
             // Move into each prefix list of streams
             foreach ($streamsForPrefix as $streams) {
                 $newRows = array_map([$this, 'mapStream'], $streams);
@@ -139,7 +139,7 @@ class DebugLocatorCommand extends Command
      */
     protected function getSchemePaths(string $scheme): array
     {
-        $resources = $this->locator->getResources($scheme . '://', true);
+        $resources = $this->locator->getResources($scheme . '://');
 
         if (empty($resources)) {
             return ['<comment>No resources found</comment>'];

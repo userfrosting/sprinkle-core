@@ -65,8 +65,8 @@ class DebugLocatorCommandTest extends TestCase
             ->shouldReceive('getLocations')->once()->andReturn([$location1, $location2])
             ->shouldReceive('getStreams')->once()->andReturn(['config' => ['' => [$stream]]])
             ->shouldReceive('listStreams')->once()->andReturn(['config', 'bar'])
-            ->shouldReceive('getResources')->with('config://', true)->once()->andReturn([$resource1, $resource2])
-            ->shouldReceive('getResources')->with('bar://', true)->once()->andReturn([])
+            ->shouldReceive('getResources')->with('config://')->once()->andReturn([$resource1, $resource2])
+            ->shouldReceive('getResources')->with('bar://')->once()->andReturn([])
             ->getMock();
 
         // Set mock in CI and run command
