@@ -49,7 +49,7 @@ class DatabaseHandler extends AbstractProcessingHandler
     /**
      * {@inheritdoc}
      */
-    protected function write(array $record)
+    protected function write(array $record): void
     {
         $log = $this->classMapper->createInstance($this->modelName, $record['extra']);
         $log->save();

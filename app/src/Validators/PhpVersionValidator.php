@@ -31,6 +31,6 @@ class PhpVersionValidator extends AbstractVersionValidator
     {
         $version = preg_replace('#^([^~+-]+).*$#', '$1', $this->installed);
 
-        return $version;
+        return (string) $version;
     }
 }

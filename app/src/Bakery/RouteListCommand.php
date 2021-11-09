@@ -31,7 +31,7 @@ class RouteListCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('route:list')
              ->setDescription('Generate a list all registered routes')
@@ -66,7 +66,7 @@ class RouteListCommand extends Command
         }
 
         // Display error if no routes
-        if (empty($routes)) {
+        if (count($routes) === 0) {
             $this->io->warning('No routes found.');
 
             return self::FAILURE;

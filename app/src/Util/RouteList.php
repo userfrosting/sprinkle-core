@@ -13,7 +13,7 @@ namespace UserFrosting\Sprinkle\Core\Util;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Slim\App;
-use Slim\Routing\Route;
+use Slim\Interfaces\RouteInterface;
 
 /**
  * Helper class for route:list Bakery Command.
@@ -35,7 +35,7 @@ class RouteList
      * @param bool        $reverse
      * @param string|null $sortBy
      *
-     * @return array
+     * @return string[][]
      */
     public function get(
         ?string $filterMethod = null,
@@ -72,7 +72,7 @@ class RouteList
             $sortBy = strtolower($sortBy);
 
             // Stop if sort is not right
-            if (!in_array($sortBy, ['method', 'uri', 'name', 'action'])) {
+            if (!in_array($sortBy, ['method', 'uri', 'name', 'action'], true)) {
                 throw new \Exception('Sort option must be one of method, uri, name, action.');
             }
 
@@ -91,18 +91,18 @@ class RouteList
     /**
      * Returns the route information for the display table.
      *
-     * @param Route $route
+     * @param RouteInterface $route
      *
-     * @return array
+     * @return string[]
      */
-    protected function getInformation(Route $route): array
+    protected function getInformation(RouteInterface $route): array
     {
         $callable = is_string($route->getCallable()) ? $route->getCallable() : 'Callable';
 
         return [
             'method' => implode('|', $route->getMethods()),
             'uri'    => $route->getPattern(),
-            'name'   => $route->getName(),
+            'name'   => (string) $route->getName(),
             'action' => $callable,
         ];
     }
@@ -110,10 +110,10 @@ class RouteList
     /**
      * Sort the routes by a given element.
      *
-     * @param string $sort
-     * @param array  $routes
+     * @param string     $sort
+     * @param string[][] $routes
      *
-     * @return array
+     * @return string[][]
      */
     protected function sort(string $sort, array $routes): array
     {
@@ -125,22 +125,22 @@ class RouteList
     /**
      * Filter the route information.
      *
-     * @param array       $route
+     * @param string[]    $route
      * @param string|null $method
      * @param string|null $name
      * @param string|null $uri
      * @param string|null $action
      *
-     * @return array|void
+     * @return string[]|null
      */
-    protected function filter(array $route, ?string $method, ?string $name, ?string $uri, ?string $action)
+    protected function filter(array $route, ?string $method, ?string $name, ?string $uri, ?string $action): ?array
     {
         if (!$this->filterParam($route, 'name', $name) ||
             !$this->filterParam($route, 'uri', $uri) ||
             !$this->filterParam($route, 'method', $method) ||
             !$this->filterParam($route, 'action', $action)
         ) {
-            return;
+            return null;
         }
 
         return $route;
@@ -149,7 +149,7 @@ class RouteList
     /**
      * Filter a specific param.
      *
-     * @param array       $route The route information
+     * @param string[]    $route The route information
      * @param string      $param The param to filter
      * @param string|null $value The value to filter against. If null, we allow as if a good match.
      *
