@@ -123,6 +123,26 @@ class SessionServiceTest extends TestCase
         $this->assertInstanceOf(FileSessionHandler::class, $this->ci->get(FileSessionHandler::class));
     }
 
+    public function testFileSessionHandlerWithError(): void
+    {
+        // Set mock Config service
+        $config = Mockery::mock(Config::class)
+            ->shouldNotReceive('get')->with('session.minutes')
+            ->getMock();
+        $this->ci->set(Config::class, $config);
+
+        // Set mock dependencies
+        $this->ci->set(Filesystem::class, Mockery::mock(Filesystem::class));
+        $locator = Mockery::mock(ResourceLocatorInterface::class)
+            ->shouldReceive('findResource')->with('sessions://')->once()->andReturn(false)
+            ->getMock();
+        $this->ci->set(ResourceLocatorInterface::class, $locator);
+
+        // Set expectations
+        $this->expectException(\Exception::class);
+        $this->ci->get(FileSessionHandler::class);
+    }
+
     public function testDatabaseSessionHandler(): void
     {
         // Set mock Config service
