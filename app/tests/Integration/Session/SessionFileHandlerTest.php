@@ -12,8 +12,8 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Session;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Session\FileSessionHandler;
+use PHPUnit\Framework\TestCase;
 use UserFrosting\Session\Session;
-use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
  * Integration tests for the session service.
@@ -78,6 +78,9 @@ class SessionFileHandlerTest extends TestCase
      */
     public function testUsingSessionDouble(): void
     {
+        // Destroy any active session from previous test
+        session_destroy();
+
         $fs = new Filesystem();
         $handler = new FileSessionHandler($fs, $this->testSessionDir, 120);
         $session = new Session($handler, []);
