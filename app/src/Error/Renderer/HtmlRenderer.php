@@ -10,29 +10,32 @@
 
 namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 
-class HtmlRenderer extends ErrorRenderer
+use Psr\Http\Message\ServerRequestInterface;
+use Slim\Psr7\Request;
+use Throwable;
+
+final class HtmlRenderer implements ErrorRendererInterface
 {
     /**
-     * Render HTML error report.
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    public function render()
-    {
+    public function render(
+        ServerRequestInterface $request,
+        Throwable $exception,
+        array $userMessages,
+        int $statusCode,
+        bool $displayErrorDetails = false
+    ): string {
         $title = 'UserFrosting Application Error';
 
-        if ($this->displayErrorDetails) {
+        if ($displayErrorDetails) {
             $html = '<p>The application could not run because of the following error:</p>';
             $html .= '<h2>Details</h2>';
-            $html .= $this->renderException($this->exception);
+            $html .= $this->renderException($exception);
 
             $html .= '<h2>Your request</h2>';
-            $html .= $this->renderRequest();
+            $html .= $this->renderRequest($request);
 
-            $html .= '<h2>Response headers</h2>';
-            $html .= $this->renderResponseHeaders();
-
-            $exception = $this->exception;
             while ($exception = $exception->getPrevious()) {
                 $html .= '<h2>Previous exception</h2>';
                 $html .= $this->renderException($exception);
@@ -60,11 +63,11 @@ class HtmlRenderer extends ErrorRenderer
     /**
      * Render a summary of the exception.
      *
-     * @param \Exception $exception
+     * @param Throwable $exception
      *
      * @return string
      */
-    public function renderException(\Exception $exception)
+    public function renderException(Throwable $exception)
     {
         $html = sprintf('<div><strong>Type:</strong> %s</div>', get_class($exception));
 
@@ -97,12 +100,12 @@ class HtmlRenderer extends ErrorRenderer
      *
      * @return string
      */
-    public function renderRequest()
+    public function renderRequest(Request $request): string
     {
-        $method = $this->request->getMethod();
-        $uri = $this->request->getUri();
-        $params = $this->request->getParams();
-        $requestHeaders = $this->request->getHeaders();
+        $method = $request->getMethod();
+        $uri = $request->getUri();
+        $params = $request->getQueryParams();
+        $requestHeaders = $request->getHeaders();
 
         $html = '<h3>Request URI:</h3>';
 
@@ -115,21 +118,6 @@ class HtmlRenderer extends ErrorRenderer
         $html .= '<h3>Request headers:</h3>';
 
         $html .= $this->renderTable($requestHeaders);
-
-        return $html;
-    }
-
-    /**
-     * Render HTML representation of response headers.
-     *
-     * @return string
-     */
-    public function renderResponseHeaders()
-    {
-        $html = '<h3>Response headers:</h3>';
-        $html .= '<em>Additional response headers may have been set by Slim after the error handling routine.  Please check your browser console for a complete list.</em><br>';
-
-        $html .= $this->renderTable($this->response->getHeaders());
 
         return $html;
     }

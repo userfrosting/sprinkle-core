@@ -10,48 +10,20 @@
 
 namespace UserFrosting\Sprinkle\Core\Error\Handler;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 
 /**
  * All exception handlers must implement this interface.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 interface ExceptionHandlerInterface
 {
     /**
-     * @param ContainerInterface     $ci
      * @param ServerRequestInterface $request
-     * @param ResponseInterface      $response
-     * @param \Throwable             $exception
-     * @param bool                   $displayErrorDetails
-     */
-    public function __construct(ContainerInterface $ci, ServerRequestInterface $request, ResponseInterface $response, $exception, $displayErrorDetails = false);
-
-    /**
+     * @param Throwable              $exception
+     *
      * @return ResponseInterface
      */
-    public function handle();
-
-    /**
-     * @return ResponseInterface
-     */
-    public function renderDebugResponse();
-
-    /**
-     * @return ResponseInterface
-     */
-    public function renderGenericResponse();
-
-    /**
-     * Write to the error log.
-     */
-    public function writeToErrorLog();
-
-    /**
-     * Write user-friendly error messages to the alert message stream.
-     */
-    public function writeAlerts();
+    public function handle(ServerRequestInterface $request, Throwable $exception): ResponseInterface;
 }

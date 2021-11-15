@@ -23,9 +23,7 @@ return [
         'queries'       => true,
         'smtp'          => true,
         'twig'          => true,
-    ],
-    'settings' => [
-        'displayErrorDetails' => true,
+        'exception'     => true,
     ],
     'site' => [
         'debug' => [

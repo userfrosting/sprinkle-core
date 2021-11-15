@@ -10,28 +10,35 @@
 
 namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 
+use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
+
 /**
  * Default XML Error Renderer.
  */
-class XmlRenderer extends ErrorRenderer
+final class XmlRenderer implements ErrorRendererInterface
 {
     /**
-     * @return string
+     * {@inheritDoc}
      */
-    public function render()
-    {
-        $e = $this->exception;
+    public function render(
+        ServerRequestInterface $request,
+        Throwable $exception,
+        array $userMessages,
+        int $statusCode,
+        bool $displayErrorDetails = false
+    ): string {
         $xml = "<error>\n  <message>UserFrosting Application Error</message>\n";
-        if ($this->displayErrorDetails) {
+        if ($displayErrorDetails) {
             do {
                 $xml .= "  <exception>\n";
-                $xml .= '    <type>' . get_class($e) . "</type>\n";
-                $xml .= '    <code>' . $e->getCode() . "</code>\n";
-                $xml .= '    <message>' . $this->createCdataSection($e->getMessage()) . "</message>\n";
-                $xml .= '    <file>' . $e->getFile() . "</file>\n";
-                $xml .= '    <line>' . $e->getLine() . "</line>\n";
+                $xml .= '    <type>' . get_class($exception) . "</type>\n";
+                $xml .= '    <code>' . $exception->getCode() . "</code>\n";
+                $xml .= '    <message>' . $this->createCdataSection($exception->getMessage()) . "</message>\n";
+                $xml .= '    <file>' . $exception->getFile() . "</file>\n";
+                $xml .= '    <line>' . $exception->getLine() . "</line>\n";
                 $xml .= "  </exception>\n";
-            } while ($e = $e->getPrevious());
+            } while ($exception = $exception->getPrevious());
         }
         $xml .= '</error>';
 
@@ -45,7 +52,7 @@ class XmlRenderer extends ErrorRenderer
      *
      * @return string
      */
-    private function createCdataSection($content)
+    private function createCdataSection(string $content): string
     {
         return sprintf('<![CDATA[%s]]>', str_replace(']]>', ']]]]><![CDATA[>', $content));
     }

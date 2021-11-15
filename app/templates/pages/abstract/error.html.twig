@@ -1,32 +1,48 @@
-{# This is the layout template for error pages.  Note that there is no navigation bar. #}
-{% extends "pages/abstract/base.html.twig" %}
+<html>
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+    <title>{% block page_title %}{{ translate('ERROR.TITLE') }}{% endblock %}</title>
+    <style>
+    body {
+        margin: 0;
+        padding: 30px;
+        font: 12px/1.5 Helvetica, Arial, Verdana, sans-serif;
+    }
 
-{% block page_title %}{{ translate('ERROR.TITLE') }}{% endblock %}
+    h1 {
+        margin: 0;
+        font-size: 48px;
+        font-weight: normal;
+        line-height: 48px;
+    }
 
-{% block page_description %}{{ translate('ERROR.DESCRIPTION') }}{% endblock %}
+    strong {
+        display: inline-block;
+        width: 65px;
+    }
 
-{% block body %}
-    <body {% block body_attributes %}{% endblock %}>
-        <!-- Main content -->
-        <section class="content">
-          <div class="error-page container">
-            {% block headline %}<h2 class="headline text-red"><i class="fas fa-terminal" aria-hidden="true"></i></h2>{% endblock %}
+    table, th, td {
+        font: 12px Helvetica, Arial, Verdana, sans-serif;
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 5px;
+        text-align: left;
+    }
 
-            <div class="error-content">
-              <br /><h3>{% block heading %}<i class="fas fa-warning text-red"></i> {{ translate('ERROR.ENCOUNTERED') }}{% endblock %}</h3>
-
-              {% block content %}
-                  {% if messages %}<p>{{ translate('ERROR.DETAIL') }}</p>{% endif %}
-                  {% for message in messages %}
-                    <div class="alert alert-danger">{{ translate(message.message, message.parameters) }}</div>
-                  {% endfor %}
-                  <p class="lead">{{ translate('ERROR.RETURN', {url : site.uri.public})|raw }}</p>
-              {% endblock %}
-            </div>
-            <!-- /.error-content -->
-          </div>
-          <!-- /.error-page -->
-        </section>
-        <!-- /.content -->
-    </body>
-{% endblock %}
+    th {
+        font-weight: 600;
+    }
+    </style>
+</head>
+<body>
+    <h1>{{ block('page_title') }}</h1>
+    <p>{% block page_description %}{{ translate('ERROR.DESCRIPTION') }}{% endblock %}</p>
+    <div>
+        {% block messages %}
+            {% for message in messages %}
+            <p>{{ translate(message.message, message.parameters) }}</p>
+            {% endfor %}
+        {% endblock %}
+    </div>
+</body>
+</html>

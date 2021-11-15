@@ -45,6 +45,9 @@ class LocatorService implements ServicesProviderInterface
                     $locator->addStream($stream);
                 }
 
+                // Register public stream tied to main sprinkle
+                // TODO. Can use path.public_relative config
+
                 return $locator;
             },
         ];

@@ -10,8 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 
 /**
  * ErrorRendererInterface.
@@ -19,20 +19,19 @@ use Psr\Http\Message\ServerRequestInterface;
 interface ErrorRendererInterface
 {
     /**
-     * @param ServerRequestInterface $request             The most recent Request object
-     * @param ResponseInterface      $response            The most recent Response object
-     * @param \Throwable             $exception           The caught Exception object
+     * @param ServerRequestInterface $request
+     * @param Throwable              $exception
+     * @param UserMessage[]          $userMessages
+     * @param int                    $statusCode
      * @param bool                   $displayErrorDetails
-     */
-    public function __construct(ServerRequestInterface $request, ResponseInterface $response, $exception, $displayErrorDetails = false);
-
-    /**
+     *
      * @return string
      */
-    public function render();
-
-    /**
-     * @return \Slim\Http\Body
-     */
-    public function renderWithBody();
+    public function render(
+        ServerRequestInterface $request,
+        Throwable $exception,
+        array $userMessages,
+        int $statusCode,
+        bool $displayErrorDetails = false
+    ): string;
 }

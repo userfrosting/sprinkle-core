@@ -37,6 +37,7 @@ use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\SessionsTable;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\ThrottlesTable;
+use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\SessionMiddleware;
 use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
@@ -184,6 +185,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
             LocaleMiddleware::class,
             SessionMiddleware::class,
             TwigMiddleware::class,
+            ExceptionHandlerMiddleware::class,
         ];
     }
 

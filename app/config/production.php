@@ -34,16 +34,16 @@ return [
      * Turn off debug logs
      */
     'debug' => [
-        'twig' => false,
-        'auth' => false,
-        'smtp' => false,
+        'twig'      => false,
+        'auth'      => false,
+        'smtp'      => false,
+        'exception' => false,
     ],
     /*
      * Use router cache, disable full error details
      */
     'settings' => [
         'routerCacheFile'     => 'routes.cache',
-        'displayErrorDetails' => false,
     ],
     /*
      * Enable analytics, disable more debugging

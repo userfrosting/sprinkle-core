@@ -10,47 +10,42 @@
 
 namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 
+use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
+
 /**
  * Default JSON Error Renderer.
  */
-class JsonRenderer extends ErrorRenderer
+final class JsonRenderer implements ErrorRendererInterface
 {
     /**
-     * @return string
+     * {@inheritDoc}
      */
-    public function render()
-    {
-        $message = $this->exception->getMessage();
+    public function render(
+        ServerRequestInterface $request,
+        Throwable $exception,
+        array $userMessages,
+        int $statusCode,
+        bool $displayErrorDetails = false
+    ): string {
+        $error = ['message' => $exception->getMessage()];
 
-        return $this->formatExceptionPayload($message);
-    }
-
-    /**
-     * @param string $message
-     *
-     * @return string
-     */
-    public function formatExceptionPayload($message)
-    {
-        $e = $this->exception;
-        $error = ['message' => $message];
-
-        if ($this->displayErrorDetails) {
+        if ($displayErrorDetails) {
             $error['exception'] = [];
             do {
-                $error['exception'][] = $this->formatExceptionFragment($e);
-            } while ($e = $e->getPrevious());
+                $error['exception'][] = $this->formatExceptionFragment($exception);
+            } while ($exception = $exception->getPrevious());
         }
 
         return json_encode($error, JSON_PRETTY_PRINT);
     }
 
     /**
-     * @param \Exception|\Throwable $e
+     * @param Throwable $e
      *
      * @return array
      */
-    public function formatExceptionFragment($e)
+    public function formatExceptionFragment(Throwable $e)
     {
         return [
             'type'    => get_class($e),

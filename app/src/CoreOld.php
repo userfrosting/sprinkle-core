@@ -56,7 +56,7 @@ class CoreOld extends Sprinkle
         // Model::$ci = $this->ci;
 
         // Set container for environment info class
-        EnvironmentInfo::$ci = $this->ci;
+        // EnvironmentInfo::$ci = $this->ci;
     }
 
     /**

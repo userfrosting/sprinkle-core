@@ -98,7 +98,7 @@ class LoggersService implements ServicesProviderInterface
 
             // Define common StreamHandler with .
             StreamHandler::class => function (Config $config) {
-                return new StreamHandler($config->get('logger.streamHandler.stream'));
+                return new StreamHandler($config->get('logs.path'));
             },
         ];
     }

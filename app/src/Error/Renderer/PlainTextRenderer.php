@@ -10,29 +10,40 @@
 
 namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 
+use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
+
 /**
  * Plain Text Error Renderer.
  */
-class PlainTextRenderer extends ErrorRenderer
+final class PlainTextRenderer implements ErrorRendererInterface
 {
-    public function render()
-    {
-        if ($this->displayErrorDetails) {
-            return $this->formatExceptionBody();
+    /**
+     * {@inheritDoc}
+     */
+    public function render(
+        ServerRequestInterface $request,
+        Throwable $exception,
+        array $userMessages,
+        int $statusCode,
+        bool $displayErrorDetails = false
+    ): string {
+        if ($displayErrorDetails) {
+            return $this->formatExceptionBody($exception);
         }
 
-        return $this->exception->getMessage();
+        return $exception->getMessage();
     }
 
     /**
      * Format Exception Body.
      *
+     * @param Throwable $e
+     *
      * @return string
      */
-    public function formatExceptionBody()
+    public function formatExceptionBody(Throwable $e): string
     {
-        $e = $this->exception;
-
         $text = 'UserFrosting Application Error:' . PHP_EOL;
         $text .= $this->formatExceptionFragment($e);
 
@@ -45,11 +56,11 @@ class PlainTextRenderer extends ErrorRenderer
     }
 
     /**
-     * @param \Exception|\Throwable $e
+     * @param Throwable $e
      *
      * @return string
      */
-    public function formatExceptionFragment($e)
+    public function formatExceptionFragment(Throwable $e): string
     {
         $text = sprintf('Type: %s' . PHP_EOL, get_class($e));
 

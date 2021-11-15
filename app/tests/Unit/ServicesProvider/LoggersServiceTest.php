@@ -44,7 +44,7 @@ class LoggersServiceTest extends TestCase
 
         // Set mock Config
         $locator = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('logger.streamHandler.stream')->once()->andReturn('logs://database.log')
+            ->shouldReceive('get')->with('logs.path')->once()->andReturn('logs://database.log')
             ->getMock();
         $this->ci->set(Config::class, $locator);
     }

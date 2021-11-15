@@ -11,7 +11,6 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use PHPUnit\Framework\TestCase;
-use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerManager;
 
 /**
  * Integration tests for `errorHandler` service.

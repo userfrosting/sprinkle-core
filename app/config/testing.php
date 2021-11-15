@@ -34,6 +34,7 @@ return [
     'debug' => [
         'deprecation' => false,
         'queries'     => false,
+        'exception'   => false,
     ],
 
     /*
@@ -51,13 +52,6 @@ return [
                 'root'   => 'storage/testingDriver', //TODO : Replace with locator; \UserFrosting\STORAGE_DIR . \UserFrosting\DS . 'testingDriver',
             ],
         ],
-    ],
-
-    /*
-     * Don't display error detail in test. Return the non formatted errors
-     */
-    'settings' => [
-        'displayErrorDetails' => false,
     ],
 
     /*

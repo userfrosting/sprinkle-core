@@ -13,116 +13,65 @@ namespace UserFrosting\Sprinkle\Core\Error\Handler;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Twig\Error\LoaderError;
+use Slim\Exception\HttpException;
+use Slim\Psr7\Factory\ResponseFactory;
+use Throwable;
+use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
+use UserFrosting\Sprinkle\Core\Error\Renderer\HtmlRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\JsonRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PlainTextRenderer;
-use UserFrosting\Sprinkle\Core\Error\Renderer\WhoopsRenderer;
+use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\XmlRenderer;
 use UserFrosting\Sprinkle\Core\Http\Concerns\DeterminesContentType;
 use UserFrosting\Support\Message\UserMessage;
+use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Generic handler for exceptions.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class ExceptionHandler implements ExceptionHandlerInterface
 {
     use DeterminesContentType;
 
     /**
-     * @var ContainerInterface The global container object, which holds all your services.
+     * @var string[] Renderers for normal
      */
-    protected $ci;
+    protected $errorRenderers = [
+        'application/json' => JsonRenderer::class,
+        'application/xml'  => XmlRenderer::class,
+        'text/xml'         => XmlRenderer::class,
+        'text/html'        => HtmlRenderer::class,
+        'text/plain'       => PlainTextRenderer::class,
+    ];
 
-    /**
-     * @var ServerRequestInterface
-     */
-    protected $request;
-
-    /**
-     * @var ResponseInterface
-     */
-    protected $response;
-
-    /**
-     * @var \Throwable
-     */
-    protected $exception;
-
-    /**
-     * @var \UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface
-     */
-    protected $renderer = null;
-
-    /**
-     * @var string
-     */
-    protected $contentType;
-
-    /**
-     * @var int
-     */
-    protected $statusCode;
-
-    /**
-     * Tells the handler whether or not to output detailed error information to the client.
-     * Each handler may choose if and how to implement this.
-     *
-     * @var bool
-     */
-    protected $displayErrorDetails;
-
-    /**
-     * Create a new ExceptionHandler object.
-     *
-     * @param ContainerInterface     $ci
-     * @param ServerRequestInterface $request             The most recent Request object
-     * @param ResponseInterface      $response            The most recent Response object
-     * @param \Throwable             $exception           The caught Exception object
-     * @param bool                   $displayErrorDetails
-     */
     public function __construct(
-        ContainerInterface $ci,
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        $exception,
-        $displayErrorDetails = false
+        protected ContainerInterface $ci,
+        protected ResponseFactory $responseFactory,
+        protected Config $config,
     ) {
-        $this->ci = $ci;
-        $this->request = $request;
-        $this->response = $response;
-        $this->exception = $exception;
-        $this->displayErrorDetails = $displayErrorDetails;
-        $this->statusCode = $this->determineStatusCode();
-        $this->contentType = $this->determineContentType($request, $this->ci->config['site.debug.ajax']);
-        $this->renderer = $this->determineRenderer();
     }
 
     /**
-     * Handle the caught exception.
-     * The handler may render a detailed debugging error page, a generic error page, write to logs, and/or add messages to the alert stream.
+     * @param ServerRequestInterface $request
+     * @param Throwable              $exception
      *
      * @return ResponseInterface
      */
-    public function handle()
+    public function handle(ServerRequestInterface $request, Throwable $exception): ResponseInterface
     {
-        // If displayErrorDetails is set to true, we'll halt and immediately respond with a detailed debugging page.
-        // We do not log errors in this case.
-        if ($this->displayErrorDetails) {
-            $response = $this->renderDebugResponse();
-        } else {
-            // Write exception to log
-            $this->writeToErrorLog();
+        // TODO
+        // if ($this->config->get('logs.exception')) {
+        //     $this->writeToErrorLog();
+        // }
 
-            // Render generic error page
-            $response = $this->renderGenericResponse();
-        }
-
+        // TODO
         // If this is an AJAX request and AJAX debugging is turned off, write messages to the alert stream
-        if ($this->request->isXhr() && !$this->ci->config['site.debug.ajax']) {
-            $this->writeAlerts();
-        }
+        // if ($this->request->isXhr() && !$this->ci->config['site.debug.ajax']) {
+        //     $this->writeAlerts();
+        // }
+
+        // Render Response
+        $response = $this->renderResponse($request, $exception);
 
         return $response;
     }
@@ -132,38 +81,31 @@ class ExceptionHandler implements ExceptionHandlerInterface
      *
      * @return ResponseInterface
      */
-    public function renderDebugResponse()
+    public function renderResponse(ServerRequestInterface $request, Throwable $exception): ResponseInterface
     {
-        $body = $this->renderer->renderWithBody();
+        $statusCode = $this->determineStatusCode($request, $exception);
+        $contentType = $this->determineContentType($request);
+        $response = $this->responseFactory->createResponse($statusCode);
+        $messages = $this->determineUserMessages($exception);
 
-        return $this->response
-            ->withStatus($this->statusCode)
-            ->withHeader('Content-type', $this->contentType)
-            ->withBody($body);
+        // Determine which renderer to use based on the content type and required details
+        $renderer = $this->determineRenderer($contentType);
+
+        // Write to the response body
+        $body = $renderer->render($request, $exception, $messages, $statusCode, $this->displayErrorDetails());
+        $response->getBody()->write($body);
+
+        return $response
+            ->withStatus($statusCode)
+            ->withHeader('Content-type', $contentType);
     }
 
     /**
-     * Render a generic, user-friendly response without sensitive debugging information.
-     *
-     * @return ResponseInterface
+     * @return bool
      */
-    public function renderGenericResponse()
+    protected function displayErrorDetails(): bool
     {
-        $messages = $this->determineUserMessages();
-        $httpCode = $this->statusCode;
-
-        try {
-            $template = $this->ci->view->getEnvironment()->loadTemplate("pages/error/$httpCode.html.twig");
-        } catch (LoaderError $e) {
-            $template = $this->ci->view->getEnvironment()->loadTemplate('pages/abstract/error.html.twig');
-        }
-
-        return $this->response
-            ->withStatus($httpCode)
-            ->withHeader('Content-type', $this->contentType)
-            ->write($template->render([
-                'messages' => $messages,
-            ]));
+        return $this->config->get('debug.exception');
     }
 
     /**
@@ -173,7 +115,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
     {
         $renderer = new PlainTextRenderer($this->request, $this->response, $this->exception, true);
         $error = $renderer->render();
-        $error .= PHP_EOL . 'View in rendered output by enabling the "displayErrorDetails" setting.' . PHP_EOL;
+        $error .= PHP_EOL . 'View in rendered output by enabling the "debug.exception" setting.' . PHP_EOL;
         $this->logError($error);
     }
 
@@ -195,45 +137,36 @@ class ExceptionHandler implements ExceptionHandlerInterface
      *
      * @throws \RuntimeException
      *
-     * @return \UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface
+     * @return ErrorRendererInterface
      */
-    protected function determineRenderer()
+    protected function determineRenderer(string $contentType): ErrorRendererInterface
     {
-        $renderer = $this->renderer;
+        // TODO : Register those / use param / move to config
+        switch ($contentType) {
+            case 'application/json':
+                $renderer = JsonRenderer::class;
+                break;
 
-        if ((!is_null($renderer) && !class_exists($renderer))
-            || (!is_null($renderer) && !in_array('UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface', class_implements($renderer)))
-        ) {
-            throw new \RuntimeException(sprintf(
-                'Non compliant error renderer provided (%s). ' .
-                'Renderer must implement the ErrorRendererInterface',
-                $renderer
-            ));
+            case 'text/xml':
+            case 'application/xml':
+                $renderer = XmlRenderer::class;
+                break;
+
+            case 'text/plain':
+                $renderer = PlainTextRenderer::class;
+                break;
+
+            default:
+            case 'text/html':
+                $renderer = PrettyPageRenderer::class;
+                // $renderer = HtmlRenderer::class;
+                break;
         }
 
-        if (is_null($renderer)) {
-            switch ($this->contentType) {
-                case 'application/json':
-                    $renderer = JsonRenderer::class;
-                    break;
+        // Make sure it's a valid interface before returning
+        // TODO
 
-                case 'text/xml':
-                case 'application/xml':
-                    $renderer = XmlRenderer::class;
-                    break;
-
-                case 'text/plain':
-                    $renderer = PlainTextRenderer::class;
-                    break;
-
-                default:
-                case 'text/html':
-                    $renderer = WhoopsRenderer::class;
-                    break;
-            }
-        }
-
-        return new $renderer($this->request, $this->response, $this->exception, $this->displayErrorDetails);
+        return $this->ci->get($renderer);
     }
 
     /**
@@ -241,10 +174,12 @@ class ExceptionHandler implements ExceptionHandlerInterface
      *
      * @return int
      */
-    protected function determineStatusCode()
+    protected function determineStatusCode(ServerRequestInterface $request, Throwable $exception): int
     {
-        if ($this->request->getMethod() === 'OPTIONS') {
+        if ($request->getMethod() === 'OPTIONS') {
             return 200;
+        } elseif ($exception instanceof HttpException) {
+            return $exception->getCode();
         }
 
         return 500;
@@ -253,10 +188,15 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * Resolve a list of error messages to present to the end user.
      *
-     * @return array
+     * @return UserMessage[]
      */
-    protected function determineUserMessages()
+    protected function determineUserMessages(Throwable $exception): array
     {
+        // TODO
+        // if ($exception instanceof HttpException) {
+        //     return $exception->getUserMessages();
+        // }
+
         return [
             new UserMessage('ERROR.SERVER'),
         ];
@@ -267,7 +207,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      *
      * @param string $message
      */
-    protected function logError($message)
+    protected function logError(string $message): void
     {
         $this->ci->errorLogger->error($message); // TODO
     }

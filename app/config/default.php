@@ -204,6 +204,7 @@ return [
         'queries'       => false,
         'smtp'          => false,
         'twig'          => false,
+        'exception'     => true,
     ],
 
     /*
@@ -283,13 +284,12 @@ return [
 
     /*
     * ----------------------------------------------------------------------
-    * Logger Config
+    * Logs Config
     * ----------------------------------------------------------------------
     */
-    'logger' => [
-        'streamHandler' => [
-            'stream' => 'logs://userfrosting.log',
-        ],
+    'logs' => [
+        'exception' => true, // Send exceptions details to the logs
+        'path'      => 'logs://userfrosting.log',
     ],
 
     /*
@@ -354,18 +354,7 @@ return [
         'keys' => [
             'csrf'    => 'site.csrf', // the key (prefix) used to store an ArrayObject of CSRF tokens.
         ],
-    ],
-
-    /*
-    * ----------------------------------------------------------------------
-    * Slim settings
-    * ----------------------------------------------------------------------
-    * See http://www.slimframework.com/docs/objects/application.html#slim-default-settings
-    * Set `displayErrorDetails` to true to display full error details
-    */
-    'settings' => [
-        'displayErrorDetails' => true,
-    ],
+    ],    
 
     /*
     * ----------------------------------------------------------------------

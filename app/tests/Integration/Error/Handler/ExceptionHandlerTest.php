@@ -22,11 +22,11 @@ class ExceptionHandlerTest extends TestCase
     /**
      * Test ExceptionHandler constructor
      */
-    public function testConstructor()
+    /*public function testConstructor()
     {
         $handler = new ExceptionHandler($this->getCi(), $this->getRequest(), $this->getResponse(), $this->getException(), false);
         $this->assertInstanceOf(ExceptionHandler::class, $handler);
-    }
+    }*/
 
     /**
      * @return ContainerInterface
