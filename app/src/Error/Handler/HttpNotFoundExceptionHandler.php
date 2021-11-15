@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Error\Handler;
 
 /**
- * Force HttpNotFoundException to not display error details
+ * Force HttpNotFoundException to not display error details.
  */
 final class HttpNotFoundExceptionHandler extends ExceptionHandler
 {

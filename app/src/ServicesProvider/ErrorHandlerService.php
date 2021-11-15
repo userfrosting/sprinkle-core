@@ -23,7 +23,7 @@ class ErrorHandlerService implements ServicesProviderInterface
     {
         return [
             /**
-             * Register custom Handler
+             * Register custom Handler.
              */
             ExceptionHandlerMiddleware::class => \DI\decorate(function (ExceptionHandlerMiddleware $middleware) {
 
@@ -34,7 +34,7 @@ class ErrorHandlerService implements ServicesProviderInterface
                 // $middleware->registerHandler('\phpmailerException', PhpMailerExceptionHandler::class);
 
                 return $middleware;
-            })
+            }),
         ];
     }
 }

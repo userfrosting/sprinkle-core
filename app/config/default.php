@@ -354,7 +354,7 @@ return [
         'keys' => [
             'csrf'    => 'site.csrf', // the key (prefix) used to store an ArrayObject of CSRF tokens.
         ],
-    ],    
+    ],
 
     /*
     * ----------------------------------------------------------------------
