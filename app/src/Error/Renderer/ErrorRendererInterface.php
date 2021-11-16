@@ -12,6 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
+use UserFrosting\Support\Message\UserMessage;
 
 /**
  * ErrorRendererInterface.

@@ -14,12 +14,15 @@ use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views\Twig;
 use Throwable;
 use Twig\Error\LoaderError;
+use UserFrosting\Support\Message\UserMessage;
+use UserFrosting\Support\Repository\Repository as Config;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 
 final class PrettyPageRenderer implements ErrorRendererInterface
 {
     public function __construct(
+        protected Config $config,
         protected Twig $twig,
         protected Run $whoops,
         protected PrettyPageHandler $handler,
@@ -37,18 +40,21 @@ final class PrettyPageRenderer implements ErrorRendererInterface
         int $statusCode,
         bool $displayErrorDetails = false
     ): string {
+
+        // Show Whoops page if error details is active
         if ($displayErrorDetails) {
             return $this->whoops->handleException($exception);
         }
 
+        // Render Twig pretty page otherwise
         return $this->renderTwigPage($userMessages, $statusCode);
     }
 
     /**
      * Render a generic, user-friendly response without sensitive debugging information.
      *
-     * @param array $userMessages
-     * @param int   $statusCode
+     * @param UserMessage[] $userMessages
+     * @param int           $statusCode
      *
      * @return string
      */
@@ -58,11 +64,11 @@ final class PrettyPageRenderer implements ErrorRendererInterface
             'messages' => $userMessages,
         ];
 
-        // TODO : Move string to config
         try {
-            $body = $this->twig->fetch("pages/error/$statusCode.html.twig", $payload);
+            $page = sprintf($this->config->get('error.pages.status'), $statusCode);
+            $body = $this->twig->fetch($page, $payload);
         } catch (LoaderError $e) {
-            $body = $this->twig->fetch('pages/abstract/error.html.twig', $payload);
+            $body = $this->twig->fetch($this->config->get('error.pages.error'), $payload);
         }
 
         return $body;
