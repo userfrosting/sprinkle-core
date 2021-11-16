@@ -11,7 +11,6 @@
 namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Exception\HttpException;
 use Slim\Views\Twig;
 use Throwable;
 use Twig\Error\LoaderError;
@@ -43,8 +42,7 @@ final class PrettyPageRenderer implements ErrorRendererInterface
     ): string {
 
         // Show Whoops page if error details is active
-        // Always skip if instance of HttpException
-        if (!$exception instanceof HttpException && $displayErrorDetails) {
+        if ($displayErrorDetails) {
             return $this->whoops->handleException($exception);
         }
 

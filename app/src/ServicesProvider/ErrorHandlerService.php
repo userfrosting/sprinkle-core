@@ -27,6 +27,9 @@ class ErrorHandlerService implements ServicesProviderInterface
              */
             ExceptionHandlerMiddleware::class => \DI\decorate(function (ExceptionHandlerMiddleware $middleware) {
 
+                // Register the NotFoundExceptionHandler.
+                $middleware->registerHandler(HttpNotFoundException::class, HttpNotFoundExceptionHandler::class);
+
                 // Register the PhpMailerExceptionHandler.
                 // $middleware->registerHandler('\phpmailerException', PhpMailerExceptionHandler::class);
 
