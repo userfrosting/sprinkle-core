@@ -13,11 +13,13 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Error\Handler;
 
 /**
- * Force HttpNotFoundException to not display error details.
+ * Custom handler for all HttpException.
  */
-final class HttpNotFoundExceptionHandler extends ExceptionHandler
+final class HttpExceptionHandler extends ExceptionHandler
 {
     /**
+     * Never display error details for HttpException
+     *
      * @return bool
      */
     protected function displayErrorDetails(): bool

@@ -10,11 +10,10 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
-use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpException;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerMiddleware;
-use UserFrosting\Sprinkle\Core\Error\Handler\HttpNotFoundExceptionHandler;
-use UserFrosting\Sprinkle\Core\Error\Handler\NotFoundExceptionHandler;
+use UserFrosting\Sprinkle\Core\Error\Handler\HttpExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Handler\PhpMailerExceptionHandler;
 
 class ErrorHandlerService implements ServicesProviderInterface
@@ -27,8 +26,8 @@ class ErrorHandlerService implements ServicesProviderInterface
              */
             ExceptionHandlerMiddleware::class => \DI\decorate(function (ExceptionHandlerMiddleware $middleware) {
 
-                // Register the NotFoundExceptionHandler.
-                $middleware->registerHandler(HttpNotFoundException::class, HttpNotFoundExceptionHandler::class);
+                // Register the HttpExceptionHandler.
+                $middleware->registerHandler(HttpException::class, HttpExceptionHandler::class, true);
 
                 // Register the PhpMailerExceptionHandler.
                 // $middleware->registerHandler('\phpmailerException', PhpMailerExceptionHandler::class);
