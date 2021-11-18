@@ -36,7 +36,6 @@ final class JsonRenderer implements ErrorRendererInterface
         ];
 
         if ($displayErrorDetails) {
-            $error['message'] = $exception->getMessage();
             $error['exception'] = [];
             do {
                 $error['exception'][] = $this->formatExceptionFragment($exception);
