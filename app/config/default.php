@@ -194,11 +194,11 @@ return [
     ],
 
     /**
-    * ----------------------------------------------------------------------
-    * Debug Configuration
-    * ----------------------------------------------------------------------
-    * Turn any of those on to help debug your app
-    */
+     * ----------------------------------------------------------------------
+     * Debug Configuration
+     * ----------------------------------------------------------------------
+     * Turn any of those on to help debug your app.
+     */
     'debug' => [
         'deprecation'   => true,
         'queries'       => false,
@@ -208,17 +208,18 @@ return [
     ],
 
     /**
-    * ----------------------------------------------------------------------
-    * Error Configuration
-    * ----------------------------------------------------------------------
-    * Configuration for built in Twig error page returned by the PrettyPageRenderer
-    * @see \UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer 
-    */
+     * ----------------------------------------------------------------------
+     * Error Configuration
+     * ----------------------------------------------------------------------
+     * Configuration for built in Twig error page returned by the PrettyPageRenderer.
+     *
+     * @see \UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer
+     */
     'error' => [
         'pages' => [
-            'status' => "pages/error/%d.html.twig", // Use %d as placeholder for the status code (eg. 404, 400, 500, etc.)
-            'error'  => "pages/error/error.html.twig", // Fallback page, if the status one isn't available
-        ]
+            'status' => 'pages/error/%d.html.twig', // Use %d as placeholder for the status code (eg. 404, 400, 500, etc.)
+            'error'  => 'pages/error/error.html.twig', // Fallback page, if the status one isn't available
+        ],
     ],
 
     /*

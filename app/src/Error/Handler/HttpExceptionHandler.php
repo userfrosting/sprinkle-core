@@ -22,7 +22,7 @@ use Throwable;
 final class HttpExceptionHandler extends ExceptionHandler
 {
     /**
-     * Never display error details for HttpException
+     * Never display error details for HttpException.
      *
      * @return bool
      */
