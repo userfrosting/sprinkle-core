@@ -44,7 +44,7 @@ trait DeterminesContentType
      *
      * @return string
      */
-    protected function determineContentType(ServerRequestInterface $request, $ajaxDebug = false)
+    protected function determineContentType(ServerRequestInterface $request, bool $ajaxDebug = false): string
     {
         // For AJAX requests, if AJAX debugging is turned on, always return html
         if ($ajaxDebug && $request->isXhr()) {

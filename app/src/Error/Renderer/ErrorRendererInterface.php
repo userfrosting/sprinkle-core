@@ -12,7 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
-use UserFrosting\Support\Message\UserMessage;
+use UserFrosting\Sprinkle\Core\Util\Message\Message;
 
 /**
  * ErrorRendererInterface.
@@ -22,7 +22,7 @@ interface ErrorRendererInterface
     /**
      * @param ServerRequestInterface $request
      * @param Throwable              $exception
-     * @param UserMessage[]          $userMessages
+     * @param Message                $userMessage
      * @param int                    $statusCode
      * @param bool                   $displayErrorDetails
      *
@@ -31,7 +31,7 @@ interface ErrorRendererInterface
     public function render(
         ServerRequestInterface $request,
         Throwable $exception,
-        array $userMessages,
+        Message $userMessage,
         int $statusCode,
         bool $displayErrorDetails = false
     ): string;

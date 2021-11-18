@@ -14,7 +14,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views\Twig;
 use Throwable;
 use Twig\Error\LoaderError;
-use UserFrosting\Support\Message\UserMessage;
+use UserFrosting\Sprinkle\Core\Util\Message\Message;
 use UserFrosting\Support\Repository\Repository as Config;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
@@ -36,7 +36,7 @@ final class PrettyPageRenderer implements ErrorRendererInterface
     public function render(
         ServerRequestInterface $request,
         Throwable $exception,
-        array $userMessages,
+        Message $userMessage,
         int $statusCode,
         bool $displayErrorDetails = false
     ): string {
@@ -47,21 +47,23 @@ final class PrettyPageRenderer implements ErrorRendererInterface
         }
 
         // Render Twig pretty page otherwise
-        return $this->renderTwigPage($userMessages, $statusCode);
+        return $this->renderTwigPage($userMessage, $statusCode);
     }
 
     /**
      * Render a generic, user-friendly response without sensitive debugging information.
      *
-     * @param UserMessage[] $userMessages
-     * @param int           $statusCode
+     * @param Message $userMessage
+     * @param int     $statusCode
      *
      * @return string
      */
-    protected function renderTwigPage(array $userMessages, int $statusCode): string
+    protected function renderTwigPage(Message $userMessage, int $statusCode): string
     {
         $payload = [
-            'messages' => $userMessages,
+            'title'       => $userMessage->title,
+            'description' => $userMessage->description,
+            'status'      => $statusCode,
         ];
 
         try {

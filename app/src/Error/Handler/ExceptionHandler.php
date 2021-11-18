@@ -13,9 +13,9 @@ namespace UserFrosting\Sprinkle\Core\Error\Handler;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Exception\HttpException;
 use Slim\Psr7\Factory\ResponseFactory;
 use Throwable;
+use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
 use UserFrosting\Sprinkle\Core\Error\Renderer\HtmlRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\JsonRenderer;
@@ -23,7 +23,7 @@ use UserFrosting\Sprinkle\Core\Error\Renderer\PlainTextRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\XmlRenderer;
 use UserFrosting\Sprinkle\Core\Http\Concerns\DeterminesContentType;
-use UserFrosting\Support\Message\UserMessage;
+use UserFrosting\Sprinkle\Core\Util\Message\Message;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /**
@@ -48,6 +48,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
         protected ContainerInterface $ci,
         protected ResponseFactory $responseFactory,
         protected Config $config,
+        protected Translator $translator,
     ) {
     }
 
@@ -86,13 +87,13 @@ class ExceptionHandler implements ExceptionHandlerInterface
         $statusCode = $this->determineStatusCode($request, $exception);
         $contentType = $this->determineContentType($request);
         $response = $this->responseFactory->createResponse($statusCode);
-        $messages = $this->determineUserMessages($exception);
+        $userMessage = $this->determineUserMessage($exception, $statusCode);
 
         // Determine which renderer to use based on the content type and required details
         $renderer = $this->determineRenderer($contentType);
 
         // Write to the response body
-        $body = $renderer->render($request, $exception, $messages, $statusCode, $this->displayErrorDetails());
+        $body = $renderer->render($request, $exception, $userMessage, $statusCode, $this->displayErrorDetails());
         $response->getBody()->write($body);
 
         return $response
@@ -124,7 +125,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     public function writeAlerts()
     {
-        $messages = $this->determineUserMessages();
+        $messages = $this->determineUserMessage();
 
         foreach ($messages as $message) {
             $this->ci->alerts->addMessageTranslated('danger', $message->message, $message->parameters);
@@ -178,28 +179,47 @@ class ExceptionHandler implements ExceptionHandlerInterface
     {
         if ($request->getMethod() === 'OPTIONS') {
             return 200;
-        } elseif ($exception instanceof HttpException) {
-            return $exception->getCode();
         }
 
         return 500;
     }
 
     /**
-     * Resolve a list of error messages to present to the end user.
+     * Return the end user message.
      *
-     * @return UserMessage[]
+     * @param Throwable $exception
+     * @param int       $statusCode
+     *
+     * @return Message
      */
-    protected function determineUserMessages(Throwable $exception): array
+    protected function determineUserMessage(Throwable $exception, int $statusCode): Message
     {
-        // TODO
-        // if ($exception instanceof HttpException) {
-        //     return $exception->getUserMessages();
-        // }
+        return new Message(
+            $this->translateStatusMessage($statusCode, 'ERROR.%d.TITLE', 'ERROR.TITLE'),
+            $this->translateStatusMessage($statusCode, 'ERROR.%d.DESCRIPTION', 'ERROR.DESCRIPTION')
+        );
+    }
 
-        return [
-            new UserMessage('ERROR.SERVER'),
-        ];
+    /**
+     * Get the right message based on status code, and returned the translated version.
+     *
+     * @param int    $statusCode
+     * @param string $format
+     * @param string $fallback
+     *
+     * @return string
+     */
+    protected function translateStatusMessage(int $statusCode, string $format, string $fallback): string
+    {
+        // Get locale dictionary from translator
+        $dictionary = $this->translator->getDictionary();
+
+        // If dictionary has string, returns it, otherwise, use fallback
+        if ($dictionary->has(sprintf($format, $statusCode))) {
+            return $this->translator->translate(sprintf($format, $statusCode));
+        }
+
+        return $this->translator->translate(sprintf($fallback, $statusCode));
     }
 
     /**

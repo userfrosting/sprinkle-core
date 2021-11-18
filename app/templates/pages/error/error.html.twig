@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-    <title>{% block page_title %}{{ translate('ERROR.TITLE') }}{% endblock %}</title>
+    <title>{{ block('page_title') }}</title>
     <style>
     body {
         margin: 0;
@@ -35,14 +35,7 @@
     </style>
 </head>
 <body>
-    <h1>{{ block('page_title') }}</h1>
-    <p>{% block page_description %}{{ translate('ERROR.DESCRIPTION') }}{% endblock %}</p>
-    <div>
-        {% block messages %}
-            {% for message in messages %}
-            <p>{{ translate(message.message, message.parameters) }}</p>
-            {% endfor %}
-        {% endblock %}
-    </div>
+    <h1>{% block page_title %}{{ title }}{% endblock %}</h1>
+    <p>{% block page_description %}{{ description }}{% endblock %}</p>
 </body>
 </html>

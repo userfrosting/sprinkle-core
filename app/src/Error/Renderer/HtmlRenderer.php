@@ -13,6 +13,7 @@ namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Request;
 use Throwable;
+use UserFrosting\Sprinkle\Core\Util\Message\Message;
 
 final class HtmlRenderer implements ErrorRendererInterface
 {
@@ -22,7 +23,7 @@ final class HtmlRenderer implements ErrorRendererInterface
     public function render(
         ServerRequestInterface $request,
         Throwable $exception,
-        array $userMessages,
+        Message $userMessage,
         int $statusCode,
         bool $displayErrorDetails = false
     ): string {
@@ -67,7 +68,7 @@ final class HtmlRenderer implements ErrorRendererInterface
      *
      * @return string
      */
-    public function renderException(Throwable $exception)
+    public function renderException(Throwable $exception): string
     {
         $html = sprintf('<div><strong>Type:</strong> %s</div>', get_class($exception));
 
@@ -97,6 +98,8 @@ final class HtmlRenderer implements ErrorRendererInterface
 
     /**
      * Render HTML representation of original request.
+     *
+     * @param Request $request
      *
      * @return string
      */
@@ -129,7 +132,7 @@ final class HtmlRenderer implements ErrorRendererInterface
      *
      * @return string
      */
-    protected function renderTable($data)
+    protected function renderTable(array $data): string
     {
         $html = '<table><tr><th>Name</th><th>Value</th></tr>';
         foreach ($data as $name => $value) {

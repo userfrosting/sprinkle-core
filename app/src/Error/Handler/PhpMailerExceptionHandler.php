@@ -24,7 +24,7 @@ class PhpMailerExceptionHandler extends ExceptionHandler
      *
      * @return array
      */
-    protected function determineUserMessages()
+    protected function determineUserMessage()
     {
         return [
             new UserMessage('ERROR.MAIL'),

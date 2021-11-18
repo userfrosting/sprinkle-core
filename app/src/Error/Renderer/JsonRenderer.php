@@ -12,6 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
+use UserFrosting\Sprinkle\Core\Util\Message\Message;
 
 /**
  * Default JSON Error Renderer.
@@ -24,13 +25,18 @@ final class JsonRenderer implements ErrorRendererInterface
     public function render(
         ServerRequestInterface $request,
         Throwable $exception,
-        array $userMessages,
+        Message $userMessage,
         int $statusCode,
         bool $displayErrorDetails = false
     ): string {
-        $error = ['message' => $exception->getMessage()];
+        $error = [
+            'title'       => $userMessage->title,
+            'description' => $userMessage->description,
+            'status'      => $statusCode,
+        ];
 
         if ($displayErrorDetails) {
+            $error['message'] = $exception->getMessage();
             $error['exception'] = [];
             do {
                 $error['exception'][] = $this->formatExceptionFragment($exception);
@@ -43,9 +49,9 @@ final class JsonRenderer implements ErrorRendererInterface
     /**
      * @param Throwable $e
      *
-     * @return array
+     * @return mixed[]
      */
-    public function formatExceptionFragment(Throwable $e)
+    public function formatExceptionFragment(Throwable $e): array
     {
         return [
             'type'    => get_class($e),
