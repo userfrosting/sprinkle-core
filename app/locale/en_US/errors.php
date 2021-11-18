@@ -10,8 +10,6 @@
 
 /**
  * US English message token translations for the 'core' sprinkle.
- *
- * @author Alexander Weissman
  */
 
 return [
@@ -20,15 +18,27 @@ return [
 
         '400' => [
             'TITLE'       => 'Error 400: Bad Request',
-            'DESCRIPTION' => "It's probably not your fault.",
+            'DESCRIPTION' => 'The server cannot or will not process the request due to an apparent client error.',
         ],
-
+        '401' => [
+            'TITLE'       => 'Error 401: Unauthorized',
+            'DESCRIPTION' => 'The request requires valid user authentication.',
+        ],
+        '403' => [
+            'TITLE'       => 'Error 403: Forbidden',
+            'DESCRIPTION' => 'You are not permitted to perform the requested operation.',
+        ],
         '404' => [
             'TITLE'       => 'Error 404: Not Found',
-            'DESCRIPTION' => "We can't seem to find what you're looking for.",
-            'DETAIL'      => 'We tried to find your page...',
-            'EXPLAIN'     => 'We could not find the page you were looking for.',
-            'RETURN'      => 'Either way, click <a href="{{url}}">here</a> to return to the front page.',
+            'DESCRIPTION' => 'The requested resource could not be found.',
+        ],
+        '405' => [
+            'TITLE'       => 'Error 405: Method Not Allowed',
+            'DESCRIPTION' => 'The request method is not supported for the requested resource.',
+        ],
+        '410' => [
+            'TITLE'       => 'Error 410: Gone',
+            'DESCRIPTION' => 'The target resource is no longer available at the origin server.',
         ],
 
         'CONFIG' => [
@@ -38,7 +48,7 @@ return [
             'RETURN'      => 'Please fix the following errors, then <a href="{{url}}">reload</a>.',
         ],
 
-        'DESCRIPTION' => "We've sensed a great disturbance in the Force.",
+        'DESCRIPTION' => "Oops, looks like our server might have goofed. If you're an admin, please check the PHP or UserFrosting logs.",
         'DETAIL'      => "Here's what we got:",
 
         'ENCOUNTERED' => "Uhhh...something happened.  We don't know what.",
@@ -47,8 +57,6 @@ return [
 
         'RETURN' => 'Click <a href="{{url}}">here</a> to return to the front page.',
 
-        'SERVER' => "Oops, looks like our server might have goofed. If you're an admin, please check the PHP or UserFrosting logs.",
-
-        'TITLE' => 'Disturbance in the Force',
+        'TITLE' => "We've sensed a great disturbance in the Force.",
     ],
 ];
