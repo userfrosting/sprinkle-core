@@ -170,6 +170,7 @@ class SetupSmtpCommand extends Command
 
         $choice = $this->io->choice('Select setup method', [self::Setup_SMTP, self::Setup_Gmail, self::Setup_Native, self::Setup_None], self::Setup_SMTP);
 
+        //TODO : Can be changed to new match
         switch ($choice) {
             case self::Setup_SMTP:
                 return $this->askForSmtp($input);

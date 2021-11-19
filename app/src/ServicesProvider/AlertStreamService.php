@@ -33,18 +33,17 @@ class AlertStreamService implements ServicesProviderInterface
     public function register(): array
     {
         return [
+            /**
+             * Select AlertStream based on Config.
+             *
+             * @throws BadConfigException
+             */
             AlertStream::class => function (ContainerInterface $ci, Config $config) {
-                switch ($config->get('alert.storage')) {
-                    case 'cache':
-                        return $ci->get(CacheAlertStream::class);
-                    break;
-                    case 'session':
-                        return $ci->get(SessionAlertStream::class);
-                    break;
-                    default:
-                        throw new BadConfigException("Bad alert storage handler type '{$config->get('alert.storage')}' specified in configuration file.");
-                    break;
-                }
+                return match ($config->get('alert.storage')) {
+                    'cache'   => $ci->get(CacheAlertStream::class),
+                    'session' => $ci->get(SessionAlertStream::class),
+                    default   => throw new BadConfigException("Bad alert storage handler type '{$config->get('alert.storage')}' specified in configuration file."),
+                };
             },
 
             // TODO : If config service is passed as argument, no need for this. A `setKey` on the interface would help.

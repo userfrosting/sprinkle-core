@@ -44,21 +44,12 @@ class SessionService implements ServicesProviderInterface
              * @throws BadConfigException
              */
             SessionHandlerInterface::class => function (ContainerInterface $ci, Config $config) {
-                // Create appropriate handler based on config
-                switch ($config->get('session.handler')) {
-                    case 'file':
-                        return $ci->get(FileSessionHandler::class);
-                    break;
-                    case 'database':
-                        return $ci->get(DatabaseSessionHandler::class);
-                    break;
-                    case 'array':
-                        return $ci->get(NullSessionHandler::class);
-                    break;
-                    default:
-                        throw new BadConfigException("Bad session handler type '{$config->get('session.handler')}' specified in configuration file.");
-                    break;
-                }
+                return match ($config->get('session.handler')) {
+                    'file'     => $ci->get(FileSessionHandler::class),
+                    'database' => $ci->get(DatabaseSessionHandler::class),
+                    'array'    => $ci->get(NullSessionHandler::class),
+                    default    => throw new BadConfigException("Bad session handler type '{$config->get('session.handler')}' specified in configuration file."),
+                };
             },
 
             /**

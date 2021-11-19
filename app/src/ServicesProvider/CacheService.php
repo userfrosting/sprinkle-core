@@ -30,21 +30,18 @@ class CacheService implements ServicesProviderInterface
     public function register(): array
     {
         return [
+            /**
+             * Select cache store based on Config.
+             *
+             * @throws BadConfigException
+             */
             Cache::class => function (ContainerInterface $ci, Config $config) {
-                switch ($config->get('cache.driver')) {
-                    case 'file':
-                        return $ci->get(TaggableFileStore::class)->instance();
-                    break;
-                    case 'memcached':
-                        return $ci->get(MemcachedStore::class)->instance();
-                    break;
-                    case 'redis':
-                        return $ci->get(RedisStore::class)->instance();
-                    break;
-                    default:
-                        throw new BadConfigException("Bad cache store type '{$config->get('cache.driver')}' specified in configuration file.");
-                    break;
-                }
+                return match ($config->get('cache.driver')) {
+                    'file'      => $ci->get(TaggableFileStore::class)->instance(),
+                    'memcached' => $ci->get(MemcachedStore::class)->instance(),
+                    'redis'     => $ci->get(RedisStore::class)->instance(),
+                    default     => throw new BadConfigException("Bad cache store type '{$config->get('cache.driver')}' specified in configuration file."),
+                };
             },
 
             /**
