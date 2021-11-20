@@ -40,6 +40,12 @@ return [
         'exception' => false,
     ],
     /*
+    * Log error in production
+    */
+    'logs' => [
+        'exception' => true,
+    ],
+    /*
      * Use router cache, disable full error details
      */
     'settings' => [

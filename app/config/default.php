@@ -303,7 +303,7 @@ return [
     * ----------------------------------------------------------------------
     */
     'logs' => [
-        'exception' => true, // Send exceptions details to the logs
+        'exception' => false, // Send exceptions details to the logs
         'path'      => 'logs://userfrosting.log',
     ],
 

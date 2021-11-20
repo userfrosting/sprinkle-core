@@ -1,6 +1,5 @@
 <?php
 
-
 declare(strict_types=1);
 
 /*
@@ -30,7 +29,7 @@ final class HtmlRenderer implements ErrorRendererInterface
         int $statusCode,
         bool $displayErrorDetails = false
     ): string {
-        $title = 'UserFrosting Application Error';
+        $title = $userMessage->title;
 
         if ($displayErrorDetails) {
             $html = '<p>The application could not run because of the following error:</p>';
@@ -45,7 +44,7 @@ final class HtmlRenderer implements ErrorRendererInterface
                 $html .= $this->renderException($exception);
             }
         } else {
-            $html = '<p>A website error has occurred. Sorry for the temporary inconvenience.</p>';
+            $html = '<p>' . $userMessage->description . '</p>';
         }
 
         $output = sprintf(

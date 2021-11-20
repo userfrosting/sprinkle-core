@@ -1,6 +1,5 @@
 <?php
 
-
 declare(strict_types=1);
 
 /*
@@ -25,7 +24,7 @@ interface ErrorRendererInterface
     /**
      * @param ServerRequestInterface $request
      * @param Throwable              $exception
-     * @param Message                $userMessage
+     * @param Message                $userMessage         User facing message
      * @param int                    $statusCode
      * @param bool                   $displayErrorDetails
      *

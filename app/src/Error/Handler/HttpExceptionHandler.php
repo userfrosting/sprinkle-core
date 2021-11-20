@@ -1,6 +1,5 @@
 <?php
 
-
 declare(strict_types=1);
 
 /*
@@ -22,6 +21,14 @@ use Throwable;
  */
 final class HttpExceptionHandler extends ExceptionHandler
 {
+    /**
+     * Never log exceptions for HttpException.
+     */
+    protected function shouldLogExceptions(): bool
+    {
+        return false;
+    }
+
     /**
      * Never display error details for HttpException.
      *

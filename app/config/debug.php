@@ -25,6 +25,9 @@ return [
         'twig'          => true,
         'exception'     => true,
     ],
+    'logs' => [
+        'exception' => true,
+    ],
     'site' => [
         'debug' => [
             'ajax' => true,

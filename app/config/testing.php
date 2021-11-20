@@ -38,6 +38,13 @@ return [
     ],
 
     /*
+    * Don't log exceptions in tests
+    */
+    'logs' => [
+        'exception' => false,
+    ],
+
+    /*
      * Use testing filesystem for tests
      */
     'filesystems' => [

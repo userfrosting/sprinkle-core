@@ -21,12 +21,12 @@ use Throwable;
 use UserFrosting\Exceptions\BadInstanceOfException;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
-use UserFrosting\Sprinkle\Core\Error\Renderer\HtmlRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\JsonRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PlainTextRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\XmlRenderer;
 use UserFrosting\Sprinkle\Core\Http\Concerns\DeterminesContentType;
+use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
 use UserFrosting\Support\Repository\Repository as Config;
 
@@ -54,6 +54,11 @@ class ExceptionHandler implements ExceptionHandlerInterface
     protected string $defaultErrorRenderer = PrettyPageRenderer::class;
 
     /**
+     * @var string Renderer for log messages
+     */
+    protected string $logFormatter = PlainTextRenderer::class;
+
+    /**
      * @param ContainerInterface $ci
      * @param ResponseFactory    $responseFactory
      * @param Config             $config
@@ -64,6 +69,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
         protected ResponseFactory $responseFactory,
         protected Config $config,
         protected Translator $translator,
+        protected ErrorLogger $logger,
     ) {
     }
 
@@ -75,10 +81,9 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     public function handle(ServerRequestInterface $request, Throwable $exception): ResponseInterface
     {
-        // TODO
-        // if ($this->config->get('logs.exception')) {
-        //     $this->writeToErrorLog();
-        // }
+        if ($this->shouldLogExceptions()) {
+            $this->writeToErrorLog($request, $exception);
+        }
 
         // TODO
         // If this is an AJAX request and AJAX debugging is turned off, write messages to the alert stream
@@ -96,8 +101,8 @@ class ExceptionHandler implements ExceptionHandlerInterface
      * Render a detailed response with debugging information.
      *
      * @param ServerRequestInterface $request
-     * @param Throwable $exception
-     * 
+     * @param Throwable              $exception
+     *
      * @return ResponseInterface
      */
     public function renderResponse(ServerRequestInterface $request, Throwable $exception): ResponseInterface
@@ -120,22 +125,24 @@ class ExceptionHandler implements ExceptionHandlerInterface
     }
 
     /**
-     * @return bool
-     */
-    protected function displayErrorDetails(): bool
-    {
-        return $this->config->get('debug.exception');
-    }
-
-    /**
      * Write to the error log.
+     *
+     * @param ServerRequestInterface $request
+     * @param Throwable              $exception
      */
-    public function writeToErrorLog()
+    public function writeToErrorLog(ServerRequestInterface $request, Throwable $exception): void
     {
-        $renderer = new PlainTextRenderer($this->request, $this->response, $this->exception, true);
-        $error = $renderer->render();
-        $error .= PHP_EOL . 'View in rendered output by enabling the "debug.exception" setting.' . PHP_EOL;
-        $this->logError($error);
+        $renderer = $this->ci->get($this->logFormatter);
+        if (!$renderer instanceof ErrorRendererInterface) {
+            throw new BadInstanceOfException("{$this->logFormatter} is not an instance of ErrorRendererInterface");
+        }
+
+        $statusCode = $this->determineStatusCode($request, $exception);
+        $userMessage = $this->determineUserMessage($exception, $statusCode); // Don't need this here?
+
+        $error = $renderer->render($request, $exception, $userMessage, $statusCode, true);
+
+        $this->logger->error($error);
     }
 
     /**
@@ -151,9 +158,25 @@ class ExceptionHandler implements ExceptionHandlerInterface
     }
 
     /**
+     * @return bool
+     */
+    protected function shouldLogExceptions(): bool
+    {
+        return $this->config->get('logs.exception');
+    }
+
+    /**
+     * @return bool
+     */
+    protected function displayErrorDetails(): bool
+    {
+        return $this->config->get('debug.exception');
+    }
+
+    /**
      * Determine which renderer to use based on content type
      * Overloaded $renderer from calling class takes precedence over all.
-     * 
+     *
      * @param string $contentType
      *
      * @throws \RuntimeException
@@ -179,9 +202,9 @@ class ExceptionHandler implements ExceptionHandlerInterface
 
     /**
      * Resolve the status code to return in the response from this handler.
-     * 
+     *
      * @param ServerRequestInterface $request
-     * @param Throwable $exception
+     * @param Throwable              $exception
      *
      * @return int
      */
@@ -230,16 +253,6 @@ class ExceptionHandler implements ExceptionHandlerInterface
         }
 
         return $this->translator->translate(sprintf($fallback, $statusCode));
-    }
-
-    /**
-     * Monolog logging for errors.
-     *
-     * @param string $message
-     */
-    protected function logError(string $message): void
-    {
-        $this->ci->errorLogger->error($message); // TODO
     }
 
     /**
