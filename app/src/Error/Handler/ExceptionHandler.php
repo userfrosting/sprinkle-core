@@ -239,7 +239,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
     }
 
     /**
-     * Register new content renderer
+     * Register new content renderer.
      *
      * @param string $contentType
      * @param string $errorRenderer
