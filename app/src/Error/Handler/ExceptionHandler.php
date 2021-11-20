@@ -81,15 +81,10 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     public function handle(ServerRequestInterface $request, Throwable $exception): ResponseInterface
     {
+        // Log error if required
         if ($this->shouldLogExceptions()) {
             $this->writeToErrorLog($request, $exception);
         }
-
-        // TODO
-        // If this is an AJAX request and AJAX debugging is turned off, write messages to the alert stream
-        // if ($this->request->isXhr() && !$this->ci->config['site.debug.ajax']) {
-        //     $this->writeAlerts();
-        // }
 
         // Render Response
         $response = $this->renderResponse($request, $exception);
@@ -146,18 +141,6 @@ class ExceptionHandler implements ExceptionHandlerInterface
     }
 
     /**
-     * Write user-friendly error messages to the alert message stream.
-     */
-    public function writeAlerts()
-    {
-        $messages = $this->determineUserMessage();
-
-        foreach ($messages as $message) {
-            $this->ci->alerts->addMessageTranslated('danger', $message->message, $message->parameters);
-        }
-    }
-
-    /**
      * @return bool
      */
     protected function shouldLogExceptions(): bool
@@ -185,7 +168,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function determineRenderer(string $contentType): ErrorRendererInterface
     {
-        if (in_array($contentType, array_keys($this->errorRenderers), true)) {
+        if (array_key_exists($contentType, $this->errorRenderers)) {
             $renderer = $this->errorRenderers[$contentType];
         } else {
             $renderer = $this->defaultErrorRenderer;

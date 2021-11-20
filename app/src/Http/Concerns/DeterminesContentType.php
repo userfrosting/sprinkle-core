@@ -22,7 +22,7 @@ trait DeterminesContentType
     /**
      * Known handled content types.
      *
-     * @var array
+     * @var string[]
      */
     protected $knownContentTypes = [
         'application/json',
@@ -40,17 +40,11 @@ trait DeterminesContentType
      * as willdurand/negotiation for any other situation.
      *
      * @param ServerRequestInterface $request
-     * @param bool                   $ajaxDebug
      *
      * @return string
      */
-    protected function determineContentType(ServerRequestInterface $request, bool $ajaxDebug = false): string
+    protected function determineContentType(ServerRequestInterface $request): string
     {
-        // For AJAX requests, if AJAX debugging is turned on, always return html
-        if ($ajaxDebug && $request->isXhr()) {
-            return 'text/html';
-        }
-
         $acceptHeader = $request->getHeaderLine('Accept');
         $selectedContentTypes = array_intersect(explode(',', $acceptHeader), $this->knownContentTypes);
         $count = count($selectedContentTypes);
