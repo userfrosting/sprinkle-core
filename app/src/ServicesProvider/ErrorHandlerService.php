@@ -1,5 +1,8 @@
 <?php
 
+
+declare(strict_types=1);
+
 /*
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
@@ -14,7 +17,8 @@ use Slim\Exception\HttpException;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerMiddleware;
 use UserFrosting\Sprinkle\Core\Error\Handler\HttpExceptionHandler;
-use UserFrosting\Sprinkle\Core\Error\Handler\PhpMailerExceptionHandler;
+
+// use UserFrosting\Sprinkle\Core\Error\Handler\PhpMailerExceptionHandler;
 
 class ErrorHandlerService implements ServicesProviderInterface
 {
