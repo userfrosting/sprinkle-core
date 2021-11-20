@@ -1,6 +1,5 @@
 <?php
 
-
 declare(strict_types=1);
 
 /*
@@ -13,11 +12,13 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Error\Handler;
 
+use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Factory\ResponseFactory;
 use Throwable;
+use UserFrosting\Exceptions\BadInstanceOfException;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
 use UserFrosting\Sprinkle\Core\Error\Renderer\HtmlRenderer;
@@ -37,16 +38,27 @@ class ExceptionHandler implements ExceptionHandlerInterface
     use DeterminesContentType;
 
     /**
-     * @var string[] Renderers for normal
+     * @var string[] Renderers for specific content types.
      */
-    protected $errorRenderers = [
+    protected array $errorRenderers = [
         'application/json' => JsonRenderer::class,
         'application/xml'  => XmlRenderer::class,
         'text/xml'         => XmlRenderer::class,
-        'text/html'        => HtmlRenderer::class,
+        'text/html'        => PrettyPageRenderer::class,
         'text/plain'       => PlainTextRenderer::class,
     ];
 
+    /**
+     * @var string Renderer used if no renderer is tied to content type.
+     */
+    protected string $defaultErrorRenderer = PrettyPageRenderer::class;
+
+    /**
+     * @param ContainerInterface $ci
+     * @param ResponseFactory    $responseFactory
+     * @param Config             $config
+     * @param Translator         $translator
+     */
     public function __construct(
         protected ContainerInterface $ci,
         protected ResponseFactory $responseFactory,
@@ -83,6 +95,9 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * Render a detailed response with debugging information.
      *
+     * @param ServerRequestInterface $request
+     * @param Throwable $exception
+     * 
      * @return ResponseInterface
      */
     public function renderResponse(ServerRequestInterface $request, Throwable $exception): ResponseInterface
@@ -138,6 +153,8 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * Determine which renderer to use based on content type
      * Overloaded $renderer from calling class takes precedence over all.
+     * 
+     * @param string $contentType
      *
      * @throws \RuntimeException
      *
@@ -145,36 +162,26 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function determineRenderer(string $contentType): ErrorRendererInterface
     {
-        // TODO : Register those / use param / move to config
-        switch ($contentType) {
-            case 'application/json':
-                $renderer = JsonRenderer::class;
-                break;
-
-            case 'text/xml':
-            case 'application/xml':
-                $renderer = XmlRenderer::class;
-                break;
-
-            case 'text/plain':
-                $renderer = PlainTextRenderer::class;
-                break;
-
-            default:
-            case 'text/html':
-                $renderer = PrettyPageRenderer::class;
-                // $renderer = HtmlRenderer::class;
-                break;
+        if (in_array($contentType, array_keys($this->errorRenderers), true)) {
+            $renderer = $this->errorRenderers[$contentType];
+        } else {
+            $renderer = $this->defaultErrorRenderer;
         }
 
         // Make sure it's a valid interface before returning
-        // TODO
+        $rendererInstance = $this->ci->get($renderer);
+        if (!$rendererInstance instanceof ErrorRendererInterface) {
+            throw new BadInstanceOfException("$renderer is not an instance of ErrorRendererInterface");
+        }
 
-        return $this->ci->get($renderer);
+        return $rendererInstance;
     }
 
     /**
      * Resolve the status code to return in the response from this handler.
+     * 
+     * @param ServerRequestInterface $request
+     * @param Throwable $exception
      *
      * @return int
      */
@@ -233,5 +240,34 @@ class ExceptionHandler implements ExceptionHandlerInterface
     protected function logError(string $message): void
     {
         $this->ci->errorLogger->error($message); // TODO
+    }
+
+    /**
+     * Register new content renderer
+     *
+     * @param string $contentType
+     * @param string $errorRenderer
+     */
+    public function registerErrorRenderer(string $contentType, string $errorRenderer): void
+    {
+        if (!is_a($errorRenderer, ErrorRendererInterface::class, true)) {
+            throw new InvalidArgumentException('Registered error renderer must implement ErrorRendererInterface');
+        }
+
+        $this->errorRenderers[$contentType] = $errorRenderer;
+    }
+
+    /**
+     * Set default renderer.
+     *
+     * @param string $errorRenderer
+     */
+    public function setDefaultErrorRenderer(string $errorRenderer): void
+    {
+        if (!is_a($errorRenderer, ErrorRendererInterface::class, true)) {
+            throw new InvalidArgumentException('Registered error renderer must implement ErrorRendererInterface');
+        }
+
+        $this->defaultErrorRenderer = $errorRenderer;
     }
 }
