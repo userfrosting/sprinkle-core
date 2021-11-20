@@ -20,7 +20,6 @@ use Slim\Exception\HttpException;
 use Throwable;
 use UserFrosting\Sprinkle\Core\Error\Handler\ExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Handler\ExceptionHandlerInterface;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Default UserFrosting application error handler.
@@ -48,7 +47,6 @@ class ExceptionHandlerMiddleware implements MiddlewareInterface
 
     /**
      * @param ContainerInterface $ci
-     * @param Config             $config
      */
     public function __construct(
         protected ContainerInterface $ci
@@ -74,8 +72,7 @@ class ExceptionHandlerMiddleware implements MiddlewareInterface
      * Invoke error handler.
      *
      * @param ServerRequestInterface $request   The most recent Request object
-     * @param ResponseInterface      $response  The most recent Response object
-     * @param \Throwable             $exception The caught Exception object
+     * @param Throwable              $exception The caught Exception object
      *
      * @return ResponseInterface
      */
@@ -102,15 +99,18 @@ class ExceptionHandlerMiddleware implements MiddlewareInterface
     public function getErrorHandler(string $type): ExceptionHandlerInterface
     {
         if (isset($this->handlers[$type])) {
+            /** @var ExceptionHandlerInterface */
             return $this->ci->get($this->handlers[$type]);
         }
 
         if (isset($this->subClassHandlers[$type])) {
+            /** @var ExceptionHandlerInterface */
             return $this->ci->get($this->subClassHandlers[$type]);
         }
 
         foreach ($this->subClassHandlers as $class => $handler) {
             if (is_subclass_of($type, $class)) {
+                /** @var ExceptionHandlerInterface */
                 return $this->ci->get($handler);
             }
         }
@@ -140,6 +140,7 @@ class ExceptionHandlerMiddleware implements MiddlewareInterface
      */
     public function getDefaultErrorHandler(): ExceptionHandlerInterface
     {
+        /** @var ExceptionHandlerInterface */
         return $this->ci->get($this->defaultErrorHandler);
     }
 
