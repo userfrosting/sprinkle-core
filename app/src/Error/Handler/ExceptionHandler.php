@@ -18,7 +18,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Factory\ResponseFactory;
 use Throwable;
-use UserFrosting\Support\Exception\BadInstanceOfException;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
 use UserFrosting\Sprinkle\Core\Error\Renderer\JsonRenderer;
@@ -28,6 +27,7 @@ use UserFrosting\Sprinkle\Core\Error\Renderer\XmlRenderer;
 use UserFrosting\Sprinkle\Core\Http\Concerns\DeterminesContentType;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
+use UserFrosting\Support\Exception\BadInstanceOfException;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /**

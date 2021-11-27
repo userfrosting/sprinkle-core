@@ -379,7 +379,7 @@ abstract class Sprunje
             // Check that this filter is allowed
             if (($name != '_all') && !in_array($name, $this->filterable)) {
                 $e = new HttpBadRequestException();
-                // TODO 
+                // TODO
                 // $e->addUserMessage('VALIDATE.SPRUNJE.BAD_FILTER', ['name' => $name]);
 
                 throw $e;
@@ -406,7 +406,7 @@ abstract class Sprunje
             // Check that this sort is allowed
             if (!in_array($name, $this->sortable)) {
                 $e = new HttpBadRequestException();
-                // TODO 
+                // TODO
                 // $e->addUserMessage('VALIDATE.SPRUNJE.BAD_SORT', ['name' => $name]);
 
                 throw $e;
