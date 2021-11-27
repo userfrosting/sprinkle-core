@@ -43,7 +43,7 @@ class SprinkleMigrationLocatorTest extends TestCase
             ->getMock();
 
         $manager = Mockery::mock(SprinkleManager::class)
-            ->shouldReceive('getSprinkles')->andReturn([new MigrationsSprinkleStub])
+            ->shouldReceive('getSprinkles')->andReturn([new MigrationsSprinkleStub()])
             ->getMock();
 
         $loader = new RecipeExtensionLoader($manager, $ci);
@@ -83,7 +83,7 @@ class SprinkleMigrationLocatorTest extends TestCase
 
         // Mock Sprinkle Manager so it return the Migration stub
         $sprinkleManager = Mockery::mock(SprinkleManager::class)
-            ->shouldReceive('getSprinkles')->andReturn([new MigrationsSprinkleStub])
+            ->shouldReceive('getSprinkles')->andReturn([new MigrationsSprinkleStub()])
             ->getMock();
         $ci->set(SprinkleManager::class, $sprinkleManager);
 

@@ -14,7 +14,6 @@ use DI\Container;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
-use UserFrosting\Support\Exception\BadInstanceOfException;
 use UserFrosting\Sprinkle\Core\Seeder\SeedInterface;
 use UserFrosting\Sprinkle\Core\Seeder\SeedRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Seeder\SprinkleSeedsRepository;
@@ -23,6 +22,7 @@ use UserFrosting\Sprinkle\Core\Tests\Integration\TestSprinkle;
 use UserFrosting\Sprinkle\Core\Util\ClassRepository\ClassRepositoryInterface;
 use UserFrosting\Sprinkle\RecipeExtensionLoader;
 use UserFrosting\Sprinkle\SprinkleManager;
+use UserFrosting\Support\Exception\BadInstanceOfException;
 use UserFrosting\Support\Exception\ClassNotFoundException;
 
 /**
@@ -40,7 +40,7 @@ class SprinkleSeedsRepositoryTest extends TestCase
             ->getMock();
 
         $manager = Mockery::mock(SprinkleManager::class)
-            ->shouldReceive('getSprinkles')->andReturn([new SeedsSprinkleStub])
+            ->shouldReceive('getSprinkles')->andReturn([new SeedsSprinkleStub()])
             ->getMock();
 
         $loader = new RecipeExtensionLoader($manager, $ci);
@@ -76,7 +76,7 @@ class SprinkleSeedsRepositoryTest extends TestCase
             ->getMock();
 
         $manager = Mockery::mock(SprinkleManager::class)
-            ->shouldReceive('getSprinkles')->andReturn([new BadSeedsSprinkleStub])
+            ->shouldReceive('getSprinkles')->andReturn([new BadSeedsSprinkleStub()])
             ->getMock();
 
         $loader = new RecipeExtensionLoader($manager, $ci);

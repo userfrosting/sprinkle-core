@@ -11,6 +11,8 @@
 namespace UserFrosting\Sprinkle\Core;
 
 use Slim\Views\TwigMiddleware;
+use UserFrosting\Event\AppInitiatedEvent;
+use UserFrosting\Event\EventListenerRecipe;
 use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
 use UserFrosting\Sprinkle\Core\Bakery\BuildAssets;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
@@ -38,6 +40,7 @@ use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\SessionsTable;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\ThrottlesTable;
 use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerMiddleware;
+use UserFrosting\Sprinkle\Core\Error\RegisterShutdownHandler;
 use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\SessionMiddleware;
 use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
@@ -72,7 +75,7 @@ use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
 use UserFrosting\Sprinkle\SprinkleRecipe;
 use UserFrosting\UniformResourceLocator\ResourceStream;
 
-class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, LocatorRecipe
+class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, LocatorRecipe, EventListenerRecipe
 {
     /**
      * {@inheritdoc}
@@ -234,6 +237,18 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
             new ResourceStream('logs', shared: true),
             new ResourceStream('sessions', shared: true),
             new ResourceStream('storage', shared: true),
+        ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getEventListeners(): array
+    {
+        return [
+            AppInitiatedEvent::class => [
+                RegisterShutdownHandler::class,
+            ],
         ];
     }
 }

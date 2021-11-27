@@ -69,7 +69,6 @@ return [
      * Send errors to log
      */
     'php' => [
-        'display_errors'  => 'false',
-        'log_errors'      => 'true',
+        'log_errors'      => true,
     ],
 ];

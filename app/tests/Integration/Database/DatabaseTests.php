@@ -10,13 +10,13 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database;
 
+use Exception;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;
-use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 // use UserFrosting\Support\Exception\BadRequestException;
-use Exception;
+use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
  * Test custom relations in `/src/Database/Relations`.

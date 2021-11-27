@@ -445,11 +445,9 @@ return [
     * ----------------------------------------------------------------------
     */
     'php' => [
-        'timezone'        => 'America/New_York',
-        'error_reporting' => E_ALL,  // Development - report all errors and suggestions
-        'display_errors'  => 'true',
-        'log_errors'      => 'false',
-        // Let PHP itself render errors natively.  Useful if a fatal error is raised in our custom shutdown handler.
-        'display_errors_native' => 'false',
+        'timezone'              => 'America/New_York',
+        'error_reporting'       => E_ALL, // Development - report all errors and suggestions
+        'log_errors'            => false,
+        'display_errors_native' => false, // Let PHP itself render errors natively.  Useful if a fatal error is raised in our custom shutdown handler.
     ],
 ];
