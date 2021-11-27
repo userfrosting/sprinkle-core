@@ -15,8 +15,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use League\Csv\Writer;
 use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Exception\HttpBadRequestException;
 use UserFrosting\Sprinkle\Core\Util\ClassMapper;
-use UserFrosting\Support\Exception\BadRequestException;
 use Valitron\Validator;
 
 /**
@@ -144,12 +144,13 @@ abstract class Sprunje
 
         // TODO: translated rules
         if (!$v->validate()) {
-            $e = new BadRequestException();
-            foreach ($v->errors() as $idx => $field) {
-                foreach ($field as $eidx => $error) {
-                    $e->addUserMessage($error);
-                }
-            }
+            $e = new HttpBadRequestException();
+            // TODO Requires new Exeception
+            // foreach ($v->errors() as $idx => $field) {
+            //     foreach ($field as $eidx => $error) {
+            //         $e->addUserMessage($error);
+            //     }
+            // }
 
             throw $e;
         }
@@ -377,8 +378,9 @@ abstract class Sprunje
         foreach ($this->options['filters'] as $name => $value) {
             // Check that this filter is allowed
             if (($name != '_all') && !in_array($name, $this->filterable)) {
-                $e = new BadRequestException();
-                $e->addUserMessage('VALIDATE.SPRUNJE.BAD_FILTER', ['name' => $name]);
+                $e = new HttpBadRequestException();
+                // TODO 
+                // $e->addUserMessage('VALIDATE.SPRUNJE.BAD_FILTER', ['name' => $name]);
 
                 throw $e;
             }
@@ -403,8 +405,9 @@ abstract class Sprunje
         foreach ($this->options['sorts'] as $name => $direction) {
             // Check that this sort is allowed
             if (!in_array($name, $this->sortable)) {
-                $e = new BadRequestException();
-                $e->addUserMessage('VALIDATE.SPRUNJE.BAD_SORT', ['name' => $name]);
+                $e = new HttpBadRequestException();
+                // TODO 
+                // $e->addUserMessage('VALIDATE.SPRUNJE.BAD_SORT', ['name' => $name]);
 
                 throw $e;
             }

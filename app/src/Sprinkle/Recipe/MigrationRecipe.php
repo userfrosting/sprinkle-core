@@ -20,5 +20,5 @@ interface MigrationRecipe
      *
      * @return \UserFrosting\Sprinkle\Core\Database\MigrationInterface[]
      */
-    public static function getMigrations(): array;
+    public function getMigrations(): array;
 }

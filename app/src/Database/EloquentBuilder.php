@@ -39,7 +39,8 @@ class EloquentBuilder extends LaravelEloquentBuilder
     public function findInt($id, $columns = ['*'])
     {
         if (!isset($id) || (filter_var($id, FILTER_VALIDATE_INT) === false)) {
-            throw new BadRequestException();
+            // throw new BadRequestException();
+            throw new \Exception(); // TODO
         }
 
         return $this->find($id, $columns);

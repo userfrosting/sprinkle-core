@@ -65,12 +65,12 @@ class SprinkleListCommand extends Command
      *
      * @return string[]
      */
-    protected function mapSprinkle($sprinkle): array
+    protected function mapSprinkle(SprinkleRecipe $sprinkle): array
     {
         return [
-            'sprinkle'  => $sprinkle::getName(),
-            'class'     => $sprinkle,
-            'path'      => $sprinkle::getPath(),
+            'sprinkle'  => $sprinkle->getName(),
+            'class'     => $sprinkle::class,
+            'path'      => $sprinkle->getPath(),
         ];
     }
 }

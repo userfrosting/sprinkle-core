@@ -214,6 +214,6 @@ class BuildAssets extends Command
     {
         // TODO : See if locator could be better fit here.
         //        Another way / place for the build dir seams required.
-        return $this->sprinkleManager->getMainSprinkle()::getPath() . '\..\build'; //  \UserFrosting\DS . \UserFrosting\BUILD_DIR_NAME;
+        return $this->sprinkleManager->getMainSprinkle()->getPath() . '\..\build'; //  \UserFrosting\DS . \UserFrosting\BUILD_DIR_NAME;
     }
 }

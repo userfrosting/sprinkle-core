@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Traversable;
 use UserFrosting\Sprinkle\Core\Util\ClassRepository\AbstractClassRepository;
 use UserFrosting\Sprinkle\Core\Util\ClassRepository\ClassRepositoryInterface;
-use UserFrosting\Support\Exception\NotFoundException;
+use UserFrosting\Support\Exception\ClassNotFoundException;
 
 class ClassRepositoryTest extends TestCase
 {
@@ -81,7 +81,7 @@ class ClassRepositoryTest extends TestCase
      */
     public function testGetWithNotFound(ClassRepositoryInterface $repository): void
     {
-        $this->expectException(NotFoundException::class);
+        $this->expectException(ClassNotFoundException::class);
         $repository->get(StubClassC::class);
     }
 

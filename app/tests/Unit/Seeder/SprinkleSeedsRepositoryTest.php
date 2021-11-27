@@ -14,7 +14,7 @@ use DI\Container;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
-use UserFrosting\Exceptions\BadInstanceOfException;
+use UserFrosting\Support\Exception\BadInstanceOfException;
 use UserFrosting\Sprinkle\Core\Seeder\SeedInterface;
 use UserFrosting\Sprinkle\Core\Seeder\SeedRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Seeder\SprinkleSeedsRepository;
@@ -23,7 +23,7 @@ use UserFrosting\Sprinkle\Core\Tests\Integration\TestSprinkle;
 use UserFrosting\Sprinkle\Core\Util\ClassRepository\ClassRepositoryInterface;
 use UserFrosting\Sprinkle\RecipeExtensionLoader;
 use UserFrosting\Sprinkle\SprinkleManager;
-use UserFrosting\Support\Exception\NotFoundException;
+use UserFrosting\Support\Exception\ClassNotFoundException;
 
 /**
  * SprinkleSeedsRepository Test
@@ -40,7 +40,7 @@ class SprinkleSeedsRepositoryTest extends TestCase
             ->getMock();
 
         $manager = Mockery::mock(SprinkleManager::class)
-            ->shouldReceive('getSprinkles')->andReturn([SeedsSprinkleStub::class])
+            ->shouldReceive('getSprinkles')->andReturn([new SeedsSprinkleStub])
             ->getMock();
 
         $loader = new RecipeExtensionLoader($manager, $ci);
@@ -76,7 +76,7 @@ class SprinkleSeedsRepositoryTest extends TestCase
             ->getMock();
 
         $manager = Mockery::mock(SprinkleManager::class)
-            ->shouldReceive('getSprinkles')->andReturn([BadSeedsSprinkleStub::class])
+            ->shouldReceive('getSprinkles')->andReturn([new BadSeedsSprinkleStub])
             ->getMock();
 
         $loader = new RecipeExtensionLoader($manager, $ci);
@@ -87,7 +87,7 @@ class SprinkleSeedsRepositoryTest extends TestCase
 
         // Set expectations
         $this->expectException(BadInstanceOfException::class);
-        $this->expectExceptionMessage('Class `' . StubNotSeed::class . '` must be instance of ' . SeedInterface::class);
+        $this->expectExceptionMessage('Class must be instance of ' . SeedInterface::class);
 
         // Perform
         $repository->all();
@@ -131,7 +131,7 @@ class SprinkleSeedsRepositoryTest extends TestCase
      */
     public function testGetWithNotFound(SprinkleSeedsRepository $repository): void
     {
-        $this->expectException(NotFoundException::class);
+        $this->expectException(ClassNotFoundException::class);
         $repository->get(StubSeedC::class);
     }
 }
@@ -159,7 +159,7 @@ class StubNotSeed
 
 class SeedsSprinkleStub extends TestSprinkle implements SeedRecipe
 {
-    public static function getSeeds(): array
+    public function getSeeds(): array
     {
         return [
             StubSeedA::class,
@@ -170,7 +170,7 @@ class SeedsSprinkleStub extends TestSprinkle implements SeedRecipe
 
 class BadSeedsSprinkleStub extends TestSprinkle implements SeedRecipe
 {
-    public static function getSeeds(): array
+    public function getSeeds(): array
     {
         return [
             StubSeedA::class,

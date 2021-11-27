@@ -23,7 +23,7 @@ use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\Core\Tests\Integration\TestSprinkle;
 use UserFrosting\Sprinkle\RecipeExtensionLoader;
 use UserFrosting\Sprinkle\SprinkleManager;
-use UserFrosting\Support\Exception\NotFoundException;
+use UserFrosting\Support\Exception\ClassNotFoundException;
 use UserFrosting\Testing\ContainerStub;
 
 /**
@@ -43,7 +43,7 @@ class SprinkleMigrationLocatorTest extends TestCase
             ->getMock();
 
         $manager = Mockery::mock(SprinkleManager::class)
-            ->shouldReceive('getSprinkles')->andReturn([MigrationsSprinkleStub::class])
+            ->shouldReceive('getSprinkles')->andReturn([new MigrationsSprinkleStub])
             ->getMock();
 
         $loader = new RecipeExtensionLoader($manager, $ci);
@@ -83,7 +83,7 @@ class SprinkleMigrationLocatorTest extends TestCase
 
         // Mock Sprinkle Manager so it return the Migration stub
         $sprinkleManager = Mockery::mock(SprinkleManager::class)
-            ->shouldReceive('getSprinkles')->andReturn([MigrationsSprinkleStub::class])
+            ->shouldReceive('getSprinkles')->andReturn([new MigrationsSprinkleStub])
             ->getMock();
         $ci->set(SprinkleManager::class, $sprinkleManager);
 
@@ -138,7 +138,7 @@ class SprinkleMigrationLocatorTest extends TestCase
      */
     public function testGetWithNotFound(SprinkleMigrationLocator $locator): void
     {
-        $this->expectException(NotFoundException::class);
+        $this->expectException(ClassNotFoundException::class);
         $locator->get(StubMigrationC::class);
     }
 }
@@ -167,7 +167,7 @@ class StubMigrationB extends Migration
 
 class MigrationsSprinkleStub extends TestSprinkle implements MigrationRecipe
 {
-    public static function getMigrations(): array
+    public function getMigrations(): array
     {
         return [
             StubMigrationA::class,

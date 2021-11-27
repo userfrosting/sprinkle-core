@@ -146,7 +146,7 @@ class TestRollbackMigrationSprinkle extends Core
     /**
      * Replace core migration with our dumb ones.
      */
-    public static function getMigrations(): array
+    public function getMigrations(): array
     {
         return [
             StubAnalyserRollbackMigrationA::class,

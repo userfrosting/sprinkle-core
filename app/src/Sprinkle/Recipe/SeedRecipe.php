@@ -20,5 +20,5 @@ interface SeedRecipe
      *
      * @return \UserFrosting\Sprinkle\Core\Database\Seeder\SeedInterface[]
      */
-    public static function getSeeds(): array;
+    public function getSeeds(): array;
 }

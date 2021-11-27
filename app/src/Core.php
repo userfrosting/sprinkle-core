@@ -77,7 +77,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
     /**
      * {@inheritdoc}
      */
-    public static function getName(): string
+    public function getName(): string
     {
         return 'Core Sprinkle';
     }
@@ -85,7 +85,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
     /**
      * {@inheritdoc}
      */
-    public static function getPath(): string
+    public function getPath(): string
     {
         return __DIR__ . '/../';
     }
@@ -93,7 +93,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
     /**
      * {@inheritdoc}
      */
-    public static function getBakeryCommands(): array
+    public function getBakeryCommands(): array
     {
         return [
             BakeCommand::class,
@@ -126,7 +126,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
     /**
      * {@inheritdoc}
      */
-    public static function getSprinkles(): array
+    public function getSprinkles(): array
     {
         return [];
     }
@@ -136,7 +136,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
      *
      * @return string[]
      */
-    public static function getRoutes(): array
+    public function getRoutes(): array
     {
         return [
             AlertsRoutes::class,
@@ -149,7 +149,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
      *
      * @return string[]
      */
-    public static function getServices(): array
+    public function getServices(): array
     {
         return [
             AlertStreamService::class,
@@ -179,7 +179,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
      *
      * @return \Psr\Http\Server\MiddlewareInterface[]
      */
-    public static function getMiddlewares(): array
+    public function getMiddlewares(): array
     {
         return [
             LocaleMiddleware::class,
@@ -194,7 +194,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
      *
      * @return \Twig\Extension\ExtensionInterface[]
      */
-    public static function getTwigExtensions(): array
+    public function getTwigExtensions(): array
     {
         return [
             AssetsExtension::class,
@@ -205,7 +205,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
         ];
     }
 
-    public static function getMigrations(): array
+    public function getMigrations(): array
     {
         return [
             SessionsTable::class,
@@ -218,7 +218,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
      *
      * @return \UserFrosting\UniformResourceLocator\ResourceStreamInterface[]
      */
-    public static function getResourceStreams(): array
+    public function getResourceStreams(): array
     {
         return [
             // new ResourceStream('assets'),

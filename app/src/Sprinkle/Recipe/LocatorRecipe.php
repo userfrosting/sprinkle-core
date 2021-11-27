@@ -20,5 +20,5 @@ interface LocatorRecipe
      *
      * @return \UserFrosting\UniformResourceLocator\ResourceStreamInterface[]
      */
-    public static function getResourceStreams(): array;
+    public function getResourceStreams(): array;
 }

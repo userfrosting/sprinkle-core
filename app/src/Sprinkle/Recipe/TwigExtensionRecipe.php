@@ -20,5 +20,5 @@ interface TwigExtensionRecipe
      *
      * @return \Twig\Extension\ExtensionInterface[]
      */
-    public static function getTwigExtensions(): array;
+    public function getTwigExtensions(): array;
 }

@@ -14,8 +14,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Csrf\Guard;
+use Slim\Exception\HttpBadRequestException;
 use UserFrosting\Sprinkle\Core\Facades\Config;
-use UserFrosting\Support\Exception\BadRequestException;
 
 /**
  * Slim Csrf Provider Class.
@@ -42,7 +42,10 @@ class SlimCsrfProvider implements CsrfProviderInterface
         $csrfStorage = $ci->session[$csrfKey];
 
         $onFailure = function ($request, $response, $next) {
-            $e = new BadRequestException('The CSRF code was invalid or not provided.');
+            // TODO : This will NOT WORK. HttpBadRequestException requires the request.
+            // BadRequestException was removed, a new custom exception might be needed
+            // (but this whole class requires a rewrite)
+            $e = new HttpBadRequestException('The CSRF code was invalid or not provided.');
             $e->addUserMessage('CSRF_MISSING');
 
             throw $e;

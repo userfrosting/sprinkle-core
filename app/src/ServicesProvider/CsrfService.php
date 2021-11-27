@@ -18,7 +18,7 @@ use UserFrosting\Sprinkle\Core\Csrf\SlimCsrfProvider;
  * Initialize CSRF guard middleware.
  *
  * @see https://github.com/slimphp/Slim-Csrf
- * @throws \UserFrosting\Support\Exception\BadRequestException
+ * @throws \Slim\Exception\HttpBadRequestException
  * @return \Slim\Csrf\Guard
  */
 class CsrfService implements ServicesProviderInterface

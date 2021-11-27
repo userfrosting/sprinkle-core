@@ -15,7 +15,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
-use UserFrosting\Support\Exception\BadRequestException;
+// use UserFrosting\Support\Exception\BadRequestException;
+use Exception;
 
 /**
  * Test custom relations in `/src/Database/Relations`.
@@ -946,7 +947,8 @@ class DatabaseTests extends TestCase
     public function testFindIntThrowsExceptionOnNull(): void
     {
         $this->generateTasks();
-        $this->expectException(BadRequestException::class);
+        // $this->expectException(BadRequestException::class);
+        $this->expectException(Exception::class);
         EloquentTestTask::findInt(null);
     }
 
@@ -957,7 +959,8 @@ class DatabaseTests extends TestCase
     public function testFindIntThrowsExceptionOnNonInteger(): void
     {
         $this->generateTasks();
-        $this->expectException(BadRequestException::class);
+        // $this->expectException(BadRequestException::class);
+        $this->expectException(Exception::class);
         EloquentTestTask::findInt('hi');
     }
 

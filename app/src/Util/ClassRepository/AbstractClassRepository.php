@@ -12,7 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Util\ClassRepository;
 
 use ArrayIterator;
 use Iterator;
-use UserFrosting\Support\Exception\NotFoundException;
+use UserFrosting\Support\Exception\ClassNotFoundException;
 
 /**
  * Handle a PHP class repository.
@@ -40,7 +40,7 @@ abstract class AbstractClassRepository implements ClassRepositoryInterface
     public function get(string $class): object
     {
         if (!$this->has($class)) {
-            throw new NotFoundException("Class `$class` not found.");
+            throw new ClassNotFoundException("Class `$class` not found.");
         }
 
         $results = array_filter($this->all(), function ($m) use ($class) {

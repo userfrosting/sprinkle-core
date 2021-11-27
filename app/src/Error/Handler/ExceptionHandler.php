@@ -18,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Factory\ResponseFactory;
 use Throwable;
-use UserFrosting\Exceptions\BadInstanceOfException;
+use UserFrosting\Support\Exception\BadInstanceOfException;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
 use UserFrosting\Sprinkle\Core\Error\Renderer\JsonRenderer;

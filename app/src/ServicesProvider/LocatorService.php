@@ -27,11 +27,11 @@ class LocatorService implements ServicesProviderInterface
 
                 // Create instance based on main sprinkle path
                 $mainSprinkle = $sprinkleManager->getMainSprinkle();
-                $locator = new ResourceLocator($mainSprinkle::getPath());
+                $locator = new ResourceLocator($mainSprinkle->getPath());
 
                 // Register all sprinkles locations
                 foreach ($sprinkleManager->getSprinkles() as $sprinkle) {
-                    $locator->registerLocation($sprinkle::getName(), $sprinkle::getPath());
+                    $locator->registerLocation($sprinkle->getName(), $sprinkle->getPath());
                 }
 
                 // Register all sprinkles streams from recipes

@@ -73,13 +73,13 @@ class DebugCommand extends Command
 
         // Perform tasks & display info
         $this->io->definitionList(
-            ['UserFrosting version' => \UserFrosting\VERSION], // TODO Rethink usefulness of this. Might need to move to sprinkle list, with each sprinkle having it's own version.
-            ['OS Name'              => php_uname('s')],
-            ['Main Sprinkle Path'   => $this->sprinkleManager->getMainSprinkle()::getPath()],
-            ['Environment mode'     => env('UF_MODE', 'default')],
-            ['PHP Version'          => $this->phpVersionValidator->getInstalled()],
-            ['Node Version'         => $this->nodeVersionValidator->getInstalled()],
-            ['NPM Version'          => $this->npmVersionValidator->getInstalled()]
+            ['Framework version'  => \Composer\InstalledVersions::getPrettyVersion('userfrosting/framework')],
+            ['OS Name'            => php_uname('s')],
+            ['Main Sprinkle Path' => $this->sprinkleManager->getMainSprinkle()->getPath()],
+            ['Environment mode'   => env('UF_MODE', 'default')],
+            ['PHP Version'        => $this->phpVersionValidator->getInstalled()],
+            ['Node Version'       => $this->nodeVersionValidator->getInstalled()],
+            ['NPM Version'        => $this->npmVersionValidator->getInstalled()]
         );
 
         // Now we list Sprinkles
