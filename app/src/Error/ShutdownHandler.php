@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Error;
 
+use Psr\Http\Message\ServerRequestInterface;
 use UserFrosting\Sprinkle\Core\Http\Concerns\DeterminesContentType;
 use UserFrosting\Support\Repository\Repository as Config;
 
@@ -38,6 +39,7 @@ class ShutdownHandler
 
     public function __construct(
         protected Config $config,
+        protected ServerRequestInterface $request,
     ) {
     }
 
@@ -46,28 +48,33 @@ class ShutdownHandler
      */
     public function register(): void
     {
-        register_shutdown_function([$this, 'fatalHandler']);
+        register_shutdown_function([$this, 'handle']);
     }
 
     /**
      * Set up the fatal error handler, so that we get a clean error message and alert instead of a WSOD.
      */
-    public function fatalHandler(): void
+    public function handle(): void
     {
         $error = error_get_last();
 
         // Handle fatal errors and parse errors
         if ($error !== null && in_array($error['type'], array_keys($this->errorTypes), true)) {
 
-            // Determine if error display is enabled in the shutdown handler.
-            $displayErrors = (bool) $this->config->get('debug.exception');
-
-            // Build the appropriate error message (debug or client)
-            if ($displayErrors) {
-                $errorMessage = $this->buildErrorInfoMessage($error);
+            // Default to 'text/plain' if in CLI
+            if (php_sapi_name() === 'cli') {
+                $contentType = 'text/plain';
             } else {
-                $errorMessage = "Oops, looks like our server might have goofed.  If you're an admin, please ensure that <code>php.log_errors</code> is enabled, and then check the <strong>PHP</strong> error log.";
+                $contentType = $this->determineContentType($this->request);
             }
+
+            // Get error message based on
+            $errorMessage = match ($contentType) {
+                'application/json' => $this->buildJsonError($error),
+                'text/html'        => $this->buildHtmlError($error),
+                'text/plain'       => $this->buildTxtError($error),
+                default            => $this->buildTxtError($error),
+            };
 
             // For CLI, just print the message and exit.
             if (php_sapi_name() === 'cli') {
@@ -75,14 +82,7 @@ class ShutdownHandler
             }
 
             // For all other environments, print a debug response for the requested data type
-            echo $this->buildErrorPage($errorMessage);
-
-            // If this is an AJAX request and AJAX debugging is turned off, write message to the alert stream
-            // if ($this->ci->request->isXhr() && !$this->ci->config['site.debug.ajax']) {
-            //     if ($this->ci->alerts && is_object($this->ci->alerts)) {
-            //         $this->ci->alerts->addMessageTranslated('danger', $errorMessage);
-            //     }
-            // }
+            echo $errorMessage;
 
             header('HTTP/1.1 500 Internal Server Error');
             exit();
@@ -90,60 +90,63 @@ class ShutdownHandler
     }
 
     /**
-     * Build the error message string.
+     * Build an error response of the appropriate type as determined by the request's Accept header.
      *
      * @param (string|int)[] $error
      *
      * @return string
      */
-    protected function buildErrorInfoMessage(array $error): string
+    protected function buildJsonError(array $error): string
     {
-        $file = $error['file'];
-        $line = (string) $error['line'];
-        $message = $error['message'];
-        $type = $this->errorTypes[$error['type']];
+        if ($this->shouldDisplayError()) {
+            // Translate type int to string
+            $error['type'] = $this->errorTypes[$error['type']];
 
-        return "<strong>$type</strong>: $message in <strong>$file</strong> on line <strong>$line</strong>";
+            return json_encode($error, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+        } else {
+            return json_encode([
+                'message' => "Oops, looks like our server might have goofed. If you're an admin, please ensure that `php.log_errors` is enabled, and then check the PHP error log."
+            ], JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+        }
     }
 
     /**
      * Build an error response of the appropriate type as determined by the request's Accept header.
      *
-     * @param string $message
+     * @param (string|int)[] $error
      *
      * @return string
      */
-    protected function buildErrorPage(string $message): string
+    protected function buildTxtError(array $error): string
     {
-        return $this->buildHtmlErrorPage($message);
+        if ($this->shouldDisplayError()) {
+            $file = $error['file'];
+            $line = (string) $error['line'];
+            $message = $error['message'];
+            $type = $this->errorTypes[$error['type']];
 
-        // TODO : Request is not in CI anymore...
-        /*$contentType = $this->determineContentType($this->ci->request);
-
-        switch ($contentType) {
-            case 'application/json':
-                $error = ['message' => $message];
-
-                return json_encode($error, JSON_PRETTY_PRINT);
-
-            case 'text/html':
-                return $this->buildHtmlErrorPage($message);
-
-            default:
-            case 'text/plain':
-                return $message;
-        }*/
+            return "$type: $message in $file on line $line";
+        } else {
+            return "Oops, looks like our server might have goofed. If you're an admin, please ensure that `php.log_errors` is enabled, and then check the PHP error log.";
+        }
     }
 
     /**
      * Build an HTML error page from an error string.
      *
-     * @param string $message
+     * @param (string|int)[] $error
      *
      * @return string
      */
-    protected function buildHtmlErrorPage(string $message): string
+    protected function buildHtmlError(array $error): string
     {
+        // Build the appropriate error message (debug or client)
+        if ($this->shouldDisplayError()) {
+            $message = $this->buildHttpErrorInfoMessage($error);
+        } else {
+            $message = "Oops, looks like our server might have goofed. If you're an admin, please ensure that <code>php.log_errors</code> is enabled, and then check the <strong>PHP</strong> error log.";
+        }
+
         $title = 'UserFrosting Application Error';
         $html = "<p>$message</p>";
 
@@ -156,5 +159,32 @@ class ShutdownHandler
             $title,
             $html
         );
+    }
+
+    /**
+     * Build the error message string.
+     *
+     * @param (string|int)[] $error
+     *
+     * @return string
+     */
+    protected function buildHttpErrorInfoMessage(array $error): string
+    {
+        $file = $error['file'];
+        $line = (string) $error['line'];
+        $message = $error['message'];
+        $type = $this->errorTypes[$error['type']];
+
+        return "<strong>$type</strong>: $message in <strong>$file</strong> on line <strong>$line</strong>";
+    }
+
+    /**
+     * Should display full error (true) or not (false)
+     *
+     * @return bool
+     */
+    protected function shouldDisplayError(): bool
+    {
+        return (bool) $this->config->get('debug.exception');
     }
 }

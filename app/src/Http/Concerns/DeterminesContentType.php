@@ -14,8 +14,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Trait for classes that need to determine a request's accepted content type(s).
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 trait DeterminesContentType
 {
