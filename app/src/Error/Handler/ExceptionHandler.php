@@ -145,7 +145,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function shouldLogExceptions(): bool
     {
-        return $this->config->get('logs.exception');
+        return boolval($this->config->get('logs.exception'));
     }
 
     /**
@@ -153,7 +153,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function displayErrorDetails(): bool
     {
-        return $this->config->get('debug.exception');
+        return boolval($this->config->get('debug.exception'));
     }
 
     /**
