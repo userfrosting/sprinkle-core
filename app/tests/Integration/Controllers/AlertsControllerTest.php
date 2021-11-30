@@ -23,10 +23,8 @@ class AlertsControllerTest extends TestCase
         $request = $this->createRequest('GET', '/alerts');
         $response = $this->handleRequest($request);
 
-        // Assert 200 response
-        $this->assertSame($response->getStatusCode(), 200);
-
-        // Assert response body
-        $this->assertResponseJson([], $response);
+        // Assert response status & body
+        $this->assertResponseStatus(200, $response);
+        $this->assertJsonResponse([], $response);
     }
 }
