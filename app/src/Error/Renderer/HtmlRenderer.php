@@ -101,11 +101,11 @@ final class HtmlRenderer implements ErrorRendererInterface
     /**
      * Render HTML representation of original request.
      *
-     * @param Request $request
+     * @param ServerRequestInterface $request
      *
      * @return string
      */
-    public function renderRequest(Request $request): string
+    public function renderRequest(ServerRequestInterface $request): string
     {
         $method = $request->getMethod();
         $uri = $request->getUri();

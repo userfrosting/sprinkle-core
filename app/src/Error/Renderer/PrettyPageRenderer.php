@@ -69,10 +69,12 @@ final class PrettyPageRenderer implements ErrorRendererInterface
         ];
 
         try {
-            $page = sprintf($this->config->get('error.pages.status'), $statusCode);
+            $format = strval($this->config->get('error.pages.status'));
+            $page = sprintf($format, $statusCode);
             $body = $this->twig->fetch($page, $payload);
         } catch (LoaderError $e) {
-            $body = $this->twig->fetch($this->config->get('error.pages.error'), $payload);
+            $format = strval($this->config->get('error.pages.error'));
+            $body = $this->twig->fetch($format, $payload);
         }
 
         return $body;

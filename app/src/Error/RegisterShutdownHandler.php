@@ -16,7 +16,7 @@ use UserFrosting\Event\AppInitiatedEvent;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /**
- * Register the ShutdownHandler
+ * Register the ShutdownHandler.
  */
 class RegisterShutdownHandler
 {

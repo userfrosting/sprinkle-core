@@ -105,7 +105,7 @@ class ShutdownHandler
             return json_encode($error, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
         } else {
             return json_encode([
-                'message' => "Oops, looks like our server might have goofed. If you're an admin, please ensure that `php.log_errors` is enabled, and then check the PHP error log."
+                'message' => "Oops, looks like our server might have goofed. If you're an admin, please ensure that `php.log_errors` is enabled, and then check the PHP error log.",
             ], JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
         }
     }
@@ -179,7 +179,7 @@ class ShutdownHandler
     }
 
     /**
-     * Should display full error (true) or not (false)
+     * Should display full error (true) or not (false).
      *
      * @return bool
      */

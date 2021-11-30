@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Error\Renderer;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Slim\Psr7\Request;
 use Throwable;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
 
@@ -38,13 +39,14 @@ final class JsonRenderer implements ErrorRendererInterface
         ];
 
         if ($displayErrorDetails) {
+            $error['request'] = $this->renderRequest($request);
             $error['exception'] = [];
             do {
                 $error['exception'][] = $this->formatExceptionFragment($exception);
             } while ($exception = $exception->getPrevious());
         }
 
-        return json_encode($error, JSON_PRETTY_PRINT);
+        return json_encode($error, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
     }
 
     /**
@@ -60,6 +62,23 @@ final class JsonRenderer implements ErrorRendererInterface
             'message' => $e->getMessage(),
             'file'    => $e->getFile(),
             'line'    => $e->getLine(),
+        ];
+    }
+
+    /**
+     * Render representation of original request.
+     *
+     * @param ServerRequestInterface $request
+     *
+     * @return string[]
+     */
+    public function renderRequest(ServerRequestInterface $request): array
+    {
+        return [
+            'method'  => $request->getMethod(),
+            'uri'     => (string) $request->getUri(),
+            'params'  => print_r($request->getQueryParams(), true),
+            'headers' => print_r($request->getHeaders(), true),
         ];
     }
 }
