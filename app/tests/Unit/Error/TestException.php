@@ -16,6 +16,4 @@ class TestException extends Exception
 {
     protected $message = 'Test exception';
     protected $code = 123;
-    protected $file = 'foo/bar.php';
-    protected $line = 321;
 }
