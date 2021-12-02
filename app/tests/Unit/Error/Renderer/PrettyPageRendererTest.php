@@ -14,7 +14,6 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\UriInterface;
 use Slim\Psr7\Request;
 use Slim\Views\Twig;
 use Twig\Error\LoaderError;
@@ -38,7 +37,6 @@ class PrettyPageRendererTest extends TestCase
     public function testRender(): void
     {
         // Mocks
-        $uri = Mockery::mock(UriInterface::class);
         $request = Mockery::mock(Request::class);
         $userMessage = new Message('title', 'description');
 
@@ -90,7 +88,6 @@ class PrettyPageRendererTest extends TestCase
     public function testRenderWithLoaderError(): void
     {
         // Mocks
-        $uri = Mockery::mock(UriInterface::class);
         $request = Mockery::mock(Request::class);
         $userMessage = new Message('title', 'description');
 
@@ -141,7 +138,6 @@ class PrettyPageRendererTest extends TestCase
     public function testRenderWithDisplayError(): void
     {
         // Mocks
-        $uri = Mockery::mock(UriInterface::class);
         $request = Mockery::mock(Request::class);
         $userMessage = new Message('title', 'description');
         $exception = new TestException();

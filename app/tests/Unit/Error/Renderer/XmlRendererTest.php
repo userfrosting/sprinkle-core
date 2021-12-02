@@ -14,7 +14,6 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\UriInterface;
 use Slim\Psr7\Request;
 use UserFrosting\Sprinkle\Core\Error\Renderer\XmlRenderer;
 use UserFrosting\Sprinkle\Core\Tests\Unit\Error\TestException;
@@ -33,7 +32,6 @@ class XmlRendererTest extends TestCase
     public function testRender(): void
     {
         // Mocks
-        $uri = Mockery::mock(UriInterface::class);
         $request = Mockery::mock(Request::class);
         $userMessage = new Message('title', 'description');
 
@@ -57,7 +55,6 @@ class XmlRendererTest extends TestCase
     public function testRenderWithDisplayError(): void
     {
         // Mocks
-        $uri = Mockery::mock(UriInterface::class);
         $request = Mockery::mock(Request::class);
         $userMessage = new Message('title', 'description');
         $exception = new TestException();

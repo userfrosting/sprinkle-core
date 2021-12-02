@@ -64,7 +64,6 @@ class HtmlRendererTest extends TestCase
     public function testRender(): void
     {
         // Mocks
-        $uri = Mockery::mock(UriInterface::class);
         $request = Mockery::mock(Request::class);
         $userMessage = new Message('title', 'description');
 
