@@ -130,6 +130,10 @@ class ExceptionHandlerMiddleware implements MiddlewareInterface
      */
     public function setDefaultErrorHandler(string $handler): self
     {
+        if (!is_a($handler, ExceptionHandlerInterface::class, true)) {
+            throw new InvalidArgumentException('Registered exception handler must implement ExceptionHandlerInterface');
+        }
+
         $this->defaultErrorHandler = $handler;
 
         return $this;
@@ -162,7 +166,7 @@ class ExceptionHandlerMiddleware implements MiddlewareInterface
     public function registerHandler(string $type, string $handler, bool $handleSubclasses = false): self
     {
         if (!is_a($handler, ExceptionHandlerInterface::class, true)) {
-            throw new InvalidArgumentException('Registered exception handler must implement ExceptionHandlerInterface!');
+            throw new InvalidArgumentException('Registered exception handler must implement ExceptionHandlerInterface');
         }
 
         if ($handleSubclasses) {

@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Error;
 
 use Psr\Http\Message\ServerRequestInterface;
-use UserFrosting\Sprinkle\Core\Http\Concerns\DeterminesContentType;
+use UserFrosting\Sprinkle\Core\Http\Concerns\DeterminesContentTypeTrait;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /**
@@ -24,7 +24,7 @@ use UserFrosting\Support\Repository\Repository as Config;
  */
 class ShutdownHandler
 {
-    use DeterminesContentType;
+    use DeterminesContentTypeTrait;
 
     /**
      * @var string[] Error types this handler handle.
@@ -35,6 +35,17 @@ class ShutdownHandler
         E_CORE_ERROR        => 'PHP core error',
         E_COMPILE_ERROR     => 'Zend compile error',
         E_RECOVERABLE_ERROR => 'Catchable fatal error',
+    ];
+
+    /**
+     * Known handled content types.
+     *
+     * @var string[]
+     */
+    protected array $knownContentTypes = [
+        'application/json',
+        'text/html',
+        'text/plain',
     ];
 
     public function __construct(
@@ -65,28 +76,43 @@ class ShutdownHandler
             if (php_sapi_name() === 'cli') {
                 $contentType = 'text/plain';
             } else {
-                $contentType = $this->determineContentType($this->request);
+                $contentType = $this->determineContentType($this->request, $this->knownContentTypes, 'text/plain');
             }
 
             // Get error message based on
             $errorMessage = match ($contentType) {
                 'application/json' => $this->buildJsonError($error),
                 'text/html'        => $this->buildHtmlError($error),
-                'text/plain'       => $this->buildTxtError($error),
                 default            => $this->buildTxtError($error),
             };
 
             // For CLI, just print the message and exit.
             if (php_sapi_name() === 'cli') {
-                exit($errorMessage . PHP_EOL);
+                $errorMessage .= PHP_EOL;
             }
 
             // For all other environments, print a debug response for the requested data type
-            echo $errorMessage;
-
-            header('HTTP/1.1 500 Internal Server Error');
-            exit();
+            $this->terminate($errorMessage);
         }
+    }
+
+    /**
+     * Display the error message and terminate the process.
+     *
+     * The exist is separated in it's own class to allows testing.
+     * @see https://stackoverflow.com/a/21578225/445757
+     * @codeCoverageIgnore
+     *
+     * @param string $errorMessage
+     *
+     * @return never
+     */
+    protected function terminate(string $errorMessage): void
+    {
+        echo $errorMessage;
+
+        header('HTTP/1.1 500 Internal Server Error');
+        exit();
     }
 
     /**
@@ -96,7 +122,7 @@ class ShutdownHandler
      *
      * @return string
      */
-    protected function buildJsonError(array $error): string
+    public function buildJsonError(array $error): string
     {
         if ($this->shouldDisplayError()) {
             // Translate type int to string
@@ -117,7 +143,7 @@ class ShutdownHandler
      *
      * @return string
      */
-    protected function buildTxtError(array $error): string
+    public function buildTxtError(array $error): string
     {
         if ($this->shouldDisplayError()) {
             $file = $error['file'];
@@ -138,7 +164,7 @@ class ShutdownHandler
      *
      * @return string
      */
-    protected function buildHtmlError(array $error): string
+    public function buildHtmlError(array $error): string
     {
         // Build the appropriate error message (debug or client)
         if ($this->shouldDisplayError()) {

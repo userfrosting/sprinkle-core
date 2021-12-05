@@ -14,6 +14,6 @@ use Exception;
 
 class TestException extends Exception
 {
-    protected $message = 'Test exception';
-    protected $code = 123;
+    protected $message = 'Test exception'; // @phpstan-ignore-line
+    protected $code = 123; // @phpstan-ignore-line
 }

@@ -15,21 +15,8 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Trait for classes that need to determine a request's accepted content type(s).
  */
-trait DeterminesContentType
+trait DeterminesContentTypeTrait
 {
-    /**
-     * Known handled content types.
-     *
-     * @var string[]
-     */
-    protected $knownContentTypes = [
-        'application/json',
-        'application/xml',
-        'text/xml',
-        'text/html',
-        'text/plain',
-    ];
-
     /**
      * Determine which content type we know about is wanted using Accept header.
      *
@@ -38,13 +25,18 @@ trait DeterminesContentType
      * as willdurand/negotiation for any other situation.
      *
      * @param ServerRequestInterface $request
+     * @param array                  $knownContentTypes
+     * @param string                 $defaultType
      *
      * @return string
      */
-    protected function determineContentType(ServerRequestInterface $request): string
-    {
+    protected function determineContentType(
+        ServerRequestInterface $request,
+        array $knownContentTypes = [],
+        string $defaultType = 'text/html',
+    ): string {
         $acceptHeader = $request->getHeaderLine('Accept');
-        $selectedContentTypes = array_intersect(explode(',', $acceptHeader), $this->knownContentTypes);
+        $selectedContentTypes = array_intersect(explode(',', $acceptHeader), $knownContentTypes);
         $count = count($selectedContentTypes);
 
         if ($count) {
@@ -63,11 +55,11 @@ trait DeterminesContentType
 
         if (preg_match('/\+(json|xml)/', $acceptHeader, $matches)) {
             $mediaType = 'application/' . $matches[1];
-            if (in_array($mediaType, $this->knownContentTypes)) {
+            if (in_array($mediaType, $knownContentTypes)) {
                 return $mediaType;
             }
         }
 
-        return 'text/html';
+        return $defaultType;
     }
 }

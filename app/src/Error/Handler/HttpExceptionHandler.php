@@ -45,7 +45,7 @@ final class HttpExceptionHandler extends ExceptionHandler
     protected function determineStatusCode(ServerRequestInterface $request, Throwable $exception): int
     {
         if ($exception instanceof HttpException) {
-            return $exception->getCode();
+            return intval($exception->getCode());
         }
 
         return parent::determineStatusCode($request, $exception);

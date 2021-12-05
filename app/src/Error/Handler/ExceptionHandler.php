@@ -24,7 +24,7 @@ use UserFrosting\Sprinkle\Core\Error\Renderer\JsonRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PlainTextRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\XmlRenderer;
-use UserFrosting\Sprinkle\Core\Http\Concerns\DeterminesContentType;
+use UserFrosting\Sprinkle\Core\Http\Concerns\DeterminesContentTypeTrait;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
 use UserFrosting\Support\Exception\BadInstanceOfException;
@@ -35,7 +35,7 @@ use UserFrosting\Support\Repository\Repository as Config;
  */
 class ExceptionHandler implements ExceptionHandlerInterface
 {
-    use DeterminesContentType;
+    use DeterminesContentTypeTrait;
 
     /**
      * @var string[] Renderers for specific content types.
@@ -47,11 +47,6 @@ class ExceptionHandler implements ExceptionHandlerInterface
         'text/html'        => PrettyPageRenderer::class,
         'text/plain'       => PlainTextRenderer::class,
     ];
-
-    /**
-     * @var string Renderer used if no renderer is tied to content type.
-     */
-    protected string $defaultErrorRenderer = PrettyPageRenderer::class;
 
     /**
      * @var string Renderer for log messages
@@ -103,12 +98,16 @@ class ExceptionHandler implements ExceptionHandlerInterface
     public function renderResponse(ServerRequestInterface $request, Throwable $exception): ResponseInterface
     {
         $statusCode = $this->determineStatusCode($request, $exception);
-        $contentType = $this->determineContentType($request);
-        $response = $this->responseFactory->createResponse($statusCode);
-        $userMessage = $this->determineUserMessage($exception, $statusCode);
+        $contentType = $this->determineContentType($request, array_keys($this->errorRenderers));
 
         // Determine which renderer to use based on the content type and required details
         $renderer = $this->determineRenderer($contentType);
+
+        // Get response
+        $response = $this->responseFactory->createResponse($statusCode);
+
+        // Determine user facing message
+        $userMessage = $this->determineUserMessage($exception, $statusCode);
 
         // Write to the response body
         $body = $renderer->render($request, $exception, $userMessage, $statusCode, $this->displayErrorDetails());
@@ -168,11 +167,8 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function determineRenderer(string $contentType): ErrorRendererInterface
     {
-        if (array_key_exists($contentType, $this->errorRenderers)) {
-            $renderer = $this->errorRenderers[$contentType];
-        } else {
-            $renderer = $this->defaultErrorRenderer;
-        }
+        // determineContentType already make sure we have a valid content type.
+        $renderer = $this->errorRenderers[$contentType];
 
         // Make sure it's a valid interface before returning
         $rendererInstance = $this->ci->get($renderer);
@@ -251,19 +247,5 @@ class ExceptionHandler implements ExceptionHandlerInterface
         }
 
         $this->errorRenderers[$contentType] = $errorRenderer;
-    }
-
-    /**
-     * Set default renderer.
-     *
-     * @param string $errorRenderer
-     */
-    public function setDefaultErrorRenderer(string $errorRenderer): void
-    {
-        if (!is_a($errorRenderer, ErrorRendererInterface::class, true)) {
-            throw new InvalidArgumentException('Registered error renderer must implement ErrorRendererInterface');
-        }
-
-        $this->defaultErrorRenderer = $errorRenderer;
     }
 }
