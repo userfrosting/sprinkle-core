@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Http\Concerns;
+namespace UserFrosting\Sprinkle\Core\Util;
 
 use Psr\Http\Message\ServerRequestInterface;
 

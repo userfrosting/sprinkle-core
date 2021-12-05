@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Error;
 
 use Psr\Http\Message\ServerRequestInterface;
-use UserFrosting\Sprinkle\Core\Http\Concerns\DeterminesContentTypeTrait;
+use UserFrosting\Sprinkle\Core\Util\DeterminesContentTypeTrait;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /**
