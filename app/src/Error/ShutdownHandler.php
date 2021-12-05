@@ -100,6 +100,7 @@ class ShutdownHandler
      * Display the error message and terminate the process.
      *
      * The exist is separated in it's own class to allows testing.
+     *
      * @see https://stackoverflow.com/a/21578225/445757
      * @codeCoverageIgnore
      *
