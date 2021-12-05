@@ -60,17 +60,12 @@ class PrettyPageRendererTest extends TestCase
             ])->once()->andReturn('body')
             ->getMock();
 
-        $handler = Mockery::mock(PrettyPageHandler::class);
-        $whoops = Mockery::mock('alias:' . Run::class)
-            ->shouldReceive('appendHandler')->with($handler)->once()
-            ->getMock();
-
         // Create renderer and render exception
         $renderer = new PrettyPageRenderer(
             $config,
             $twig,
-            $whoops,
-            $handler
+            new Run(),
+            new PrettyPageHandler()
         );
 
         $data = $renderer->render(
@@ -110,17 +105,12 @@ class PrettyPageRendererTest extends TestCase
             ->shouldReceive('fetch')->withArgs(['pages/error/error.html.twig', $payload])->once()->andReturn('body')
             ->getMock();
 
-        $handler = Mockery::mock(PrettyPageHandler::class);
-        $whoops = Mockery::mock('alias:' . Run::class)
-            ->shouldReceive('appendHandler')->with($handler)->once()
-            ->getMock();
-
         // Create renderer and render exception
         $renderer = new PrettyPageRenderer(
             $config,
             $twig,
-            $whoops,
-            $handler
+            new Run(),
+            new PrettyPageHandler()
         );
 
         $data = $renderer->render(
@@ -145,11 +135,15 @@ class PrettyPageRendererTest extends TestCase
         // Mocks dependencies
         $config = Mockery::mock(Config::class);
         $twig = Mockery::mock(Twig::class);
-        $handler = Mockery::mock(PrettyPageHandler::class);
-        $whoops = Mockery::mock('alias:' . Run::class)
-            ->shouldReceive('appendHandler')->with($handler)->once()
-            ->shouldReceive('handleException')->with($exception)->once()->andReturn('foo')
-            ->getMock();
+
+        // Force Whoops handler to handle normally, bypassing CLI config
+        $handler = new PrettyPageHandler();
+        $handler->handleUnconditionally(true);
+
+        // Force whoops config, so it doesn't echo and exit
+        $whoops = new Run();
+        $whoops->writeToOutput(false);
+        $whoops->allowQuit(false);
 
         // Create renderer and render exception
         $renderer = new PrettyPageRenderer(
@@ -168,6 +162,6 @@ class PrettyPageRendererTest extends TestCase
         );
 
         // Assert
-        $this->assertSame('foo', $data);
+        $this->assertNotSame('', $data);
     }
 }
