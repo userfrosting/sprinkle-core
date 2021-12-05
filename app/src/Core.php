@@ -17,6 +17,7 @@ use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
 use UserFrosting\Sprinkle\Core\Bakery\BuildAssets;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugEventsCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugLocatorCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleCompareCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleDictionaryCommand;
@@ -103,6 +104,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
             BuildAssets::class,
             ClearCacheCommand::class,
             DebugCommand::class,
+            DebugEventsCommand::class,
             DebugLocatorCommand::class,
             LocaleCompareCommand::class,
             LocaleDictionaryCommand::class,

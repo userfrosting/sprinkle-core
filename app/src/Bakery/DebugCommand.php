@@ -91,9 +91,12 @@ class DebugCommand extends Command
         // Check database connection
         $this->checkDatabase();
 
-        // Show locator debug on verbose mode
+        // Show child debug commands on verbose mode
         if ($this->io->isVerbose()) {
             $command = $this->getApplication()->find('debug:locator');
+            $command->run($input, $output);
+
+            $command = $this->getApplication()->find('debug:events');
             $command->run($input, $output);
         }
 
