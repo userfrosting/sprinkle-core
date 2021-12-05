@@ -20,7 +20,7 @@ class AlertsControllerTest extends TestCase
     public function testJsonAlerts(): void
     {
         // Create request with method and url and fetch response
-        $request = $this->createRequest('GET', '/alerts');
+        $request = $this->createJsonRequest('GET', '/alerts');
         $response = $this->handleRequest($request);
 
         // Assert response status & body

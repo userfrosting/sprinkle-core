@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
 use UserFrosting\Sprinkle\Core\Error\ShutdownHandler;
 use UserFrosting\Support\Repository\Repository as Config;
-use UserFrosting\Testing\WithCustomAssertions;
+use UserFrosting\Testing\CustomAssertionsTrait;
 
 /**
  * Test ShutdownHandler
@@ -26,7 +26,7 @@ use UserFrosting\Testing\WithCustomAssertions;
 class ShutdownHandlerTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
-    use WithCustomAssertions;
+    use CustomAssertionsTrait;
 
     /** @var (string|int)[] $error */
     public static array $error = [

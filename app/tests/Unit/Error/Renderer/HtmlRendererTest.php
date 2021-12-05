@@ -19,7 +19,7 @@ use Slim\Psr7\Request;
 use UserFrosting\Sprinkle\Core\Error\Renderer\HtmlRenderer;
 use UserFrosting\Sprinkle\Core\Tests\Unit\Error\TestException;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
-use UserFrosting\Testing\WithCustomAssertions;
+use UserFrosting\Testing\CustomAssertionsTrait;
 
 /**
  * HtmlRenderer Test
@@ -30,7 +30,7 @@ use UserFrosting\Testing\WithCustomAssertions;
 class HtmlRendererTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
-    use WithCustomAssertions;
+    use CustomAssertionsTrait;
 
     public function testRenderRequest(): void
     {
