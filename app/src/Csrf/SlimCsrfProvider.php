@@ -15,31 +15,39 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Csrf\Guard;
 use Slim\Exception\HttpBadRequestException;
-use UserFrosting\Sprinkle\Core\Facades\Config;
+use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\Session\Session;
 
 /**
  * Slim Csrf Provider Class.
  */
+// TODO : This class still need a rewriting !
 class SlimCsrfProvider implements CsrfProviderInterface
 {
+    public function __construct(
+        protected Config $config,
+        protected Session $session,
+    ) {
+    }
+    
     /**
      * {@inheritdoc}
      *
      * @return \Slim\Csrf\Guard
      */
-    public static function setupService(ContainerInterface $ci)
+    public static function setupService()
     {
-        $csrfKey = $ci->config['session.keys.csrf'];
+        $csrfKey = $this->config->get('session.keys.csrf');
 
         // Workaround so that we can pass storage into CSRF guard.
         // If we tried to directly pass the indexed portion of `session` (for example, $ci->session['site.csrf']),
         // we would get an 'Indirect modification of overloaded element of UserFrosting\Session\Session' error.
         // If we tried to assign an array and use that, PHP would only modify the local variable, and not the session.
         // Since ArrayObject is an object, PHP will modify the object itself, allowing it to persist in the session.
-        if (!$ci->session->has($csrfKey)) {
-            $ci->session[$csrfKey] = new \ArrayObject();
+        if (!$this->session->has($csrfKey)) {
+            $this->session[$csrfKey] = new \ArrayObject();
         }
-        $csrfStorage = $ci->session[$csrfKey];
+        $csrfStorage = $this->session[$csrfKey];
 
         $onFailure = function ($request, $response, $next) {
             // TODO : This will NOT WORK. HttpBadRequestException requires the request.
@@ -51,7 +59,14 @@ class SlimCsrfProvider implements CsrfProviderInterface
             throw $e;
         };
 
-        return new Guard($ci->config['csrf.name'], $csrfStorage, $onFailure, $ci->config['csrf.storage_limit'], $ci->config['csrf.strength'], $ci->config['csrf.persistent_token']);
+        return new Guard(
+            $this->config->get('csrf.name'),
+            $csrfStorage,
+            $onFailure,
+            $this->config->get('csrf.storage_limit'),
+            $this->config->get('csrf.strength'),
+            $this->config->get('csrf.persistent_token')
+        );
     }
 
     /**
@@ -60,7 +75,7 @@ class SlimCsrfProvider implements CsrfProviderInterface
     public static function registerMiddleware(App $app, Request $request, $guard)
     {
         // Global on/off switch
-        if (!Config::get('csrf.enabled')) {
+        if (!$this->config->get('csrf.enabled')) {
             return;
         }
 
@@ -73,7 +88,7 @@ class SlimCsrfProvider implements CsrfProviderInterface
         // Normalize method to uppercase.
         $method = strtoupper($method);
 
-        $csrfBlacklist = Config::get('csrf.blacklist');
+        $csrfBlacklist = $this->config->get('csrf.blacklist');
         $isBlacklisted = false;
 
         // Go through the blacklist and determine if the path and method match any of the blacklist entries.
