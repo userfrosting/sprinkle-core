@@ -19,6 +19,6 @@ class AlertsRoutes implements RouteDefinitionInterface
 {
     public function register(App $app): void
     {
-        $app->get('/alerts', AlertsController::class); //->add(new NoCache()); // TODO
+        $app->get('/alerts', AlertsController::class)->setName('alerts'); //->add(new NoCache()); // TODO
     }
 }

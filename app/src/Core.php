@@ -73,6 +73,7 @@ use UserFrosting\Sprinkle\Core\Twig\Extensions\AssetsExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\CsrfExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\RoutesExtension;
 use UserFrosting\Sprinkle\SprinkleRecipe;
 use UserFrosting\UniformResourceLocator\ResourceStream;
 
@@ -207,6 +208,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
             // CsrfExtension::class,
             I18nExtension::class,
             AlertsExtension::class,
+            RoutesExtension::class,
         ];
     }
 
