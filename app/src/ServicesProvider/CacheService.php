@@ -48,7 +48,7 @@ class CacheService implements ServicesProviderInterface
              * Inject path from locator into TaggableFileStore.
              */
             TaggableFileStore::class => function (ResourceLocatorInterface $locator) {
-                $path = $locator->findResource('cache://', true, true);
+                $path = $locator->getResource('cache://', true);
 
                 return new TaggableFileStore($path);
             },

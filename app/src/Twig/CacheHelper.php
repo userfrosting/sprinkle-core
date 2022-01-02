@@ -33,7 +33,7 @@ class CacheHelper
     public function clearCache(): bool
     {
         // Get location
-        $path = $this->locator->findResource('cache://twig', true, true);
+        $path = $this->locator->getResource('cache://twig', true);
 
         // Get Filesystem instance
         $fs = new Filesystem();

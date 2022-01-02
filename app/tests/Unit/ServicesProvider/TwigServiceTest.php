@@ -138,9 +138,12 @@ class TwigServiceTest extends TestCase
         $this->ci->set(Config::class, $config);
 
         // Set Locator Mock
+        $resource = Mockery::mock(ResourceInterface::class)
+            ->shouldReceive('getAbsolutePath')->andReturn('')
+            ->getMock();
         $locator = Mockery::mock(ResourceLocatorInterface::class)
                 ->shouldReceive('getResources')->once()->andReturn([])
-                ->shouldReceive('findResource')->with('cache://twig', true, true)->once()->andReturn('')
+                ->shouldReceive('getResource')->with('cache://twig', true)->once()->andReturn($resource)
                 ->getMock();
         $this->ci->set(ResourceLocatorInterface::class, $locator);
 

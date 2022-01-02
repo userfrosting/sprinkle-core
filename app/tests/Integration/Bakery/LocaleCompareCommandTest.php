@@ -18,6 +18,7 @@ use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
+use UserFrosting\UniformResourceLocator\ResourceStream;
 
 /**
  * Test for LocaleCompareCommand (locale:compare)
@@ -37,8 +38,9 @@ class LocaleCompareCommandTest extends TestCase
         $ci = ContainerStub::create();
 
         // Use test locale data
+        $stream = new ResourceStream('locale', shared: true);
         $locator = new ResourceLocator(__DIR__ . '/data');
-        $locator->registerStream('locale', '', null, true);
+        $locator->addStream($stream);
         $ci->set(ResourceLocatorInterface::class, $locator);
 
         // Force config to only three locales

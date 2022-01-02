@@ -66,7 +66,7 @@ class ClearCacheCommand extends Command
         /*$this->io->writeln('<info> > Clearing Router cache file</info>', OutputInterface::VERBOSITY_VERBOSE);
         if (!$this->clearRouterCache()) {
             $filename = $this->config->get('settings.routerCacheFile');
-            $file = $this->locator->findResource("cache://$filename", true, true);
+            $file = $this->locator->getResource("cache://$filename", true);
             $this->io->error("Failed to delete Router cache file. Make sure you have write access to the `$file` file.");
             exit(1);
         }*/

@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
+use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Session\DatabaseSessionHandler;
@@ -56,10 +57,10 @@ class SessionService implements ServicesProviderInterface
              * Inject dependencies into FileSessionHandler.
              */
             FileSessionHandler::class => function (Filesystem $fs, Config $config, ResourceLocatorInterface $locator) {
-                $path = $locator->findResource('sessions://');
+                $path = $locator->getResource('sessions://');
 
-                if ($path === false) {
-                    throw new \Exception('Session resource not found. Make sure directory exist.');
+                if ($path === null) {
+                    throw new Exception('Session resource not found. Make sure directory exist.');
                 }
 
                 return new FileSessionHandler($fs, $path, $config->get('session.minutes'));

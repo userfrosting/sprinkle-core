@@ -47,7 +47,7 @@ class AssetService implements ServicesProviderInterface
                     // Load raw asset bundles for each Sprinkle.
 
                     // Retrieve locations of raw asset bundle schemas that exist.
-                    $bundleSchemas = array_reverse($locator->findResources('sprinkles://' . $config->get('assets.raw.schema')));
+                    $bundleSchemas = array_reverse($locator->getResources('sprinkles://' . $config->get('assets.raw.schema')));
 
                     // Load asset bundle schemas that exist.
                     if (array_key_exists(0, $bundleSchemas)) {
@@ -72,7 +72,7 @@ class AssetService implements ServicesProviderInterface
                     $assets = new Assets($locator, 'assets', $baseUrl);
 
                     // Load compiled asset bundle.
-                    $path = $locator->findResource('build://' . $config->get('assets.compiled.schema'), true, true);
+                    $path = $locator->getResource('build://' . $config->get('assets.compiled.schema'), true);
                     $bundles = new CompiledAssetBundles($path);
                     $assets->addAssetBundles($bundles);
                 }

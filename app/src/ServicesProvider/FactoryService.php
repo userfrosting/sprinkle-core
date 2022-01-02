@@ -31,7 +31,7 @@ class FactoryService implements ServicesProviderInterface
             FactoryMuffin::class => function (ResourceLocatorInterface $locator) {
 
                 // Get the path of all of the sprinkle's factories
-                $factoriesPath = $locator->findResources('factories://', true);
+                $factoriesPath = $locator->getResources('factories://');
 
                 // Create a new Factory Muffin instance
                 $fm = new FactoryMuffin();

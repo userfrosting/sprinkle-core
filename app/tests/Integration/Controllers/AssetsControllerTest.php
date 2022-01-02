@@ -13,6 +13,7 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Controller;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
+use UserFrosting\UniformResourceLocator\ResourceStream;
 
 /**
  * Tests CoreController class.
@@ -33,7 +34,8 @@ class AssetsControllerTest extends CoreTestCase
         // Set test assets location
         /** @var ResourceLocatorInterface $locator */
         $locator = $this->ci->get(ResourceLocatorInterface::class);
-        $locator->removeStream('assets')->registerStream('assets', '', __DIR__ . '/data', true);
+        $stream = new ResourceStream('assets', __DIR__ . '/data', true);
+        $locator->removeStream('assets')->addStream($stream);
     }
 
     /**

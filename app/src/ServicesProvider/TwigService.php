@@ -49,7 +49,9 @@ class TwigService implements ServicesProviderInterface
                 $twigEnv = $twig->getEnvironment();
 
                 if ($config->get('cache.twig')) {
-                    $twigEnv->setCache($locator->findResource('cache://twig', true, true));
+                    $resource = $locator->getResource('cache://twig', true);
+                    $path = $resource?->getAbsolutePath() ?? false;
+                    $twigEnv->setCache($path);
                 }
 
                 if ($config->get('debug.twig')) {

@@ -18,6 +18,7 @@ use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
+use UserFrosting\UniformResourceLocator\ResourceStream;
 
 /**
  * Tests SiteLocale.
@@ -93,7 +94,8 @@ class SiteLocaleTest extends TestCase
     {
         // Implement fake locale file location & locator
         $locator = new ResourceLocator(__DIR__);
-        $locator->registerStream('locale', '', 'data', true);
+        $stream = new ResourceStream('locale', 'data', true);
+        $locator->addStream($stream);
 
         // Set expectations. Note the sort applied here
         $expected = [
