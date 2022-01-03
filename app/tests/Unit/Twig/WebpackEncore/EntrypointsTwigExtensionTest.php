@@ -16,12 +16,12 @@ use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
 use Twig\Extension\ExtensionInterface;
 use UserFrosting\Sprinkle\Core\Twig\WebpackEncore\TagRenderer;
-use UserFrosting\Sprinkle\Core\Twig\WebpackEncore\WebpackEncoreTwigExtension;
+use UserFrosting\Sprinkle\Core\Twig\WebpackEncore\EntrypointsTwigExtension;
 
 /**
  * Tests for WebpackEncoreTwigExtension.
  */
-class WebpackEncoreTwigExtensionTest extends TestCase
+class EntrypointsTwigExtensionTest extends TestCase
 {
     protected EntrypointLookupInterface $entryPoints;
     protected TagRenderer $tagRenderer;
@@ -34,7 +34,7 @@ class WebpackEncoreTwigExtensionTest extends TestCase
 
         $this->entryPoints = new EntrypointLookup(__DIR__ . '/entrypoints.json');
         $this->tagRenderer = new TagRenderer($this->entryPoints);
-        $this->extension = new WebpackEncoreTwigExtension($this->entryPoints, $this->tagRenderer);
+        $this->extension = new EntrypointsTwigExtension($this->entryPoints, $this->tagRenderer);
 
         // Create dumb Twig and test adding extension
         $this->view = Twig::create('');
