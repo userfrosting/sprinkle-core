@@ -15,7 +15,7 @@ use Symfony\WebpackEncoreBundle\Asset\IntegrityDataProviderInterface;
 
 /**
  * Render <script> and <link> HTML tags from Webpack Encore `entrypoints.json`.
- * 
+ *
  * @see https://symfony.com/doc/current/frontend.html
  * @see https://github.com/symfony/webpack-encore-bundle
  * @see https://github.com/symfony/webpack-encore-bundle/blob/509cad50878e838c879743225e0e921b3b64a3f2/src/Asset/TagRenderer.php
