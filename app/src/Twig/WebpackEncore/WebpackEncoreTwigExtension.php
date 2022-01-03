@@ -21,7 +21,7 @@ use Twig\TwigFunction;
  * - encore_entry_js_files
  * - encore_entry_css_files
  * - encore_entry_script_tags
- * - encore_entry_link_tags
+ * - encore_entry_link_tags.
  *
  * @see https://symfony.com/doc/current/frontend.html
  * @see https://github.com/symfony/webpack-encore-bundle
