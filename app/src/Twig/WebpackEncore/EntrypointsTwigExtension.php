@@ -18,7 +18,7 @@ use Twig\TwigFunction;
 
 /**
  * Adds Webpack Encore related function to Twig.
- * 
+ *
  * Added functions :
  * - encore_entry_js_files(string $entryName)
  * - encore_entry_css_files(string $entryName)
