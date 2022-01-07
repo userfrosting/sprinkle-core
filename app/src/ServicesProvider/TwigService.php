@@ -43,7 +43,7 @@ class TwigService implements ServicesProviderInterface
 
                 // Add Sprinkles' templates namespaces
                 foreach (array_reverse($templatePaths) as $templateResource) {
-                    $loader->addPath($templateResource->getAbsolutePath(), $templateResource->getLocation()->getName());
+                    $loader->addPath($templateResource->getAbsolutePath(), $templateResource->getLocation()->getSlug());
                 }
 
                 $twigEnv = $twig->getEnvironment();

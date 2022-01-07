@@ -81,7 +81,7 @@ class TwigServiceTest extends TestCase
         // Set Locator Mock
         // TODO : templatePaths are mocked here, but an integration test with a Stub template would be best.
         $location = Mockery::mock(ResourceLocationInterface::class)
-                ->shouldReceive('getName')->andReturn('foobar')
+                ->shouldReceive('getSlug')->andReturn('foobar')
                 ->getMock();
         $resource = Mockery::mock(ResourceInterface::class)
                 ->shouldReceive('getAbsolutePath')->andReturn(__DIR__)
