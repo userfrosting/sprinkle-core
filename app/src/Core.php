@@ -10,6 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core;
 
+use Lcharette\WebpackEncoreTwig\EntrypointsTwigExtension;
+use Lcharette\WebpackEncoreTwig\VersionedAssetsTwigExtension;
 use Slim\Views\TwigMiddleware;
 use UserFrosting\Event\AppInitiatedEvent;
 use UserFrosting\Event\EventListenerRecipe;
@@ -65,6 +67,7 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\SessionService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\VersionsService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\WebpackService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\LocatorRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
@@ -177,6 +180,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
             // ThrottlerService::class,
             TwigService::class,
             VersionsService::class,
+            WebpackService::class,
         ];
     }
 
@@ -209,6 +213,8 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
             I18nExtension::class,
             AlertsExtension::class,
             RoutesExtension::class,
+            EntrypointsTwigExtension::class,
+            VersionedAssetsTwigExtension::class,
         ];
     }
 
