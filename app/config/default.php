@@ -378,11 +378,6 @@ return [
     * "Site" settings that are automatically passed to Twig
     */
     'site' => [
-        // AdminLTE skin color
-        // See https://adminlte.io/themes/AdminLTE/documentation/index.html#layout
-        'AdminLTE' => [
-            'skin' => 'blue',
-        ],
         // Google Analytics Settings
         'analytics' => [
             'google' => [
