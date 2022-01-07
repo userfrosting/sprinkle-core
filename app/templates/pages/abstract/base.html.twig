@@ -11,6 +11,9 @@
 
             <title>{{ site.title }} | {% block page_title %}{% endblock %}</title>
 
+            {# Add favicons content #}
+            {% include "content/favicons.html.twig" %}
+
             {# Use this block to add extra content in page head without having to override the entire base layout #}
             {% block head_extra %}{% endblock %}
 
