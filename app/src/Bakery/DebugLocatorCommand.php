@@ -56,17 +56,16 @@ class DebugLocatorCommand extends Command
         $this->io->section('Registered Locations (Sprinkles)');
         $locations = $this->locator->getLocations();
         $locationsTable = array_map([$this, 'mapLocation'], $locations);
-        $this->io->table(['Name', 'Path'], $locationsTable);
+        $this->io->table(['Name', 'Slug', 'Path'], $locationsTable);
 
         // Display Streams
         $this->io->section('Registered Streams');
-        $prefixedStreams = $this->locator->getStreams();
-        $streamsTable = $this->mapStreams($prefixedStreams);
-        $this->io->table(['Scheme', 'Prefix', 'Path', 'Shared'], $streamsTable);
+        $streamsTable = $this->mapStreams($this->locator->getStreams());
+        $this->io->table(['Scheme', 'Path', 'Shared'], $streamsTable);
 
         // Display all possibilities for each streams
         $this->io->section('Schemes Paths');
-        $schemes = $this->locator->listStreams();
+        $schemes = $this->locator->listSchemes();
         foreach ($schemes as $scheme) {
             $this->io->writeln("<info>> $scheme://</info>");
             $this->io->listing($this->getSchemePaths($scheme));
@@ -86,28 +85,25 @@ class DebugLocatorCommand extends Command
     {
         return [
             'name' => $location->getName(),
+            'slug' => $location->getSlug(),
             'path' => $location->getPath(),
         ];
     }
 
     /**
-     * Map of ResourceStreamInterface, arranged by prefix, into table for display.
+     * Map of ResourceStreamInterface, arranged by schemes, into table for display.
      *
-     * @param ResourceStreamInterface[][][] $prefixedStreams
+     * @param ResourceStreamInterface[][] $schemes
      *
      * @return string[][]
      */
-    protected function mapStreams(array $prefixedStreams): array
+    protected function mapStreams(array $schemes): array
     {
         $rows = [];
 
-        // Move into each prefix
-        foreach ($prefixedStreams as $streamsForPrefix) {
-            // Move into each prefix list of streams
-            foreach ($streamsForPrefix as $streams) {
-                $newRows = array_map([$this, 'mapStream'], $streams);
-                $rows = array_merge($rows, $newRows);
-            }
+        foreach ($schemes as $streams) {
+            $newRows = array_map([$this, 'mapStream'], $streams);
+            $rows = array_merge($rows, $newRows);
         }
 
         return $rows;
@@ -124,7 +120,6 @@ class DebugLocatorCommand extends Command
     {
         return [
             'scheme' => $stream->getScheme(),
-            'prefix' => $stream->getPrefix(),
             'path'   => $stream->getPath(),
             'shared' => ($stream->isShared()) ? 'YES' : 'NO',
         ];

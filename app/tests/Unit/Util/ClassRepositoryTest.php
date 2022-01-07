@@ -11,7 +11,6 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Util;
 
 use Countable;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use Traversable;
 use UserFrosting\Sprinkle\Core\Util\ClassRepository\AbstractClassRepository;
@@ -20,8 +19,6 @@ use UserFrosting\Support\Exception\ClassNotFoundException;
 
 class ClassRepositoryTest extends TestCase
 {
-    use MockeryPHPUnitIntegration;
-
     public function testConstruct(): ClassRepositoryInterface
     {
         $repository = new TestClassRepository();
