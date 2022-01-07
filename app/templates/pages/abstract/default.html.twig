@@ -1,45 +1,35 @@
 {% extends "pages/abstract/base.html.twig" %}
 
 {% block stylesheets_page_group %}
-{% endblock %}
+<style>
+    body {
+        margin: 0;
+        padding: 30px;
+        font: 12px/1.5 Helvetica, Arial, Verdana, sans-serif;
+    }
 
-{% block body_attributes %}
-    class="hold-transition skin-{{site.AdminLTE.skin}} layout-top-nav"
-{% endblock %}
+    h1 {
+        margin: 0;
+        font-size: 48px;
+        font-weight: normal;
+        line-height: 48px;
+    }
 
-{% block content %}
+    strong {
+        display: inline-block;
+        width: 65px;
+    }
 
-<div class="wrapper">
+    table, th, td {
+        font: 12px Helvetica, Arial, Verdana, sans-serif;
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 5px;
+        text-align: left;
+    }
 
-  <header class="main-header">
-    {% include "navigation/main-nav.html.twig" %}
-  </header>
-
-  <!-- Full Width Column -->
-  <div class="content-wrapper">
-    <div class="container">
-        <!-- Content Header (Page header) -->
-        {% block content_header %}
-        <section class="content-header">
-          <h1>{% block header_title %}{{ block('page_title') }}{% endblock %}</h1>
-          {% if block('page_description') is not empty %}<h1><small>{% block header_description %}{{ block('page_description') }}{% endblock %}</small></h1>{% endif %}
-          {% block breadcrumb %}
-            {% include 'navigation/breadcrumb.html.twig' with {page_title: block('page_title')} %}
-          {% endblock %}
-          <div id="alerts-page"></div>
-        </section>
-        {% endblock %}
-        <section class="content">
-            {% block body_matter %}{% endblock %}
-        </section>
-    </div>
-  </div>
-  <!-- /.content-wrapper -->
-
-  {% block footer %}
-    {% include "pages/partials/footer.html.twig" %}
-  {% endblock %}
-</div>
-<!-- ./wrapper -->
-
+    th {
+        font-weight: 600;
+    }
+</style>
 {% endblock %}
