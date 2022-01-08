@@ -44,6 +44,8 @@ use UserFrosting\Sprinkle\Core\Database\Migrations\v400\SessionsTable;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\ThrottlesTable;
 use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerMiddleware;
 use UserFrosting\Sprinkle\Core\Error\RegisterShutdownHandler;
+use UserFrosting\Sprinkle\Core\Event\ResourceLocatorInitiatedEvent;
+use UserFrosting\Sprinkle\Core\Listeners\ResourceLocatorInitiated;
 use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\SessionMiddleware;
 use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
@@ -68,7 +70,6 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\VersionsService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\WebpackService;
-use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\LocatorRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
@@ -78,9 +79,8 @@ use UserFrosting\Sprinkle\Core\Twig\Extensions\CsrfExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\RoutesExtension;
 use UserFrosting\Sprinkle\SprinkleRecipe;
-use UserFrosting\UniformResourceLocator\ResourceStream;
 
-class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, LocatorRecipe, EventListenerRecipe
+class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, EventListenerRecipe
 {
     /**
      * {@inheritdoc}
@@ -227,30 +227,6 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
     }
 
     /**
-     * Return an array of all locator Resource Steams to register with locator.
-     *
-     * @return \UserFrosting\UniformResourceLocator\ResourceStreamInterface[]
-     */
-    public function getResourceStreams(): array
-    {
-        return [
-            // new ResourceStream('assets'),
-            new ResourceStream('sprinkles', path: ''),
-            new ResourceStream('config'),
-            new ResourceStream('extra'),
-            new ResourceStream('factories'), // TODO Change to DI
-            new ResourceStream('locale'),
-            new ResourceStream('schema'),
-            new ResourceStream('templates'),
-
-            new ResourceStream('cache', shared: true),
-            new ResourceStream('logs', shared: true),
-            new ResourceStream('sessions', shared: true),
-            new ResourceStream('storage', shared: true),
-        ];
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getEventListeners(): array
@@ -259,6 +235,9 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Loca
             AppInitiatedEvent::class => [
                 RegisterShutdownHandler::class,
             ],
+            ResourceLocatorInitiatedEvent::class => [
+                ResourceLocatorInitiated::class,
+            ]
         ];
     }
 }

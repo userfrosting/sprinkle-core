@@ -10,20 +10,23 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
-use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\LocatorRecipe;
-use UserFrosting\Sprinkle\RecipeExtensionLoader;
+use UserFrosting\Sprinkle\Core\Event\ResourceLocatorInitiatedEvent;
 use UserFrosting\Sprinkle\SprinkleManager;
+use UserFrosting\UniformResourceLocator\ResourceLocation;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
-use UserFrosting\UniformResourceLocator\ResourceStreamInterface;
 
 class LocatorService implements ServicesProviderInterface
 {
     public function register(): array
     {
         return [
-            ResourceLocatorInterface::class => function (SprinkleManager $sprinkleManager, RecipeExtensionLoader $extensionLoader) {
+            ResourceLocatorInterface::class => function (
+                SprinkleManager $sprinkleManager,
+                EventDispatcherInterface $eventDispatcher
+            ) {
 
                 // Create instance based on main sprinkle path
                 $mainSprinkle = $sprinkleManager->getMainSprinkle();
@@ -31,24 +34,15 @@ class LocatorService implements ServicesProviderInterface
 
                 // Register all sprinkles locations
                 foreach ($sprinkleManager->getSprinkles() as $sprinkle) {
-                    $locator->registerLocation($sprinkle->getName(), $sprinkle->getPath());
+                    $location = new ResourceLocation($sprinkle->getName(), $sprinkle->getPath());
+                    $locator->addLocation($location);
                 }
 
-                // Register all sprinkles streams from recipes
-                $streams = $extensionLoader->getObjects(
-                    method: 'getResourceStreams',
-                    recipeInterface: LocatorRecipe::class,
-                    extensionInterface: ResourceStreamInterface::class,
-                );
+                // Dispatch ResourceLocatorInitiated event
+                $event = new ResourceLocatorInitiatedEvent($locator);
+                $event = $eventDispatcher->dispatch($event);
 
-                foreach ($streams as $stream) {
-                    $locator->addStream($stream);
-                }
-
-                // Register public stream tied to main sprinkle
-                // TODO. Can use path.public_relative config
-
-                return $locator;
+                return $event->getLocator();
             },
         ];
     }
