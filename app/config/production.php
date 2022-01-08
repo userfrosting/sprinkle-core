@@ -13,12 +13,6 @@
  */
 return [
     /*
-     * Use compiled assets
-     */
-    'assets' => [
-        'use_raw' => false,
-    ],
-    /*
      * `confirm_sensitive_command` in production mode
      */
     'bakery' => [

@@ -46,28 +46,8 @@ class ConfigService implements ServicesProviderInterface
             },
 
             Config::class => function (ArrayFileLoader $loader) {
-
-                // Load config repository
                 $config = new Config($loader->load());
-
-                // Construct base url from components, if not explicitly specified
-                // TODO : Request not in CI. Move to Middleware
-                /*if (!isset($config['site.uri.public'])) {
-                      $uri = $c->get('request')->getUri();
-
-                      // Slim\Http\Uri likes to add trailing slashes when the path is empty, so this fixes that.
-                      $config['site.uri.public'] = trim($uri->getBaseUrl(), '/');
-                   }*/
-
-                // Hacky fix to prevent sessions from being hit too much: ignore CSRF middleware for requests for raw assets ;-)
-                // See https://github.com/laravel/framework/issues/8172#issuecomment-99112012 for more information on why it's bad to hit Laravel sessions multiple times in rapid succession.
-                $csrfBlacklist = $config['csrf.blacklist'];
-                $csrfBlacklist['^/' . $config['assets.raw.path']] = [
-                    'GET',
-                ];
-
-                $config->set('csrf.blacklist', $csrfBlacklist);
-
+                
                 return $config;
             },
 

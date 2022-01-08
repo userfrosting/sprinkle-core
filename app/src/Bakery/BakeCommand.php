@@ -56,7 +56,7 @@ class BakeCommand extends Command
         $this->executeSetup($input, $output);
         $this->executeDebug($input, $output);
         $this->executeConfiguration($input, $output);
-        $this->executeAsset($input, $output);
+        // $this->executeAsset($input, $output);
         $this->executeCleanup($input, $output);
 
         return self::SUCCESS;
@@ -109,8 +109,8 @@ class BakeCommand extends Command
      */
     protected function executeAsset(InputInterface $input, OutputInterface $output): void
     {
-        $command = $this->getApplication()->find('build-assets');
-        $command->run($input, $output);
+        // $command = $this->getApplication()->find('build-assets');
+        // $command->run($input, $output);
     }
 
     /**

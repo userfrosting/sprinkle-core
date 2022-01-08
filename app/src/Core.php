@@ -16,7 +16,6 @@ use Slim\Views\TwigMiddleware;
 use UserFrosting\Event\AppInitiatedEvent;
 use UserFrosting\Event\EventListenerRecipe;
 use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
-use UserFrosting\Sprinkle\Core\Bakery\BuildAssets;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugEventsCommand;
@@ -49,9 +48,7 @@ use UserFrosting\Sprinkle\Core\Listeners\ResourceLocatorInitiated;
 use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\SessionMiddleware;
 use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
-use UserFrosting\Sprinkle\Core\Routes\AssetsRoutes;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
-use UserFrosting\Sprinkle\Core\ServicesProvider\AssetService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CsrfService;
@@ -73,7 +70,6 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\WebpackService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
-use UserFrosting\Sprinkle\Core\Twig\Extensions\AssetsExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\CsrfExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
@@ -105,7 +101,6 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
     {
         return [
             BakeCommand::class,
-            BuildAssets::class,
             ClearCacheCommand::class,
             DebugCommand::class,
             DebugEventsCommand::class,
@@ -149,7 +144,6 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
     {
         return [
             AlertsRoutes::class,
-            AssetsRoutes::class,
         ];
     }
 
@@ -162,7 +156,6 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
     {
         return [
             AlertStreamService::class,
-            AssetService::class,
             CacheService::class,
             ConfigService::class,
             // CsrfService::class,
@@ -207,7 +200,6 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
     public function getTwigExtensions(): array
     {
         return [
-            AssetsExtension::class,
             CoreExtension::class,
             // CsrfExtension::class,
             I18nExtension::class,

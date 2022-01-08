@@ -44,25 +44,6 @@ return [
 
     /*
     * ----------------------------------------------------------------------
-    * Assets Service Config
-    * ----------------------------------------------------------------------
-    * `use_raw` defines if raw or compiled assets are served. Set to false
-    * in production mode, so compiled assets can be served
-    */
-    'assets' => [
-        'compiled' => [
-            'path'   => 'assets',
-            'schema' => 'bundle.result.json',
-        ],
-        'raw' => [
-            'path'   => 'assets-raw',
-            'schema' => 'asset-bundles.json',
-        ],
-        'use_raw'  => true,
-    ],
-
-    /*
-    * ----------------------------------------------------------------------
     * Bakery Config
     * ----------------------------------------------------------------------
     * `confirm_sensitive_command` set to true will ask for confirmation before

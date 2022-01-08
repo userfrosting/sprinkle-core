@@ -42,7 +42,7 @@ class I18nExtension extends AbstractExtension implements GlobalsInterface
     }
 
     /**
-     * Adds Twig global variables `site` and `assets`.
+     * Adds Twig global variables `currentLocale`.
      *
      * @return array[mixed]
      */
