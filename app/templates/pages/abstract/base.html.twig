@@ -19,7 +19,7 @@
 
             {% block stylesheets %}
                 {# Override this block in a child layout template or page template to override site-level stylesheets. #}
-                {% block stylesheets_site %}{{ encore_entry_link_tags('app') }}{% endblock %}
+                {% include 'content/stylesheets_site.html.twig' %}
 
                 {# Override this block in a child layout template or page template to specify or override stylesheets for groups of similar pages. #}
                 {% block stylesheets_page_group %}{% endblock %}
@@ -59,7 +59,7 @@
                 </script>
 
                 {# Override this block in a child layout template or page template to override site-level scripts. #}
-                {% block scripts_site %}{{ encore_entry_script_tags('app') }}{% endblock %}
+                {% include 'content/scripts_site.html.twig' %}
 
                 {# Override this block in a child layout template or page template to specify or override scripts for groups of similar pages. #}
                 {% block scripts_page_group %}{% endblock %}

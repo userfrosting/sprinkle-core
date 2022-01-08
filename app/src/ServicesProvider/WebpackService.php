@@ -22,11 +22,15 @@ class WebpackService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            EntrypointLookupInterface::class => function () {
-                return new EntrypointLookup('public://assets/entrypoints.json'); // TODO : Use Config
+            EntrypointLookupInterface::class => function (Config $config) {
+                $path = $config->get('webpack.entrypoints');
+
+                return new EntrypointLookup(strval($path));
             },
-            JsonManifestInterface::class => function () {
-                return new JsonManifest('public://assets/manifest.json'); // TODO : Use Config
+            JsonManifestInterface::class => function (Config $config) {
+                $path = $config->get('webpack.manifest');
+
+                return new JsonManifest(strval($path));
             },
         ];
     }

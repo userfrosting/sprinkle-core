@@ -445,4 +445,15 @@ return [
         'log_errors'            => false,
         'display_errors_native' => false, // Let PHP itself render errors natively.  Useful if a fatal error is raised in our custom shutdown handler.
     ],
+
+    /**
+     * ----------------------------------------------------------------------
+     * Webpack Integration Settings
+     * ----------------------------------------------------------------------
+     * Defines path to Webpack Encore `entrypoints.json` and `manifest.json` files.
+     */
+    'webpack' => [
+        'entrypoints' => 'assets://entrypoints.json',
+        'manifest'    => 'assets://manifest.json',
+    ],
 ];
