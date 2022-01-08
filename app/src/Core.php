@@ -237,7 +237,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
             ],
             ResourceLocatorInitiatedEvent::class => [
                 ResourceLocatorInitiated::class,
-            ]
+            ],
         ];
     }
 }

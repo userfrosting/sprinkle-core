@@ -31,7 +31,7 @@ class ResourceLocatorInitiated
     }
 
     /**
-     * Add all defined streams
+     * Add all defined streams.
      *
      * @param ResourceLocatorInitiatedEvent $event
      */
