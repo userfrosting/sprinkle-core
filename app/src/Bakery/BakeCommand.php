@@ -87,6 +87,9 @@ class BakeCommand extends Command
     {
         $command = $this->getApplication()->find('debug');
         $command->run($input, $output);
+
+        // If all went well and there's no fatal errors, we are ready to bake
+        $this->io->success('Ready to bake !');
     }
 
     /**

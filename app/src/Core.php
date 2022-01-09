@@ -39,6 +39,7 @@ use UserFrosting\Sprinkle\Core\Bakery\SetupEnvCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupSmtpCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
+use UserFrosting\Sprinkle\Core\Bakery\WebpackCommand;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\SessionsTable;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\ThrottlesTable;
 use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerMiddleware;
@@ -124,6 +125,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
             SetupSmtpCommand::class,
             SprinkleListCommand::class,
             TestMailCommand::class,
+            WebpackCommand::class,
         ];
     }
 

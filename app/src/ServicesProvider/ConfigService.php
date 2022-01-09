@@ -47,7 +47,7 @@ class ConfigService implements ServicesProviderInterface
 
             Config::class => function (ArrayFileLoader $loader) {
                 $config = new Config($loader->load());
-                
+
                 return $config;
             },
 

@@ -13,8 +13,6 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 use UserFrosting\Sprinkle\Core\Bakery\DebugLocatorCommand;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
 use UserFrosting\Testing\BakeryTester;
-use UserFrosting\Testing\ContainerStub;
-use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * Test DebugLocatorCommand
@@ -26,15 +24,9 @@ class DebugLocatorCommandTest extends CoreTestCase
 {
     public function testCommand(): void
     {
-        // Set stub CI and run command
-        $ci = ContainerStub::create();
-        $ci->set(ResourceLocatorInterface::class, $this->ci->get(ResourceLocatorInterface::class));
-
         /** @var DebugLocatorCommand */
-        $command = $ci->get(DebugLocatorCommand::class);
+        $command = $this->ci->get(DebugLocatorCommand::class);
         $result = BakeryTester::runCommand($command);
-
-        // Assert some output
         $this->assertSame(0, $result->getStatusCode());
     }
 }

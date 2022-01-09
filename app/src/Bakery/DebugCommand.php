@@ -100,9 +100,6 @@ class DebugCommand extends Command
             $command->run($input, $output);
         }
 
-        // If all went well and there's no fatal errors, we are ready to bake
-        $this->io->success('Ready to bake !');
-
         // Command return success
         return self::SUCCESS;
     }
