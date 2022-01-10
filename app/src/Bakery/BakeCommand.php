@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
@@ -10,18 +12,32 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Bakery\Event\BakeCommandEvent;
 
 /**
  * Bake command.
- * Shortcut to run multiple commands at once.
+ * Umbrella command used to run multiple install/setup sub-commands at once.
  */
-class BakeCommand extends Command
+final class BakeCommand extends Command
 {
     use WithSymfonyStyle;
+
+    /**
+     * @var string[] Commands to run
+     */
+    protected array $commands = [
+        // 'setup:db', // TODO
+        // 'setup:mails', // TODO
+        'debug',
+        'migrate',
+        'webpack',
+        // 'clear-cache', // TODO
+    ];
 
     /**
      * @var string The UserFrosting ASCII art.
@@ -37,13 +53,24 @@ class BakeCommand extends Command
                                                    |___/";
 
     /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct(
+        protected EventDispatcherInterface $eventDispatcher
+    ) {
+        parent::__construct();
+    }
+
+    /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
+        $list = implode(', ', $this->aggregateCommands());
+
         $this->setName('bake')
              ->setDescription('UserFrosting installation command')
-             ->setHelp('This command combine the <info>setup:db</info>, <info>setup:mail</info>, <info>debug</info>, <info>migrate</info>, <info>create-admin</info> and <info>build-assets</info> commands.');
+             ->setHelp('This command combine the following commands : ' . $list);
     }
 
     /**
@@ -52,79 +79,25 @@ class BakeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io->writeln("<info>{$this->title}</info>");
-
-        $this->executeSetup($input, $output);
-        $this->executeDebug($input, $output);
-        $this->executeConfiguration($input, $output);
-        // $this->executeAsset($input, $output);
-        $this->executeCleanup($input, $output);
+        $application = $this->getApplication();
+        foreach ($this->aggregateCommands() as $commandName) {
+            $command = $application->find($commandName);
+            $command->run($input, $output);
+        }
 
         return self::SUCCESS;
     }
 
     /**
-     * Core setup group of task.
+     * Aggregate commands to run using BakeCommandEvent.
      *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
+     * @return string[]
      */
-    protected function executeSetup(InputInterface $input, OutputInterface $output): void
+    protected function aggregateCommands(): array
     {
-        $command = $this->getApplication()->find('setup:db');
-        $command->run($input, $output);
+        $event = new BakeCommandEvent($this->commands);
+        $event = $this->eventDispatcher->dispatch($event);
 
-        $command = $this->getApplication()->find('setup:mail');
-        $command->run($input, $output);
-    }
-
-    /**
-     * Debug group of task.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
-    protected function executeDebug(InputInterface $input, OutputInterface $output): void
-    {
-        $command = $this->getApplication()->find('debug');
-        $command->run($input, $output);
-
-        // If all went well and there's no fatal errors, we are ready to bake
-        $this->io->success('Ready to bake !');
-    }
-
-    /**
-     * Configuration group of task.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
-    protected function executeConfiguration(InputInterface $input, OutputInterface $output): void
-    {
-        $command = $this->getApplication()->find('migrate');
-        $command->run($input, $output);
-    }
-
-    /**
-     * Assets setup group of task.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
-    protected function executeAsset(InputInterface $input, OutputInterface $output): void
-    {
-        // $command = $this->getApplication()->find('build-assets');
-        // $command->run($input, $output);
-    }
-
-    /**
-     * Cleanup group of task.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
-    protected function executeCleanup(InputInterface $input, OutputInterface $output): void
-    {
-        $command = $this->getApplication()->find('clear-cache');
-        $command->run($input, $output);
+        return $event->getCommands();
     }
 }
