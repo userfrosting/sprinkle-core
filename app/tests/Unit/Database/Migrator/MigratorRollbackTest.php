@@ -44,7 +44,6 @@ class MigratorRollbackTest extends TestCase
             ->shouldReceive('list')->once()->andReturn([
                 StubAnalyserRollbackMigrationD::class,
             ])
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationD::class)->once()->andReturn(new StubAnalyserRollbackMigrationD())
             ->getMock();
 
         $connection = Mockery::mock(Connection::class);
@@ -71,7 +70,6 @@ class MigratorRollbackTest extends TestCase
             ->shouldReceive('list')->once()->andReturn([
                 StubAnalyserRollbackMigrationD::class,
             ])
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationD::class)->once()->andReturn(new StubAnalyserRollbackMigrationD())
             ->getMock();
 
         $connection = Mockery::mock(Connection::class);
@@ -107,10 +105,6 @@ class MigratorRollbackTest extends TestCase
                 StubAnalyserRollbackMigrationD::class,
             ])
             ->shouldReceive('has')->with(StubAnalyserRollbackMigrationC::class)->twice()->andReturn(true)
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationA::class)->twice()->andReturn(new StubAnalyserRollbackMigrationA())
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationB::class)->twice()->andReturn(new StubAnalyserRollbackMigrationB())
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationC::class)->times(4)->andReturn(new StubAnalyserRollbackMigrationC()) // Once for main, one as a dependency
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationD::class)->twice()->andReturn(new StubAnalyserRollbackMigrationD())
             ->getMock();
 
         $connection = Mockery::mock(Connection::class);
@@ -206,9 +200,6 @@ class MigratorRollbackTest extends TestCase
                 StubAnalyserRollbackMigrationD::class,
             ])
             ->shouldReceive('has')->with(StubAnalyserRollbackMigrationC::class)->twice()->andReturn(true)
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationA::class)->twice()->andReturn(new StubAnalyserRollbackMigrationA())
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationB::class)->twice()->andReturn(new StubAnalyserRollbackMigrationB())
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationC::class)->twice()->andReturn(new StubAnalyserRollbackMigrationC())
             ->getMock();
         $connection = Mockery::mock(Connection::class);
         $analyser = new Migrator($installed, $available, $connection);
@@ -247,8 +238,6 @@ class MigratorRollbackTest extends TestCase
                 StubAnalyserRollbackMigrationB::class,
             ])
             ->shouldReceive('has')->with(StubAnalyserRollbackMigrationC::class)->twice()->andReturn(false)
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationA::class)->twice()->andReturn(new StubAnalyserRollbackMigrationA())
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationB::class)->twice()->andReturn(new StubAnalyserRollbackMigrationB())
             ->getMock();
         $connection = Mockery::mock(Connection::class);
         $analyser = new Migrator($installed, $available, $connection);
@@ -284,7 +273,6 @@ class MigratorRollbackTest extends TestCase
                 StubAnalyserRollbackMigrationB::class,
             ])
             ->shouldReceive('has')->with(StubAnalyserRollbackMigrationC::class)->twice()->andReturn(false)
-            ->shouldReceive('get')->with(StubAnalyserRollbackMigrationB::class)->twice()->andReturn(new StubAnalyserRollbackMigrationB())
             ->getMock();
         $connection = Mockery::mock(Connection::class);
         $analyser = new Migrator($installed, $available, $connection);
@@ -303,17 +291,18 @@ class MigratorRollbackTest extends TestCase
 
 class StubAnalyserRollbackMigrationA implements MigrationInterface
 {
-    public function up()
+    public function up(): void
     {
     }
 
-    public function down()
+    public function down(): void
     {
     }
 }
 
 class StubAnalyserRollbackMigrationB extends StubAnalyserRollbackMigrationA
 {
+    /** @var string[] */
     public static $dependencies = [
         StubAnalyserRollbackMigrationC::class,
     ];

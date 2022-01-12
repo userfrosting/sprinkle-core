@@ -232,7 +232,7 @@ class TestMigrateSprinkle extends Core
 
 class StubMigrationA extends Migration
 {
-    public function up()
+    public function up(): void
     {
         $this->schema->create('test', function (Blueprint $table) {
             $table->id();
@@ -240,7 +240,7 @@ class StubMigrationA extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         $this->schema->drop('test');
     }

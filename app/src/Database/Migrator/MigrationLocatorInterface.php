@@ -15,6 +15,8 @@ use UserFrosting\Sprinkle\Core\Util\ClassRepository\ClassRepositoryInterface;
 
 /**
  * Find and returns all migrations definitions (classes) registered and available.
+ *
+ * @extends ClassRepositoryInterface<MigrationInterface>
  */
 interface MigrationLocatorInterface extends ClassRepositoryInterface
 {

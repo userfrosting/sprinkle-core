@@ -16,15 +16,13 @@ use UserFrosting\Sprinkle\Core\Database\Migration;
 /**
  * Throttles table migration
  * Version 4.0.0.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class ThrottlesTable extends Migration
 {
     /**
      * {@inheritdoc}
      */
-    public function up()
+    public function up(): void
     {
         if (!$this->schema->hasTable('throttles')) {
             $this->schema->create('throttles', function (Blueprint $table) {
@@ -46,7 +44,7 @@ class ThrottlesTable extends Migration
     /**
      * {@inheritdoc}
      */
-    public function down()
+    public function down(): void
     {
         $this->schema->drop('throttles');
     }

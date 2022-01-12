@@ -15,13 +15,16 @@ use IteratorAggregate;
 
 /**
  * Handle a PHP class repository.
+ *
+ * @template T of object
+ * @extends IteratorAggregate<T>
  */
 interface ClassRepositoryInterface extends Countable, IteratorAggregate
 {
     /**
      * Return all classes.
      *
-     * @return object[] A list of classes instances.
+     * @return T[] A list of classes instances.
      */
     public function all(): array;
 
@@ -37,7 +40,7 @@ interface ClassRepositoryInterface extends Countable, IteratorAggregate
      *
      * @param string $class Class FQN.
      *
-     * @return object
+     * @return T
      */
     public function get(string $class): object;
 

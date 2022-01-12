@@ -12,7 +12,6 @@ namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
-use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
 
@@ -103,22 +102,19 @@ class Migrator
      */
     protected function getPendingDependencies(string $migrationClass): array
     {
-        // Get migration instance
-        $migration = $this->locator->get($migrationClass);
-
         // Start with the migration in the return.
         // This allows the main migration to be placed in the correct order
         // When doing a nested call.
         $dependencies = [$migrationClass];
 
         // Loop dependencies and validate them
-        foreach ($this->getDependenciesProperty($migration) as $dependency) {
+        foreach ($this->getDependenciesProperty($migrationClass) as $dependency) {
 
             // The dependency might already be installed. Check that first.
             // Skip if it's the case (we don't want it pending again).
             // This allows to accept stale (installed, but not available
             // migration) as valid dependencies.
-            if (in_array($dependency, $this->getInstalled())) {
+            if (in_array($dependency, $this->getInstalled(), true)) {
                 continue;
             }
 
@@ -137,11 +133,11 @@ class Migrator
     /**
      * Returns the migration dependency list.
      *
-     * @param MigrationInterface $migration The migration instance
+     * @param string $migration The migration class
      *
      * @return string[] The dependency list
      */
-    protected function getDependenciesProperty(MigrationInterface $migration): array
+    protected function getDependenciesProperty(string $migration): array
     {
         // Should be handled by interface, but since it a property, it's not... so should still be kept in case.
         // If the `dependencies` property exist, use it
@@ -224,7 +220,7 @@ class Migrator
         }
 
         // Can't rollback anything if there's any stale migration
-        if (!empty($stale = $this->getStale())) {
+        if (count($stale = $this->getStale()) > 0) {
             throw new MigrationRollbackException('Stale migration detected : ' . implode(', ', $stale));
         }
 
@@ -239,7 +235,7 @@ class Migrator
 
             // Get all dependencies for $installed, make sure $migrations is not in them
             $dependencies = $this->getInstalledDependencies($installedMigration);
-            if (in_array($migration, $dependencies)) {
+            if (in_array($migration, $dependencies, true)) {
                 throw new MigrationRollbackException("$migration cannot be rolled back since $installedMigration depends on it.");
             }
         }
@@ -255,14 +251,11 @@ class Migrator
      */
     protected function getInstalledDependencies(string $migrationClass): array
     {
-        // Get migration instance
-        $migration = $this->locator->get($migrationClass);
-
         // Return variable
         $dependencies = [];
 
         // Loop dependencies and validate them
-        foreach ($this->getDependenciesProperty($migration) as $dependency) {
+        foreach ($this->getDependenciesProperty($migrationClass) as $dependency) {
 
             // Make sure dependency exist. Otherwise it's a dead end.
             if (!$this->locator->has($dependency)) {
@@ -362,7 +355,7 @@ class Migrator
      *
      * @throws MigrationDependencyNotMetException if a dependencies is not met among pending migration.
      *
-     * @return array[] The list of queries, grouped by migration.
+     * @return mixed[] The list of queries, grouped by migration.
      */
     public function pretendToMigrate(): array
     {
@@ -405,7 +398,7 @@ class Migrator
      *
      * @throws MigrationRollbackException If something prevent migration to be rollback
      *
-     * @return array The list of rolledback migration classes
+     * @return string[] The list of rolledback migration classes
      */
     public function rollback(int $steps = 1): array
     {
@@ -463,7 +456,7 @@ class Migrator
      *
      * @throws MigrationRollbackException If something prevent migration to be rollback
      *
-     * @return string[] The list of queries, grouped by migration.
+     * @return array<string, string[]> The list of queries, grouped by migration.
      */
     public function pretendToRollback(int $steps = 1): array
     {
@@ -511,7 +504,7 @@ class Migrator
      *
      * @throws MigrationRollbackException If something prevent migration to be rollback
      *
-     * @return string[] The list of queries, grouped by migration.
+     * @return array<string, string[]> The list of queries, grouped by migration.
      */
     public function pretendToReset(): array
     {
@@ -534,7 +527,7 @@ class Migrator
      * Spin through ordered pending migrations, apply the changes to the
      * databases and log them to the repository.
      *
-     * @param array $migrations The migrations to run down
+     * @param string[] $migrations The migrations classes to run down
      */
     protected function runDownMigrations(array $migrations): void
     {
@@ -564,9 +557,9 @@ class Migrator
      * Spin through ordered pending migrations, pretend to run them down and
      * return the queries log.
      *
-     * @param array $migrations The migrations to run down
+     * @param string[] $migrations The migrations classes to run down
      *
-     * @return string[] The list of queries, grouped by migration.
+     * @return array<string, string[]> The list of queries, grouped by migration.
      */
     protected function pretendToRunDownMigrations(array $migrations): array
     {

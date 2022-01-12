@@ -31,7 +31,7 @@ class BakeCommandTest extends TestCase
 
     public function testBaseCommand(): void
     {
-        // Setup services mock. Command will be set by BakeCommandEvent 
+        // Setup services mock. Command will be set by BakeCommandEvent
         /** @var ListenerProviderInterface */
         $listener = Mockery::mock(ListenerProviderInterface::class)
             ->shouldReceive('getListenersForEvent')->andReturn([new BakeCommandListenerStub()])

@@ -42,14 +42,13 @@ class SprinkleMigrationLocatorTest extends TestCase
             ->shouldReceive('get')->with(StubMigrationB::class)->andReturn(new StubMigrationB($builder))
             ->getMock();
 
+        /** @var SprinkleManager */
         $manager = Mockery::mock(SprinkleManager::class)
             ->shouldReceive('getSprinkles')->andReturn([new MigrationsSprinkleStub()])
             ->getMock();
 
         $loader = new RecipeExtensionLoader($manager, $ci);
         $locator = new SprinkleMigrationLocator($loader);
-
-        $this->assertInstanceOf(MigrationLocatorInterface::class, $locator);
 
         return $locator;
     }
@@ -61,7 +60,6 @@ class SprinkleMigrationLocatorTest extends TestCase
     {
         $migrations = $locator->all();
 
-        $this->assertIsArray($migrations);
         $this->assertCount(2, $migrations);
         $this->assertInstanceOf(StubMigrationA::class, $migrations[0]);
         $this->assertInstanceOf(StubMigrationB::class, $migrations[1]);
@@ -90,11 +88,8 @@ class SprinkleMigrationLocatorTest extends TestCase
         /** @var MigrationLocatorInterface */
         $locator = $ci->get(MigrationLocatorInterface::class);
 
-        $this->assertInstanceOf(MigrationLocatorInterface::class, $locator);
-
         // Get all migrations assertions
         $migrations = $locator->all();
-        $this->assertIsArray($migrations);
         $this->assertCount(2, $migrations);
         $this->assertInstanceOf(StubMigrationA::class, $migrations[0]);
         $this->assertInstanceOf(StubMigrationB::class, $migrations[1]);
@@ -119,7 +114,7 @@ class SprinkleMigrationLocatorTest extends TestCase
     public function testHas(SprinkleMigrationLocator $locator): void
     {
         $this->assertTrue($locator->has(StubMigrationA::class));
-        $this->assertFalse($locator->has(StubMigrationC::class));
+        $this->assertFalse($locator->has(StubMigrationC::class)); // @phpstan-ignore-line
     }
 
     /**
@@ -139,28 +134,28 @@ class SprinkleMigrationLocatorTest extends TestCase
     public function testGetWithNotFound(SprinkleMigrationLocator $locator): void
     {
         $this->expectException(ClassNotFoundException::class);
-        $locator->get(StubMigrationC::class);
+        $locator->get(StubMigrationC::class); // @phpstan-ignore-line
     }
 }
 
 class StubMigrationA extends Migration
 {
-    public function up()
+    public function up(): void
     {
     }
 
-    public function down()
+    public function down(): void
     {
     }
 }
 
 class StubMigrationB extends Migration
 {
-    public function up()
+    public function up(): void
     {
     }
 
-    public function down()
+    public function down(): void
     {
     }
 }

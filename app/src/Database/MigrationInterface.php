@@ -18,12 +18,10 @@ interface MigrationInterface
     /**
      * Method to apply changes to the database.
      */
-    // TODO : Return type ?
-    public function up();
+    public function up(): void;
 
     /**
      * Method to revert changes applied by the `up` method.
      */
-    // TODO : Return type ?
-    public function down();
+    public function down(): void;
 }

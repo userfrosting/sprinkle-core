@@ -136,11 +136,11 @@ class TestMigrationSprinkle extends Core
 
 class StubAnalyserMigrationA implements MigrationInterface
 {
-    public function up()
+    public function up(): void
     {
     }
 
-    public function down()
+    public function down(): void
     {
     }
 }
