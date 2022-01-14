@@ -10,20 +10,28 @@
 
 namespace UserFrosting\Sprinkle\Core\Seeder;
 
+use Psr\Container\ContainerInterface;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\SeedRecipe;
-use UserFrosting\Sprinkle\Core\Util\ClassRepository\AbstractClassRepository;
-use UserFrosting\Sprinkle\RecipeExtensionLoader;
+use UserFrosting\Sprinkle\SprinkleManager;
+use UserFrosting\Support\ClassRepository;
+use UserFrosting\Support\Exception\BadClassNameException;
+use UserFrosting\Support\Exception\BadInstanceOfException;
 
 /**
  * Find and returns all registered SeedInterface across all sprinkles, using SeedRecipe.
+ *
+ * @extends ClassRepository<SeedInterface>
  */
-final class SprinkleSeedsRepository extends AbstractClassRepository implements SeedRepositoryInterface
+final class SprinkleSeedsRepository extends ClassRepository implements SeedRepositoryInterface
 {
     /**
-     * @param RecipeExtensionLoader $extensionLoader
+     * @param SprinkleManager    $sprinkleManager
+     * @param ContainerInterface $ci
      */
-    public function __construct(protected RecipeExtensionLoader $extensionLoader)
-    {
+    public function __construct(
+        protected SprinkleManager $sprinkleManager,
+        protected ContainerInterface $ci
+    ) {
     }
 
     /**
@@ -31,19 +39,24 @@ final class SprinkleSeedsRepository extends AbstractClassRepository implements S
      */
     public function all(): array
     {
-        return $this->extensionLoader->getInstances(
-            method: 'getSeeds',
-            recipeInterface: SeedRecipe::class,
-            extensionInterface: SeedInterface::class,
-        );
-    }
+        $instances = [];
 
-    /**
-     * {@inheritDoc}
-     */
-    public function get(string $migration): SeedInterface
-    {
-        // Wrap around parent to satisfy interface
-        return parent::get($migration);
+        foreach ($this->sprinkleManager->getSprinkles() as $sprinkle) {
+            if (!$sprinkle instanceof SeedRecipe) {
+                continue;
+            }
+            foreach ($sprinkle->getSeeds() as $commandsClass) {
+                if (!class_exists($commandsClass)) {
+                    throw new BadClassNameException("Seed class `$commandsClass` not found.");
+                }
+                $instance = $this->ci->get($commandsClass);
+                if (!is_object($instance) || !is_subclass_of($instance, SeedInterface::class)) {
+                    throw new BadInstanceOfException("Seed class `$commandsClass` doesn't implement " . SeedInterface::class . '.');
+                }
+                $instances[] = $instance;
+            }
+        }
+
+        return $instances;
     }
 }

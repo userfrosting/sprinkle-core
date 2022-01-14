@@ -18,7 +18,7 @@ interface MigrationRecipe
     /**
      * Return an array of all registered Migrations.
      *
-     * @return class-string[]
+     * @return string[]
      */
     public function getMigrations(): array;
 }

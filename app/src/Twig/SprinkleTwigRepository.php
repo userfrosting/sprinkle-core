@@ -8,22 +8,22 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Database\Migrator;
+namespace UserFrosting\Sprinkle\Core\Twig;
 
 use Psr\Container\ContainerInterface;
-use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
-use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
+use Twig\Extension\ExtensionInterface;
+use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
 use UserFrosting\Sprinkle\SprinkleManager;
 use UserFrosting\Support\ClassRepository;
 use UserFrosting\Support\Exception\BadClassNameException;
 use UserFrosting\Support\Exception\BadInstanceOfException;
 
 /**
- * Find and returns all migrations definitions (classes) registered and available.
+ * Find and returns all registered ExtensionInterface across all sprinkles, using TwigExtensionRecipe.
  *
- * @extends ClassRepository<MigrationInterface>
+ * @extends ClassRepository<ExtensionInterface>
  */
-final class SprinkleMigrationLocator extends ClassRepository implements MigrationLocatorInterface
+final class SprinkleTwigRepository extends ClassRepository implements TwigRepositoryInterface
 {
     /**
      * @param SprinkleManager    $sprinkleManager
@@ -43,16 +43,16 @@ final class SprinkleMigrationLocator extends ClassRepository implements Migratio
         $instances = [];
 
         foreach ($this->sprinkleManager->getSprinkles() as $sprinkle) {
-            if (!$sprinkle instanceof MigrationRecipe) {
+            if (!$sprinkle instanceof TwigExtensionRecipe) {
                 continue;
             }
-            foreach ($sprinkle->getMigrations() as $commandsClass) {
+            foreach ($sprinkle->getTwigExtensions() as $commandsClass) {
                 if (!class_exists($commandsClass)) {
-                    throw new BadClassNameException("Migration class `$commandsClass` not found.");
+                    throw new BadClassNameException("Seed class `$commandsClass` not found.");
                 }
                 $instance = $this->ci->get($commandsClass);
-                if (!is_object($instance) || !is_subclass_of($instance, MigrationInterface::class)) {
-                    throw new BadInstanceOfException("Migration class `$commandsClass` doesn't implement " . MigrationInterface::class . '.');
+                if (!is_object($instance) || !is_subclass_of($instance, ExtensionInterface::class)) {
+                    throw new BadInstanceOfException("Seed class `$commandsClass` doesn't implement " . ExtensionInterface::class . '.');
                 }
                 $instances[] = $instance;
             }

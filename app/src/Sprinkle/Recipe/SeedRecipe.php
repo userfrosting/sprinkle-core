@@ -18,7 +18,7 @@ interface SeedRecipe
     /**
      * Return an array of all registered seeds.
      *
-     * @return \UserFrosting\Sprinkle\Core\Database\Seeder\SeedInterface[]
+     * @return string[]
      */
     public function getSeeds(): array;
 }

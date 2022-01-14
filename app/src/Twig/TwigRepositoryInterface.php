@@ -8,16 +8,16 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Database\Migrator;
+namespace UserFrosting\Sprinkle\Core\Twig;
 
-use UserFrosting\Sprinkle\Core\Database\MigrationInterface;
+use Twig\Extension\ExtensionInterface;
 use UserFrosting\Support\ClassRepositoryInterface;
 
 /**
- * Find and returns all migrations definitions (classes) registered and available.
+ * Find and returns all registered ExtensionInterface.
  *
- * @extends ClassRepositoryInterface<MigrationInterface>
+ * @extends ClassRepositoryInterface<ExtensionInterface>
  */
-interface MigrationLocatorInterface extends ClassRepositoryInterface
+interface TwigRepositoryInterface extends ClassRepositoryInterface
 {
 }

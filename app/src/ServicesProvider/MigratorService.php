@@ -29,7 +29,9 @@ class MigratorService implements ServicesProviderInterface
     {
         return [
             MigrationRepositoryInterface::class => function (Capsule $db, Config $config) {
-                return new DatabaseMigrationRepository($db, $config->get('migrations.repository_table'));
+                $repositoryTable = strval($config->get('migrations.repository_table'));
+
+                return new DatabaseMigrationRepository($db, $repositoryTable);
             },
 
             MigrationLocatorInterface::class => \DI\autowire(SprinkleMigrationLocator::class),

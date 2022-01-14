@@ -21,7 +21,6 @@ use UserFrosting\Sprinkle\Core\Database\Migrator\SprinkleMigrationLocator;
 use UserFrosting\Sprinkle\Core\ServicesProvider\MigratorService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\Core\Tests\Integration\TestSprinkle;
-use UserFrosting\Sprinkle\RecipeExtensionLoader;
 use UserFrosting\Sprinkle\SprinkleManager;
 use UserFrosting\Support\Exception\ClassNotFoundException;
 use UserFrosting\Testing\ContainerStub;
@@ -47,8 +46,7 @@ class SprinkleMigrationLocatorTest extends TestCase
             ->shouldReceive('getSprinkles')->andReturn([new MigrationsSprinkleStub()])
             ->getMock();
 
-        $loader = new RecipeExtensionLoader($manager, $ci);
-        $locator = new SprinkleMigrationLocator($loader);
+        $locator = new SprinkleMigrationLocator($manager, $ci);
 
         return $locator;
     }

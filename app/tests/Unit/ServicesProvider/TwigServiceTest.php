@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\ServicesProvider;
 
+use ArrayIterator;
 use DI\Container;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -19,12 +20,10 @@ use Slim\Interfaces\RouteCollectorInterface;
 use Slim\Interfaces\RouteParserInterface;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
-use Twig\Extension\ExtensionInterface;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
-use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
-use UserFrosting\Sprinkle\RecipeExtensionLoader;
+use UserFrosting\Sprinkle\Core\Twig\TwigRepositoryInterface;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceInterface;
@@ -69,7 +68,7 @@ class TwigServiceTest extends TestCase
         $this->assertInstanceOf(TwigMiddleware::class, $this->ci->get(TwigMiddleware::class));
     }
 
-    public function testService()
+    public function testService(): void
     {
         // Set Config Mock
         $config = Mockery::mock(Config::class)
@@ -98,6 +97,8 @@ class TwigServiceTest extends TestCase
             ['message' => 'foo'],
             ['message' => 'bar'],
         ];
+
+        /** @var AlertStream */
         $alertStream = Mockery::mock(AlertStream::class)
                 ->shouldReceive('getAndClearMessages')
                 ->once()
@@ -107,14 +108,11 @@ class TwigServiceTest extends TestCase
         // Init TwigAlertsExtension
         $extension = new AlertsExtension($alertStream);
 
-        // Set SprinkleManager Mock
-        $manager = Mockery::mock(RecipeExtensionLoader::class)
-                ->shouldReceive('getInstances')
-                ->with('getTwigExtensions', TwigExtensionRecipe::class, ExtensionInterface::class)
-                ->once()
-                ->andReturn([$extension])
-                ->getMock();
-        $this->ci->set(RecipeExtensionLoader::class, $manager);
+        /** @var TwigRepositoryInterface */
+        $repository = Mockery::mock(TwigRepositoryInterface::class)
+            ->shouldReceive('getIterator')->andReturn(new ArrayIterator([$extension]))
+            ->getMock();
+        $this->ci->set(TwigRepositoryInterface::class, $repository);
 
         // Assert Service is returned.
         $view = $this->ci->get(Twig::class);
@@ -128,7 +126,7 @@ class TwigServiceTest extends TestCase
     /**
      * @depends testService
      */
-    public function testServiceWithCacheAndDebug()
+    public function testServiceWithCacheAndDebug(): void
     {
         // Set Config Mock
         $config = Mockery::mock(Config::class)
@@ -147,14 +145,11 @@ class TwigServiceTest extends TestCase
                 ->getMock();
         $this->ci->set(ResourceLocatorInterface::class, $locator);
 
-        // Set SprinkleManager Mock
-        $manager = Mockery::mock(RecipeExtensionLoader::class)
-                ->shouldReceive('getInstances')
-                ->with('getTwigExtensions', TwigExtensionRecipe::class, ExtensionInterface::class)
-                ->once()
-                ->andReturn([])
-                ->getMock();
-        $this->ci->set(RecipeExtensionLoader::class, $manager);
+        /** @var TwigRepositoryInterface */
+        $repository = Mockery::mock(TwigRepositoryInterface::class)
+            ->shouldReceive('getIterator')->andReturn(new ArrayIterator([]))
+            ->getMock();
+        $this->ci->set(TwigRepositoryInterface::class, $repository);
 
         $this->assertInstanceOf(Twig::class, $this->ci->get(Twig::class));
     }
