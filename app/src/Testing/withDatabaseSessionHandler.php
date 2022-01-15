@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests;
+namespace UserFrosting\Sprinkle\Core\Testing;
 
 use Illuminate\Session\DatabaseSessionHandler;
 

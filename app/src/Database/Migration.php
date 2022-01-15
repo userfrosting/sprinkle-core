@@ -21,7 +21,7 @@ abstract class Migration implements MigrationInterface
      * List of dependencies for this migration.
      * Should return an array of class required to be run before this migration.
      *
-     * @var MigrationInterface[]
+     * @var string[]
      */
     public static $dependencies = [];
 

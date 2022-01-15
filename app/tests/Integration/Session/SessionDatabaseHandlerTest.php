@@ -15,9 +15,9 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Session\DatabaseSessionHandler;
 use UserFrosting\Session\Session;
 use UserFrosting\Sprinkle\Core\Database\Models\Session as SessionTable;
+use UserFrosting\Sprinkle\Core\Testing\RefreshDatabase;
+use UserFrosting\Sprinkle\Core\Testing\withDatabaseSessionHandler;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
-use UserFrosting\Sprinkle\Core\Tests\RefreshDatabase;
-use UserFrosting\Sprinkle\Core\Tests\withDatabaseSessionHandler;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /**
