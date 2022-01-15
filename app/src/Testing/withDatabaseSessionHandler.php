@@ -13,12 +13,12 @@ namespace UserFrosting\Sprinkle\Core\Testing;
 use Illuminate\Session\DatabaseSessionHandler;
 
 /**
- * Trait used to run test against the `test_integration` db connection
+ * Trait used to run test against the `test_integration` db connection.
  */
 trait withDatabaseSessionHandler
 {
     /**
-     * Reset CI with database session handler
+     * Reset CI with database session handler.
      */
     // TODO : Require session service...
     public function useDatabaseSessionHandler()
