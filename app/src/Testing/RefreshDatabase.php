@@ -17,7 +17,7 @@ use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 
 /**
  * Trait enabling wrapping of each test case in a database transaction
- * Based on Laravel `RefreshDatabase` Traits
+ * Based on Laravel `RefreshDatabase` Traits.
  */
 trait RefreshDatabase
 {
