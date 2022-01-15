@@ -48,11 +48,11 @@ final class SprinkleTwigRepository extends ClassRepository implements TwigReposi
             }
             foreach ($sprinkle->getTwigExtensions() as $commandsClass) {
                 if (!class_exists($commandsClass)) {
-                    throw new BadClassNameException("Seed class `$commandsClass` not found.");
+                    throw new BadClassNameException("Extension class `$commandsClass` not found.");
                 }
                 $instance = $this->ci->get($commandsClass);
                 if (!is_object($instance) || !is_subclass_of($instance, ExtensionInterface::class)) {
-                    throw new BadInstanceOfException("Seed class `$commandsClass` doesn't implement " . ExtensionInterface::class . '.');
+                    throw new BadInstanceOfException("Extension class `$commandsClass` doesn't implement " . ExtensionInterface::class . '.');
                 }
                 $instances[] = $instance;
             }

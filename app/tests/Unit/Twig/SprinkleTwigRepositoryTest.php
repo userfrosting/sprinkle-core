@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Twig;
 
 use DI\Container;
 use Mockery;
@@ -16,41 +16,41 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use stdClass;
-use UserFrosting\Sprinkle\Core\Seeder\SeedInterface;
-use UserFrosting\Sprinkle\Core\Seeder\SprinkleSeedsRepository;
-use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\SeedRecipe;
+use Twig\Extension\ExtensionInterface;
+use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
+use UserFrosting\Sprinkle\Core\Twig\SprinkleTwigRepository;
 use UserFrosting\Sprinkle\SprinkleManager;
 use UserFrosting\Sprinkle\SprinkleRecipe;
 use UserFrosting\Support\Exception\BadClassNameException;
 use UserFrosting\Support\Exception\BadInstanceOfException;
 
 /**
- * SprinkleSeedsRepository Test
+ * Twig Repository Tests
  */
-class SprinkleSeedsRepositoryTest extends TestCase
+class SprinkleTwigRepositoryTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
     public function testGetAll(): void
     {
-        $mockSeed1 = Mockery::mock(SeedInterface::class);
-        $mockSeed2 = Mockery::mock(SeedInterface::class);
+        $mockExtension1 = Mockery::mock(ExtensionInterface::class);
+        $mockExtension2 = Mockery::mock(ExtensionInterface::class);
 
         $ci = Mockery::mock(Container::class)
-            ->shouldReceive('get')->with($mockSeed1::class)->andReturn($mockSeed1)
-            ->shouldReceive('get')->with($mockSeed2::class)->andReturn($mockSeed2)
+            ->shouldReceive('get')->with($mockExtension1::class)->once()->andReturn($mockExtension1)
+            ->shouldReceive('get')->with($mockExtension2::class)->once()->andReturn($mockExtension2)
             ->getMock();
 
-        /** @var SeedRecipe */
-        $sprinkle1 = Mockery::mock(SeedRecipe::class)
-            ->shouldReceive('getSeeds')->andReturn([
-                $mockSeed1::class,
-                $mockSeed2::class,
+        /** @var TwigExtensionRecipe */
+        $sprinkle1 = Mockery::mock(TwigExtensionRecipe::class)
+            ->shouldReceive('getTwigExtensions')->andReturn([
+                $mockExtension1::class,
+                $mockExtension2::class,
             ])->getMock();
 
         /** @var SprinkleRecipe */
         $sprinkle2 = Mockery::mock(SprinkleRecipe::class)
-            ->shouldReceive('getSeeds')->andReturn([$mockSeed1::class])
+            ->shouldReceive('getTwigExtensions')->andReturn([$mockExtension1::class])
             ->getMock();
 
         /** @var SprinkleManager */
@@ -60,19 +60,19 @@ class SprinkleSeedsRepositoryTest extends TestCase
                 $sprinkle2,
             ])->getMock();
 
-        $repository = new SprinkleSeedsRepository($manager, $ci);
+        $repository = new SprinkleTwigRepository($manager, $ci);
 
-        $seeds = $repository->all();
+        $extensions = $repository->all();
 
-        $this->assertCount(2, $seeds);
-        $this->assertContainsOnlyInstancesOf(SeedInterface::class, $seeds);
+        $this->assertCount(2, $extensions);
+        $this->assertContainsOnlyInstancesOf(ExtensionInterface::class, $extensions);
     }
 
     public function testGetAllWithCommandNotFound(): void
     {
-        /** @var SeedRecipe */
-        $sprinkle = Mockery::mock(SeedRecipe::class)
-            ->shouldReceive('getSeeds')->andReturn(['/Not/Command'])
+        /** @var TwigExtensionRecipe */
+        $sprinkle = Mockery::mock(TwigExtensionRecipe::class)
+            ->shouldReceive('getTwigExtensions')->andReturn(['/Not/Extension'])
             ->getMock();
 
         /** @var SprinkleManager */
@@ -83,20 +83,20 @@ class SprinkleSeedsRepositoryTest extends TestCase
         /** @var ContainerInterface */
         $ci = Mockery::mock(ContainerInterface::class);
 
-        $repository = new SprinkleSeedsRepository($sprinkleManager, $ci);
+        $repository = new SprinkleTwigRepository($sprinkleManager, $ci);
 
         $this->expectException(BadClassNameException::class);
-        $this->expectExceptionMessage('Seed class `/Not/Command` not found.');
+        $this->expectExceptionMessage('Extension class `/Not/Extension` not found.');
         $repository->all();
     }
 
     public function testGetAllWithCommandWrongInterface(): void
     {
-        $seed = Mockery::mock(stdClass::class);
+        $extension = Mockery::mock(stdClass::class);
 
-        /** @var SeedRecipe */
-        $sprinkle = Mockery::mock(SeedRecipe::class)
-            ->shouldReceive('getSeeds')->andReturn([$seed::class])
+        /** @var TwigExtensionRecipe */
+        $sprinkle = Mockery::mock(TwigExtensionRecipe::class)
+            ->shouldReceive('getTwigExtensions')->andReturn([$extension::class])
             ->getMock();
 
         /** @var SprinkleManager */
@@ -106,13 +106,13 @@ class SprinkleSeedsRepositoryTest extends TestCase
 
         /** @var ContainerInterface */
         $ci = Mockery::mock(ContainerInterface::class)
-            ->shouldReceive('get')->with($seed::class)->andReturn($seed)
+            ->shouldReceive('get')->with($extension::class)->andReturn($extension)
             ->getMock();
 
-        $repository = new SprinkleSeedsRepository($sprinkleManager, $ci);
+        $repository = new SprinkleTwigRepository($sprinkleManager, $ci);
 
         $this->expectException(BadInstanceOfException::class);
-        $this->expectExceptionMessage('Seed class `' . $seed::class . "` doesn't implement " . SeedInterface::class . '.');
+        $this->expectExceptionMessage('Extension class `' . $extension::class . "` doesn't implement " . ExtensionInterface::class . '.');
         $repository->all();
     }
 }

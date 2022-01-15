@@ -10,6 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core\Util;
 
+use UserFrosting\Support\Exception\BadClassNameException;
+
 /**
  * UserFrosting class mapper.
  *
