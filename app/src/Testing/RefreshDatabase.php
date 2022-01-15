@@ -55,7 +55,7 @@ trait RefreshDatabase
      */
     protected function refreshInMemoryDatabase(): void
     {
-        $this->ci->get(Migrator::class)->run();
+        $this->ci->get(Migrator::class)->migrate();
     }
 
     /**
