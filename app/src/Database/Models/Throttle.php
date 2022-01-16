@@ -14,7 +14,7 @@ namespace UserFrosting\Sprinkle\Core\Database\Models;
  * Throttle Class.
  *
  * Represents a throttleable request from a user agent.
- * 
+ *
  * @mixin \Illuminate\Database\Query\Builder
  *
  * @property string $type
