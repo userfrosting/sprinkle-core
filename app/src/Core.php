@@ -45,6 +45,7 @@ use UserFrosting\Sprinkle\Core\Database\Migrations\v400\ThrottlesTable;
 use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerMiddleware;
 use UserFrosting\Sprinkle\Core\Error\RegisterShutdownHandler;
 use UserFrosting\Sprinkle\Core\Event\ResourceLocatorInitiatedEvent;
+use UserFrosting\Sprinkle\Core\Listeners\ModelInitiated;
 use UserFrosting\Sprinkle\Core\Listeners\ResourceLocatorInitiated;
 use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\SessionMiddleware;
@@ -228,6 +229,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
         return [
             AppInitiatedEvent::class => [
                 RegisterShutdownHandler::class,
+                ModelInitiated::class,
             ],
             ResourceLocatorInitiatedEvent::class => [
                 ResourceLocatorInitiated::class,
