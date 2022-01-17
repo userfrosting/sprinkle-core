@@ -12,7 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Database\Models;
 
 /**
  * Session Class.
- * 
+ *
  * @mixin \Illuminate\Database\Query\Builder
  *
  * Represents a session object as stored in the database.
