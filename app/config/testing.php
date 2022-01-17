@@ -34,7 +34,7 @@ return [
     'debug' => [
         'deprecation' => false,
         'queries'     => false,
-        'exception'   => false,
+        'exception'   => true,
     ],
 
     /*
