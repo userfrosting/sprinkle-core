@@ -24,7 +24,7 @@ class PhpVersionValidatorTest extends AbstractVersionValidatorTester
     /**
      * PHP version provider.
      *
-     * @return array [version, sanitized, valid]
+     * @return array<string|bool>[] [version, sanitized, valid]
      */
     public function versionProvider(): array
     {

@@ -25,7 +25,7 @@ class PhpDeprecationValidatorTest extends AbstractVersionValidatorTester
     /**
      * PHP version provider.
      *
-     * @return array [version, sanitized, deprecated]
+     * @return array<string|bool>[] [version, sanitized, deprecated]
      */
     public function versionProvider(): array
     {

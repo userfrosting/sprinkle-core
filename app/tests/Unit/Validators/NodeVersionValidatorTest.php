@@ -24,7 +24,7 @@ class NodeVersionValidatorTest extends AbstractVersionValidatorTester
     /**
      * Node version provider.
      *
-     * @return array [version, sanitized, valid]
+     * @return array<string|bool>[] [version, sanitized, valid]
      */
     public function versionProvider(): array
     {

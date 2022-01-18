@@ -20,6 +20,7 @@ abstract class AbstractVersionValidatorTester extends TestCase
 {
     protected string $required;
 
+    /** @var class-string<\UserFrosting\Sprinkle\Core\Validators\AbstractVersionValidator> */
     protected string $validator;
 
     /**
@@ -56,7 +57,7 @@ abstract class AbstractVersionValidatorTester extends TestCase
     /**
      * Version provider.
      *
-     * @return array [version, sanitized, valid]
+     * @return array<string|bool>[] [version, sanitized, valid]
      */
     abstract public function versionProvider(): array;
 }

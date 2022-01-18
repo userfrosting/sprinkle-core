@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Setup PHP, with composer and extensions
+    - name: Setup PHP,with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.0'
@@ -25,4 +25,4 @@ jobs:
       run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
     - name: Run PHPStan
-      run: vendor/bin/phpstan analyse app/src/ app/tests/
+      run: vendor/bin/phpstan analyse app/src/{Event,Exceptions,Listeners,Middlewares,Routes,Seeder,Sprinkle,Testing,Validators} app/tests/Integration/{Controllers,Error,Twig} app/tests/Unit/{Error,Seeder,Validators}
