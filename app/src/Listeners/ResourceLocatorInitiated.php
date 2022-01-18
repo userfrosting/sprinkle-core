@@ -55,7 +55,6 @@ class ResourceLocatorInitiated
             new ResourceStream('sprinkles', path: ''),
             new ResourceStream('config'),
             new ResourceStream('extra'),
-            new ResourceStream('factories'), // TODO Change to DI
             new ResourceStream('locale'),
             new ResourceStream('schema'),
             new ResourceStream('templates'),

@@ -1,0 +1,25 @@
+<?php
+
+/*
+ * UserFrosting Core Sprinkle (http://www.userfrosting.com)
+ *
+ * @link      https://github.com/userfrosting/sprinkle-core
+ * @copyright Copyright (c) 2021 Alexander Weissman & Louis Charette
+ * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
+ */
+
+namespace UserFrosting\Sprinkle\Core\Database\Factories;
+
+use Faker\Factory as FakerFactory;
+use Illuminate\Database\Eloquent\Factories\Factory as LaravelFactory;
+
+/**
+ * Adapt Laravel Factory abstract class for use with UserFrosting.
+ */
+abstract class Factory extends LaravelFactory
+{
+    protected function withFaker()
+    {
+        return FakerFactory::create();
+    }
+}

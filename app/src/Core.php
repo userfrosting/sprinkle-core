@@ -56,7 +56,6 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CsrfService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\DatabaseService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ErrorHandlerService;
-use UserFrosting\Sprinkle\Core\ServicesProvider\FactoryService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\I18nService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\LocatorService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\LoggersService;
@@ -164,7 +163,6 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
             // CsrfService::class,
             DatabaseService::class,
             ErrorHandlerService::class,
-            // FactoryService::class,
             I18nService::class,
             LocatorService::class,
             LoggersService::class,

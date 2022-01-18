@@ -57,8 +57,7 @@
         "phpstan/phpstan-strict-rules": "^1.0",
         "phpunit/phpunit": "^9.5",
         "mockery/mockery": "^1.2",
-        "league/factory-muffin": "^3.0",
-        "league/factory-muffin-faker": "^2.0",
+        "fakerphp/faker": "^1.17",
         "slam/phpstan-extensions": "^6.0",
         "php-mock/php-mock-mockery": "^1.3"
     },

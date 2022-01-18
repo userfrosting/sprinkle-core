@@ -10,8 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core\Database\Models;
 
-use DI\FactoryInterface;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
+use Psr\Container\ContainerInterface;
 use UserFrosting\Sprinkle\Core\Database\Builder;
 use UserFrosting\Sprinkle\Core\Database\EloquentBuilder;
 use UserFrosting\Sprinkle\Core\Database\Models\Concerns\HasRelationships;
@@ -26,9 +26,9 @@ abstract class Model extends LaravelModel
     use HasRelationships;
 
     /**
-     * @var FactoryInterface The DI container for your application.
+     * @var ContainerInterface The DI container for your application.
      */
-    public static FactoryInterface $ci;
+    public static ContainerInterface $ci;
 
     /**
      * @var bool Disable timestamps for now.

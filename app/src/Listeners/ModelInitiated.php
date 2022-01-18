@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Listeners;
 
-use DI\FactoryInterface;
+use Psr\Container\ContainerInterface;
 use UserFrosting\Event\AppInitiatedEvent;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;
 
@@ -23,10 +23,10 @@ use UserFrosting\Sprinkle\Core\Database\Models\Model;
 class ModelInitiated
 {
     /**
-     * @param FactoryInterface $ci
+     * @param ContainerInterface $ci
      */
     public function __construct(
-        protected FactoryInterface $ci,
+        protected ContainerInterface $ci,
     ) {
     }
 
