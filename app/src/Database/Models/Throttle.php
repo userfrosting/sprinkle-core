@@ -28,14 +28,12 @@ class Throttle extends Model
      */
     protected $table = 'throttles';
 
+    /**
+     * @var string[] The attributes that are mass assignable.
+     */
     protected $fillable = [
         'type',
         'ip',
         'request_data',
     ];
-
-    /**
-     * @var bool Enable timestamps for Throttles.
-     */
-    public $timestamps = true;
 }

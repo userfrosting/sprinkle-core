@@ -31,11 +31,6 @@ abstract class Model extends LaravelModel
     public static ContainerInterface $ci;
 
     /**
-     * @var bool Disable timestamps for now.
-     */
-    public $timestamps = false;
-
-    /**
      * Determine if an attribute exists on the model - even if it is null.
      *
      * @param string $key

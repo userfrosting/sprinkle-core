@@ -23,4 +23,9 @@ class Session extends Model
      * @var string The name of the table for the current model.
      */
     protected $table = 'sessions';
+
+    /**
+     * @var bool Disable timestamps
+     */
+    public $timestamps = false;
 }
