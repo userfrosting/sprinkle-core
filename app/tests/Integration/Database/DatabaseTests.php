@@ -1269,6 +1269,10 @@ class DatabaseTests extends TestCase
  */
 class EloquentTestModel extends Model
 {
+    /**
+      * @var bool Disable timestamps for now.
+      */
+      public $timestamps = false;
 }
 
 class EloquentTestUser extends EloquentTestModel
