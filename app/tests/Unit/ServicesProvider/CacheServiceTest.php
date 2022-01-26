@@ -98,6 +98,18 @@ class CacheServiceTest extends TestCase
         $this->assertInstanceOf(TaggableFileStore::class, $this->ci->get(TaggableFileStore::class));
     }
 
+    public function testTaggableFileStoreForNullPath(): void
+    {
+        // Set mock Locator
+        $locator = Mockery::mock(ResourceLocatorInterface::class)
+            ->shouldReceive('findResource')->withArgs(['cache://', true])->andReturn(null)
+            ->getMock();
+        $this->ci->set(ResourceLocatorInterface::class, $locator);
+
+        $this->expectException(\Exception::class);
+        $this->ci->get(TaggableFileStore::class);
+    }
+
     public function testMemcachedStore(): void
     {
         // Set mock Config service
