@@ -25,7 +25,6 @@ use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
 use UserFrosting\Sprinkle\Core\ServicesProvider\SessionService;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
-use UserFrosting\UniformResourceLocator\ResourceInterface;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
@@ -115,11 +114,8 @@ class SessionServiceTest extends TestCase
 
         // Set mock dependencies
         $this->ci->set(Filesystem::class, Mockery::mock(Filesystem::class));
-        $resource = Mockery::mock(ResourceInterface::class)
-            ->shouldReceive('__toString')->andReturn('')
-            ->getMock();
         $locator = Mockery::mock(ResourceLocatorInterface::class)
-            ->shouldReceive('getResource')->with('sessions://')->once()->andReturn($resource)
+            ->shouldReceive('findResource')->with('sessions://')->once()->andReturn('')
             ->getMock();
         $this->ci->set(ResourceLocatorInterface::class, $locator);
 
@@ -138,7 +134,7 @@ class SessionServiceTest extends TestCase
         // Set mock dependencies
         $this->ci->set(Filesystem::class, Mockery::mock(Filesystem::class));
         $locator = Mockery::mock(ResourceLocatorInterface::class)
-            ->shouldReceive('getResource')->with('sessions://')->once()->andReturn(null)
+            ->shouldReceive('findResource')->with('sessions://')->once()->andReturn(null)
             ->getMock();
         $this->ci->set(ResourceLocatorInterface::class, $locator);
 

@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
+use Exception;
 use Illuminate\Cache\Repository as Cache;
 use Psr\Container\ContainerInterface;
 use UserFrosting\Cache\MemcachedStore;
@@ -48,7 +49,11 @@ class CacheService implements ServicesProviderInterface
              * Inject path from locator into TaggableFileStore.
              */
             TaggableFileStore::class => function (ResourceLocatorInterface $locator) {
-                $path = $locator->getResource('cache://', true);
+                $path = $locator->findResource('cache://', true);
+
+                if ($path === null) {
+                    throw new Exception('Cache resource not found. Make sure directory exist.');
+                }
 
                 return new TaggableFileStore($path);
             },

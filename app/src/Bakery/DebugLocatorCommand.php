@@ -14,7 +14,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
-use UserFrosting\UniformResourceLocator\ResourceInterface;
 use UserFrosting\UniformResourceLocator\ResourceLocationInterface;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 use UserFrosting\UniformResourceLocator\ResourceStreamInterface;
@@ -134,14 +133,12 @@ class DebugLocatorCommand extends Command
      */
     protected function getSchemePaths(string $scheme): array
     {
-        $resources = $this->locator->getResources($scheme . '://');
+        $resources = $this->locator->findResources($scheme . '://');
 
         if (count($resources) === 0) {
             return ['<comment>No resources found</comment>'];
         }
 
-        return array_map(function (ResourceInterface $resource) {
-            return $resource->getAbsolutePath();
-        }, $resources);
+        return $resources;
     }
 }

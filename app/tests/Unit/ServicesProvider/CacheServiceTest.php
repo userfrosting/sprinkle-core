@@ -22,7 +22,6 @@ use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
 use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
-use UserFrosting\UniformResourceLocator\ResourceInterface;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
@@ -91,11 +90,8 @@ class CacheServiceTest extends TestCase
     public function testTaggableFileStore(): void
     {
         // Set mock Locator
-        $resource = Mockery::mock(ResourceInterface::class)
-            ->shouldReceive('__toString')->andReturn('foo/')
-            ->getMock();
         $locator = Mockery::mock(ResourceLocatorInterface::class)
-            ->shouldReceive('getResource')->withArgs(['cache://', true])->andReturn($resource)
+            ->shouldReceive('findResource')->withArgs(['cache://', true])->andReturn('foo/')
             ->getMock();
         $this->ci->set(ResourceLocatorInterface::class, $locator);
 

@@ -33,13 +33,13 @@ class CacheHelper
     public function clearCache(): bool
     {
         // Get location
-        $path = $this->locator->getResource('cache://twig', true);
+        $path = $this->locator->findResource('cache://twig', true);
 
         // Get Filesystem instance
         $fs = new Filesystem();
 
         // Make sure directory exist and delete it
-        if ($fs->exists($path)) {
+        if ($path !== null && $fs->exists($path)) {
             return $fs->deleteDirectory($path, true);
         }
 
