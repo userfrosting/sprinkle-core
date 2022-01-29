@@ -18,6 +18,7 @@ use Slim\Psr7\Request;
 use Slim\Views\Twig;
 use Twig\Error\LoaderError;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
+use UserFrosting\Sprinkle\Core\Exceptions\Contracts\TwigRenderedException;
 use UserFrosting\Sprinkle\Core\Tests\Unit\Error\TestException;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
 use UserFrosting\Support\Repository\Repository as Config;
@@ -71,6 +72,50 @@ class PrettyPageRendererTest extends TestCase
         $data = $renderer->render(
             request: $request,
             exception: new TestException(),
+            userMessage: $userMessage,
+            statusCode: 234,
+            displayErrorDetails: false
+        );
+
+        // Assert
+        $this->assertSame('body', $data);
+    }
+
+    public function testRenderWithTwigRenderedException(): void
+    {
+        // Mocks
+        $request = Mockery::mock(Request::class);
+        $userMessage = new Message('title', 'description');
+
+        $payload = [
+            'title'       => 'title',
+            'description' => 'description',
+            'status'      => '234',
+        ];
+
+        // Mocks dependencies
+        /** @var Config $config */
+        $config = Mockery::mock(Config::class);
+
+        /** @var Twig $twig */
+        $twig = Mockery::mock(Twig::class)
+            ->shouldReceive('fetch')->withArgs([
+                'pages/error/warning.html.twig',
+                $payload,
+            ])->once()->andReturn('body')
+            ->getMock();
+
+        // Create renderer and render exception
+        $renderer = new PrettyPageRenderer(
+            $config,
+            $twig,
+            new Run(),
+            new PrettyPageHandler()
+        );
+
+        $data = $renderer->render(
+            request: $request,
+            exception: new TwigTestException(),
             userMessage: $userMessage,
             statusCode: 234,
             displayErrorDetails: false
@@ -163,5 +208,13 @@ class PrettyPageRendererTest extends TestCase
 
         // Assert
         $this->assertNotSame('', $data);
+    }
+}
+
+class TwigTestException extends Exception implements TwigRenderedException
+{
+    public function getTemplate(): string
+    {
+        return 'pages/error/warning.html.twig';
     }
 }

@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Unit\Error\Renderer;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Error\Handler;
 
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;

@@ -24,6 +24,7 @@ use UserFrosting\Sprinkle\Core\Error\Renderer\JsonRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PlainTextRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\XmlRenderer;
+use UserFrosting\Sprinkle\Core\Exceptions\Contracts\UserMessageException;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
 use UserFrosting\Sprinkle\Core\Util\DeterminesContentTypeTrait;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
@@ -206,6 +207,13 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function determineUserMessage(Throwable $exception, int $statusCode): Message
     {
+        if ($exception instanceof UserMessageException) {
+            return new Message(
+                $this->translator->translate($exception->getTitle()),
+                $this->translator->translate($exception->getDescription())
+            );
+        }
+
         return new Message(
             $this->translateStatusMessage($statusCode, 'ERROR.%d.TITLE', 'ERROR.TITLE'),
             $this->translateStatusMessage($statusCode, 'ERROR.%d.DESCRIPTION', 'ERROR.DESCRIPTION')

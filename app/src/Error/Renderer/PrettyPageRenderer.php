@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views\Twig;
 use Throwable;
 use Twig\Error\LoaderError;
+use UserFrosting\Sprinkle\Core\Exceptions\Contracts\TwigRenderedException;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
 use UserFrosting\Support\Repository\Repository as Config;
 use Whoops\Handler\PrettyPageHandler;
@@ -49,7 +50,7 @@ final class PrettyPageRenderer implements ErrorRendererInterface
         }
 
         // Render Twig pretty page otherwise
-        return $this->renderTwigPage($userMessage, $statusCode);
+        return $this->renderTwigPage($exception, $userMessage, $statusCode);
     }
 
     /**
@@ -60,7 +61,7 @@ final class PrettyPageRenderer implements ErrorRendererInterface
      *
      * @return string
      */
-    protected function renderTwigPage(Message $userMessage, int $statusCode): string
+    protected function renderTwigPage(Throwable $exception, Message $userMessage, int $statusCode): string
     {
         $payload = [
             'title'       => $userMessage->title,
@@ -68,9 +69,14 @@ final class PrettyPageRenderer implements ErrorRendererInterface
             'status'      => $statusCode,
         ];
 
-        try {
+        if ($exception instanceof TwigRenderedException) {
+            $page = $exception->getTemplate();
+        } else {
             $format = strval($this->config->get('error.pages.status'));
             $page = sprintf($format, $statusCode);
+        }
+
+        try {
             $body = $this->twig->fetch($page, $payload);
         } catch (LoaderError $e) {
             $format = strval($this->config->get('error.pages.error'));
