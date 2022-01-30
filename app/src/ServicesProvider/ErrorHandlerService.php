@@ -28,8 +28,8 @@ class ErrorHandlerService implements ServicesProviderInterface
              * Register custom Handler.
              */
             ExceptionHandlerMiddleware::class => \DI\autowire()
-                ->method('registerHandler', HttpException::class, HttpExceptionHandler::class, true)
-                // ->method('registerHandler', \phpmailerException, PhpMailerExceptionHandler::class, true),
+                ->method('registerHandler', HttpException::class, HttpExceptionHandler::class, true),
+            // ->method('registerHandler', \phpmailerException, PhpMailerExceptionHandler::class, true),
         ];
     }
 }
