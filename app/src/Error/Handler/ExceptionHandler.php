@@ -29,6 +29,7 @@ use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
 use UserFrosting\Sprinkle\Core\Util\DeterminesContentTypeTrait;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
 use UserFrosting\Support\Exception\BadInstanceOfException;
+use UserFrosting\Support\Message\UserMessage;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /**
@@ -209,8 +210,8 @@ class ExceptionHandler implements ExceptionHandlerInterface
     {
         if ($exception instanceof UserMessageException) {
             return new Message(
-                $this->translator->translate($exception->getTitle()),
-                $this->translator->translate($exception->getDescription())
+                $this->translateUserMessage($exception->getTitle()),
+                $this->translateUserMessage($exception->getDescription())
             );
         }
 
@@ -218,6 +219,22 @@ class ExceptionHandler implements ExceptionHandlerInterface
             $this->translateStatusMessage($statusCode, 'ERROR.%d.TITLE', 'ERROR.TITLE'),
             $this->translateStatusMessage($statusCode, 'ERROR.%d.DESCRIPTION', 'ERROR.DESCRIPTION')
         );
+    }
+
+    /**
+     * Return the translated version of a UserMessage|string.
+     *
+     * @param string|UserMessage $userMessage
+     *
+     * @return string
+     */
+    protected function translateUserMessage(string|UserMessage $userMessage): string
+    {
+        if (is_string($userMessage)) {
+            return $this->translator->translate($userMessage);
+        }
+
+        return $this->translator->translate($userMessage->message, $userMessage->parameters);
     }
 
     /**

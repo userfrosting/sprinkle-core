@@ -10,19 +10,21 @@
 
 namespace UserFrosting\Sprinkle\Core\Exceptions\Contracts;
 
+use UserFrosting\Support\Message\UserMessage;
+
 interface UserMessageException
 {
     /**
      * Return user facing message title.
      *
-     * @return string
+     * @return string|UserMessage
      */
-    public function getTitle(): string;
+    public function getTitle(): string|UserMessage;
 
     /**
      * Return user facing message description.
      *
-     * @return string
+     * @return string|UserMessage
      */
-    public function getDescription(): string;
+    public function getDescription(): string|UserMessage;
 }

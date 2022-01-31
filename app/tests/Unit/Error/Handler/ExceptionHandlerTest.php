@@ -30,6 +30,7 @@ use UserFrosting\Sprinkle\Core\Exceptions\Contracts\UserMessageException;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
 use UserFrosting\Sprinkle\Core\Tests\Unit\Error\TestException;
 use UserFrosting\Support\Exception\BadInstanceOfException;
+use UserFrosting\Support\Message\UserMessage;
 use UserFrosting\Support\Repository\Repository as Config;
 
 /**
@@ -115,6 +116,71 @@ class ExceptionHandlerTest extends TestCase
 
         // Do stuff
         $result = $handler->handle($request, new TestException());
+
+        // Assert
+        $this->assertSame($response, $result);
+    }
+
+    public function testHandleWithUserMessageStringException(): void
+    {
+        // Mock Config to control the settings
+        /** @var Config $config */
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('get')->with('debug.exception')->once()->andReturn(true)
+            ->shouldReceive('get')->with('logs.exception')->once()->andReturn(false)
+            ->getMock();
+
+        /** @var ErrorRendererInterface $renderer */
+        $renderer = Mockery::mock(ErrorRendererInterface::class)
+            ->shouldReceive('render')->once()->andReturn('Some body')
+            ->getMock();
+
+        // Mock CI and decide witch renderer is passed
+        /** @var ContainerInterface $ci */
+        $ci = Mockery::mock(ContainerInterface::class)
+            ->shouldReceive('get')->with(PrettyPageRenderer::class)->once()->andReturn($renderer) // Display
+            ->getMock();
+
+        // Return from getBody of response
+        /** @var StreamInterface $streamInterface */
+        $streamInterface = Mockery::mock(StreamInterface::class)
+            ->shouldReceive('write')->once()
+            ->getMock();
+
+        // Mocked response
+        /** @var ResponseInterface $response */
+        $response = Mockery::mock(ResponseInterface::class)
+            ->shouldReceive('getBody')->once()->andReturn($streamInterface)
+            ->shouldReceive('withStatus')->with(500)->once()->andReturnSelf()
+            ->shouldReceive('withHeader')->with('Content-type', 'text/html')->once()->andReturnSelf()
+            ->getMock();
+
+        // Mock for ResponseFactory
+        /** @var ResponseFactory $responseFactory */
+        $responseFactory = Mockery::mock(ResponseFactory::class)
+            ->shouldReceive('createResponse')->with(500)->once()->andReturn($response)
+            ->getMock();
+
+        /** @var Translator $translator */
+        $translator = Mockery::mock(Translator::class)
+            ->shouldReceive('translate')->with('User %param', ['param' => 'Title'])->times(1)->andReturn('User Title')
+            ->shouldReceive('translate')->with('User %param', ['param' => 'Description'])->times(1)->andReturn('User Description')
+            ->getMock();
+
+        /** @var ErrorLogger $logger */
+        $logger = Mockery::mock(ErrorLogger::class);
+
+        /** @var ServerRequestInterface $request */
+        $request = Mockery::mock(ServerRequestInterface::class)
+            ->shouldReceive('getMethod')->times(1)->andReturn('GET')
+            ->shouldReceive('getHeaderLine')->with('Accept')->once()->andReturn('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
+            ->getMock();
+
+        // Get handler
+        $handler = new ExceptionHandler($ci, $responseFactory, $config, $translator, $logger);
+
+        // Do stuff
+        $result = $handler->handle($request, new UserMessageTestException());
 
         // Assert
         $this->assertSame($response, $result);
@@ -365,13 +431,26 @@ class ExceptionHandlerTest extends TestCase
 
 class MessageTestException extends Exception implements UserMessageException
 {
-    public function getTitle(): string
+    public function getTitle(): string|UserMessage
     {
         return 'User Title';
     }
 
-    public function getDescription(): string
+    public function getDescription(): string|UserMessage
     {
         return 'User Description';
+    }
+}
+
+class UserMessageTestException extends Exception implements UserMessageException
+{
+    public function getTitle(): string|UserMessage
+    {
+        return new UserMessage('User %param', ['param' => 'Title']);
+    }
+
+    public function getDescription(): string|UserMessage
+    {
+        return new UserMessage('User %param', ['param' => 'Description']);
     }
 }
