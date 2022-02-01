@@ -15,6 +15,7 @@
  */
 return [
     'VALIDATE' => [
+        'ERROR'         => 'Validation error',
         'ARRAY'         => 'The values for <strong>{{label}}</strong> must be in an array.',
         'BOOLEAN'       => "The value for <strong>{{label}}</strong> must be either '0' or '1'.",
         'INTEGER'       => 'The value for <strong>{{label}}</strong> must be an integer.',

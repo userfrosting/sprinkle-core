@@ -13,7 +13,6 @@ namespace UserFrosting\Sprinkle\Core\Database\Models;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Psr\Container\ContainerInterface;
 use UserFrosting\Sprinkle\Core\Database\Builder;
-use UserFrosting\Sprinkle\Core\Database\EloquentBuilder;
 use UserFrosting\Sprinkle\Core\Database\Models\Concerns\HasRelationships;
 
 /**
@@ -87,24 +86,6 @@ abstract class Model extends LaravelModel
 
         // Store function should always return the id of the object
         return $this->id;
-    }
-
-    /**
-     * Overrides Laravel's base Model to return our custom Eloquent builder object.
-     *
-     * @param Builder $query
-     *
-     * @return \UserFrosting\Sprinkle\Core\Database\EloquentBuilder
-     */
-    public function newEloquentBuilder($query)
-    {
-        // TODO : To keep classmapper feature here, it would be the next line, But need the $ci... And I don't like the way it was done (in event)
-        // Ci would replace classmapper here, but it would need to be injected, so created by the container... always... A Trait would be better...
-        // So the class is hardcoded for now
-        // Would be:
-        // return $ci->make(EloquentBuilder::class, [$query]);
-
-        return new EloquentBuilder($query);
     }
 
     /**

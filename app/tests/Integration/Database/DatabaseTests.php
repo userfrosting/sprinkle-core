@@ -10,7 +10,6 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database;
 
-use Exception;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
@@ -926,42 +925,6 @@ class DatabaseTests extends TestCase
         $this->assertEquals([
             'user_id' => 1,
         ], $job->toArray());
-    }
-
-    /**
-     * @depends testTableCreation
-     * testFindInt
-     */
-    public function testFindInt(): void
-    {
-        $this->generateTasks();
-        $task = EloquentTestTask::findInt(1);
-
-        $this->assertEquals($task, EloquentTestTask::find(1));
-    }
-
-    /**
-     * @depends testTableCreation
-     * testFindIntThrowsExceptionOnNull
-     */
-    public function testFindIntThrowsExceptionOnNull(): void
-    {
-        $this->generateTasks();
-        // $this->expectException(BadRequestException::class);
-        $this->expectException(Exception::class);
-        EloquentTestTask::findInt(null);
-    }
-
-    /**
-     * @depends testTableCreation
-     * testFindIntThrowsExceptionOnNonInteger
-     */
-    public function testFindIntThrowsExceptionOnNonInteger(): void
-    {
-        $this->generateTasks();
-        // $this->expectException(BadRequestException::class);
-        $this->expectException(Exception::class);
-        EloquentTestTask::findInt('hi');
     }
 
     /**
