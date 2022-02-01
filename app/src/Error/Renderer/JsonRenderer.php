@@ -70,15 +70,15 @@ final class JsonRenderer implements ErrorRendererInterface
      *
      * @param ServerRequestInterface $request
      *
-     * @return string[]
+     * @return mixed[]
      */
     public function renderRequest(ServerRequestInterface $request): array
     {
         return [
             'method'  => $request->getMethod(),
             'uri'     => (string) $request->getUri(),
-            'params'  => print_r($request->getQueryParams(), true),
-            'headers' => print_r($request->getHeaders(), true),
+            'params'  => $request->getQueryParams(),
+            'headers' => $request->getHeaders(),
         ];
     }
 }
