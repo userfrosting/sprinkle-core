@@ -150,7 +150,7 @@ class Captcha
     }
 
     /**
-     * Get the value of key
+     * Get the value of key.
      */
     public function getKey(): string
     {
@@ -158,7 +158,7 @@ class Captcha
     }
 
     /**
-     * Set the value of key
+     * Set the value of key.
      *
      * @return static
      */
