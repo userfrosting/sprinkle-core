@@ -13,67 +13,46 @@ namespace UserFrosting\Sprinkle\Core\Util;
 use UserFrosting\Session\Session;
 
 /**
- * Captcha Class.
- *
  * Implements the captcha for user registration.
- *
- * @author r3wt
- * @author Alex Weissman (https://alexanderweissman.com)
- *
- * @see http://www.userfrosting.com/components/#messages
  */
 class Captcha
 {
     /**
      * @var string The randomly generated captcha code.
      */
-    protected $code;
+    protected string $code = '';
 
     /**
      * @var string The captcha image, represented as a binary string.
      */
-    protected $image;
-
-    /**
-     * @var Session We use the session object so that the hashed captcha token will automatically appear in the session.
-     */
-    protected $session;
-
-    /**
-     * @var string
-     */
-    protected $key;
+    protected string $image = '';
 
     /**
      * Create a new captcha.
      *
-     * @param Session $session
+     * @param Session $session We use the session object so that the hashed captcha token will automatically appear in the session.
      * @param string  $key
      */
-    public function __construct(Session $session, $key)
-    {
-        $this->session = $session;
-        $this->key = $key;
-
-        if (!$this->session->has($key)) {
-            $this->session[$key] = [];
-        }
+    public function __construct(
+        protected Session $session,
+        protected string $key = 'captcha'
+    ) {
     }
 
     /**
      * Generates a new captcha for the user registration form.
      *
-     * This generates a random 5-character captcha and stores it in the session with an md5 hash.
-     * Also, generates the corresponding captcha image.
+     * This generates a random 5-character captcha and stores it in the session
+     * with an md5 hash. Also, generates the corresponding captcha image.
      */
-    public function generateRandomCode()
+    public function generateRandomCode(): void
     {
-        $md5_hash = md5(rand(0, 99999));
+        $md5_hash = md5((string) rand(0, 99999));
         $this->code = substr($md5_hash, 25, 5);
         $enc = md5($this->code);
 
         // Store the generated captcha value to the session
-        $this->session[$this->key] = $enc;
+        $this->session->set($this->key, $enc);
 
         $this->generateImage();
     }
@@ -83,7 +62,7 @@ class Captcha
      *
      * @return string
      */
-    public function getCaptcha()
+    public function getCaptcha(): string
     {
         return $this->code;
     }
@@ -93,7 +72,7 @@ class Captcha
      *
      * @return string
      */
-    public function getImage()
+    public function getImage(): string
     {
         return $this->image;
     }
@@ -106,9 +85,9 @@ class Captcha
      *
      * @return bool
      */
-    public function verifyCode($code)
+    public function verifyCode(string $code): bool
     {
-        return md5($code) == $this->session[$this->key];
+        return md5($code) == $this->session->get($this->key, []);
     }
 
     /**
@@ -117,7 +96,7 @@ class Captcha
      *
      * @return string
      */
-    protected function generateImage()
+    protected function generateImage(): string
     {
         $width = 150;
         $height = 30;
@@ -168,5 +147,25 @@ class Captcha
         $this->image = ob_get_clean();
 
         return $this->image;
+    }
+
+    /**
+     * Get the value of key
+     */
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    /**
+     * Set the value of key
+     *
+     * @return static
+     */
+    public function setKey(string $key): static
+    {
+        $this->key = $key;
+
+        return $this;
     }
 }
