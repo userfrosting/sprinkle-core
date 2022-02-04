@@ -46,5 +46,10 @@ return [
         'DESCRIPTION' => "Oops, looks like our server might have goofed. If you're an admin, please check the PHP or UserFrosting logs.",
 
         'MAIL' => 'Fatal error attempting mail, contact your server administrator.  If you are the admin, please check the UserFrosting log.',
+
+        'RATE_LIMIT_EXCEEDED' => [
+            'TITLE'       => 'Rate Limit Exceeded',
+            'DESCRIPTION' => 'The rate limit for this action has been exceeded. You must wait another {{delay}} seconds before you will be allowed to make another attempt.',
+        ]
     ],
 ];
