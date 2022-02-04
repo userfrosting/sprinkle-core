@@ -17,7 +17,7 @@ use UserFrosting\Sprinkle\Core\Exceptions\Contracts\UserMessageException;
 use UserFrosting\Support\Message\UserMessage;
 
 /**
- * Exception thrown when the throttler delay
+ * Exception thrown when the throttler delay.
  */
 final class ThrottlerDelayException extends Exception implements TwigRenderedException, UserMessageException
 {
@@ -26,7 +26,7 @@ final class ThrottlerDelayException extends Exception implements TwigRenderedExc
     protected string $twigTemplate = 'pages/error/throttler.html.twig';
 
     /**
-     * @var int $delay The delay before the user can re-attempt
+     * @var int The delay before the user can re-attempt
      */
     protected int $delay = 0;
 
