@@ -71,12 +71,14 @@ class Throttler
 
         // Fetch all throttle events of the specified type, that match the specified rule
         if ($throttleRule->getMethod() === 'ip') {
+            /** @var Collection<ThrottleModelInterface> */
             $events = $this->throttleModel
                 ->where('type', $type)
                 ->where('created_at', '>', $startTime)
                 ->where('ip', $_SERVER['REMOTE_ADDR'])
                 ->get();
         } else {
+            /** @var Collection<ThrottleModelInterface> */
             $events = $this->throttleModel
                 ->where('type', $type)
                 ->where('created_at', '>', $startTime)
