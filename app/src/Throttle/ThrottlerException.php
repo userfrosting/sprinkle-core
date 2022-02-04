@@ -10,11 +10,11 @@
 
 namespace UserFrosting\Sprinkle\Core\Throttle;
 
+use RuntimeException;
+
 /**
- * Throttler exception.  Used when there is a problem with the request throttler.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
+ * Throttler exception. Used when there is a problem with the request throttler.
  */
-class ThrottlerException extends \RuntimeException
+class ThrottlerException extends RuntimeException
 {
 }

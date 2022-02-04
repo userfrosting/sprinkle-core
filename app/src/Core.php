@@ -171,7 +171,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
             RoutingService::class,
             SeedService::class,
             SessionService::class,
-            // ThrottlerService::class,
+            ThrottlerService::class,
             TwigService::class,
             VersionsService::class,
             WebpackService::class,

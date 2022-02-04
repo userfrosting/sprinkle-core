@@ -10,9 +10,9 @@ declare(strict_types=1);
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Database\Models;
+namespace UserFrosting\Sprinkle\Core\Database\Models\Interfaces;
 
-use UserFrosting\Sprinkle\Core\Database\Models\Interfaces\ThrottleModelInterface;
+use Carbon\Carbon;
 
 /**
  * Throttle Class.
@@ -21,20 +21,14 @@ use UserFrosting\Sprinkle\Core\Database\Models\Interfaces\ThrottleModelInterface
  *
  * @mixin \Illuminate\Database\Eloquent\Builder
  * @mixin \Illuminate\Database\Eloquent\Model
+ *
+ * @property int         $id
+ * @property string      $type
+ * @property string|null $ip
+ * @property string      $request_data
+ * @property Carbon      $created_at
+ * @property Carbon      $updated_at
  */
-class Throttle extends Model implements ThrottleModelInterface
+interface ThrottleModelInterface
 {
-    /**
-     * @var string The name of the table for the current model.
-     */
-    protected $table = 'throttles';
-
-    /**
-     * @var string[] The attributes that are mass assignable.
-     */
-    protected $fillable = [
-        'type',
-        'ip',
-        'request_data',
-    ];
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
@@ -11,29 +13,27 @@
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
+use UserFrosting\Sprinkle\Core\Database\Models\Interfaces\ThrottleModelInterface;
+use UserFrosting\Sprinkle\Core\Database\Models\Throttle;
 use UserFrosting\Sprinkle\Core\Throttle\Throttler;
 use UserFrosting\Sprinkle\Core\Throttle\ThrottleRule;
 use UserFrosting\Support\Repository\Repository as Config;
 
-/*
-* Request throttler.
-*
-* Throttles (rate-limits) requests of a predefined type, with rules defined in site config.
-*
-* @return \UserFrosting\Sprinkle\Core\Throttle\Throttler
-*/
+/**
+ * Request throttler.
+ *
+ * Throttles (rate-limits) requests of a predefined type, with rules defined in site config.
+ */
 class ThrottlerService implements ServicesProviderInterface
 {
     public function register(): array
     {
         return [
-            // TODO Replace ClassMapper
-            // TODO Add interface
-            Throttler::class => function (Config $config) {
-                $throttler = new Throttler($c->classMapper);
+            Throttler::class => function (ThrottleModelInterface $model, Config $config) {
+                $throttler = new Throttler($model);
 
-                if ($config->has('throttles') && ($config['throttles'] !== null)) {
-                    foreach ($config['throttles'] as $type => $rule) {
+                if ($config->has('throttles') && is_array($config->get('throttles'))) {
+                    foreach ($config->get('throttles') as $type => $rule) {
                         if ($rule) {
                             $throttleRule = new ThrottleRule($rule['method'], $rule['interval'], $rule['delays']);
                             $throttler->addThrottleRule($type, $throttleRule);
@@ -45,6 +45,9 @@ class ThrottlerService implements ServicesProviderInterface
 
                 return $throttler;
             },
+
+            // Map Throttle Model
+            ThrottleModelInterface::class  => \DI\autowire(Throttle::class),
         ];
     }
 }

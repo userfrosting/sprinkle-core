@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
@@ -13,26 +15,26 @@ namespace UserFrosting\Sprinkle\Core\Throttle;
 use Carbon\Carbon;
 
 /**
- * ThrottleRule Class.
- *
  * Represents a request throttling rule.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class ThrottleRule
 {
-    /** @var string Set to 'ip' for ip-based throttling, 'data' for request-data-based throttling. */
-    protected $method;
+    /**
+     * @var string Set to 'ip' for ip-based throttling, 'data' for request-data-based throttling.
+     */
+    protected string $method;
 
-    /** @var int The amount of time, in seconds, to look back in determining attempts to consider. */
-    protected $interval;
+    /**
+     * @var int The amount of time, in seconds, to look back in determining attempts to consider.
+     */
+    protected int $interval;
 
     /**
      * @var int[] A mapping of minimum observation counts (x) to delays (y), in seconds.
      *            Any throttleable event that has occurred more than x times in this rule's interval,
      *            must wait y seconds after the last occurrence before another attempt is permitted.
      */
-    protected $delays;
+    protected array $delays;
 
     /**
      * Create a new ThrottleRule object.
@@ -41,11 +43,11 @@ class ThrottleRule
      * @param int    $interval The amount of time, in seconds, to look back in determining attempts to consider.
      * @param int[]  $delays   A mapping of minimum observation counts (x) to delays (y), in seconds.
      */
-    public function __construct($method, $interval, $delays)
+    public function __construct(string $method, int $interval, array $delays)
     {
-        $this->setMethod($method);
-        $this->setInterval($interval);
-        $this->setDelays($delays);
+        $this->setMethod($method)
+             ->setInterval($interval)
+             ->setDelays($delays);
     }
 
     /**
@@ -53,11 +55,13 @@ class ThrottleRule
      *
      * @param Carbon $lastEventTime The timestamp for the last countable event.
      * @param int    $count         The total number of events which have occurred in an interval.
+     *
+     * @return int
      */
-    public function getDelay(Carbon $lastEventTime, $count)
+    public function getDelay(Carbon $lastEventTime, int $count): int
     {
         // Zero occurrences always maps to a delay of 0 seconds.
-        if ($count == 0) {
+        if ($count === 0) {
             return 0;
         }
 
@@ -81,7 +85,7 @@ class ThrottleRule
      *
      * @return int[]
      */
-    public function getDelays()
+    public function getDelays(): array
     {
         return $this->delays;
     }
@@ -91,7 +95,7 @@ class ThrottleRule
      *
      * @return int
      */
-    public function getInterval()
+    public function getInterval(): int
     {
         return $this->interval;
     }
@@ -101,7 +105,7 @@ class ThrottleRule
      *
      * @return string
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -110,8 +114,10 @@ class ThrottleRule
      * Sets the current mapping of attempts (int) to delays (seconds).
      *
      * @param int[] $delays A mapping of minimum observation counts (x) to delays (y), in seconds.
+     *
+     * @return static
      */
-    public function setDelays($delays)
+    public function setDelays(array $delays): static
     {
         // Sort the array by key, from highest to lowest value
         $this->delays = $delays;
@@ -124,8 +130,10 @@ class ThrottleRule
      * Sets the current throttling interval (seconds).
      *
      * @param int $interval The amount of time, in seconds, to look back in determining attempts to consider.
+     *
+     * @return static
      */
-    public function setInterval($interval)
+    public function setInterval(int $interval): static
     {
         $this->interval = $interval;
 
@@ -136,8 +144,10 @@ class ThrottleRule
      * Sets the current throttling method ('ip' or 'data').
      *
      * @param string $method Set to 'ip' for ip-based throttling, 'data' for request-data-based throttling.
+     *
+     * @return static
      */
-    public function setMethod($method)
+    public function setMethod(string $method): static
     {
         $this->method = $method;
 
