@@ -11,27 +11,24 @@
 namespace UserFrosting\Sprinkle\Core\Mail;
 
 use Monolog\Logger;
-use PHPMailer\PHPMailer\Exception as phpmailerException;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use PHPMailer\PHPMailer\PHPMailer;
 
 /**
  * Mailer Class.
- *
  * A basic wrapper for sending template-based emails.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class Mailer
 {
     /**
      * @var Logger
      */
-    protected $logger;
+    protected Logger $logger;
 
     /**
-     * @var \PHPMailer
+     * @var PHPMailer
      */
-    protected $phpMailer;
+    protected PHPMailer $phpMailer;
 
     /**
      * Create a new Mailer instance.
@@ -39,9 +36,9 @@ class Mailer
      * @param Logger  $logger A Monolog logger, used to dump debugging info for SMTP server transactions.
      * @param mixed[] $config An array of configuration parameters for phpMailer.
      *
-     * @throws phpmailerException Wrong mailer config value given.
+     * @throws PHPMailerException Wrong mailer config value given.
      */
-    public function __construct($logger, $config = [])
+    public function __construct(Logger $logger, array $config = [])
     {
         $this->logger = $logger;
 
@@ -81,7 +78,7 @@ class Mailer
                 }
                 break;
             default:
-                throw new phpmailerException("'mailer' must be one of 'smtp', 'mail', 'qmail', or 'sendmail'.");
+                throw new PHPMailerException("'mailer' must be one of 'smtp', 'mail', 'qmail', or 'sendmail'.");
         }
 
         // Set any additional message-specific options
@@ -101,7 +98,7 @@ class Mailer
      *
      * @return PHPMailer
      */
-    public function getPhpMailer()
+    public function getPhpMailer(): PHPMailer
     {
         return $this->phpMailer;
     }
@@ -115,9 +112,9 @@ class Mailer
      * @param MailMessage $message
      * @param bool        $clearRecipients Set to true to clear the list of recipients in the message after calling send().  This helps avoid accidentally sending a message multiple times.
      *
-     * @throws phpmailerException The message could not be sent.
+     * @throws PHPMailerException The message could not be sent.
      */
-    public function send(MailMessage $message, $clearRecipients = true)
+    public function send(MailMessage $message, bool $clearRecipients = true): void
     {
         $this->phpMailer->From = $message->getFromEmail();
         $this->phpMailer->FromName = $message->getFromName();
@@ -165,9 +162,9 @@ class Mailer
      * @param MailMessage $message
      * @param bool        $clearRecipients Set to true to clear the list of recipients in the message after calling send().  This helps avoid accidentally sending a message multiple times.
      *
-     * @throws phpmailerException The message could not be sent.
+     * @throws PHPMailerException The message could not be sent.
      */
-    public function sendDistinct(MailMessage $message, $clearRecipients = true)
+    public function sendDistinct(MailMessage $message, bool $clearRecipients = true): void
     {
         $this->phpMailer->From = $message->getFromEmail();
         $this->phpMailer->FromName = $message->getFromName();
@@ -212,9 +209,9 @@ class Mailer
      *
      * @param mixed[] $options
      *
-     * @return Mailer
+     * @return static
      */
-    public function setOptions($options)
+    public function setOptions(array $options): static
     {
         if (isset($options['isHtml'])) {
             $this->phpMailer->isHTML($options['isHtml']);

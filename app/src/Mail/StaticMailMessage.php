@@ -11,40 +11,26 @@
 namespace UserFrosting\Sprinkle\Core\Mail;
 
 /**
- * StaticMailMessage Class.
- *
  * Represents a basic mail message, containing a static subject and body.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
-class StaticMailMessage extends MailMessage
+final class StaticMailMessage extends AbstractMailMessage implements MailMessage
 {
-    /**
-     * @var string The default body for this message.
-     */
-    protected $body;
-
-    /**
-     * @var string The default subject for this message.
-     */
-    protected $subject;
-
     /**
      * Create a new MailMessage instance.
      *
-     * @param string $subject
-     * @param string $body
+     * @param string $subject The body for this message.
+     * @param string $body    The subject for this message.
      */
-    public function __construct($subject = '', $body = '')
-    {
-        $this->subject = $subject;
-        $this->body = $body;
+    public function __construct(
+        protected string $subject = '',
+        protected string $body = '',
+    ) {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function renderBody($params = [])
+    public function renderBody(array $params = []): string
     {
         return $this->body;
     }
@@ -52,7 +38,7 @@ class StaticMailMessage extends MailMessage
     /**
      * {@inheritdoc}
      */
-    public function renderSubject($params = [])
+    public function renderSubject(array $params = []): string
     {
         return $this->subject;
     }
@@ -61,8 +47,10 @@ class StaticMailMessage extends MailMessage
      * Set the text of the message subject.
      *
      * @param string $subject
+     *
+     * @return static
      */
-    public function setSubject($subject)
+    public function setSubject(string $subject): static
     {
         $this->subject = $subject;
 
@@ -74,7 +62,7 @@ class StaticMailMessage extends MailMessage
      *
      * @param string $body
      */
-    public function setBody($body)
+    public function setBody(string $body): static
     {
         $this->body = $body;
 

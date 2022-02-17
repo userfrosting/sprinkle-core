@@ -11,51 +11,32 @@
 namespace UserFrosting\Sprinkle\Core\Mail;
 
 /**
- * EmailRecipient Class.
- *
- * A class representing a recipient for a MailMessage, with associated parameters.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
+ * A class representing a recipient for a EmailRecipient.
  */
 class EmailRecipient
 {
     /**
-     * @var string The email address for this recipient.
+     * @var string[][] A list of CCs for this recipient.  Each CC is an associative array with `email` and `name` properties.
      */
-    protected $email;
+    protected array $cc = [];
 
     /**
-     * @var string The name for this recipient.
+     * @var string[][] A list of BCCs for this recipient.  Each BCC is an associative array with `email` and `name` properties.
      */
-    protected $name;
-
-    /**
-     * @var array Any additional parameters (name => value) to use when rendering an email template for this recipient.
-     */
-    protected $params = [];
-
-    /**
-     * @var array A list of CCs for this recipient.  Each CC is an associative array with `email` and `name` properties.
-     */
-    protected $cc = [];
-
-    /**
-     * @var array A list of BCCs for this recipient.  Each BCC is an associative array with `email` and `name` properties.
-     */
-    protected $bcc = [];
+    protected array $bcc = [];
 
     /**
      * Create a new EmailRecipient instance.
      *
-     * @param string $email  The primary recipient email address.
-     * @param string $name   The primary recipient name.
-     * @param array  $params An array of template parameters to render the email message with for this particular recipient.
+     * @param string  $email  The email address for this recipient.
+     * @param string  $name   The name for this recipient.
+     * @param mixed[] $params An array of template parameters (name => value) to render the email message with for this particular recipient.
      */
-    public function __construct($email, $name = '', $params = [])
-    {
-        $this->email = $email;
-        $this->name = $name;
-        $this->params = $params;
+    public function __construct(
+        protected string $email,
+        protected string $name = '',
+        protected array $params = []
+    ) {
     }
 
     /**
@@ -64,12 +45,14 @@ class EmailRecipient
      * @param string $email The CC recipient email address.
      * @param string $name  The CC recipient name.
      */
-    public function cc($email, $name = '')
+    public function cc(string $email, string $name = ''): static
     {
         $this->cc[] = [
             'email' => $email,
             'name'  => $name,
         ];
+
+        return $this;
     }
 
     /**
@@ -78,12 +61,14 @@ class EmailRecipient
      * @param string $email The BCC recipient email address.
      * @param string $name  The BCC recipient name.
      */
-    public function bcc($email, $name = '')
+    public function bcc(string $email, string $name = ''): static
     {
         $this->bcc[] = [
             'email' => $email,
             'name'  => $name,
         ];
+
+        return $this;
     }
 
     /**
@@ -91,7 +76,7 @@ class EmailRecipient
      *
      * @return string the primary recipient email address.
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -101,7 +86,7 @@ class EmailRecipient
      *
      * @return string the primary recipient name.
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -109,9 +94,9 @@ class EmailRecipient
     /**
      * Get the parameters to use when rendering the template this recipient.
      *
-     * @return array The parameters (name => value) to use when rendering an email template for this recipient.
+     * @return mixed[] The parameters (name => value) to use when rendering an email template for this recipient.
      */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -119,9 +104,9 @@ class EmailRecipient
     /**
      * Get the list of CCs for this recipient.
      *
-     * @return array A list of CCs for this recipient.  Each CC is an associative array with `email` and `name` properties.
+     * @return string[][] A list of CCs for this recipient.  Each CC is an associative array with `email` and `name` properties.
      */
-    public function getCCs()
+    public function getCCs(): array
     {
         return $this->cc;
     }
@@ -129,9 +114,9 @@ class EmailRecipient
     /**
      * Get the list of BCCs for this recipient.
      *
-     * @return array A list of BCCs for this recipient.  Each BCC is an associative array with `email` and `name` properties.
+     * @return string[][] A list of BCCs for this recipient.  Each BCC is an associative array with `email` and `name` properties.
      */
-    public function getBCCs()
+    public function getBCCs(): array
     {
         return $this->bcc;
     }
