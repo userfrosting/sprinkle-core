@@ -33,58 +33,33 @@ class Mailer
     /**
      * Create a new Mailer instance.
      *
-     * @param Logger  $logger A Monolog logger, used to dump debugging info for SMTP server transactions.
-     * @param mixed[] $config An array of configuration parameters for phpMailer.
+     * @param Logger         $logger    A Monolog logger, used to dump debugging info for SMTP server transactions.
+     * @param mixed[]        $config    An array of configuration parameters for phpMailer.
+     * @param PHPMailer|null $phpMailer Instance of phpMailer. Set to null to instantiate it.
      *
      * @throws PHPMailerException Wrong mailer config value given.
      */
-    public function __construct(Logger $logger, array $config = [])
+    public function __construct(Logger $logger, array $config = [], ?PHPMailer $phpMailer = null)
     {
         $this->logger = $logger;
 
         // 'true' tells PHPMailer to use exceptions instead of error codes
-        $this->phpMailer = new PHPMailer(true);
+        $this->phpMailer = $phpMailer ?? new PHPMailer(true);
 
         // Configuration options
-        switch ($config['mailer']) {
-            case 'mail':
-                $this->phpMailer->isMail();
-                break;
-            case 'qmail':
-                $this->phpMailer->isQmail();
-                break;
-            case 'sendmail':
-                $this->phpMailer->isSendmail();
-                break;
-            case 'smtp':
-                $this->phpMailer->isSMTP(true);
-                $this->phpMailer->Host = $config['host'];
-                $this->phpMailer->Port = $config['port'];
-                $this->phpMailer->SMTPAuth = $config['auth'];
-                $this->phpMailer->SMTPSecure = $config['secure'];
-                $this->phpMailer->Username = $config['username'];
-                $this->phpMailer->Password = $config['password'];
-                $this->phpMailer->SMTPDebug = $config['smtp_debug'];
-
-                // Disable opportunistic encryption if secure is unset. This is
-                // required if you have an incorrect or invalid SSL Certificate on
-                // your SMTP host, but the server offers STARTTLS.
-                if (!$config['secure']) {
-                    $this->phpMailer->SMTPAutoTLS = false;
-                }
-
-                if (isset($config['smtp_options'])) {
-                    $this->phpMailer->SMTPOptions = $config['smtp_options'];
-                }
-                break;
-            default:
-                throw new PHPMailerException("'mailer' must be one of 'smtp', 'mail', 'qmail', or 'sendmail'.");
-        }
+        $mailer = $config['mailer'] ?? '';
+        match ($mailer) {
+            'mail'     => $this->phpMailer->isMail(),
+            'qmail'    => $this->phpMailer->isQmail(),
+            'sendmail' => $this->phpMailer->isSendmail(),
+            'smtp'     => $this->setupSmtp($config),
+            default    => throw new PHPMailerException("'mailer' must be one of 'smtp', 'mail', 'qmail', or 'sendmail'."),
+        };
 
         // Set any additional message-specific options
         // TODO: enforce which options can be set through this subarray
         if (isset($config['message_options'])) {
-            $this->setOptions($config['message_options']);
+            $this->setOptions((array) $config['message_options']);
         }
 
         // Pass logger into phpMailer object
@@ -125,16 +100,11 @@ class Mailer
             $this->phpMailer->addAddress($recipient->getEmail(), $recipient->getName());
 
             // Add any CCs and BCCs
-            if ($recipient->getCCs()) {
-                foreach ($recipient->getCCs() as $cc) {
-                    $this->phpMailer->addCC($cc['email'], $cc['name']);
-                }
+            foreach ($recipient->getCCs() as $cc) {
+                $this->phpMailer->addCC($cc['email'], $cc['name']);
             }
-
-            if ($recipient->getBCCs()) {
-                foreach ($recipient->getBCCs() as $bcc) {
-                    $this->phpMailer->addBCC($bcc['email'], $bcc['name']);
-                }
+            foreach ($recipient->getBCCs() as $bcc) {
+                $this->phpMailer->addBCC($bcc['email'], $bcc['name']);
             }
         }
 
@@ -175,16 +145,11 @@ class Mailer
             $this->phpMailer->addAddress($recipient->getEmail(), $recipient->getName());
 
             // Add any CCs and BCCs
-            if ($recipient->getCCs()) {
-                foreach ($recipient->getCCs() as $cc) {
-                    $this->phpMailer->addCC($cc['email'], $cc['name']);
-                }
+            foreach ($recipient->getCCs() as $cc) {
+                $this->phpMailer->addCC($cc['email'], $cc['name']);
             }
-
-            if ($recipient->getBCCs()) {
-                foreach ($recipient->getBCCs() as $bcc) {
-                    $this->phpMailer->addBCC($bcc['email'], $bcc['name']);
-                }
+            foreach ($recipient->getBCCs() as $bcc) {
+                $this->phpMailer->addBCC($bcc['email'], $bcc['name']);
             }
 
             $this->phpMailer->Subject = $message->renderSubject($recipient->getParams());
@@ -214,7 +179,7 @@ class Mailer
     public function setOptions(array $options): static
     {
         if (isset($options['isHtml'])) {
-            $this->phpMailer->isHTML($options['isHtml']);
+            $this->phpMailer->isHTML((bool) $options['isHtml']);
         }
 
         foreach ($options as $name => $value) {
@@ -222,5 +187,33 @@ class Mailer
         }
 
         return $this;
+    }
+
+    /**
+     * Setup SMTP config.
+     *
+     * @param mixed[] $config
+     */
+    protected function setupSmtp(array $config): void
+    {
+        $this->phpMailer->isSMTP();
+        $this->phpMailer->Host = strval($config['host']);
+        $this->phpMailer->Port = intval($config['port']);
+        $this->phpMailer->SMTPAuth = (bool) $config['auth'];
+        $this->phpMailer->SMTPSecure = strval($config['secure']);
+        $this->phpMailer->Username = strval($config['username']);
+        $this->phpMailer->Password = strval($config['password']);
+        $this->phpMailer->SMTPDebug = intval($config['smtp_debug']);
+
+        // Disable opportunistic encryption if secure is unset. This is
+        // required if you have an incorrect or invalid SSL Certificate on
+        // your SMTP host, but the server offers STARTTLS.
+        if ($config['secure'] !== true) {
+            $this->phpMailer->SMTPAutoTLS = false;
+        }
+
+        if (isset($config['smtp_options'])) {
+            $this->phpMailer->SMTPOptions = (array) $config['smtp_options'];
+        }
     }
 }
