@@ -146,7 +146,7 @@ abstract class AbstractMailMessage implements MailMessage
     /**
      * {@inheritDoc}
      */
-    public function setReplyName(?string $replyName):static
+    public function setReplyName(?string $replyName): static
     {
         $this->replyName = $replyName;
 
