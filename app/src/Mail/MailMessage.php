@@ -129,5 +129,5 @@ interface MailMessage
      *
      * @return static
      */
-    public function setReplyName(?string $replyName):static;
+    public function setReplyName(?string $replyName): static;
 }
