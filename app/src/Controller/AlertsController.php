@@ -29,7 +29,7 @@ class AlertsController
      */
     public function __invoke(Response $response, AlertStream $alerts): Response
     {
-        $payload = json_encode($alerts->getAndClearMessages());
+        $payload = json_encode($alerts->getAndClearMessages(), JSON_THROW_ON_ERROR);
         $response->getBody()->write($payload);
 
         return $response

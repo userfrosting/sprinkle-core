@@ -74,23 +74,23 @@ final class HtmlRenderer implements ErrorRendererInterface
     {
         $html = sprintf('<div><strong>Type:</strong> %s</div>', get_class($exception));
 
-        if (($code = $exception->getCode())) {
+        if (($code = $exception->getCode()) == true) {
             $html .= sprintf('<div><strong>Code:</strong> %s</div>', $code);
         }
 
-        if (($message = $exception->getMessage())) {
+        if (($message = $exception->getMessage()) == true) {
             $html .= sprintf('<div><strong>Message:</strong> %s</div>', htmlentities($message));
         }
 
-        if (($file = $exception->getFile())) {
+        if (($file = $exception->getFile()) == true) {
             $html .= sprintf('<div><strong>File:</strong> %s</div>', $file);
         }
 
-        if (($line = $exception->getLine())) {
+        if (($line = $exception->getLine()) == true) {
             $html .= sprintf('<div><strong>Line:</strong> %s</div>', $line);
         }
 
-        if (($trace = $exception->getTraceAsString())) {
+        if (($trace = $exception->getTraceAsString()) == true) {
             $html .= '<h2>Trace</h2>';
             $html .= sprintf('<pre>%s</pre>', htmlentities($trace));
         }

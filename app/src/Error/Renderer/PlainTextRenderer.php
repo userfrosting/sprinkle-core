@@ -67,19 +67,19 @@ final class PlainTextRenderer implements ErrorRendererInterface
     {
         $text = sprintf('Type: %s' . PHP_EOL, get_class($e));
 
-        if ($code = $e->getCode()) {
+        if (($code = $e->getCode()) == true) {
             $text .= sprintf('Code: %s' . PHP_EOL, $code);
         }
-        if ($message = $e->getMessage()) {
+        if (($message = $e->getMessage()) == true) {
             $text .= sprintf('Message: %s' . PHP_EOL, htmlentities($message));
         }
-        if ($file = $e->getFile()) {
+        if (($file = $e->getFile()) == true) {
             $text .= sprintf('File: %s' . PHP_EOL, $file);
         }
-        if ($line = $e->getLine()) {
+        if (($line = $e->getLine()) == true) {
             $text .= sprintf('Line: %s' . PHP_EOL, $line);
         }
-        if ($trace = $e->getTraceAsString()) {
+        if (($trace = $e->getTraceAsString()) == true) {
             $text .= sprintf('Trace: %s', $trace);
         }
 
