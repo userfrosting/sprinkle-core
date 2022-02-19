@@ -10,24 +10,21 @@
 
 namespace UserFrosting\Sprinkle\Core\Error\Handler;
 
-use UserFrosting\Support\Message\UserMessage;
+use Throwable;
+use UserFrosting\Sprinkle\Core\Util\Message\Message;
 
 /**
  * Handler for phpMailer exceptions.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
-class PhpMailerExceptionHandler extends ExceptionHandler
+final class PhpMailerExceptionHandler extends ExceptionHandler
 {
     /**
-     * Resolve a list of error messages to present to the end user.
-     *
-     * @return array
+     * {@inheritDoc}
      */
-    protected function determineUserMessage()
+    protected function determineUserMessage(Throwable $exception, int $statusCode): Message
     {
-        return [
-            new UserMessage('ERROR.MAIL'),
-        ];
+        return new Message(
+            $this->translateUserMessage('ERROR.MAIL')
+        );
     }
 }
