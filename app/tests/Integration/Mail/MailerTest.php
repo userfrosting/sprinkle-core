@@ -96,8 +96,15 @@ class MailerTest extends TestCase
         $message->setFromEmail('test@test.com')
                 ->setReplyEmail('test@test.com')
                 ->addEmailRecipient($recipient);
-
+        $this->assertNotSame([], $message->getRecipients());
         $mailer->send($message, true);
+
+        // Test clearRecipients
+        $this->assertSame([], $message->getRecipients());
+
+        // Test for https://github.com/userfrosting/UserFrosting/issues/1200
+        $phpMailerInstance = $mailer->getPhpMailer();
+        $this->assertSame([], $phpMailerInstance->getReplyToAddresses());
     }
 
     public function testMailAndDistinct(): void
@@ -124,8 +131,11 @@ class MailerTest extends TestCase
                 ->setReplyEmail('test@test.com')
                 ->addEmailRecipient($recipient1)
                 ->addEmailRecipient($recipient2);
-
+        $this->assertNotSame([], $message->getRecipients());
         $mailer->sendDistinct($message, true);
+
+        // Test clearRecipients
+        $this->assertSame([], $message->getRecipients());
     }
 
     public function testQMail(): void
@@ -144,11 +154,17 @@ class MailerTest extends TestCase
         $mailer = new Mailer($logger, $config, $phpMailer);
 
         // Create message
+        $recipient = new EmailRecipient('user1@test.com');
         $message = new StaticMailMessage('subject', 'body');
         $message->setFromEmail('test@test.com')
+                ->addEmailRecipient($recipient)
                 ->setReplyEmail('test@test.com');
+        $this->assertNotSame([], $message->getRecipients());
 
-        $mailer->send($message, true);
+        $mailer->send($message, false);
+
+        // Test clearRecipients
+        $this->assertNotSame([], $message->getRecipients());
     }
 
     public function testSendmail(): void

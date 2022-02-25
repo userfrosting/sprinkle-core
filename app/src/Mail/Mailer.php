@@ -91,32 +91,35 @@ class Mailer
      */
     public function send(MailMessage $message, bool $clearRecipients = true): void
     {
-        $this->phpMailer->From = $message->getFromEmail();
-        $this->phpMailer->FromName = $message->getFromName();
-        $this->phpMailer->addReplyTo($message->getReplyEmail(), $message->getReplyName());
+        // Clone phpMailer so we don't have to reset it after sending.
+        $phpMailer = clone $this->phpMailer;
+
+        $phpMailer->From = $message->getFromEmail();
+        $phpMailer->FromName = $message->getFromName();
+        $phpMailer->addReplyTo($message->getReplyEmail(), $message->getReplyName());
 
         // Add all email recipients, as well as their CCs and BCCs
         foreach ($message->getRecipients() as $recipient) {
-            $this->phpMailer->addAddress($recipient->getEmail(), $recipient->getName());
+            $phpMailer->addAddress($recipient->getEmail(), $recipient->getName());
 
             // Add any CCs and BCCs
             foreach ($recipient->getCCs() as $cc) {
-                $this->phpMailer->addCC($cc['email'], $cc['name']);
+                $phpMailer->addCC($cc['email'], $cc['name']);
             }
             foreach ($recipient->getBCCs() as $bcc) {
-                $this->phpMailer->addBCC($bcc['email'], $bcc['name']);
+                $phpMailer->addBCC($bcc['email'], $bcc['name']);
             }
         }
 
-        $this->phpMailer->Subject = $message->renderSubject();
-        $this->phpMailer->Body = $message->renderBody();
+        $phpMailer->Subject = $message->renderSubject();
+        $phpMailer->Body = $message->renderBody();
 
         // Try to send the mail.  Will throw an exception on failure.
-        $this->phpMailer->send();
+        $phpMailer->send();
 
         // Clear recipients from the PHPMailer object for this iteration,
         // so that we can use the same object for other emails.
-        $this->phpMailer->clearAllRecipients();
+        $phpMailer->clearAllRecipients();
 
         // Clear out the MailMessage's internal recipient list
         if ($clearRecipients) {
@@ -136,31 +139,34 @@ class Mailer
      */
     public function sendDistinct(MailMessage $message, bool $clearRecipients = true): void
     {
-        $this->phpMailer->From = $message->getFromEmail();
-        $this->phpMailer->FromName = $message->getFromName();
-        $this->phpMailer->addReplyTo($message->getReplyEmail(), $message->getReplyName());
+        // Clone phpMailer so we don't have to reset it after sending.
+        $phpMailer = clone $this->phpMailer;
+
+        $phpMailer->From = $message->getFromEmail();
+        $phpMailer->FromName = $message->getFromName();
+        $phpMailer->addReplyTo($message->getReplyEmail(), $message->getReplyName());
 
         // Loop through email recipients, sending customized content to each one
         foreach ($message->getRecipients() as $recipient) {
-            $this->phpMailer->addAddress($recipient->getEmail(), $recipient->getName());
+            $phpMailer->addAddress($recipient->getEmail(), $recipient->getName());
 
             // Add any CCs and BCCs
             foreach ($recipient->getCCs() as $cc) {
-                $this->phpMailer->addCC($cc['email'], $cc['name']);
+                $phpMailer->addCC($cc['email'], $cc['name']);
             }
             foreach ($recipient->getBCCs() as $bcc) {
-                $this->phpMailer->addBCC($bcc['email'], $bcc['name']);
+                $phpMailer->addBCC($bcc['email'], $bcc['name']);
             }
 
-            $this->phpMailer->Subject = $message->renderSubject($recipient->getParams());
-            $this->phpMailer->Body = $message->renderBody($recipient->getParams());
+            $phpMailer->Subject = $message->renderSubject($recipient->getParams());
+            $phpMailer->Body = $message->renderBody($recipient->getParams());
 
             // Try to send the mail.  Will throw an exception on failure.
-            $this->phpMailer->send();
+            $phpMailer->send();
 
             // Clear recipients from the PHPMailer object for this iteration,
             // so that we can send a separate email to the next recipient.
-            $this->phpMailer->clearAllRecipients();
+            $phpMailer->clearAllRecipients();
         }
 
         // Clear out the MailMessage's internal recipient list
