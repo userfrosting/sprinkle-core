@@ -26,12 +26,6 @@ class MailService implements ServicesProviderInterface
             Mailer::class => function (Config $config, MailLogger $logger) {
                 $mailer = new Mailer($logger, $config->get('mail'));
 
-                // Use UF debug settings to override any service-specific log settings.
-                // TODO : Should probably be done in Mailer ?
-                if (!$config->get('debug.smtp')) {
-                    $mailer->getPhpMailer()->SMTPDebug = 0;
-                }
-
                 return $mailer;
             },
         ];

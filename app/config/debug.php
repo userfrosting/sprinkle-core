@@ -18,7 +18,6 @@ return [
     'debug' => [
         'deprecation'   => true,
         'queries'       => true,
-        'smtp'          => true,
         'twig'          => true,
         'exception'     => true,
     ],

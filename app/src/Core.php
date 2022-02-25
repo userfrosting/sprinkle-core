@@ -166,7 +166,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
             I18nService::class,
             LocatorService::class,
             LoggersService::class,
-            // MailService::class,
+            MailService::class,
             MigratorService::class,
             RoutingService::class,
             SeedService::class,

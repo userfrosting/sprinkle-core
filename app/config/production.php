@@ -30,7 +30,6 @@ return [
     'debug' => [
         'twig'      => false,
         'auth'      => false,
-        'smtp'      => false,
         'exception' => false,
     ],
     /*

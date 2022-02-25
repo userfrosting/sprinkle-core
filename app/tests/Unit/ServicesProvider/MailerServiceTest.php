@@ -27,34 +27,16 @@ class MailerServiceTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    public function testService()
+    public function testService(): void
     {
         // Create container with provider to test
         $provider = new MailService();
         $ci = ContainerStub::create($provider->register());
 
-        // TODO : We test the service implementation here. This shouldn't be necessary.
-        $mailConfig = [
-            'mailer'          => 'smtp',
-            'host'            => 'localhost',
-            'port'            => 587,
-            'auth'            => true,
-            'secure'          => 'tls',
-            'username'        => '',
-            'password'        => '',
-            'smtp_debug'      => 4,
-            'message_options' => [
-                'CharSet'   => 'UTF-8',
-                'isHtml'    => true,
-                'Timeout'   => 15,
-            ],
-        ];
-
         // Set dependencies services
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('mail')->andReturn($mailConfig)
-            ->shouldReceive('get')->with('debug.smtp')->andReturn(false)
-            ->getMock(); // TODO : Test true...
+            ->shouldReceive('get')->with('mail')->andReturn(['mailer' => 'sendmail'])->once()
+            ->getMock();
         $ci->set(Config::class, $config);
 
         // Set dependencies services
