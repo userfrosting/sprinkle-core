@@ -17,7 +17,6 @@ use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Log\DebugLogger;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
 use UserFrosting\Sprinkle\Core\Log\MailLogger;
-use UserFrosting\Sprinkle\Core\Log\MixedFormatter;
 use UserFrosting\Sprinkle\Core\Log\QueryLogger;
 use UserFrosting\Support\Repository\Repository as Config;
 
@@ -33,7 +32,8 @@ class LoggersService implements ServicesProviderInterface
             *
             * @return \Monolog\Logger
             */
-            DebugLogger::class => function (StreamHandler $handler, MixedFormatter $formatter) {
+            DebugLogger::class => function (StreamHandler $handler, LineFormatter $formatter) {
+                $formatter->setJsonPrettyPrint(true);
                 $handler->setFormatter($formatter);
 
                 $logger = new DebugLogger('debug');
@@ -83,7 +83,8 @@ class LoggersService implements ServicesProviderInterface
              *
              * @return \Monolog\Logger
              */
-            QueryLogger::class => function (StreamHandler $handler, MixedFormatter $formatter) {
+            QueryLogger::class => function (StreamHandler $handler, LineFormatter $formatter) {
+                $formatter->setJsonPrettyPrint(true);
                 $handler->setFormatter($formatter);
 
                 $logger = new QueryLogger('query');
@@ -94,7 +95,6 @@ class LoggersService implements ServicesProviderInterface
 
             // Define formatter with `allowInlineLineBreaks` by default
             LineFormatter::class  => \DI\create()->constructor(null, null, true),
-            MixedFormatter::class => \DI\create()->constructor(null, null, true),
 
             // Define common StreamHandler with .
             StreamHandler::class => function (Config $config) {
