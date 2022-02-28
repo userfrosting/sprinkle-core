@@ -25,7 +25,7 @@ final class ValidationException extends Exception implements UserMessageExceptio
     protected array $errors = [];
 
     /**
-     * Add errors returned by Valitron/Validator
+     * Add errors returned by Valitron/Validator.
      *
      * @param string[][] $errors
      *
