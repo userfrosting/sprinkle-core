@@ -13,10 +13,10 @@ namespace UserFrosting\Sprinkle\Core\Tests\Unit\ServicesProvider;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Log\MailLogger;
 use UserFrosting\Sprinkle\Core\Mail\Mailer;
 use UserFrosting\Sprinkle\Core\ServicesProvider\MailService;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 
 /**

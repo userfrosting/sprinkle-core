@@ -12,8 +12,8 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleInfoCommand;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceLocator;

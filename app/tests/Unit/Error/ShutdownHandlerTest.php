@@ -16,8 +16,8 @@ use phpmock\mockery\PHPMockery;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Error\ShutdownHandler;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\CustomAssertionsTrait;
 
 /**

@@ -14,8 +14,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Config\Config;
 use UserFrosting\Support\DotenvEditor\DotenvEditor;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * SMTP Setup Wizard CLI Tools.

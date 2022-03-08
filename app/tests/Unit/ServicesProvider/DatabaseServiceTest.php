@@ -15,10 +15,10 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Listeners\LogExecutedQuery;
 use UserFrosting\Sprinkle\Core\Log\QueryLogger;
 use UserFrosting\Sprinkle\Core\ServicesProvider\DatabaseService;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 
 /**

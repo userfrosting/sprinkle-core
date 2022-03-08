@@ -12,8 +12,8 @@ namespace UserFrosting\Sprinkle\Core\I18n;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use UserFrosting\Config\Config;
 use UserFrosting\I18n\Locale;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Helper methods for the locale system.

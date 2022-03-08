@@ -10,10 +10,10 @@
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
+use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Log\MailLogger;
 use UserFrosting\Sprinkle\Core\Mail\Mailer;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /*
  * Mail service.

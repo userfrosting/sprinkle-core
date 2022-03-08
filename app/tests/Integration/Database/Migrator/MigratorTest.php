@@ -12,12 +12,12 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Core;
 use UserFrosting\Sprinkle\Core\Database\Migration;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\TestCase;
 
 /**

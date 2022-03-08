@@ -18,8 +18,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Seeder\SeedRepositoryInterface;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * seed Bakery Command

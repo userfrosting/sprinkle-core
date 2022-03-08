@@ -16,10 +16,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * migrate:refresh Bakery Command.

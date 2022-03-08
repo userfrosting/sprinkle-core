@@ -13,12 +13,12 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Session;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Session\DatabaseSessionHandler;
+use UserFrosting\Config\Config;
 use UserFrosting\Session\Session;
 use UserFrosting\Sprinkle\Core\Database\Models\Session as SessionTable;
 use UserFrosting\Sprinkle\Core\Testing\RefreshDatabase;
 use UserFrosting\Sprinkle\Core\Testing\withDatabaseSessionHandler;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Integration tests for the session service.

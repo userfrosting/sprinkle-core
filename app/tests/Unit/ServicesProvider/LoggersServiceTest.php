@@ -16,12 +16,12 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Log\DebugLogger;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
 use UserFrosting\Sprinkle\Core\Log\MailLogger;
 use UserFrosting\Sprinkle\Core\Log\QueryLogger;
 use UserFrosting\Sprinkle\Core\ServicesProvider\LoggersService;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 
 /**

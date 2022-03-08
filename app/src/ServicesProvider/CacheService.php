@@ -16,9 +16,9 @@ use Psr\Container\ContainerInterface;
 use UserFrosting\Cache\MemcachedStore;
 use UserFrosting\Cache\RedisStore;
 use UserFrosting\Cache\TaggableFileStore;
+use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**

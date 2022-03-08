@@ -18,9 +18,9 @@ use PHPUnit\Framework\TestCase;
 use UserFrosting\Cache\MemcachedStore;
 use UserFrosting\Cache\RedisStore;
 use UserFrosting\Cache\TaggableFileStore;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 

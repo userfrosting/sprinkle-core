@@ -12,12 +12,12 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
+use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Database\Models\Interfaces\ThrottleModelInterface;
 use UserFrosting\Sprinkle\Core\Database\Models\Throttle;
 use UserFrosting\Sprinkle\Core\Throttle\Throttler;
 use UserFrosting\Sprinkle\Core\Throttle\ThrottleRule;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Request throttler.

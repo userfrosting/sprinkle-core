@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Error;
 
+use UserFrosting\Config\Config;
 use UserFrosting\Event\AppInitiatedEvent;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Register the ShutdownHandler.

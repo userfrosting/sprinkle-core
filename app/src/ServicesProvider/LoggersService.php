@@ -13,12 +13,12 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Log\DebugLogger;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
 use UserFrosting\Sprinkle\Core\Log\MailLogger;
 use UserFrosting\Sprinkle\Core\Log\QueryLogger;
-use UserFrosting\Support\Repository\Repository as Config;
 
 class LoggersService implements ServicesProviderInterface
 {

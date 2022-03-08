@@ -14,8 +14,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Csrf\Guard;
 use Slim\Exception\HttpBadRequestException;
+use UserFrosting\Config\Config;
 use UserFrosting\Session\Session;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Slim Csrf Provider Class.

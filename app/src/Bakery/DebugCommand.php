@@ -15,6 +15,7 @@ use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\DatabaseTest;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
 use UserFrosting\Sprinkle\Core\Validators\NodeVersionValidator;
@@ -22,7 +23,6 @@ use UserFrosting\Sprinkle\Core\Validators\NpmVersionValidator;
 use UserFrosting\Sprinkle\Core\Validators\PhpDeprecationValidator;
 use UserFrosting\Sprinkle\Core\Validators\PhpVersionValidator;
 use UserFrosting\Sprinkle\SprinkleManager;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Debug CLI tool.

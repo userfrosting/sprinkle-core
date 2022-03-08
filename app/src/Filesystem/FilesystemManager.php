@@ -13,7 +13,7 @@ namespace UserFrosting\Sprinkle\Core\Filesystem;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager as LaravelFilesystemManager;
 use League\Flysystem\FilesystemInterface;
-use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\Config\Config;
 
 /**
  * Filesystem disk manager service.

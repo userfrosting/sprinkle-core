@@ -15,9 +15,9 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Events\Dispatcher;
+use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Listeners\LogExecutedQuery;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /*
  * Initialize Eloquent Capsule, which provides the database layer for UF.

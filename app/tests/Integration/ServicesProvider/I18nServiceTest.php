@@ -10,9 +10,9 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
+use UserFrosting\Config\Config;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Tests AccountController

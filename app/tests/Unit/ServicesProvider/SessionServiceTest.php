@@ -20,10 +20,10 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use SessionHandlerInterface;
+use UserFrosting\Config\Config;
 use UserFrosting\Session\Session;
 use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
 use UserFrosting\Sprinkle\Core\ServicesProvider\SessionService;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 

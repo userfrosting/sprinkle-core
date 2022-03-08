@@ -11,12 +11,12 @@
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
+use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationRepositoryInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\SprinkleMigrationLocator;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /*
  * Migrator service.

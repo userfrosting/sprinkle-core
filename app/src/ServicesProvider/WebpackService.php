@@ -14,8 +14,8 @@ use Lcharette\WebpackEncoreTwig\JsonManifest;
 use Lcharette\WebpackEncoreTwig\JsonManifestInterface;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
+use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
-use UserFrosting\Support\Repository\Repository as Config;
 
 class WebpackService implements ServicesProviderInterface
 {

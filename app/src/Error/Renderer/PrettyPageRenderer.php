@@ -16,9 +16,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views\Twig;
 use Throwable;
 use Twig\Error\LoaderError;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Exceptions\Contracts\TwigRenderedException;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
-use UserFrosting\Support\Repository\Repository as Config;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 

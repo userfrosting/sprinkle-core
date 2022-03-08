@@ -19,6 +19,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Slim\Exception\HttpException;
 use Slim\Psr7\Factory\ResponseFactory;
+use UserFrosting\Config\Config;
 use UserFrosting\I18n\DictionaryInterface;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\Error\Handler\ExceptionHandler;
@@ -27,7 +28,6 @@ use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
 use UserFrosting\Sprinkle\Core\Tests\Unit\Error\TestException;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * ExceptionHandler Test

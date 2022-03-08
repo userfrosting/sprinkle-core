@@ -17,11 +17,11 @@ use PHPUnit\Framework\TestCase;
 use Slim\Psr7\Request;
 use Slim\Views\Twig;
 use Twig\Error\LoaderError;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
 use UserFrosting\Sprinkle\Core\Exceptions\Contracts\TwigRenderedException;
 use UserFrosting\Sprinkle\Core\Tests\Unit\Error\TestException;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
-use UserFrosting\Support\Repository\Repository as Config;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 

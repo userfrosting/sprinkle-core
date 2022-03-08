@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Error;
 
 use Psr\Http\Message\ServerRequestInterface;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Util\DeterminesContentTypeTrait;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Registers a handler to be invoked whenever the application shuts down.

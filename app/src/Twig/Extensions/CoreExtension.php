@@ -13,8 +13,8 @@ namespace UserFrosting\Sprinkle\Core\Twig\Extensions;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 use Twig\TwigFilter;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Util\Util;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Test Twig functionality from CoreExtension.

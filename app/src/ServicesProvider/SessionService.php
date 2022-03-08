@@ -18,10 +18,10 @@ use Illuminate\Session\FileSessionHandler;
 use Illuminate\Session\NullSessionHandler;
 use Psr\Container\ContainerInterface;
 use SessionHandlerInterface;
+use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Session\Session;
 use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**

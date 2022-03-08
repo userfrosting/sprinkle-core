@@ -14,10 +14,10 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Bakery\SeedCommand;
 use UserFrosting\Sprinkle\Core\Seeder\SeedInterface;
 use UserFrosting\Sprinkle\Core\Seeder\SeedRepositoryInterface;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;
 

@@ -19,13 +19,13 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Slim\Psr7\Factory\ResponseFactory;
+use UserFrosting\Config\Config;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\Error\Handler\PhpMailerExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PlainTextRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * PhpMailerExceptionHandler Test

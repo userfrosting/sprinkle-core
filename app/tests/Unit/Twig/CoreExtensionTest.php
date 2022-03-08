@@ -14,9 +14,9 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use Slim\Views\Twig;
-use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
+use UserFrosting\Config\Config;
 
-use UserFrosting\Support\Repository\Repository as Config;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
 
 /**
  * CoreExtensionTest class.

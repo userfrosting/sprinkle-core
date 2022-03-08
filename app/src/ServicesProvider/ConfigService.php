@@ -13,10 +13,10 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidPathException;
 use Psr\Container\ContainerInterface;
+use UserFrosting\Config\Config;
 use UserFrosting\Config\ConfigPathBuilder;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Support\Repository\Loader\ArrayFileLoader;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
@@ -42,7 +42,7 @@ class ConfigService implements ServicesProviderInterface
                     // Skip loading the environment config file if it doesn't exist.
                 }
 
-                return env('UF_MODE') ?: '';
+                return env('UF_MODE', '');
             },
 
             Config::class => function (ArrayFileLoader $loader) {
@@ -52,6 +52,7 @@ class ConfigService implements ServicesProviderInterface
             },
 
             ArrayFileLoader::class => function (ConfigPathBuilder $builder, ContainerInterface $ci) {
+                /** @var string */
                 $mode = $ci->get('UF_MODE');
 
                 return new ArrayFileLoader($builder->buildPaths($mode));

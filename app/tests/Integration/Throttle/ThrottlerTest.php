@@ -13,13 +13,13 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Throttle;
 use Carbon\Carbon;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Database\Models\Throttle;
 use UserFrosting\Sprinkle\Core\Testing\RefreshDatabase;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
 use UserFrosting\Sprinkle\Core\Throttle\Throttler;
 use UserFrosting\Sprinkle\Core\Throttle\ThrottlerException;
 use UserFrosting\Sprinkle\Core\Throttle\ThrottleRule;
-use UserFrosting\Support\Repository\Repository as Config;
 
 class ThrottlerTest extends CoreTestCase
 {

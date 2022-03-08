@@ -14,10 +14,10 @@ use DI\Container;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Config\Config;
 use UserFrosting\Config\ConfigPathBuilder;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
 use UserFrosting\Support\Repository\Loader\ArrayFileLoader;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 

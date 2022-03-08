@@ -10,10 +10,10 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
+use UserFrosting\Config\Config;
 use UserFrosting\Config\ConfigPathBuilder;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\Support\Repository\Loader\ArrayFileLoader;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Test service implementation works.

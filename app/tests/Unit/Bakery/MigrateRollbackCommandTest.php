@@ -14,10 +14,10 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Bakery\MigrateRollbackCommand;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;
 

@@ -13,10 +13,10 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\I18n;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use Psr\Http\Message\ResponseInterface as Response;
+use UserFrosting\Config\Config;
 use UserFrosting\I18n\Locale;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
 use UserFrosting\UniformResourceLocator\ResourceStream;
 

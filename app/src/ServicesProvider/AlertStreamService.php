@@ -15,11 +15,11 @@ use Psr\Container\ContainerInterface;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Alert\CacheAlertStream;
 use UserFrosting\Alert\SessionAlertStream;
+use UserFrosting\Config\Config;
 use UserFrosting\I18n\Translator;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Session\Session;
 use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Flash messaging service.

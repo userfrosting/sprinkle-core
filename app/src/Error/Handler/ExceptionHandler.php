@@ -18,6 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Factory\ResponseFactory;
 use Throwable;
+use UserFrosting\Config\Config;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
 use UserFrosting\Sprinkle\Core\Error\Renderer\JsonRenderer;
@@ -30,7 +31,6 @@ use UserFrosting\Sprinkle\Core\Util\DeterminesContentTypeTrait;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
 use UserFrosting\Support\Exception\BadInstanceOfException;
 use UserFrosting\Support\Message\UserMessage;
-use UserFrosting\Support\Repository\Repository as Config;
 
 /**
  * Generic handler for exceptions.

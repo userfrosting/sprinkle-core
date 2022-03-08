@@ -18,11 +18,11 @@ use PHPUnit\Framework\TestCase;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Alert\CacheAlertStream;
 use UserFrosting\Alert\SessionAlertStream;
+use UserFrosting\Config\Config;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Session\Session;
 use UserFrosting\Sprinkle\Core\Exceptions\BadConfigException;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
-use UserFrosting\Support\Repository\Repository as Config;
 use UserFrosting\Testing\ContainerStub;
 
 /**
