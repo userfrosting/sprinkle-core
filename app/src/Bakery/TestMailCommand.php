@@ -11,24 +11,38 @@
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Carbon\Carbon;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
+use Slim\Views\Twig;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Mail\EmailRecipient;
+use UserFrosting\Sprinkle\Core\Mail\Mailer;
 use UserFrosting\Sprinkle\Core\Mail\TwigMailMessage;
 
 /**
- * TestMail CLI Command.
- *
- * @author Louis Charette
+ * Command to test email setup.
  */
-class TestMailCommand extends Command
+final class TestMailCommand extends Command
 {
+    use WithSymfonyStyle;
+
+    /** @Inject */
+    protected Config $config;
+
+    /** @Inject */
+    protected Twig $view;
+
+    /** @Inject */
+    protected Mailer $mailer;
+
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('test:mail')
              ->setDescription('Test mail settings')
@@ -43,25 +57,29 @@ class TestMailCommand extends Command
     {
         $this->io->title('Testing Email Configuration');
 
-        /** @var \UserFrosting\Support\Repository\Repository */
-        $config = $this->ci->config;
+        // Get options
+        if (is_string($input->getOption('to'))) {
+            $to = $input->getOption('to');
+        } else {
+            $to = $this->config->getString('address_book.admin.email');
+        }
 
-        $to = $input->getOption('to') ?: $config['address_book.admin.email'];
         $this->io->writeln("Sending test email to : $to");
 
         // Create and send email
-        $message = new TwigMailMessage($this->ci->view, 'mail/test.html.twig');
-        $message->from($config['address_book.admin'])
+        $message = new TwigMailMessage($this->view, 'mail/test.html.twig');
+        $message->from($this->config->getArray('address_book.admin')) // @phpstan-ignore-line
                 ->addEmailRecipient(new EmailRecipient($to, $to))
                 ->addParams([
                     'request_date' => Carbon::now()->format('Y-m-d H:i:s'),
                 ]);
 
         try {
-            $this->ci->mailer->send($message);
-        } catch (\Exception $e) {
+            $this->mailer->send($message);
+        } catch (PHPMailerException $e) {
             $this->io->error($e->getMessage());
-            exit(1);
+
+            return self::FAILURE;
         }
 
         $this->io->success("Test email sent to $to !");
