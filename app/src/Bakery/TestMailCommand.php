@@ -12,7 +12,6 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Carbon\Carbon;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
-use Slim\Views\Twig;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,7 +20,7 @@ use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Mail\EmailRecipient;
 use UserFrosting\Sprinkle\Core\Mail\Mailer;
-use UserFrosting\Sprinkle\Core\Mail\TwigMailMessage;
+use UserFrosting\Sprinkle\Core\Mail\StaticMailMessage;
 
 /**
  * Command to test email setup.
@@ -32,9 +31,6 @@ final class TestMailCommand extends Command
 
     /** @Inject */
     protected Config $config;
-
-    /** @Inject */
-    protected Twig $view;
 
     /** @Inject */
     protected Mailer $mailer;
@@ -67,12 +63,11 @@ final class TestMailCommand extends Command
         $this->io->writeln("Sending test email to : $to");
 
         // Create and send email
-        $message = new TwigMailMessage($this->view, 'mail/test.html.twig');
+        $title = $this->config->getString('site.title') . ' - Test email';
+        $body = sprintf('A test email has been submitted from %s on %s.', $this->config->getString('site.title'), Carbon::now()->format('Y-m-d H:i:s'));
+        $message = new StaticMailMessage($title, $body);
         $message->from($this->config->getArray('address_book.admin')) // @phpstan-ignore-line
-                ->addEmailRecipient(new EmailRecipient($to, $to))
-                ->addParams([
-                    'request_date' => Carbon::now()->format('Y-m-d H:i:s'),
-                ]);
+                ->addEmailRecipient(new EmailRecipient($to, $to));
 
         try {
             $this->mailer->send($message);

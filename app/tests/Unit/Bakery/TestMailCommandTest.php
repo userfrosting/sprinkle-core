@@ -14,8 +14,6 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use PHPUnit\Framework\TestCase;
-use Slim\Views\Twig;
-use Twig\Environment;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
 use UserFrosting\Sprinkle\Core\Bakery\WebpackCommand;
@@ -32,27 +30,12 @@ class TestMailCommandTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    /** @var \Mockery\MockInterface */
-    private $twig;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        // Setup mock Twig
-        $env = Mockery::mock(Environment::class)
-            ->shouldReceive('getGlobals')->andReturn([])
-            ->getMock();
-        $this->twig = Mockery::mock(Twig::class)
-            ->shouldReceive('getEnvironment')->andReturn($env)
-            ->getMock();
-    }
-
     public function testCommand(): void
     {
         // Set mocks
         $config = Mockery::mock(Config::class)
             ->shouldReceive('getString')->with('address_book.admin.email')->once()->andReturn('example@example.com')
+            ->shouldReceive('getString')->with('site.title')->times(2)->andReturn('userFrosting')
             ->shouldReceive('getArray')->with('address_book.admin')->once()->andReturn([
                 'email' => 'admin@example.com',
                 'name'  => 'Site Administrator'
@@ -66,7 +49,6 @@ class TestMailCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(Config::class, $config);
         $ci->set(Mailer::class, $mailer);
-        $ci->set(Twig::class, $this->twig);
 
         /** @var WebpackCommand */
         $command = $ci->get(TestMailCommand::class);
@@ -82,6 +64,7 @@ class TestMailCommandTest extends TestCase
         // Set mocks
         $config = Mockery::mock(Config::class)
             ->shouldNotReceive('getString')->with('address_book.admin.email')
+            ->shouldReceive('getString')->with('site.title')->times(2)->andReturn('userFrosting')
             ->shouldReceive('getArray')->with('address_book.admin')->once()->andReturn([
                 'email' => 'admin@example.com',
                 'name'  => 'Site Administrator'
@@ -95,7 +78,6 @@ class TestMailCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(Config::class, $config);
         $ci->set(Mailer::class, $mailer);
-        $ci->set(Twig::class, $this->twig);
 
         /** @var WebpackCommand */
         $command = $ci->get(TestMailCommand::class);
@@ -111,6 +93,7 @@ class TestMailCommandTest extends TestCase
         // Set mocks
         $config = Mockery::mock(Config::class)
             ->shouldReceive('getString')->with('address_book.admin.email')->once()->andReturn('example@example.com')
+            ->shouldReceive('getString')->with('site.title')->times(2)->andReturn('userFrosting')
             ->shouldReceive('getArray')->with('address_book.admin')->once()->andReturn([
                 'email' => 'admin@example.com',
                 'name'  => 'Site Administrator'
@@ -124,7 +107,6 @@ class TestMailCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(Config::class, $config);
         $ci->set(Mailer::class, $mailer);
-        $ci->set(Twig::class, $this->twig);
 
         /** @var WebpackCommand */
         $command = $ci->get(TestMailCommand::class);
