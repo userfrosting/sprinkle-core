@@ -14,11 +14,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
- * Util Class.
- *
  * Static utility functions.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 class Util
 {
@@ -163,12 +159,17 @@ class Util
      *
      * @return string
      */
-    public static function randomPhrase($numAdjectives, $maxLength = 9999999, $maxTries = 10, $separator = '-')
-    {
+    public static function randomPhrase(
+        int $numAdjectives,
+        int $maxLength = 9999999,
+        int $maxTries = 10,
+        string $separator = '-'
+    ): string {
         $adjectives = include 'extra://adjectives.php';
         $nouns = include 'extra://nouns.php';
 
         for ($n = 0; $n < $maxTries; $n++) {
+            /** @var array<string> */
             $keys = array_rand($adjectives, $numAdjectives);
             $matches = Arr::only($adjectives, $keys);
 
