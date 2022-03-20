@@ -52,9 +52,9 @@ class DatabaseServiceTest extends TestCase
 
         // Set mock Config service
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('db.connections')->once()->andReturn($data)
+            ->shouldReceive('getArray')->with('db.connections')->once()->andReturn($data)
             ->shouldReceive('get')->with('db.default')->once()->andReturn('memory')
-            ->shouldReceive('get')->with('debug.queries')->once()->andReturn(false)
+            ->shouldReceive('getBool')->with('debug.queries')->once()->andReturn(false)
             ->getMock();
         $this->ci->set(Config::class, $config);
 
@@ -77,9 +77,9 @@ class DatabaseServiceTest extends TestCase
 
         // Set mock Config service
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('db.connections')->once()->andReturn($data)
+            ->shouldReceive('getArray')->with('db.connections')->once()->andReturn($data)
             ->shouldReceive('get')->with('db.default')->once()->andReturn('memory')
-            ->shouldReceive('get')->with('debug.queries')->once()->andReturn(true)
+            ->shouldReceive('getBool')->with('debug.queries')->once()->andReturn(true)
             ->getMock();
         $this->ci->set(Config::class, $config);
 

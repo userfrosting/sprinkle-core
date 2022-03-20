@@ -23,13 +23,13 @@ class MigrateResetHardCommandTest extends CoreTestCase
 {
     public function tearDown(): void
     {
-        parent::tearDown();
-
         // Drop table, in case test fails and table stays up.
         $schema = $this->ci->get(Builder::class);
         if ($schema->hasTable('migrate_reset_hard_command_test')) {
             $schema->drop('migrate_reset_hard_command_test');
         }
+
+        parent::tearDown();
     }
 
     public function testPretendHardReset(): void
