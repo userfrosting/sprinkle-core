@@ -29,7 +29,7 @@
     "require": {
         "php": "^8.0",
         "composer/semver": "^3.2.4",
-        "doctrine/dbal": "^2.5",
+        "doctrine/dbal": "^3.3",
         "filp/whoops": "^2.14",
         "illuminate/cache": "^8.5",
         "illuminate/database": "^8.5",

@@ -34,7 +34,7 @@ class DatabaseService implements ServicesProviderInterface
                 $capsule = new Capsule();
 
                 // Add each defined connection in the config
-                foreach ($config->get('db.connections') as $name => $dbConfig) {
+                foreach ($config->getArray('db.connections') as $name => $dbConfig) {
                     $capsule->addConnection($dbConfig, $name);
                 }
 
@@ -53,7 +53,7 @@ class DatabaseService implements ServicesProviderInterface
                 $capsule->bootEloquent();
 
                 // Listen to QueryExecuted event and send debug to logger if required by config
-                if ($config->get('debug.queries')) {
+                if ($config->getBool('debug.queries') === true) {
                     $queryEventDispatcher->listen(QueryExecuted::class, $logger);
                 }
 
