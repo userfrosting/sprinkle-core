@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: ['master', '5.0']
+    branches: ['*']
   pull_request:
-    branches: ['master', '5.0']
+    branches: ['*']
   workflow_dispatch:
   # schedule:
   # - cron: "0 0 * * 5"
@@ -30,10 +30,6 @@ jobs:
           extensions: mbstring, dom, fileinfo, gd, memcached, redis, pdo_sqlite
           coverage: xdebug
           tools: pecl, composer
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 14
       
       - name: Setup Redis-server
         uses: supercharge/redis-github-action@1.1.0
@@ -82,13 +78,9 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php_versions }}
-        extensions: mbstring, dom, fileinfo, gd, memcached, redis, pdo_sqlite
+        extensions: mbstring, dom, fileinfo, gd, memcached, redis
         coverage: xdebug
         tools: pecl, composer
-
-    - uses: actions/setup-node@v2
-      with:
-        node-version: 14
     
     - name: Setup Redis-server
       uses: supercharge/redis-github-action@1.1.0
@@ -154,10 +146,6 @@ jobs:
           extensions: mbstring, dom, fileinfo, gd, memcached, redis, pdo_sqlite
           coverage: xdebug
           tools: pecl, composer
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 14
       
       - name: Setup Redis-server
         uses: supercharge/redis-github-action@1.1.0
@@ -208,7 +196,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php_versions }}
-          extensions: mbstring, dom, fileinfo, gd, memcached, redis, pdo_sqlite, pdo_pgsql
+          extensions: mbstring, dom, fileinfo, gd, memcached, redis, pdo_pgsql
           coverage: xdebug
           tools: pecl, composer
       
@@ -218,10 +206,65 @@ jobs:
           postgresql db: 'userfrosting'
           postgresql user: 'userfrosting'
           postgresql password: 'password'
-
-      - uses: actions/setup-node@v2
+      
+      - name: Setup Redis-server
+        uses: supercharge/redis-github-action@1.1.0
         with:
-          node-version: 14
+          redis-version: 6
+      
+      - name: Setup Memcached
+        uses: niden/actions-memcached@v7
+      
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Execute tests
+        run: | 
+          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+          vendor/bin/phpunit
+      
+      - name: Upload coverage to Codecov
+        if: github.event_name != 'schedule'
+        uses: codecov/codecov-action@v2
+        with:
+          file: ./_meta/coverage.xml
+          fail_ci_if_error: true
+
+  PHPUnit-mssql:
+
+      strategy:
+        fail-fast: false
+        matrix:
+          php_versions: ['8.0', '8.1']
+
+      runs-on: ubuntu-latest
+      name: PHPUnit - PHP ${{ matrix.php_versions }} - SQL Server 2019
+
+      services:
+        sqlsrv:
+          image: mcr.microsoft.com/mssql/server:2019-latest
+          env:
+            ACCEPT_EULA: Y
+            SA_PASSWORD: Forge123
+          ports:
+            - 1433:1433
+
+      env:
+        DB_TEST_CONNECTION: sqlsrv
+        DB_USER: SA
+        DB_PASSWORD: Forge123
+        DB_NAME: master
+
+      steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php_versions }}
+          extensions: mbstring, dom, fileinfo, gd, memcached, redis, sqlsrv, pdo, pdo_sqlsrv
+          coverage: xdebug
+          tools: pecl, composer
       
       - name: Setup Redis-server
         uses: supercharge/redis-github-action@1.1.0
