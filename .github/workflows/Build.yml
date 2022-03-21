@@ -27,17 +27,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php_versions }}
-          extensions: mbstring, dom, fileinfo, gd, memcached, redis, pdo_sqlite
+          extensions: mbstring, dom, fileinfo, gd, pdo_sqlite
           coverage: xdebug
           tools: pecl, composer
-      
-      - name: Setup Redis-server
-        uses: supercharge/redis-github-action@1.1.0
-        with:
-          redis-version: 6
-      
-      - name: Setup Memcached
-        uses: niden/actions-memcached@v7
             
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress
@@ -78,17 +70,9 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php_versions }}
-        extensions: mbstring, dom, fileinfo, gd, memcached, redis
+        extensions: mbstring, dom, fileinfo, gd
         coverage: xdebug
         tools: pecl, composer
-    
-    - name: Setup Redis-server
-      uses: supercharge/redis-github-action@1.1.0
-      with:
-        redis-version: 6
-    
-    - name: Setup Memcached
-      uses: niden/actions-memcached@v7
     
     - name: Shutdown Ubuntu MySQL (SUDO)
       run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
@@ -143,17 +127,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php_versions }}
-          extensions: mbstring, dom, fileinfo, gd, memcached, redis, pdo_sqlite
+          extensions: mbstring, dom, fileinfo, gd, pdo_sqlite
           coverage: xdebug
           tools: pecl, composer
-      
-      - name: Setup Redis-server
-        uses: supercharge/redis-github-action@1.1.0
-        with:
-          redis-version: 6
-      
-      - name: Setup Memcached
-        uses: niden/actions-memcached@v7
             
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress
@@ -196,7 +172,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php_versions }}
-          extensions: mbstring, dom, fileinfo, gd, memcached, redis, pdo_pgsql
+          extensions: mbstring, dom, fileinfo, gd, pdo_pgsql
           coverage: xdebug
           tools: pecl, composer
       
@@ -206,14 +182,6 @@ jobs:
           postgresql db: 'userfrosting'
           postgresql user: 'userfrosting'
           postgresql password: 'password'
-      
-      - name: Setup Redis-server
-        uses: supercharge/redis-github-action@1.1.0
-        with:
-          redis-version: 6
-      
-      - name: Setup Memcached
-        uses: niden/actions-memcached@v7
       
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress
@@ -262,17 +230,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php_versions }}
-          extensions: mbstring, dom, fileinfo, gd, memcached, redis, sqlsrv, pdo, pdo_sqlsrv
+          extensions: mbstring, dom, fileinfo, gd, sqlsrv, pdo, pdo_sqlsrv
           coverage: xdebug
           tools: pecl, composer
-      
-      - name: Setup Redis-server
-        uses: supercharge/redis-github-action@1.1.0
-        with:
-          redis-version: 6
-      
-      - name: Setup Memcached
-        uses: niden/actions-memcached@v7
       
       - name: Install Dependencies
         run: composer install --prefer-dist --no-progress
