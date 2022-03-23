@@ -54,6 +54,7 @@ trait Syncable
             // match a related row in the database.
             if (isset($row[$relatedKeyName]) && !empty($row[$relatedKeyName]) && in_array($row[$relatedKeyName], $current)) {
                 $id = $row[$relatedKeyName];
+                unset($row[$relatedKeyName]);
                 $updateRows[$id] = $row;
             } else {
                 $newRows[] = $row;
