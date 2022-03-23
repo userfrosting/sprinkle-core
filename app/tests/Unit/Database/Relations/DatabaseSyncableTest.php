@@ -52,9 +52,9 @@ class DatabaseSyncableTest extends TestCase
 
         // Test updates to existing items in relationship (2,3)
         $query->shouldReceive('where')->once()->with('id', 2)->andReturn($query);
-        $query->shouldReceive('update')->once()->with(['id' => 2, 'species' => 'Tyto'])->andReturn($query);
+        $query->shouldReceive('update')->once()->with(['species' => 'Tyto'])->andReturn($query);
         $query->shouldReceive('where')->once()->with('id', 3)->andReturn($query);
-        $query->shouldReceive('update')->once()->with(['id' => 3, 'species' => 'Megascops'])->andReturn($query);
+        $query->shouldReceive('update')->once()->with(['species' => 'Megascops'])->andReturn($query);
 
         // Test creation of new items ('x')
         $model = $this->expectCreatedModel($relation, [

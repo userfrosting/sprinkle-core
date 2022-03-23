@@ -278,7 +278,7 @@ trait Unique
         $relatedPivotKeyName = $this->related->getQualifiedKeyName();
 
         // Apply an additional scope to override any selected columns in other global scopes
-        $uniqueIdScope = function ($subQuery) use ($relatedPivotKeyName) {
+        $uniqueIdScope = function (Builder $subQuery) use ($relatedPivotKeyName) {
             $subQuery->addSelect($relatedPivotKeyName)
                      ->groupBy($relatedPivotKeyName);
         };
@@ -297,6 +297,9 @@ trait Unique
 
         $primaryKeyName = $this->getParent()->getKeyName();
         $modelIds = $constrainedBuilder->get()->pluck($primaryKeyName)->toArray();
+        $modelIds = $constrainedBuilder->get()
+                        ->pluck($primaryKeyName)
+                        ->toArray();
 
         // Modify the unconstrained query to limit to these models
         return $query->whereIn($relatedPivotKeyName, $modelIds);

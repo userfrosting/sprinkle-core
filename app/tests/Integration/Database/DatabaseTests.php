@@ -702,6 +702,7 @@ class DatabaseTests extends TestCase
 
         $paginatedPermissions = $user->permissions()->take(2)->offset(1);
 
+        $result = $paginatedPermissions->get()->toArray();
         $this->assertEquals([
             [
                 'id'    => 2,
@@ -719,7 +720,7 @@ class DatabaseTests extends TestCase
                     'permission_id' => 3,
                 ],
             ],
-        ], $paginatedPermissions->get()->toArray());
+        ], $result);
 
         $this->assertEquals(2, $paginatedPermissions->count());
     }
@@ -740,8 +741,13 @@ class DatabaseTests extends TestCase
         // If the paginated query is being ordered correctly by including the `roles_count` computed column,
         // Then `uri_spit_acid` should appear first. If not, then the results will not be ordered and the `uri_harvest`
         // result will be returned, in accordance with the default database order.
-        $paginatedPermissions = $user->permissions()->withCount('roles')->orderBy('roles_count', 'desc')->take(1)->offset(0);
+        $paginatedPermissions = $user->permissions()
+                                     ->withCount('roles')
+                                     ->orderBy('roles_count', 'desc')
+                                     ->take(1)
+                                     ->offset(0);
 
+        $result = $paginatedPermissions->get()->toArray();
         $this->assertEquals([
             [
                 'id'          => 2,
@@ -752,7 +758,7 @@ class DatabaseTests extends TestCase
                     'permission_id' => 2,
                 ],
             ],
-        ], $paginatedPermissions->get()->toArray());
+        ], $result);
     }
 
     /**
