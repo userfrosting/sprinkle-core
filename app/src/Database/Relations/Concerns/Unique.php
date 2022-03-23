@@ -296,7 +296,7 @@ trait Unique
         }
 
         $primaryKeyName = $this->getParent()->getKeyName();
-        $modelIds = $constrainedBuilder->get()->pluck($primaryKeyName)->toArray();
+        // $sql = $constrainedBuilder->toSql();
         $modelIds = $constrainedBuilder->get()
                         ->pluck($primaryKeyName)
                         ->toArray();
