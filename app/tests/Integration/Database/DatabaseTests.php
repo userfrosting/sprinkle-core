@@ -194,7 +194,7 @@ class DatabaseTests extends TestCase
             'email' => 'david@attenboroughsreef.com',
         ]);
 
-        // Delete `work`, update `primary`, and add `gmail`
+        // Delete `work` label, update `primary` label email, and add `gmail` label
         $user->emails()->sync([
             [
                 'id'    => 1,
@@ -938,17 +938,14 @@ class DatabaseTests extends TestCase
     {
         return [
             EloquentTestRole::create([
-                'id'   => 1,
                 'slug' => 'forager',
             ]),
 
             EloquentTestRole::create([
-                'id'   => 2,
                 'slug' => 'soldier',
             ]),
 
             EloquentTestRole::create([
-                'id'   => 3,
                 'slug' => 'egg-layer',
             ]),
         ];
@@ -961,22 +958,18 @@ class DatabaseTests extends TestCase
     {
         return [
             EloquentTestPermission::create([
-                'id'   => 1,
                 'slug' => 'uri_harvest',
             ]),
 
             EloquentTestPermission::create([
-                'id'   => 2,
                 'slug' => 'uri_spit_acid',
             ]),
 
             EloquentTestPermission::create([
-                'id'   => 3,
                 'slug' => 'uri_slash',
             ]),
 
             EloquentTestPermission::create([
-                'id'   => 4,
                 'slug' => 'uri_royal_jelly',
             ]),
         ];
@@ -1051,12 +1044,10 @@ class DatabaseTests extends TestCase
     {
         return [
             EloquentTestLocation::create([
-                'id'   => 1,
                 'name' => 'Hatchery',
             ]),
 
             EloquentTestLocation::create([
-                'id'   => 2,
                 'name' => 'Nexus',
             ]),
         ];
@@ -1069,17 +1060,14 @@ class DatabaseTests extends TestCase
     {
         return [
             EloquentTestTask::create([
-                'id'   => 1,
                 'name' => 'Digging',
             ]),
 
             EloquentTestTask::create([
-                'id'   => 2,
                 'name' => 'Chopping',
             ]),
 
             EloquentTestTask::create([
-                'id'   => 3,
                 'name' => 'Baleing',
             ]),
         ];
