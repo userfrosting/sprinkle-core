@@ -12,7 +12,6 @@ namespace UserFrosting\Sprinkle\Core;
 
 use Lcharette\WebpackEncoreTwig\EntrypointsTwigExtension;
 use Lcharette\WebpackEncoreTwig\VersionedAssetsTwigExtension;
-use Slim\Views\TwigMiddleware;
 use UserFrosting\Event\AppInitiatedEvent;
 use UserFrosting\Event\EventListenerRecipe;
 use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
@@ -188,7 +187,6 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
         return [
             LocaleMiddleware::class,
             SessionMiddleware::class,
-            TwigMiddleware::class,
             ExceptionHandlerMiddleware::class,
         ];
     }
