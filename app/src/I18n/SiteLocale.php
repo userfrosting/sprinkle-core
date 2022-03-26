@@ -10,7 +10,6 @@
 
 namespace UserFrosting\Sprinkle\Core\I18n;
 
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use UserFrosting\Config\Config;
 use UserFrosting\I18n\Locale;
@@ -26,7 +25,7 @@ class SiteLocale
     protected ?string $browserLocale = null;
 
     /**
-     * @param Config           $config
+     * @param Config $config
      */
     public function __construct(
         protected Config $config,
