@@ -13,6 +13,7 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 use UserFrosting\I18n\Dictionary;
 use UserFrosting\I18n\DictionaryInterface;
 use UserFrosting\I18n\Locale;
+use UserFrosting\I18n\LocaleInterface;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
@@ -22,17 +23,19 @@ use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
  *
  * Register via Autowire :
  *  - Translator::class
+ *  - SiteLocale::class
  */
 class I18nService implements ServicesProviderInterface
 {
     public function register(): array
     {
         return [
-            // TODO : Locale should be injected somehow... SiteLocale should probably extend Locale...
-            DictionaryInterface::class => function (SiteLocale $siteLocale, ResourceLocatorInterface $locator) {
-                $locale = new Locale($siteLocale->getLocaleIdentifier());
-
+            DictionaryInterface::class => function (LocaleInterface $locale, ResourceLocatorInterface $locator) {
                 return new Dictionary($locale, $locator);
+            },
+
+            LocaleInterface::class => function (SiteLocale $siteLocale) {
+                return new Locale($siteLocale->getLocaleIdentifier());
             },
         ];
     }

@@ -17,8 +17,6 @@ use UserFrosting\I18n\Locale;
 
 /**
  * Helper methods for the locale system.
- *
- * @author Louis Charette
  */
 class SiteLocale
 {
@@ -29,7 +27,6 @@ class SiteLocale
 
     /**
      * @param Config           $config
-     * @param RequestInterface $request
      */
     public function __construct(
         protected Config $config,
@@ -62,7 +59,7 @@ class SiteLocale
      */
     public function isAvailable(string $identifier): bool
     {
-        return in_array($identifier, $this->getAvailableIdentifiers());
+        return in_array($identifier, $this->getAvailableIdentifiers(), true);
     }
 
     /**
@@ -95,7 +92,7 @@ class SiteLocale
     public function getAvailableIdentifiers(): array
     {
         // Get all keys where value is true
-        $available = array_filter($this->config->get('site.locales.available'));
+        $available = array_filter($this->config->getArray('site.locales.available'));
 
         // Add the default to the list. it will always be available
         $default = $this->getDefaultLocale();
@@ -178,7 +175,7 @@ class SiteLocale
         foreach ($acceptLanguage as $index => $browserLocale) {
 
             // Split to access locale & "q"
-            $parts = explode(';', $browserLocale) ?: [];
+            $parts = explode(';', $browserLocale);
 
             // Ensure we've got at least one sub parts
             if (array_key_exists(0, $parts)) {
@@ -187,7 +184,7 @@ class SiteLocale
                 $identifier = trim(str_replace('-', '_', $parts[0]));
 
                 // Ensure locale available
-                $localeIndex = array_search(strtolower($identifier), array_map('strtolower', $availableLocales));
+                $localeIndex = array_search(strtolower($identifier), array_map('strtolower', $availableLocales), true);
 
                 if ($localeIndex !== false) {
                     $matchedLocale = $availableLocales[$localeIndex];
@@ -208,7 +205,7 @@ class SiteLocale
         }
 
         // if no $foundLocales, return null
-        if (empty($foundLocales)) {
+        if (count($foundLocales) === 0) {
             $this->browserLocale = null;
 
             return;
@@ -220,6 +217,6 @@ class SiteLocale
         // Return first element
         reset($foundLocales);
 
-        $this->browserLocale = (string) key($foundLocales);
+        $this->browserLocale = key($foundLocales);
     }
 }
