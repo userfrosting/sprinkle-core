@@ -17,7 +17,7 @@ use UserFrosting\I18n\Locale;
 /**
  * Helper methods for the locale system.
  */
-class SiteLocale
+class SiteLocale implements SiteLocaleInterface
 {
     /**
      * @var string|null

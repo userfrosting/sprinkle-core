@@ -16,6 +16,7 @@ use UserFrosting\I18n\Locale;
 use UserFrosting\I18n\LocaleInterface;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
+use UserFrosting\Sprinkle\Core\I18n\SiteLocaleInterface;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
@@ -23,7 +24,6 @@ use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
  *
  * Register via Autowire :
  *  - Translator::class
- *  - SiteLocale::class
  */
 class I18nService implements ServicesProviderInterface
 {
@@ -34,9 +34,11 @@ class I18nService implements ServicesProviderInterface
                 return new Dictionary($locale, $locator);
             },
 
-            LocaleInterface::class => function (SiteLocale $siteLocale) {
+            LocaleInterface::class => function (SiteLocaleInterface $siteLocale) {
                 return new Locale($siteLocale->getLocaleIdentifier());
             },
+
+            SiteLocaleInterface::class => \DI\autowire(SiteLocale::class),
         ];
     }
 }
