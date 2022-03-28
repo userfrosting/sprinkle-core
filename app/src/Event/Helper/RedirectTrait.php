@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Event\Helper;
 
 /**
- * Common implementation for RedirectingEventInterface
+ * Common implementation for RedirectingEventInterface.
  */
 trait RedirectTrait
 {
