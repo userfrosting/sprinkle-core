@@ -23,4 +23,11 @@ interface RedirectingEventInterface
      * @return string
      */
     public function getRedirect(): ?string;
+
+    /**
+     * Set the value of redirect.
+     *
+     * @param string $redirect
+     */
+    public function setRedirect(?string $redirect): void;
 }

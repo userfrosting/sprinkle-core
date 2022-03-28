@@ -12,7 +12,6 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\StoppableEventInterface;
-use UserFrosting\Sprinkle\Core\Error\ShutdownHandler;
 use UserFrosting\Sprinkle\Core\Event\Helper\StoppableTrait;
 
 /**

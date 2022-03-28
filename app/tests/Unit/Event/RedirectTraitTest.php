@@ -11,7 +11,6 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use PHPUnit\Framework\TestCase;
-use UserFrosting\Sprinkle\Core\Error\ShutdownHandler;
 use UserFrosting\Sprinkle\Core\Event\Contract\RedirectingEventInterface;
 use UserFrosting\Sprinkle\Core\Event\Helper\RedirectTrait;
 
