@@ -48,6 +48,7 @@ use UserFrosting\Sprinkle\Core\Listeners\ModelInitiated;
 use UserFrosting\Sprinkle\Core\Listeners\ResourceLocatorInitiated;
 use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\SessionMiddleware;
+use UserFrosting\Sprinkle\Core\Middlewares\URIMiddleware;
 use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
@@ -188,6 +189,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
             LocaleMiddleware::class,
             SessionMiddleware::class,
             ExceptionHandlerMiddleware::class,
+            URIMiddleware::class,
         ];
     }
 

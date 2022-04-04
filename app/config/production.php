@@ -57,6 +57,9 @@ return [
             'ajax' => false,
             'info' => false,
         ],
+        'uri' => [
+            'public' => 'https://example.com', // This should be set in production to avoid errors !
+        ],
     ],
     /*
      * Send errors to log

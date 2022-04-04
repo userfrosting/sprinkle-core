@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
+namespace UserFrosting\Sprinkle\Core\Tests\Unit\Seeder;
 
 use DI\Container;
 use Mockery;

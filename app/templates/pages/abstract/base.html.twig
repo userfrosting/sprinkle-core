@@ -38,11 +38,6 @@
                 <link href="{% block page_publisher_link %}{{ site.uri.publisher }}{% endblock %}" rel="publisher" />
             {% endif %}
 
-            {# Canonical page link #}
-            {% if block('page_canonical') %}
-                <link href="{{site.uri.base.scheme}}://{% block page_canonical %}{% endblock %}" rel="canonical" />
-            {% endif %}
-
             {% include "pages/partials/analytics.html.twig" %}
         </head>
     {% endblock %}

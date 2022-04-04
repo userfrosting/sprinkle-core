@@ -402,15 +402,9 @@ return [
         ],
         // URLs
         'uri' => [
-            // 'base' settings are no longer used to generate the uri frequently used in Twig (site.uri.public). This is due to Slim doing a better job of figuring this out on its own. This key has been kept to ensure backwards compatibility.
-            'base' => [
-                'host'      => isset($_SERVER['SERVER_NAME']) ? trim($_SERVER['SERVER_NAME'], '/') : 'localhost',
-                'scheme'    => empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off' ? 'http' : 'https',
-                'port'      => isset($_SERVER['SERVER_PORT']) ? (int) $_SERVER['SERVER_PORT'] : null,
-                'path'      => isset($_SERVER['SCRIPT_NAME']) ? trim(dirname($_SERVER['SCRIPT_NAME']), '/\\') : '',
-            ],
             'author'    => 'https://www.userfrosting.com',
             'publisher' => '',
+            'public'    => null,
         ],
     ],
 
