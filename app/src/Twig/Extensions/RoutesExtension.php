@@ -34,7 +34,6 @@ class RoutesExtension extends AbstractExtension
     {
         return [
             new TwigFunction('urlFor', [$this->routeParser, 'urlFor']),
-            new TwigFunction('relativeUrlFor', [$this->routeParser, 'relativeUrlFor']),
         ];
     }
 }
