@@ -17,6 +17,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Slim\App;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Middlewares\URIMiddleware;
 
@@ -47,7 +48,12 @@ class URIMiddlewareTest extends TestCase
             ->shouldNotReceive('getUri')
             ->getMock();
 
-        $middleware = new URIMiddleware($config);
+        /** @var App */
+        $app = Mockery::mock(App::class)
+            ->shouldNotReceive('setBasePath')
+            ->getMock();
+
+        $middleware = new URIMiddleware($config, $app);
         $middleware->process($request, $handler);
 
         $this->assertSame('http://example.com', $config->get('site.uri.public'));
@@ -81,7 +87,14 @@ class URIMiddlewareTest extends TestCase
             ->shouldReceive('getUri')->andReturn($uri)
             ->getMock();
 
-        $middleware = new URIMiddleware($config);
+        /** @var App */
+        $app = Mockery::mock(App::class)
+            ->shouldReceive('setBasePath')
+            ->once()
+            ->with('http://example.com')
+            ->getMock();
+
+        $middleware = new URIMiddleware($config, $app);
         $middleware->process($request, $handler);
 
         $this->assertSame('http://example.com', $config->get('site.uri.public'));
@@ -115,7 +128,14 @@ class URIMiddlewareTest extends TestCase
             ->shouldReceive('getUri')->andReturn($uri)
             ->getMock();
 
-        $middleware = new URIMiddleware($config);
+        /** @var App */
+        $app = Mockery::mock(App::class)
+            ->shouldReceive('setBasePath')
+            ->once()
+            ->with('https://localhost:8888')
+            ->getMock();
+
+        $middleware = new URIMiddleware($config, $app);
         $middleware->process($request, $handler);
 
         $this->assertSame('https://localhost:8888', $config->get('site.uri.public'));

@@ -17,6 +17,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Slim\App;
 use UserFrosting\Config\Config;
 
 class URIMiddleware implements MiddlewareInterface
@@ -26,6 +27,7 @@ class URIMiddleware implements MiddlewareInterface
      */
     public function __construct(
         protected Config $config,
+        protected App $app,
     ) {
     }
 
@@ -39,6 +41,7 @@ class URIMiddleware implements MiddlewareInterface
             $uri = $request->getUri();
             $baseUrl = $this->getBaseUrl($uri);
             $this->config->set('site.uri.public', $baseUrl);
+            $this->app->setBasePath($baseUrl);
         }
 
         return $handler->handle($request);
