@@ -13,6 +13,7 @@ namespace UserFrosting\Sprinkle\Core;
 use Lcharette\WebpackEncoreTwig\EntrypointsTwigExtension;
 use Lcharette\WebpackEncoreTwig\VersionedAssetsTwigExtension;
 use UserFrosting\Event\AppInitiatedEvent;
+use UserFrosting\Event\BakeryInitiatedEvent;
 use UserFrosting\Event\EventListenerRecipe;
 use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
@@ -227,6 +228,9 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
         return [
             AppInitiatedEvent::class => [
                 RegisterShutdownHandler::class,
+                ModelInitiated::class,
+            ],
+            BakeryInitiatedEvent::class => [
                 ModelInitiated::class,
             ],
             ResourceLocatorInitiatedEvent::class => [
