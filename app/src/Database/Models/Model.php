@@ -27,7 +27,7 @@ abstract class Model extends LaravelModel
     /**
      * @var ContainerInterface The DI container for your application.
      */
-    public static ContainerInterface $ci;
+    public static ?ContainerInterface $ci = null;
 
     /**
      * Determine if an attribute exists on the model - even if it is null.

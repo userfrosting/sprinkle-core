@@ -14,6 +14,7 @@ namespace UserFrosting\Sprinkle\Core\Listeners;
 
 use Psr\Container\ContainerInterface;
 use UserFrosting\Event\AppInitiatedEvent;
+use UserFrosting\Event\BakeryInitiatedEvent;
 use UserFrosting\Sprinkle\Core\Database\Models\Model;
 
 /**
@@ -31,9 +32,9 @@ class ModelInitiated
     }
 
     /**
-     * @param AppInitiatedEvent $event
+     * @param AppInitiatedEvent|BakeryInitiatedEvent $event
      */
-    public function __invoke(AppInitiatedEvent $event): void
+    public function __invoke(AppInitiatedEvent|BakeryInitiatedEvent $event): void
     {
         Model::$ci = $this->ci;
     }
