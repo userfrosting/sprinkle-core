@@ -19,9 +19,6 @@ use UserFrosting\Testing\ContainerStub;
 
 class ModelInitiatedTest extends TestCase
 {
-    /**
-     * @runInSeparateProcess
-     */
     public function testModelInitiatedWithApp(): void
     {
         $ci = ContainerStub::create();
@@ -32,11 +29,11 @@ class ModelInitiatedTest extends TestCase
         $this->assertNull($model::$ci);
         $listener($event);
         $this->assertSame($ci, $model::$ci); // @phpstan-ignore-line
+
+        // Manually remove $ci for next test
+        $model::$ci = null;
     }
 
-    /**
-     * @runInSeparateProcess
-     */
     public function testModelInitiatedWithBakery(): void
     {
         $ci = ContainerStub::create();
@@ -47,5 +44,8 @@ class ModelInitiatedTest extends TestCase
         $this->assertNull($model::$ci);
         $listener($event);
         $this->assertSame($ci, $model::$ci); // @phpstan-ignore-line
+
+        // Manually remove $ci for next test
+        $model::$ci = null;
     }
 }
