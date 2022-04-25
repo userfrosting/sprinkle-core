@@ -44,26 +44,26 @@ class LoggersServiceTest extends TestCase
 
         // Set mock Config
         $locator = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('logs.path')->once()->andReturn('logs://database.log')
+            ->shouldReceive('getString')->with('logs.path')->once()->andReturn('logs://database.log')
             ->getMock();
         $this->ci->set(Config::class, $locator);
     }
 
-    public function testDebugLogger()
+    public function testDebugLogger(): void
     {
         $this->assertInstanceOf(Logger::class, $this->ci->get(DebugLogger::class));
         $this->assertInstanceOf(LoggerInterface::class, $this->ci->get(DebugLogger::class));
         $this->assertInstanceOf(DebugLogger::class, $this->ci->get(DebugLogger::class));
     }
 
-    public function testErrorLogger()
+    public function testErrorLogger(): void
     {
         $this->assertInstanceOf(Logger::class, $this->ci->get(ErrorLogger::class));
         $this->assertInstanceOf(LoggerInterface::class, $this->ci->get(ErrorLogger::class));
         $this->assertInstanceOf(ErrorLogger::class, $this->ci->get(ErrorLogger::class));
     }
 
-    public function testMailLogger()
+    public function testMailLogger(): void
     {
         $this->assertInstanceOf(Logger::class, $this->ci->get(MailLogger::class));
         $this->assertInstanceOf(LoggerInterface::class, $this->ci->get(MailLogger::class));

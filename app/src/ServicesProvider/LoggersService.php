@@ -25,13 +25,13 @@ class LoggersService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            /*
-            * Debug logging with Monolog.
-            *
-            * Extend this service to push additional handlers onto the 'debug' log stack.
-            *
-            * @return \Monolog\Logger
-            */
+            /**
+             * Debug logging with Monolog.
+             *
+             * Extend this service to push additional handlers onto the 'debug' log stack.
+             *
+             * @return \Monolog\Logger
+             */
             DebugLogger::class => function (StreamHandler $handler, LineFormatter $formatter) {
                 $formatter->setJsonPrettyPrint(true);
                 $handler->setFormatter($formatter);
@@ -42,13 +42,13 @@ class LoggersService implements ServicesProviderInterface
                 return $logger;
             },
 
-            /*
-            * Error logging with Monolog.
-            *
-            * Extend this service to push additional handlers onto the 'error' log stack.
-            *
-            * @return \Monolog\Logger
-            */
+            /**
+             * Error logging with Monolog.
+             *
+             * Extend this service to push additional handlers onto the 'error' log stack.
+             *
+             * @return \Monolog\Logger
+             */
             ErrorLogger::class => function (StreamHandler $handler, LineFormatter $formatter) {
                 $handler->setFormatter($formatter);
                 $handler->setLevel(Logger::WARNING);
@@ -59,7 +59,7 @@ class LoggersService implements ServicesProviderInterface
                 return $logger;
             },
 
-            /*
+            /**
              * Mail logging service.
              *
              * PHPMailer will use this to log SMTP activity.
@@ -76,7 +76,7 @@ class LoggersService implements ServicesProviderInterface
                 return $logger;
             },
 
-            /*
+            /**
              * Laravel query logging with Monolog.
              *
              * Extend this service to push additional handlers onto the 'query' log stack.
@@ -98,7 +98,7 @@ class LoggersService implements ServicesProviderInterface
 
             // Define common StreamHandler with .
             StreamHandler::class => function (Config $config) {
-                return new StreamHandler($config->get('logs.path'));
+                return new StreamHandler($config->getString('logs.path'));
             },
         ];
     }
