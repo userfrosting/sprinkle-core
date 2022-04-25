@@ -28,7 +28,7 @@ abstract class Migration implements MigrationInterface
     /**
      * Create a new migration instance.
      *
-     * @param \Illuminate\Database\Schema\Builder $schema
+     * @param Builder $schema
      */
     public function __construct(protected Builder $schema)
     {

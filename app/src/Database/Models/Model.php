@@ -19,6 +19,8 @@ use UserFrosting\Sprinkle\Core\Database\Models\Concerns\HasRelationships;
  * Model Class.
  *
  * UserFrosting's base data model, from which all UserFrosting data classes extend.
+ *
+ * @mixin \Illuminate\Database\Eloquent\Builder
  */
 abstract class Model extends LaravelModel
 {
@@ -36,7 +38,7 @@ abstract class Model extends LaravelModel
      *
      * @return bool
      */
-    public function attributeExists($key)
+    public function attributeExists(string $key): bool
     {
         return array_key_exists($key, $this->attributes);
     }
@@ -44,17 +46,19 @@ abstract class Model extends LaravelModel
     /**
      * Determines whether a model exists by checking a unique column, including checking soft-deleted records.
      *
-     * @param mixed  $value
+     * @param string $value
      * @param string $identifier
      * @param bool   $checkDeleted set to true to include soft-deleted records
      *
-     * @return \UserFrosting\Sprinkle\Core\Database\Models\Model|null
+     * @return static|null
      */
-    public static function findUnique($value, $identifier, $checkDeleted = true)
+    public static function findUnique(string $value, string $identifier, bool $checkDeleted = true): ?static
     {
-        $query = static::whereRaw("LOWER($identifier) = ?", [mb_strtolower($value)]);
+        $query = self::whereRaw("LOWER($identifier) = ?", [mb_strtolower($value)]);
 
-        if ($checkDeleted && method_exists($query, 'withTrashed')) {
+        // @phpstan-ignore-next-line hasMacro is available when $query is \Illuminate\Database\Eloquent\Builder
+        if ($checkDeleted === true && (method_exists($query, 'withTrashed') || $query->hasMacro('withTrashed'))) {
+            // @phpstan-ignore-next-line It's called through "hasMacro"
             $query = $query->withTrashed();
         }
 
@@ -68,9 +72,9 @@ abstract class Model extends LaravelModel
      *
      * @return bool
      */
-    public function relationExists($key)
+    public function relationExists(string $key): bool
     {
-        return array_key_exists($key, $this->relations);
+        return array_key_exists($key, $this->getRelations());
     }
 
     /**
@@ -78,14 +82,14 @@ abstract class Model extends LaravelModel
      *
      * Calls save(), then returns the id of the new record in the database.
      *
-     * @return int the id of this object.
+     * @return mixed the id of this object.
      */
-    public function store()
+    public function store(): mixed
     {
         $this->save();
 
         // Store function should always return the id of the object
-        return $this->id;
+        return $this->getKey();
     }
 
     /**
