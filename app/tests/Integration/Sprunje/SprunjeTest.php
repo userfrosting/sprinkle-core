@@ -296,7 +296,15 @@ class SprunjeTest extends CoreTestCase
 
         $this->expectException(SprunjeException::class);
         $this->expectExceptionMessage('Bad filter: id');
-        $sprunje->getArray();
+
+        try {
+            $sprunje->getArray();
+        } catch (SprunjeException $e) {
+            $this->assertEquals('VALIDATE.SPRUNJE', $e->getTitle());
+            $this->assertEquals('VALIDATE.SPRUNJE.BAD_FILTER', $e->getDescription()->message); // @phpstan-ignore-line
+            $this->assertEquals(['name' => 'id'], $e->getDescription()->parameters); // @phpstan-ignore-line
+            throw $e;
+        }
     }
 
     public function testCSV(): void

@@ -10,8 +10,6 @@
 
 /**
  * US English message token translations for the 'core' sprinkle.
- *
- * @author Alexander Weissman
  */
 return [
     'VALIDATE' => [
@@ -28,9 +26,10 @@ return [
         'RANGE'         => 'The value for <strong>{{label}}</strong> must be between {{min}} and {{max}}.',
         'REQUIRED'      => 'Please specify a value for <strong>{{label}}</strong>.',
         'SPRUNJE'       => [
-            'BAD_FILTER' => '<strong>{{name}}</strong> is not a valid filter for this Sprunje.',
-            'BAD_LIST'   => '<strong>{{name}}</strong> is not a valid list for this Sprunje.',
-            'BAD_SORT'   => '<strong>{{name}}</strong> is not a valid sort field for this Sprunje.',
+            '@TRANSLATION' => 'Sprunje Validation Error',
+            'BAD_FILTER'   => '<strong>{{name}}</strong> is not a valid filter for this Sprunje.',
+            'BAD_LIST'     => '<strong>{{name}}</strong> is not a valid list for this Sprunje.',
+            'BAD_SORT'     => '<strong>{{name}}</strong> is not a valid sort field for this Sprunje.',
         ],
     ],
 ];

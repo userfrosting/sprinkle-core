@@ -19,7 +19,7 @@ use UserFrosting\Support\Message\UserMessage;
  */
 class SprunjeException extends Exception implements UserMessageException
 {
-    protected string|UserMessage $title;
+    protected string|UserMessage $title = 'VALIDATE.SPRUNJE';
     protected string|UserMessage $description;
 
     /**
