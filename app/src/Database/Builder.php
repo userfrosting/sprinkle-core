@@ -10,14 +10,12 @@
 
 namespace UserFrosting\Sprinkle\Core\Database;
 
-use Illuminate\Database\Query\Builder as LaravelBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
  * UserFrosting's custom Query Builder Class.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
-class Builder extends LaravelBuilder
+class Builder extends QueryBuilder
 {
     /**
      * @var array List of excluded columns

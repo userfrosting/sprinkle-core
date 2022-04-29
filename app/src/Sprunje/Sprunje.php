@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
@@ -10,49 +12,46 @@
 
 namespace UserFrosting\Sprinkle\Core\Sprunje;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use League\Csv\Writer;
-use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\HttpBadRequestException;
-use UserFrosting\Sprinkle\Core\Util\ClassMapper;
+use UserFrosting\Sprinkle\Core\Exceptions\ValidationException;
+use UserFrosting\Support\Message\UserMessage;
 use Valitron\Validator;
 
 /**
- * Sprunje.
- *
  * Implements a versatile API for sorting, filtering, and paginating an Eloquent query builder.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 abstract class Sprunje
 {
     /**
-     * @var ClassMapper
+     * @var string Name of this Sprunje, used when generating output files.
      */
-    protected $classMapper;
+    protected string $name = 'export';
 
     /**
-     * Name of this Sprunje, used when generating output files.
-     *
-     * @var string
+     * @var EloquentBuilder|QueryBuilder|Relation The base (unfiltered) query.
      */
-    protected $name = '';
+    protected EloquentBuilder|QueryBuilder|Relation $query;
 
     /**
-     * The base (unfiltered) query.
-     *
-     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation
+     * @var array{
+     *  sorts: array<string, string>,
+     *  filters: string[],
+     *  lists: string[],
+     *  size: string|int|null,
+     *  page: ?int,
+     *  format: 'csv'|'json',
+     * } Default HTTP request parameters.
      */
-    protected $query;
-
-    /**
-     * Default HTTP request parameters.
-     *
-     * @var array<string,mixed>
-     */
-    protected $options = [
+    protected array $options = [
         'sorts'   => [],
         'filters' => [],
         'lists'   => [],
@@ -62,60 +61,44 @@ abstract class Sprunje
     ];
 
     /**
-     * Fields to allow filtering upon.
-     *
-     * @var string[]
+     * @var string[] Fields to allow filtering upon.
      */
-    protected $filterable = [];
+    protected array $filterable = [];
 
     /**
-     * Fields to allow listing (enumeration) upon.
-     *
-     * @var string[]
+     * @var string[] Fields to allow listing (enumeration) upon.
      */
-    protected $listable = [];
+    protected array $listable = [];
 
     /**
-     * Fields to allow sorting upon.
-     *
-     * @var string[]
+     * @var string[] Fields to allow sorting upon.
      */
-    protected $sortable = [];
+    protected array $sortable = [];
 
     /**
-     * List of fields to exclude when processing an "_all" filter.
-     *
-     * @var string[]
+     * @var string[] List of fields to exclude when processing an "_all" filter.
      */
-    protected $excludeForAll = [];
+    protected array $excludeForAll = [];
 
     /**
-     * Separator to use when splitting filter values to treat them as ORs.
-     *
-     * @var string
+     * @var non-empty-string Separator to use when splitting filter values to treat them as ORs.
      */
-    protected $orSeparator = '||';
+    protected string $orSeparator = '||';
 
     /**
-     * Array key for the total unfiltered object count.
-     *
-     * @var string
+     * @var string Array key for the total unfiltered object count.
      */
-    protected $countKey = 'count';
+    protected string $countKey = 'count';
 
     /**
-     * Array key for the filtered object count.
-     *
-     * @var string
+     * @var string Array key for the filtered object count.
      */
-    protected $countFilteredKey = 'count_filtered';
+    protected string $countFilteredKey = 'count_filtered';
 
     /**
-     * Array key for the actual result set.
-     *
-     * @var string
+     * @var string Array key for the actual result set.
      */
-    protected $rowsKey = 'rows';
+    protected string $rowsKey = 'rows';
 
     /**
      * Array key for the list of enumerated columns and their enumerations.
@@ -125,15 +108,59 @@ abstract class Sprunje
     protected $listableKey = 'listable';
 
     /**
-     * Constructor.
-     *
-     * @param ClassMapper $classMapper
-     * @param mixed[]     $options
+     * @param array{
+     *  sorts?: array<string, string>,
+     *  filters?: array<string, mixed>,
+     *  lists?: string[],
+     *  size?: string|int|null,
+     *  page?: ?int,
+     *  format?: string
+     * } $options DEPRECATED. Use `$this->setOptions()` instead.
      */
-    public function __construct(ClassMapper $classMapper, array $options)
+    public function __construct(array $options = [])
     {
-        $this->classMapper = $classMapper;
+        $this->setOptions($options);
 
+        // Start a new query on any Model instances
+        if (is_a($query = $this->baseQuery(), Model::class)) {
+            $this->query = $query->newQuery();
+        } else {
+            $this->query = $query;
+        }
+    }
+
+    /**
+     * Set Sprunje options.
+     *
+     * @param array{
+     *  sorts?: array<string, string>,
+     *  filters?: array<string, mixed>,
+     *  lists?: string[],
+     *  size?: string|int|null,
+     *  page?: ?int,
+     *  format?: string
+     * } $options $options
+     *
+     * @return static
+     */
+    public function setOptions(array $options): static
+    {
+        $this->validateOptions($options);
+
+        // @phpstan-ignore-next-line - Can't make array_replace_recursive hint at TOptions
+        $this->options = array_replace_recursive($this->options, $options);
+
+        return $this;
+    }
+
+    /**
+     * Validate option using Validator.
+     *
+     * @param  mixed[]                 $options
+     * @throws HttpBadRequestException
+     */
+    protected function validateOptions(array $options): void
+    {
         // Validation on input data
         $v = new Validator($options);
         $v->rule('array', ['sorts', 'filters', 'lists']);
@@ -142,26 +169,11 @@ abstract class Sprunje
         $v->rule('integer', 'page');
         $v->rule('regex', 'format', '/json|csv/i');
 
-        // TODO: translated rules
         if (!$v->validate()) {
-            $e = new HttpBadRequestException();
-            // TODO Requires new Exeception
-            // foreach ($v->errors() as $idx => $field) {
-            //     foreach ($field as $eidx => $error) {
-            //         $e->addUserMessage($error);
-            //     }
-            // }
+            $e = new ValidationException();
+            $e->addErrors($v->errors()); // @phpstan-ignore-line errors returns array with no arguments
 
             throw $e;
-        }
-
-        $this->options = array_replace_recursive($this->options, $options);
-
-        $this->query = $this->baseQuery();
-
-        // Start a new query on any Model instances
-        if (is_a($this->baseQuery(), '\Illuminate\Database\Eloquent\Model')) {
-            $this->query = $this->baseQuery()->newQuery();
         }
     }
 
@@ -170,9 +182,9 @@ abstract class Sprunje
      *
      * @param callable $callback A callback which accepts and returns a Builder instance.
      *
-     * @return self
+     * @return static
      */
-    public function extendQuery(callable $callback)
+    public function extendQuery(callable $callback): static
     {
         $this->query = $callback($this->query);
 
@@ -182,28 +194,28 @@ abstract class Sprunje
     /**
      * Execute the query and build the results, and append them in the appropriate format to the response.
      *
-     * @param Response $response
+     * @param ResponseInterface $response
      *
-     * @return Response
+     * @return ResponseInterface
      */
-    public function toResponse(Response $response)
+    public function toResponse(ResponseInterface $response): ResponseInterface
     {
         $format = $this->options['format'];
 
         if ($format == 'csv') {
-            $result = $this->getCsv();
-
             // Prepare response
-            $response = $response->withAddedHeader('Content-Disposition', "attachment;filename={$this->name}.csv");
-            $response = $response->withAddedHeader('Content-Type', 'text/csv; charset=utf-8');
+            $response = $response->withHeader('Content-Disposition', "attachment;filename={$this->name}.csv");
+            $response = $response->withHeader('Content-Type', 'text/csv; charset=utf-8');
+            $response->getBody()->write($this->getCsv()->toString());
 
-            return $response->write($result);
-        // Default to JSON
-        } else {
-            $result = $this->getArray();
-
-            return $response->withJson($result, 200, JSON_PRETTY_PRINT);
+            return $response;
         }
+
+        // Default to JSON
+        $payload = json_encode($this->getArray(), JSON_THROW_ON_ERROR);
+        $response->getBody()->write($payload);
+
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     /**
@@ -212,9 +224,9 @@ abstract class Sprunje
      * Returns an array containing `count` (the total number of rows, before filtering), `count_filtered` (the total number of rows after filtering),
      * and `rows` (the filtered result set).
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
-    public function getArray()
+    public function getArray(): array
     {
         list($count, $countFiltered, $rows) = $this->getModels();
 
@@ -232,7 +244,7 @@ abstract class Sprunje
      *
      * @return Writer
      */
-    public function getCsv()
+    public function getCsv(): Writer
     {
         $filteredQuery = clone $this->query;
 
@@ -255,7 +267,7 @@ abstract class Sprunje
         $collection->transform(function ($item, $key) use (&$columnNames) {
             $item = Arr::dot($item->toArray());
             foreach ($item as $itemKey => $itemValue) {
-                if (!in_array($itemKey, $columnNames)) {
+                if (!in_array($itemKey, $columnNames, true)) {
                     $columnNames[] = $itemKey;
                 }
             }
@@ -269,7 +281,7 @@ abstract class Sprunje
         $collection->each(function ($item) use ($csv, $columnNames) {
             $row = [];
             foreach ($columnNames as $itemKey) {
-                // Only add the value if it is set and not an array.  Laravel's array_dot sometimes creates empty child arrays :(
+                // Only add the value if it is set and not an array. Laravel's array_dot sometimes creates empty child arrays :(
                 // See https://github.com/laravel/framework/pull/13009
                 if (isset($item[$itemKey]) && !is_array($item[$itemKey])) {
                     $row[] = $item[$itemKey];
@@ -289,9 +301,9 @@ abstract class Sprunje
      *
      * Returns the filtered, paginated result set and the counts.
      *
-     * @return mixed[]
+     * @return array{int, int, Collection}
      */
-    public function getModels()
+    public function getModels(): array
     {
         // Count unfiltered total
         $count = $this->count($this->query);
@@ -333,6 +345,7 @@ abstract class Sprunje
             $methodName = 'list' . Str::studly($name);
 
             if (method_exists($this, $methodName)) {
+                // @phpstan-ignore-next-line Allow variable method call, since we know it exists
                 $result[$name] = $this->$methodName();
             } else {
                 $result[$name] = $this->getColumnValues($name);
@@ -345,9 +358,9 @@ abstract class Sprunje
     /**
      * Get the underlying queriable object in its current state.
      *
-     * @return Builder
+     * @return EloquentBuilder|QueryBuilder|Relation
      */
-    public function getQuery()
+    public function getQuery(): EloquentBuilder|QueryBuilder|Relation
     {
         return $this->query;
     }
@@ -355,11 +368,11 @@ abstract class Sprunje
     /**
      * Set the underlying QueryBuilder object.
      *
-     * @param Builder $query
+     * @param EloquentBuilder|QueryBuilder|Relation $query
      *
-     * @return self
+     * @return static
      */
-    public function setQuery($query)
+    public function setQuery(EloquentBuilder|QueryBuilder|Relation $query): static
     {
         $this->query = $query;
 
@@ -369,18 +382,18 @@ abstract class Sprunje
     /**
      * Apply any filters from the options, calling a custom filter callback when appropriate.
      *
-     * @param Builder $query
+     * @param EloquentBuilder|QueryBuilder|Relation $query
      *
-     * @return self
+     * @return static
      */
-    public function applyFilters($query)
+    public function applyFilters(EloquentBuilder|QueryBuilder|Relation $query): static
     {
         foreach ($this->options['filters'] as $name => $value) {
             // Check that this filter is allowed
-            if (($name != '_all') && !in_array($name, $this->filterable)) {
-                $e = new HttpBadRequestException();
-                // TODO
-                // $e->addUserMessage('VALIDATE.SPRUNJE.BAD_FILTER', ['name' => $name]);
+            if (($name != '_all') && !in_array($name, $this->filterable, true)) {
+                $e = new SprunjeException("Bad filter: $name");
+                $message = new UserMessage('VALIDATE.SPRUNJE.BAD_FILTER', ['name' => $name]);
+                $e->setDescription($message);
 
                 throw $e;
             }
@@ -396,18 +409,18 @@ abstract class Sprunje
     /**
      * Apply any sorts from the options, calling a custom sorter callback when appropriate.
      *
-     * @param Builder $query
+     * @param EloquentBuilder|QueryBuilder|Relation $query
      *
-     * @return self
+     * @return static
      */
-    public function applySorts($query)
+    public function applySorts(EloquentBuilder|QueryBuilder|Relation $query): static
     {
         foreach ($this->options['sorts'] as $name => $direction) {
             // Check that this sort is allowed
-            if (!in_array($name, $this->sortable)) {
-                $e = new HttpBadRequestException();
-                // TODO
-                // $e->addUserMessage('VALIDATE.SPRUNJE.BAD_SORT', ['name' => $name]);
+            if (!in_array($name, $this->sortable, true)) {
+                $e = new SprunjeException("Bad sort: $name");
+                $message = new UserMessage('VALIDATE.SPRUNJE.BAD_SORT', ['name' => $name]);
+                $e->setDescription($message);
 
                 throw $e;
             }
@@ -416,6 +429,7 @@ abstract class Sprunje
             $methodName = 'sort' . Str::studly($name);
 
             if (method_exists($this, $methodName)) {
+                // @phpstan-ignore-next-line Allow variable method call, since we know it exists
                 $this->$methodName($query, $direction);
             } else {
                 $query->orderBy($name, $direction);
@@ -428,16 +442,15 @@ abstract class Sprunje
     /**
      * Apply pagination based on the `page` and `size` options.
      *
-     * @param Builder $query
+     * @param EloquentBuilder|QueryBuilder|Relation $query
      *
-     * @return self
+     * @return static
      */
-    public function applyPagination($query)
+    public function applyPagination(EloquentBuilder|QueryBuilder|Relation $query): static
     {
         if (
-            ($this->options['page'] !== null) &&
-            ($this->options['size'] !== null) &&
-            ($this->options['size'] != 'all')
+            (is_int($this->options['page'])) &&
+            (is_int($this->options['size']))
         ) {
             $offset = $this->options['size'] * $this->options['page'];
             $query->skip($offset)
@@ -450,15 +463,15 @@ abstract class Sprunje
     /**
      * Match any filter in `filterable`.
      *
-     * @param Builder $query
-     * @param mixed   $value
+     * @param EloquentBuilder|QueryBuilder|Relation $query
+     * @param mixed                                 $value
      *
-     * @return self
+     * @return static
      */
-    protected function filterAll($query, $value)
+    protected function filterAll(EloquentBuilder|QueryBuilder|Relation $query, mixed $value): static
     {
         foreach ($this->filterable as $name) {
-            if (Str::studly($name) != 'all' && !in_array($name, $this->excludeForAll)) {
+            if (Str::studly($name) != 'all' && !in_array($name, $this->excludeForAll, true)) {
                 // Since we want to match _any_ of the fields, we wrap the field callback in a 'orWhere' callback
                 $query->orWhere(function ($fieldQuery) use ($name, $value) {
                     $this->buildFilterQuery($fieldQuery, $name, $value);
@@ -472,18 +485,19 @@ abstract class Sprunje
     /**
      * Build the filter query for a single field.
      *
-     * @param Builder $query
-     * @param string  $name
-     * @param mixed   $value
+     * @param EloquentBuilder|QueryBuilder|Relation $query
+     * @param string                                $name
+     * @param mixed                                 $value
      *
-     * @return self
+     * @return static
      */
-    protected function buildFilterQuery($query, $name, $value)
+    protected function buildFilterQuery(EloquentBuilder|QueryBuilder|Relation $query, string $name, mixed $value): static
     {
         $methodName = 'filter' . Str::studly($name);
 
         // Determine if a custom filter method has been defined
         if (method_exists($this, $methodName)) {
+            // @phpstan-ignore-next-line Allow variable method call, since we know it exists
             $this->$methodName($query, $value);
         } else {
             $this->buildFilterDefaultFieldQuery($query, $name, $value);
@@ -496,19 +510,24 @@ abstract class Sprunje
      * Perform a 'like' query on a single field, separating the value string on the or separator and
      * matching any of the supplied values.
      *
-     * @param Builder $query
-     * @param string  $name
-     * @param mixed   $value
+     * @param EloquentBuilder|QueryBuilder|Relation $query
+     * @param string                                $name
+     * @param mixed                                 $value
      *
-     * @return self
+     * @return static
      */
-    protected function buildFilterDefaultFieldQuery($query, $name, $value)
+    protected function buildFilterDefaultFieldQuery(EloquentBuilder|QueryBuilder|Relation $query, string $name, mixed $value): static
     {
-        // Default filter - split value on separator for OR queries
-        // and search by column name
-        $values = explode($this->orSeparator, $value);
-        foreach ($values as $value) {
-            $query->orLike($name, $value);
+        if (is_bool($value)) {
+            // Bool doesn't behave correctly when cast to string (false is empty instead of 0).
+            $query->orWhere($name, $value);
+        } elseif (is_scalar($value)) {
+            // Default filter - split value on separator for OR queries
+            // and search by column name
+            $values = explode($this->orSeparator, (string) $value);
+            foreach ($values as $val) {
+                $query->orWhere($name, 'LIKE', "%$val%");
+            }
         }
 
         return $this;
@@ -516,12 +535,13 @@ abstract class Sprunje
 
     /**
      * Set any transformations you wish to apply to the collection, after the query is executed.
+     * This method is meant to be customized in child class.
      *
-     * @param \Illuminate\Support\Collection $collection
+     * @param Collection $collection
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    protected function applyTransformations($collection)
+    protected function applyTransformations(Collection $collection): Collection
     {
         return $collection;
     }
@@ -529,9 +549,9 @@ abstract class Sprunje
     /**
      * Set the initial query used by your Sprunje.
      *
-     * @return Builder|\Illuminate\Database\Eloquent\Relations\Relation|\UserFrosting\Sprinkle\Core\Database\Models\Model
+     * @return EloquentBuilder|QueryBuilder|Relation|Model
      */
-    abstract protected function baseQuery();
+    abstract protected function baseQuery(): EloquentBuilder|QueryBuilder|Relation|Model;
 
     /**
      * Returns a list of distinct values for a specified column.
@@ -539,30 +559,31 @@ abstract class Sprunje
      *
      * @param string $column
      *
-     * @return array<array<string,mixed>>
+     * @return array{value: mixed, text: mixed}[]
      */
-    protected function getColumnValues($column)
+    protected function getColumnValues(string $column): array
     {
-        $rawValues = $this->query->select($column)->distinct()->orderBy($column, 'asc')->get();
-        $values = [];
-        foreach ($rawValues as $raw) {
-            $values[] = [
-                'value' => $raw[$column],
-                'text'  => $raw[$column],
-            ];
-        }
+        $rawValues = $this->query->select($column)
+                                 ->distinct()
+                                 ->orderBy($column, 'asc')
+                                 ->get();
 
-        return $values;
+        return $rawValues->map(function ($item, $key) use ($column) {
+            return [
+                'value' => $item[$column],
+                'text'  => $item[$column],
+            ];
+        })->all();
     }
 
     /**
      * Get the unpaginated count of items (before filtering) in this query.
      *
-     * @param Builder $query
+     * @param EloquentBuilder|QueryBuilder|Relation $query
      *
      * @return int
      */
-    protected function count($query)
+    protected function count(EloquentBuilder|QueryBuilder|Relation $query): int
     {
         return $query->count();
     }
@@ -570,11 +591,11 @@ abstract class Sprunje
     /**
      * Get the unpaginated count of items (after filtering) in this query.
      *
-     * @param Builder $query
+     * @param EloquentBuilder|QueryBuilder|Relation $query
      *
      * @return int
      */
-    protected function countFiltered($query)
+    protected function countFiltered(EloquentBuilder|QueryBuilder|Relation $query): int
     {
         return $query->count();
     }
