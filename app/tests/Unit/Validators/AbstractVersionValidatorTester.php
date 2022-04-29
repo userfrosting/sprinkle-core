@@ -39,7 +39,7 @@ abstract class AbstractVersionValidatorTester extends TestCase
 
         // Assert validate function
         if ($valid) {
-            $this->assertTrue($validator->validate());
+            $this->assertTrue($validator->validate()); // @phpstan-ignore-line
         } else {
             try {
                 $validator->validate();
