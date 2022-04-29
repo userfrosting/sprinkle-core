@@ -156,7 +156,8 @@ abstract class Sprunje
     /**
      * Validate option using Validator.
      *
-     * @param  mixed[]                 $options
+     * @param mixed[] $options
+     *
      * @throws HttpBadRequestException
      */
     protected function validateOptions(array $options): void
