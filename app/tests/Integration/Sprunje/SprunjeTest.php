@@ -315,7 +315,7 @@ class SprunjeTest extends CoreTestCase
         $this->assertSame(
             'id,name,description,type,active\n' .
             '1,"The foo","Le Foo",1,1\n' .
-            '2,"The bar","Le Bar",2,0\n' .
+            '2,"The bar","Le Bar",2,\n' .
             '3,"The foobar","Le Foo et le Bar",1,1\n',
             str_replace("\n", '\n', $csv)
         );
@@ -332,7 +332,7 @@ class SprunjeTest extends CoreTestCase
         $this->assertSame(
             'id,name,description,type,active\n' .
             '1,,"Le Foo",1,1\n' .
-            '2,,"Le Bar",2,0\n' .
+            '2,,"Le Bar",2,\n' .
             '3,,"Le Foo et le Bar",1,1\n',
             str_replace("\n", '\n', $csv)
         );
@@ -347,9 +347,9 @@ class SprunjeTest extends CoreTestCase
             'count'          => 3,
             'count_filtered' => 3,
             'rows'           => [
-                ['id' => 1, 'name' => 'The foo', 'description' => 'Le Foo', 'type' => 1, 'active' => 1],
-                ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => 0],
-                ['id' => 3, 'name' => 'The foobar', 'description' => 'Le Foo et le Bar', 'type' => 1, 'active' => 1],
+                ['id' => 1, 'name' => 'The foo', 'description' => 'Le Foo', 'type' => 1, 'active' => true],
+                ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
+                ['id' => 3, 'name' => 'The foobar', 'description' => 'Le Foo et le Bar', 'type' => 1, 'active' => true],
             ],
             'listable' => $this->listable,
         ], $response);
@@ -446,6 +446,12 @@ class TestSprunjeModel extends UfModel
 
     /** @var bool */
     public $timestamps = false;
+
+    // @phpstan-ignore-next-line
+    protected $casts = [
+        'type'   => 'integer',
+        'active' => 'boolean',
+    ];
 }
 
 /**
