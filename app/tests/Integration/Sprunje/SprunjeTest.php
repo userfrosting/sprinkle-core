@@ -326,23 +326,6 @@ class SprunjeTest extends CoreTestCase
         ], $sprunje->getArray());
     }
 
-    public function testWithFieldsNotInColumnList(): void
-    {
-        $sprunje = new TestSprunje();
-        $sprunje->setColumns(['id', 'name', 'foo']);
-
-        $this->assertEquals([
-            'count'          => 3,
-            'count_filtered' => 3,
-            'rows'           => [
-                ['id' => 1, 'name' => 'The foo', '"foo"' => 'foo'],
-                ['id' => 2, 'name' => 'The bar', '"foo"' => 'foo'],
-                ['id' => 3, 'name' => 'The foobar', '"foo"' => 'foo'],
-            ],
-            'listable' => $this->listable,
-        ], $sprunje->getArray());
-    }
-
     public function testForSetters(): void
     {
         $sprunje = new TestSprunje([
