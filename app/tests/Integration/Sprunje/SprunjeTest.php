@@ -19,7 +19,6 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Collection;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Slim\Psr7\Response;
 use UserFrosting\Sprinkle\Core\Database\Migration;
 use UserFrosting\Sprinkle\Core\Database\Models\Model as UfModel;
@@ -32,8 +31,6 @@ use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
  */
 class SprunjeTest extends CoreTestCase
 {
-    use MockeryPHPUnitIntegration;
-
     /** @var mixed[] */
     protected array $listable = [
         'name' => [
@@ -59,6 +56,22 @@ class SprunjeTest extends CoreTestCase
         $migration->up();
 
         // Insert some data
+        $this->createData();
+    }
+
+    public function tearDown(): void
+    {
+        // Run custom migration down
+        /** @var Builder */
+        $builder = $this->ci->get(Builder::class);
+        $migration = new TestTableMigration($builder);
+        $migration->down();
+
+        parent::tearDown();
+    }
+
+    protected function createData(): void
+    {
         (new TestSprunjeModel([
             'id'          => 1,
             'name'        => 'foo',
@@ -80,17 +93,6 @@ class SprunjeTest extends CoreTestCase
             'type'        => 1,
             'active'      => true
         ]))->save();
-    }
-
-    public function tearDown(): void
-    {
-        // Run custom migration down
-        /** @var Builder */
-        $builder = $this->ci->get(Builder::class);
-        $migration = new TestTableMigration($builder);
-        $migration->down();
-
-        parent::tearDown();
     }
 
     public function testBaseSprunje(): void
@@ -312,6 +314,7 @@ class SprunjeTest extends CoreTestCase
         $sprunje = new TestSprunje([
             'format' => 'csv',
         ]);
+        $sprunje->setCsvChunk(1);
         $response = $sprunje->toResponse(new Response());
         $csv = (string) $response->getBody();
 
@@ -325,6 +328,31 @@ class SprunjeTest extends CoreTestCase
             '1,"The foo","Le Foo",1,1\n' .
             '2,"The bar","Le Bar",2,\n' .
             '3,"The foobar","Le Foo et le Bar",1,1\n',
+            str_replace("\n", '\n', $csv)
+        );
+    }
+
+    public function testCSVWithOptions(): void
+    {
+        $sprunje = new TestSprunje([
+            'sorts'   => ['id' => 'desc'],
+            'fields'  => ['id', 'name'],
+            'filters' => ['type' => 1],
+            'format'  => 'csv',
+        ]);
+        $sprunje->setCsvChunk(1);
+        $response = $sprunje->toResponse(new Response());
+        $csv = (string) $response->getBody();
+
+        $this->assertEquals('text/csv; charset=utf-8', $response->getHeaderLine('Content-Type'));
+        $this->assertEquals('attachment;filename=export.csv', $response->getHeaderLine('Content-Disposition'));
+
+        // Str_replace is required to normalize line endings.
+        // See: https://stackoverflow.com/a/3986325/445757
+        $this->assertSame(
+            'id,name\n' .
+            '3,"The foobar"\n' .
+            '1,"The foo"\n',
             str_replace("\n", '\n', $csv)
         );
     }

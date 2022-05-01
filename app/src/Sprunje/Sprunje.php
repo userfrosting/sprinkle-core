@@ -108,6 +108,12 @@ abstract class Sprunje
     protected $listableKey = 'listable';
 
     /**
+     * @var int CSV export split the request into multiple chunk to avoid memory overflow.
+     *          Lower this value if you encounter memory issues when exporting large data sets.
+     */
+    protected int $csvChunk = 200;
+
+    /**
      * @param array{
      *  sorts?: array<string, string>,
      *  filters?: array<string, mixed>,
@@ -255,44 +261,47 @@ abstract class Sprunje
         // Apply sorts
         $this->applySorts($filteredQuery);
 
-        $collection = collect($filteredQuery->get());
-
-        // Perform any additional transformations on the dataset
-        $collection = $this->applyTransformations($collection);
-
         $csv = Writer::createFromFileObject(new \SplTempFileObject());
 
         $columnNames = [];
+        $rows = [];
 
-        // Flatten collection while simultaneously building the column names from the union of each element's keys
-        $collection->transform(function ($item, $key) use (&$columnNames) {
-            $item = Arr::dot($item->toArray());
-            foreach ($item as $itemKey => $itemValue) {
-                if (!in_array($itemKey, $columnNames, true)) {
-                    $columnNames[] = $itemKey;
+        $filteredQuery->chunk($this->csvChunk, function ($models) use (&$columnNames, &$rows) {
+
+            // Perform any additional transformations on the dataset
+            $collection = $this->applyTransformations($models);
+
+            // Flatten collection while simultaneously building the column names from the union of each element's keys
+            $collection->transform(function ($item, $key) use (&$columnNames) {
+                $item = Arr::dot($item->toArray());
+                foreach ($item as $itemKey => $itemValue) {
+                    if (!in_array($itemKey, $columnNames, true)) {
+                        $columnNames[] = $itemKey;
+                    }
                 }
-            }
 
-            return $item;
+                return $item;
+            });
+
+            // Insert the data as rows in the CSV document
+            $collection->each(function ($item) use ($columnNames, &$rows) {
+                $row = [];
+                foreach ($columnNames as $itemKey) {
+                    // Only add the value if it is set and not an array. Laravel's array_dot sometimes creates empty child arrays :(
+                    // See https://github.com/laravel/framework/pull/13009
+                    if (isset($item[$itemKey]) && !is_array($item[$itemKey])) {
+                        $row[] = $item[$itemKey];
+                    } else {
+                        $row[] = '';
+                    }
+                }
+
+                $rows[] = $row;
+            });
         });
 
         $csv->insertOne($columnNames);
-
-        // Insert the data as rows in the CSV document
-        $collection->each(function ($item) use ($csv, $columnNames) {
-            $row = [];
-            foreach ($columnNames as $itemKey) {
-                // Only add the value if it is set and not an array. Laravel's array_dot sometimes creates empty child arrays :(
-                // See https://github.com/laravel/framework/pull/13009
-                if (isset($item[$itemKey]) && !is_array($item[$itemKey])) {
-                    $row[] = $item[$itemKey];
-                } else {
-                    $row[] = '';
-                }
-            }
-
-            $csv->insertOne($row);
-        });
+        $csv->insertAll($rows);
 
         return $csv;
     }
@@ -457,6 +466,20 @@ abstract class Sprunje
             $query->skip($offset)
                   ->take($this->options['size']);
         }
+
+        return $this;
+    }
+
+    /**
+     * Set CSV export chunk parameters.
+     *
+     * @param int $csvChunk
+     *
+     * @return static
+     */
+    public function setCsvChunk(int $csvChunk): static
+    {
+        $this->csvChunk = $csvChunk;
 
         return $this;
     }
