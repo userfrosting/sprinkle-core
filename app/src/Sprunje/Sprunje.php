@@ -45,7 +45,6 @@ abstract class Sprunje
      * @var array{
      *  sorts: array<string, string>,
      *  filters: string[],
-     *  lists: string[],
      *  size: string|int|null,
      *  page: ?int,
      *  format: 'csv'|'json',
@@ -54,7 +53,6 @@ abstract class Sprunje
     protected array $options = [
         'sorts'   => [],
         'filters' => [],
-        'lists'   => [],
         'size'    => 'all',
         'page'    => null,
         'format'  => 'json',
@@ -74,6 +72,11 @@ abstract class Sprunje
      * @var string[] Fields to allow sorting upon.
      */
     protected array $sortable = [];
+
+    /**
+     * @var string[] Fields to show in output. Empty array will load all.
+     */
+    protected array $columns = [];
 
     /**
      * @var string[] List of fields to exclude when processing an "_all" filter.
@@ -101,9 +104,7 @@ abstract class Sprunje
     protected string $rowsKey = 'rows';
 
     /**
-     * Array key for the list of enumerated columns and their enumerations.
-     *
-     * @var string
+     * @var string Array key for the list of enumerated columns and their enumerations.
      */
     protected $listableKey = 'listable';
 
@@ -117,7 +118,6 @@ abstract class Sprunje
      * @param array{
      *  sorts?: array<string, string>,
      *  filters?: array<string, mixed>,
-     *  lists?: string[],
      *  size?: string|int|null,
      *  page?: ?int,
      *  format?: string
@@ -141,7 +141,6 @@ abstract class Sprunje
      * @param array{
      *  sorts?: array<string, string>,
      *  filters?: array<string, mixed>,
-     *  lists?: string[],
      *  size?: string|int|null,
      *  page?: ?int,
      *  format?: string
@@ -170,7 +169,7 @@ abstract class Sprunje
     {
         // Validation on input data
         $v = new Validator($options);
-        $v->rule('array', ['sorts', 'filters', 'lists']);
+        $v->rule('array', ['sorts', 'filters']);
         $v->rule('regex', 'sorts.*', '/asc|desc/i');
         $v->rule('regex', 'size', '/all|[0-9]+/i');
         $v->rule('integer', 'page');
@@ -261,6 +260,10 @@ abstract class Sprunje
         // Apply sorts
         $this->applySorts($filteredQuery);
 
+        // Determine columns to select
+        $columnsToShow = ($this->columns === []) ? ['*'] : $this->columns;
+        $filteredQuery->select($columnsToShow);
+
         $csv = Writer::createFromFileObject(new \SplTempFileObject());
 
         $columnNames = [];
@@ -333,7 +336,11 @@ abstract class Sprunje
         // Paginate
         $this->applyPagination($filteredQuery);
 
-        $collection = collect($filteredQuery->get());
+        // Determine columns to select
+        $columns = ($this->columns === []) ? ['*'] : $this->columns;
+
+        // Execute query
+        $collection = collect($filteredQuery->get($columns));
 
         // Perform any additional transformations on the dataset
         $collection = $this->applyTransformations($collection);
@@ -342,11 +349,11 @@ abstract class Sprunje
     }
 
     /**
-     * Get lists of values for specified fields in 'lists' option, calling a custom lister callback when appropriate.
+     * Get lists of values for specified fields in 'listable' option, calling a custom lister callback when appropriate.
      *
      * @return array<string,mixed>
      */
-    public function getListable()
+    public function getListable(): array
     {
         $result = [];
         foreach ($this->listable as $name) {
@@ -466,6 +473,62 @@ abstract class Sprunje
             $query->skip($offset)
                   ->take($this->options['size']);
         }
+
+        return $this;
+    }
+
+    /**
+     * Set fields to allow filtering upon.
+     *
+     * @param string[] $filterable
+     *
+     * @return static
+     */
+    public function setFilterable(array $filterable): static
+    {
+        $this->filterable = $filterable;
+
+        return $this;
+    }
+
+    /**
+     * Set fields to allow listing (enumeration) upon.
+     *
+     * @param string[] $listable
+     *
+     * @return static
+     */
+    public function setListable(array $listable): static
+    {
+        $this->listable = $listable;
+
+        return $this;
+    }
+
+    /**
+     * Set fields to allow sorting upon.
+     *
+     * @param string[] $sortable
+     *
+     * @return static
+     */
+    public function setSortable(array $sortable): static
+    {
+        $this->sortable = $sortable;
+
+        return $this;
+    }
+
+    /**
+     * Set fields to show in output.
+     *
+     * @param string[] $columns
+     *
+     * @return static
+     */
+    public function setColumns(array $columns): static
+    {
+        $this->columns = $columns;
 
         return $this;
     }

@@ -309,6 +309,62 @@ class SprunjeTest extends CoreTestCase
         }
     }
 
+    public function testWithColumns(): void
+    {
+        $sprunje = new TestSprunje();
+        $sprunje->setColumns(['id', 'name']);
+
+        $this->assertEquals([
+            'count'          => 3,
+            'count_filtered' => 3,
+            'rows'           => [
+                ['id' => 1, 'name' => 'The foo'],
+                ['id' => 2, 'name' => 'The bar'],
+                ['id' => 3, 'name' => 'The foobar'],
+            ],
+            'listable' => $this->listable,
+        ], $sprunje->getArray());
+    }
+
+    public function testWithFieldsNotInColumnList(): void
+    {
+        $sprunje = new TestSprunje();
+        $sprunje->setColumns(['id', 'name', 'foo']);
+
+        $this->assertEquals([
+            'count'          => 3,
+            'count_filtered' => 3,
+            'rows'           => [
+                ['id' => 1, 'name' => 'The foo', '"foo"' => 'foo'],
+                ['id' => 2, 'name' => 'The bar', '"foo"' => 'foo'],
+                ['id' => 3, 'name' => 'The foobar', '"foo"' => 'foo'],
+            ],
+            'listable' => $this->listable,
+        ], $sprunje->getArray());
+    }
+
+    public function testForSetters(): void
+    {
+        $sprunje = new TestSprunje([
+            'filters' => ['description' => 'Foo'],
+            'sorts'   => ['description' => 'desc'],
+        ]);
+        $sprunje->setColumns(['id', 'description'])
+                ->setListable([])
+                ->setFilterable(['description'])
+                ->setSortable(['description']);
+
+        $this->assertEquals([
+            'count'          => 3,
+            'count_filtered' => 2,
+            'rows'           => [
+                ['id' => 3, 'description' => 'Le Foo et le Bar'],
+                ['id' => 1, 'description' => 'Le Foo'],
+            ],
+            'listable' => [],
+        ], $sprunje->getArray());
+    }
+
     public function testCSV(): void
     {
         $sprunje = new TestSprunje([
@@ -336,11 +392,11 @@ class SprunjeTest extends CoreTestCase
     {
         $sprunje = new TestSprunje([
             'sorts'   => ['id' => 'desc'],
-            'fields'  => ['id', 'name'],
             'filters' => ['type' => 1],
             'format'  => 'csv',
         ]);
-        $sprunje->setCsvChunk(1);
+        $sprunje->setCsvChunk(1)
+                ->setColumns(['id', 'name']);
         $response = $sprunje->toResponse(new Response());
         $csv = (string) $response->getBody();
 
@@ -420,7 +476,9 @@ class TestSprunje extends Sprunje
     protected function applyTransformations(Collection $collection): Collection
     {
         $collection = $collection->map(function ($item, $key) {
-            $item['name'] = 'The ' . $item['name'];
+            if (isset($item['name'])) {
+                $item['name'] = 'The ' . $item['name'];
+            }
 
             return $item;
         });
