@@ -90,7 +90,7 @@ class JsonRendererTest extends TestCase
         );
 
         // Assert
-        $this->assertJsonStructure(['title', 'description', 'status', 'request', 'exception'], $json);
+        $this->assertJsonStructure(['title', 'description', 'status', 'request', 'trace', 'exception'], $json);
         $this->assertJsonEquals('title', $json, 'title');
         $this->assertJsonEquals('description', $json, 'description');
         $this->assertJsonEquals(234, $json, 'status');

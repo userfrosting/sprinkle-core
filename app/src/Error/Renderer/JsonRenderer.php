@@ -40,6 +40,12 @@ final class JsonRenderer implements ErrorRendererInterface
 
         if ($displayErrorDetails) {
             $error['request'] = $this->renderRequest($request);
+
+            // Add trace
+            if (($trace = $exception->getTrace()) == true) {
+                $error['trace'] = $trace;
+            }
+
             $error['exception'] = [];
             do {
                 $error['exception'][] = $this->formatExceptionFragment($exception);
