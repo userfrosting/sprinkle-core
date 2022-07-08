@@ -27,7 +27,7 @@ class SprinkleListCommand extends Command
     /**
      * @var string[] The table header
      */
-    protected $headers = ['Sprinkle', 'Class', 'Path'];
+    protected $headers = ['Sprinkle', 'Namespace', 'Path'];
 
     /** @Inject */
     protected SprinkleManager $sprinkleManager;

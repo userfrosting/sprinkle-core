@@ -61,6 +61,7 @@ class ResourceLocatorInitiated
 
             // Add shared streams
             new ResourceStream('cache', shared: true),
+            new ResourceStream('database', shared: true),
             new ResourceStream('logs', shared: true),
             new ResourceStream('sessions', shared: true),
             new ResourceStream('storage', shared: true),

@@ -10,42 +10,75 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Bakery\Event\SetupCommandEvent;
 
 /**
  * Setup wizard CLI Tools.
- * Helper command to setup .env file.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
+ * Umbrella command used to run multiple setup sub-commands at once.
  */
-class SetupCommand extends Command
+final class SetupCommand extends Command
 {
+    use WithSymfonyStyle;
+
+    /**
+     * @param \UserFrosting\Event\EventDispatcher $eventDispatcher
+     */
+    public function __construct(
+        protected EventDispatcherInterface $eventDispatcher
+    ) {
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
+        $list = implode(', ', $this->aggregateCommands());
+
         $this->setName('setup')
              ->setDescription('UserFrosting Configuration Wizard')
-             ->setHelp('This command combine the <info>setup:env</info>, <info>setup:db</info> and <info>setup:mail</info> commands.');
+             ->setHelp('This command combine the following commands : ' . $list);
     }
+
+    /**
+     * @var string[] Commands to run
+     */
+    protected array $commands = [
+        'setup:db',
+        // 'setup:mail',
+        // 'setup:env',
+    ];
 
     /**
      * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $command = $this->getApplication()->find('setup:db');
-        $command->run($input, $output);
-
-        $command = $this->getApplication()->find('setup:mail');
-        $command->run($input, $output);
-
-        $command = $this->getApplication()->find('setup:env');
-        $command->run($input, $output);
+        $application = $this->getApplication();
+        foreach ($this->aggregateCommands() as $commandName) {
+            $command = $application->find($commandName);
+            $command->run($input, $output);
+        }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Aggregate commands to run using BakeCommandEvent.
+     *
+     * @return string[]
+     */
+    protected function aggregateCommands(): array
+    {
+        $event = new SetupCommandEvent($this->commands);
+        $event = $this->eventDispatcher->dispatch($event);
+
+        return $event->getCommands();
     }
 }

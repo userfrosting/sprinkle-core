@@ -21,7 +21,7 @@ use UserFrosting\Sprinkle\Core\Bakery\Event\BakeCommandEvent;
 
 /**
  * Bake command.
- * Umbrella command used to run multiple install/setup sub-commands at once.
+ * Umbrella command used to run multiple sub-commands at once.
  */
 final class BakeCommand extends Command
 {
@@ -53,7 +53,7 @@ final class BakeCommand extends Command
                                                    |___/";
 
     /**
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param \UserFrosting\Event\EventDispatcher $eventDispatcher
      */
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher

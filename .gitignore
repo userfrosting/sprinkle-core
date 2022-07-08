@@ -42,3 +42,4 @@ api/
 # Ignore test artifact
 app/tests/Integration/Session/data/*
 !app/tests/Integration/Session/data/.gitkeep
+app/tests/Integration/Bakery/data/env/.env
