@@ -13,7 +13,7 @@ namespace UserFrosting\Sprinkle\Core\Bakery\Helper;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 /**
- * Database Test Trait. Include method to test the db connection
+ * Database Test Trait. Include method to test the db connection.
  */
 class DbParamTester
 {
