@@ -31,7 +31,7 @@ final class BakeCommand extends Command
      * @var string[] Commands to run
      */
     protected array $commands = [
-        // 'setup:db', // TODO
+        'setup:db',
         // 'setup:mails', // TODO
         'debug',
         'migrate',

@@ -52,7 +52,7 @@ final class SetupCommand extends Command
     protected array $commands = [
         'setup:db',
         // 'setup:mail',
-        // 'setup:env',
+        'setup:env',
     ];
 
     /**
