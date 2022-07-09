@@ -53,7 +53,7 @@ class SetupEnvCommand extends Command
     protected string $defaultMode = 'default';
 
     /**
-     * Inject services
+     * Inject services.
      */
     public function __construct(
         protected ResourceLocatorInterface $locator,
