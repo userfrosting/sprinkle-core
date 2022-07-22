@@ -98,7 +98,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * @codeCoverageIgnore
      */
     public function getBakeryCommands(): array
