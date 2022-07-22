@@ -284,7 +284,7 @@ jobs:
     - name: Execute tests
       run: | 
         echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-        vendor/bin/phpunit
+        vendor/bin/phpunit --exclude-group windows-skip
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2

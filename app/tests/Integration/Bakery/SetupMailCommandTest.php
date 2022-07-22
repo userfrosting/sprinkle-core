@@ -77,6 +77,15 @@ class SetupMailCommandTest extends CoreTestCase
         $this->assertStringContainsString('Could not find .env file', $result->getDisplay());
     }
 
+    /**
+     * WARNING : This test doesn't work on Windows.
+     * @see https://symfony.com/doc/current/components/console/helpers/questionhelper.html#testing-a-command-that-expects-input
+     * "On Windows systems Symfony uses a special binary to implement hidden
+     * questions. This means that those questions don't use the default Input
+     * console object and therefore you can't test them on Windows."
+     *
+     * @group windows-skip
+     */
     public function testCommand(): void
     {
         /** @var SetupMailCommand */
@@ -170,6 +179,15 @@ class SetupMailCommandTest extends CoreTestCase
         $this->assertStringContainsString('Mail configuration saved', $result->getDisplay());
     }
 
+    /**
+     * WARNING : This test doesn't work on Windows.
+     * @see https://symfony.com/doc/current/components/console/helpers/questionhelper.html#testing-a-command-that-expects-input
+     * "On Windows systems Symfony uses a special binary to implement hidden
+     * questions. This means that those questions don't use the default Input
+     * console object and therefore you can't test them on Windows."
+     *
+     * @group windows-skip
+     */
     public function testCommandForGmailMethod(): void
     {
         /** @var SetupMailCommand */
