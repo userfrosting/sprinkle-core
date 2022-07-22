@@ -216,6 +216,6 @@ class SetupMailCommandTest extends CoreTestCase
 
         // Assertions
         $this->assertSame(0, $result->getStatusCode());
-        $this->assertStringContainsString('Current mail configuration from config service differ from the configuration', $result->getDisplay());
+        $this->assertStringContainsString('Current mail configuration from config service differ', $result->getDisplay());
     }
 }

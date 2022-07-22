@@ -78,9 +78,6 @@ use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\RoutesExtension;
 use UserFrosting\Sprinkle\SprinkleRecipe;
 
-/**
- * @codeCoverageIgnore
- */
 class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, EventListenerRecipe
 {
     /**
@@ -101,6 +98,8 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
 
     /**
      * {@inheritdoc}
+     * 
+     * @codeCoverageIgnore
      */
     public function getBakeryCommands(): array
     {
