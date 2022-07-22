@@ -16,6 +16,7 @@ use PDOException;
 use phpmock\mockery\PHPMockery;
 use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\DbParamTester;
 use UserFrosting\Sprinkle\Core\Bakery\SetupDbCommand;
@@ -57,6 +58,7 @@ class SetupDbCommandTest extends CoreTestCase
         $this->ci->set(ResourceLocatorInterface::class, $locator);
 
         // Run command and assert it fails
+        /** @var SetupDbCommand */
         $command = $this->ci->get(SetupDbCommand::class);
         $result = BakeryTester::runCommand($command);
         $this->assertSame(1, $result->getStatusCode());
@@ -66,6 +68,7 @@ class SetupDbCommandTest extends CoreTestCase
     public function testCommandWithNoInput(): void
     {
         // Run command and assert result
+        /** @var SetupDbCommand */
         $command = $this->ci->get(SetupDbCommand::class);
         $result = BakeryTester::runCommand($command, input: ['--force' => true]);
 
@@ -83,6 +86,7 @@ class SetupDbCommandTest extends CoreTestCase
         $this->ci->set(DbParamTester::class, $tester);
 
         // Run command and assert result
+        /** @var SetupDbCommand */
         $command = $this->ci->get(SetupDbCommand::class);
         $result = BakeryTester::runCommand($command);
 
@@ -113,6 +117,7 @@ class SetupDbCommandTest extends CoreTestCase
         PHPMockery::mock($namespace, 'touch')->andReturn(false);
 
         // Run command and assert result
+        /** @var SetupDbCommand */
         $command = $this->ci->get(SetupDbCommand::class);
         $result = BakeryTester::runCommand($command, userInput: [
             '3',
@@ -138,6 +143,7 @@ class SetupDbCommandTest extends CoreTestCase
         $this->ci->set(DbParamTester::class, $tester);
 
         // Run command and assert result
+        /** @var SetupDbCommand */
         $command = $this->ci->get(SetupDbCommand::class);
         $result = BakeryTester::runCommand($command, userInput: [
             '3',
@@ -154,7 +160,7 @@ class SetupDbCommandTest extends CoreTestCase
         $this->assertFileDoesNotExist(__DIR__ . '/data/database/database.sql');
     }
 
-    public function testCommandWithOptions(): void
+    public function testCommandWithOptionsAndVerbose(): void
     {
         // Mock capsule to manipulate the result
         // This simulate the entered config is valid
@@ -164,8 +170,9 @@ class SetupDbCommandTest extends CoreTestCase
         $this->ci->set(DbParamTester::class, $tester);
 
         // Run command and assert result
+        /** @var SetupDbCommand */
         $command = $this->ci->get(SetupDbCommand::class);
-        $result = BakeryTester::runCommand($command, input: [
+        $result = BakeryTester::runCommand($command, verbosity: OutputInterface::VERBOSITY_VERBOSE, input: [
             '--force'       => true,
             '--db_driver'   => 'mysql',
             '--db_name'     => 'database_name',
@@ -177,6 +184,7 @@ class SetupDbCommandTest extends CoreTestCase
 
         // Assertions
         $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('Save path for database credentials', $result->getDisplay());
         $this->assertStringContainsString('Database connection successful', $result->getDisplay());
         $this->assertStringContainsString('Database config successfully saved', $result->getDisplay());
     }
@@ -191,6 +199,7 @@ class SetupDbCommandTest extends CoreTestCase
         $this->ci->set(DbParamTester::class, $tester);
 
         // Run command and assert result
+        /** @var SetupDbCommand */
         $command = $this->ci->get(SetupDbCommand::class);
         $result = BakeryTester::runCommand($command, input: [
             '--force'       => true,
@@ -217,6 +226,7 @@ class SetupDbCommandTest extends CoreTestCase
         $this->ci->set(DbParamTester::class, $tester);
 
         // Run command and assert result
+        /** @var SetupDbCommand */
         $command = $this->ci->get(SetupDbCommand::class);
         $result = BakeryTester::runCommand($command, input: ['--force' => true], userInput: [
             '0',
@@ -236,6 +246,7 @@ class SetupDbCommandTest extends CoreTestCase
     public function testCommandForBadDriver(): void
     {
         // Run command and assert result
+        /** @var SetupDbCommand */
         $command = $this->ci->get(SetupDbCommand::class);
         $result = BakeryTester::runCommand($command, input: [
             '--force'       => true,

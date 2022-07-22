@@ -36,7 +36,7 @@ use UserFrosting\Sprinkle\Core\Bakery\SeedListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupDbCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupEnvCommand;
-use UserFrosting\Sprinkle\Core\Bakery\SetupSmtpCommand;
+use UserFrosting\Sprinkle\Core\Bakery\SetupMailCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
 use UserFrosting\Sprinkle\Core\Bakery\WebpackCommand;
@@ -78,6 +78,9 @@ use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\RoutesExtension;
 use UserFrosting\Sprinkle\SprinkleRecipe;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, EventListenerRecipe
 {
     /**
@@ -123,7 +126,7 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
             SetupCommand::class,
             SetupDbCommand::class,
             SetupEnvCommand::class,
-            SetupSmtpCommand::class,
+            SetupMailCommand::class,
             SprinkleListCommand::class,
             TestMailCommand::class,
             WebpackCommand::class,

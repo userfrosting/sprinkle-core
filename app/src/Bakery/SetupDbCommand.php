@@ -30,6 +30,14 @@ class SetupDbCommand extends Command
 {
     use WithSymfonyStyle;
 
+    /**
+     * @var string Path to the .env file
+     */
+    protected string $envPath = 'sprinkles://.env';
+
+    /**
+     * Inject services
+     */
     public function __construct(
         protected ResourceLocatorInterface $locator,
         protected Config $config,
@@ -85,7 +93,11 @@ class SetupDbCommand extends Command
 
             return self::FAILURE;
         }
-        $this->io->note("Save path for database credentials : $envPath");
+
+        // Display debug data in verbose mode.
+        if ($this->io->isVerbose()) {
+            $this->io->note("Save path for database credentials : $envPath");
+        }
 
         // Get command options
         $force = (bool) $input->getOption('force');
@@ -333,7 +345,7 @@ class SetupDbCommand extends Command
      */
     protected function getEnvPath(): string
     {
-        $path = $this->locator->findResource('sprinkles://.env', all: true);
+        $path = $this->locator->findResource($this->envPath, all: true);
 
         if ($path === null) {
             throw new Exception('Could not find .env file');
