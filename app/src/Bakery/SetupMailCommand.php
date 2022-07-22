@@ -53,7 +53,7 @@ class SetupMailCommand extends Command
     private const Setup_None = 'No email support';
 
     /**
-     * Inject services
+     * Inject services.
      */
     public function __construct(
         protected ResourceLocatorInterface $locator,
@@ -174,7 +174,7 @@ class SetupMailCommand extends Command
             self::Setup_SMTP,
             self::Setup_Gmail,
             self::Setup_Native,
-            self::Setup_None
+            self::Setup_None,
         ], self::Setup_SMTP);
 
         // @phpstan-ignore-next-line : $choice can only be one of the choices above, no need for default.
