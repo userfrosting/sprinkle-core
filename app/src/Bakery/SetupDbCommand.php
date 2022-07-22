@@ -36,7 +36,7 @@ class SetupDbCommand extends Command
     protected string $envPath = 'sprinkles://.env';
 
     /**
-     * Inject services
+     * Inject services.
      */
     public function __construct(
         protected ResourceLocatorInterface $locator,
