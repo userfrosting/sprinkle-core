@@ -32,7 +32,7 @@ final class BakeCommand extends Command
      */
     protected array $commands = [
         'setup:db',
-        // 'setup:mails', // TODO
+        'setup:mail',
         'debug',
         'migrate',
         'webpack',

@@ -72,7 +72,7 @@ class SetupMailCommand extends Command
     {
         $this->setName('setup:mail')
              ->setAliases(['setup:smtp'])
-             ->setDescription('UserFrosting SMTP Configuration Wizard')
+             ->setDescription('UserFrosting Mail Configuration Wizard')
              ->setHelp('Helper command to setup outgoing email configuration. This can also be done manually by editing the <comment>app/.env</comment> file or using global server environment variables.')
              ->addOption('force', null, InputOption::VALUE_NONE, 'Force setup if SMTP appears to be already configured')
              ->addOption('smtp_host', null, InputOption::VALUE_OPTIONAL, 'The SMTP server hostname')
