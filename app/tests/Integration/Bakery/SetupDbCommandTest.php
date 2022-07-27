@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PDOException;
@@ -21,6 +22,7 @@ use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\DbParamTester;
 use UserFrosting\Sprinkle\Core\Bakery\SetupDbCommand;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
+use UserFrosting\Support\DotenvEditor\DotenvEditor;
 use UserFrosting\Testing\BakeryTester;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
@@ -32,6 +34,8 @@ use UserFrosting\UniformResourceLocator\ResourceStream;
 class SetupDbCommandTest extends CoreTestCase
 {
     use MockeryPHPUnitIntegration;
+
+    protected string $dbFile = __DIR__ . '/data/database/database.sql';
 
     /**
      * {@inheritdoc}
@@ -47,6 +51,9 @@ class SetupDbCommandTest extends CoreTestCase
         $locator->addStream($dbStream);
         $locator->addStream($envStream);
         $this->ci->set(ResourceLocatorInterface::class, $locator);
+
+        // Delete existing env file
+        @unlink($this->dbFile);
     }
 
     public function testEnvNotFound(): void
@@ -102,7 +109,7 @@ class SetupDbCommandTest extends CoreTestCase
     public function testCommandWithFailedTouch(): void
     {
         // Make sure database file doesn't exist yet
-        $this->assertFileDoesNotExist(__DIR__ . '/data/database/database.sql');
+        $this->assertFileDoesNotExist($this->dbFile);
 
         // Mock capsule to manipulate the result
         // This simulate the entered config IS valid
@@ -121,7 +128,7 @@ class SetupDbCommandTest extends CoreTestCase
         $command = $this->ci->get(SetupDbCommand::class);
         $result = BakeryTester::runCommand($command, userInput: [
             '3',
-            __DIR__ . '/data/database/database.sql',
+            $this->dbFile,
         ]);
 
         // Assertions
@@ -131,8 +138,14 @@ class SetupDbCommandTest extends CoreTestCase
 
     public function testCommand(): void
     {
+        /** @var Capsule */
+        $capsule = $this->ci->get(Capsule::class);
+        $connection = $capsule->getConnection();
+        $this->assertSame('sqlite', $connection->getDriverName());
+        $this->assertSame(':memory:', $connection->getDatabaseName());
+
         // Make sure database file doesn't exist yet
-        $this->assertFileDoesNotExist(__DIR__ . '/data/database/database.sql');
+        $this->assertFileDoesNotExist($this->dbFile);
 
         // Mock capsule to manipulate the result
         // This simulate the entered config IS valid
@@ -147,7 +160,7 @@ class SetupDbCommandTest extends CoreTestCase
         $command = $this->ci->get(SetupDbCommand::class);
         $result = BakeryTester::runCommand($command, userInput: [
             '3',
-            __DIR__ . '/data/database/database.sql',
+            $this->dbFile,
         ]);
 
         // Assertions
@@ -155,9 +168,27 @@ class SetupDbCommandTest extends CoreTestCase
         $this->assertStringContainsString('Database connection successful', $result->getDisplay());
         $this->assertStringContainsString('Database config successfully saved', $result->getDisplay());
 
+        // Assert env and config is correctly changed
+        $dotenvEditor = new DotenvEditor();
+        $dotenvEditor->load(__DIR__ . '/data/env/.env');
+        $this->assertSame('sqlite', $dotenvEditor->getValue('DB_CONNECTION'));
+        $this->assertSame($this->dbFile, $dotenvEditor->getValue('DB_NAME'));
+
+        // Assert config is ok, env was update by the command
+        /** @var Config */
+        $config = $this->ci->get(Config::class);
+        $this->assertSame('sqlite', $config->get('db.default'));
+        $this->assertSame($this->dbFile, $config->get('db.connections.sqlite.database'));
+
+        /** @var Capsule */
+        $capsule = $this->ci->get(Capsule::class);
+        $connection = $capsule->getConnection();
+        $this->assertSame('sqlite', $connection->getDriverName());
+        $this->assertSame($this->dbFile, $connection->getDatabaseName());
+
         // Delete database file
-        unlink(__DIR__ . '/data/database/database.sql');
-        $this->assertFileDoesNotExist(__DIR__ . '/data/database/database.sql');
+        unlink($this->dbFile);
+        $this->assertFileDoesNotExist($this->dbFile);
     }
 
     public function testCommandWithOptionsAndVerbose(): void

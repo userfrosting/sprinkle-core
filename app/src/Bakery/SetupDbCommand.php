@@ -11,6 +11,7 @@
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Exception;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
 use PDOException;
 use Symfony\Component\Console\Command\Command;
@@ -43,6 +44,7 @@ class SetupDbCommand extends Command
         protected Config $config,
         protected DotenvEditor $dotenvEditor,
         protected DbParamTester $dbTester,
+        protected Capsule $capsule,
     ) {
         $this->dotenvEditor->autoBackup(false);
 
@@ -122,28 +124,6 @@ class SetupDbCommand extends Command
         $this->dotenvEditor->load($envPath);
         $this->dotenvEditor->save();
 
-        // Get existing keys
-        // $keys = [
-        //     'DB_HOST'     => ($this->dotenvEditor->keyExists('DB_HOST')) ? $this->dotenvEditor->getValue('DB_HOST') : 'localhost',
-        //     'DB_NAME'     => ($this->dotenvEditor->keyExists('DB_NAME')) ? $this->dotenvEditor->getValue('DB_NAME') : '',
-        //     'DB_USER'     => ($this->dotenvEditor->keyExists('DB_USER')) ? $this->dotenvEditor->getValue('DB_USER') : '',
-        //     'DB_PASSWORD' => ($this->dotenvEditor->keyExists('DB_PASSWORD')) ? $this->dotenvEditor->getValue('DB_PASSWORD') : '',
-        // ];
-
-        // There may be some custom config or global env values defined on the server.
-        // We'll check for that and ask for confirmation in this case.
-        // TODO : This doesn't work if the config doesn't make use of the env values.
-        // if ($defaultConnection['host'] != $keys['DB_HOST'] ||
-        //     $defaultConnection['database'] != $keys['DB_NAME'] ||
-        //     $defaultConnection['username'] != $keys['DB_USER'] ||
-        //     $defaultConnection['password'] != $keys['DB_PASSWORD']) {
-        //     $this->io->warning("Current database configuration differ from the configuration defined in `$envPath`. Global system environment variables might be defined.");
-
-        //     if (!$this->io->confirm('Continue?', false)) {
-        //         return self::SUCCESS;
-        //     }
-        // }
-
         // Ask for database info
         try {
             $dbParams = $this->askForDatabase($input);
@@ -185,10 +165,8 @@ class SetupDbCommand extends Command
         }
         $this->dotenvEditor->save();
 
-        // At this point, `$this->uf` is still using the old configs.
-        // We need to refresh the `db.default` config values
-        // $newConfig = array_merge($this->ci->config['db.default'], $dbParams);
-        // $this->ci->config->set('db.default', $newConfig);
+        // Update current services
+        $this->updateServices($dbParams);
 
         // Success
         $this->io->success("Database config successfully saved in `{$envPath}`");
@@ -352,5 +330,30 @@ class SetupDbCommand extends Command
         }
 
         return $path;
+    }
+
+    /**
+     * Update running services with the new database config.
+     *
+     * At this point, config is still using the "old env values".
+     * We need to refresh them manually for any remaining task in this
+     * execution, especially when this command is run inside `bake` command.
+     * It's a bit hacky, as config might not be using the env
+     * values att all, but it's the easiest way other than
+     * re-initializing the config class (and actually ArrayFileLoader).
+     *
+     * @param array<string, string> $dbParams The database credentials
+     */
+    protected function updateServices(array $dbParams): void
+    {
+        // Update config first
+        $this->config->set('db.default', $dbParams['driver']);
+        $driverConfig = $this->config->getArray('db.connections.' . $dbParams['driver']);
+        $driverConfig = array_merge($driverConfig, $dbParams);
+        $this->config->set('db.connections.' . $dbParams['driver'], $driverConfig);
+
+        // Also set the default connection to the new value in the db.
+        $this->capsule->addConnection($dbParams, $dbParams['driver']);
+        $this->capsule->getDatabaseManager()->setDefaultConnection($dbParams['driver']);
     }
 }

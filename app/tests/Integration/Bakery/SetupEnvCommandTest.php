@@ -16,6 +16,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Sprinkle\Core\Bakery\SetupEnvCommand;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
+use UserFrosting\Support\DotenvEditor\DotenvEditor;
 use UserFrosting\Testing\BakeryTester;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
@@ -69,6 +70,11 @@ class SetupEnvCommandTest extends CoreTestCase
         // Assertions
         $this->assertSame(0, $result->getStatusCode());
         $this->assertStringContainsString('Environment mode successfully changed to `debug`', $result->getDisplay());
+
+        // Assert env and config is correctly changed
+        $dotenvEditor = new DotenvEditor();
+        $dotenvEditor->load(__DIR__ . '/data/env/.env');
+        $this->assertSame('debug', $dotenvEditor->getValue('UF_MODE'));
     }
 
     public function testCommandWithOptionsAndVerbose(): void
