@@ -355,7 +355,7 @@ class Migrator
      *
      * @throws MigrationDependencyNotMetException if a dependencies is not met among pending migration.
      *
-     * @return mixed[] The list of queries, grouped by migration.
+     * @return array<string, mixed[]> The list of queries, grouped by migration.
      */
     public function pretendToMigrate(): array
     {

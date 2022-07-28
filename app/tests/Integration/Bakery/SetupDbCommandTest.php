@@ -141,8 +141,7 @@ class SetupDbCommandTest extends CoreTestCase
         /** @var Capsule */
         $capsule = $this->ci->get(Capsule::class);
         $connection = $capsule->getConnection();
-        $this->assertSame('sqlite', $connection->getDriverName());
-        $this->assertSame(':memory:', $connection->getDatabaseName());
+        $this->assertNotSame($this->dbFile, $connection->getDatabaseName());
 
         // Make sure database file doesn't exist yet
         $this->assertFileDoesNotExist($this->dbFile);

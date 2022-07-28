@@ -41,7 +41,7 @@ class MigrateCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('migrate')
              ->setDescription('Perform database migration')
@@ -60,10 +60,10 @@ class MigrateCommand extends Command
         $this->io->title('Database Migrator');
 
         // Get options
-        $pretend = $input->getOption('pretend');
-        $step = $input->getOption('step');
-        $force = $input->getOption('force');
-        $database = $input->getOption('database');
+        $pretend = (bool) $input->getOption('pretend');
+        $step = (bool) $input->getOption('step');
+        $force = (bool) $input->getOption('force');
+        $database = strval($input->getOption('database'));
 
         // Set connection to the selected database
         if ($database != '') {
@@ -99,7 +99,7 @@ class MigrateCommand extends Command
         }
 
         // Don't go further if no migration is pending
-        if (empty($pending)) {
+        if (count($pending) === 0) {
             $this->io->success('Nothing to migrate');
 
             return self::SUCCESS;
@@ -111,13 +111,13 @@ class MigrateCommand extends Command
         }
 
         // Show migrations about to be ran
-        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
             $this->io->section('Pending migrations');
             $this->io->listing($pending);
         }
 
         // Confirm action if required (for example in production mode).
-        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command') && !$force) {
             if (!$this->io->confirm('Do you really wish to continue ?', false)) {
                 return self::SUCCESS;
             }
@@ -132,7 +132,7 @@ class MigrateCommand extends Command
             return self::FAILURE;
         }
 
-        if (empty($migrated)) {
+        if (count($migrated) === 0) {
             // N.B.: Should not happens, only if pending get empty while
             // waiting for confirmation
             $this->io->warning('Nothing migrated !');
@@ -163,7 +163,7 @@ class MigrateCommand extends Command
             return self::FAILURE;
         }
 
-        if (empty($data)) {
+        if (count($data) === 0) {
             $this->io->success('Nothing to migrate');
 
             return self::SUCCESS;

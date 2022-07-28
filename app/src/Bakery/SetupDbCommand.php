@@ -12,8 +12,11 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Collection;
 use PDOException;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -45,6 +48,7 @@ class SetupDbCommand extends Command
         protected DotenvEditor $dotenvEditor,
         protected DbParamTester $dbTester,
         protected Capsule $capsule,
+        protected ContainerInterface $ci,
     ) {
         $this->dotenvEditor->autoBackup(false);
 
@@ -355,5 +359,10 @@ class SetupDbCommand extends Command
         // Also set the default connection to the new value in the db.
         $this->capsule->addConnection($dbParams, $dbParams['driver']);
         $this->capsule->getDatabaseManager()->setDefaultConnection($dbParams['driver']);
+
+        // Update Capsule and Builder services
+        $connection = $this->capsule->getConnection($dbParams['driver']);
+        $this->ci->set(Connection::class, $connection);
+        $this->ci->set(Builder::class, $connection->getSchemaBuilder());
     }
 }
