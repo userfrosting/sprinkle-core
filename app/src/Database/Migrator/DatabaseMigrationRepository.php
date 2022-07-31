@@ -213,7 +213,6 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      *
      * @return \Illuminate\Database\Connection
      */
-    // TODO : Instead of relying on DB, we should inject Connection directly
     public function getConnection(): Connection
     {
         return $this->db->getConnection($this->getConnectionName());

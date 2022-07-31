@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
@@ -21,16 +22,21 @@ use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
 class Migrator
 {
     /**
+     * @var string|null The connection name (default: null)
+     */
+    protected ?string $connection = null;
+
+    /**
      * Constructor.
      *
      * @param MigrationRepositoryInterface $repository The migration repository
      * @param MigrationLocatorInterface    $locator    The Migration locator
-     * @param Connection                   $connection The database Connection
+     * @param Capsule                      $db         The database
      */
     public function __construct(
         protected MigrationRepositoryInterface $repository,
         protected MigrationLocatorInterface $locator,
-        protected Connection $connection,
+        protected Capsule $db,
     ) {
     }
 
@@ -645,19 +651,29 @@ class Migrator
      */
     public function getConnection(): Connection
     {
-        return $this->connection;
+        return $this->db->getConnection($this->getConnectionName());
     }
 
     /**
-     * Set database connection.
+     * Set database connection name.
      *
-     * @param Connection $connection
+     * @param string|null $connection
      */
-    public function setConnection(Connection $connection): static
+    public function setConnectionName(?string $connection): static
     {
         $this->connection = $connection;
 
         return $this;
+    }
+
+    /**
+     * Resolve the database connection instance.
+     *
+     * @return string|null The connection name (default: null, aka the default connection)
+     */
+    public function getConnectionName(): ?string
+    {
+        return $this->connection;
     }
 
     /**

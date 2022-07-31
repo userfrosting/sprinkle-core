@@ -11,6 +11,10 @@
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\SQLiteBuilder;
+use Illuminate\Database\SQLiteConnection;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PDOException;
@@ -184,6 +188,10 @@ class SetupDbCommandTest extends CoreTestCase
         $connection = $capsule->getConnection();
         $this->assertSame('sqlite', $connection->getDriverName());
         $this->assertSame($this->dbFile, $connection->getDatabaseName());
+
+        // Assert services were updated
+        $this->assertInstanceOf(SQLiteConnection::class, $this->ci->get(Connection::class));
+        $this->assertInstanceOf(SQLiteBuilder::class, $this->ci->get(Builder::class));
 
         // Delete database file
         unlink($this->dbFile);

@@ -41,6 +41,8 @@ class SetupDbCommand extends Command
 
     /**
      * Inject services.
+     *
+     * @param \DI\Container $ci
      */
     public function __construct(
         protected ResourceLocatorInterface $locator,
