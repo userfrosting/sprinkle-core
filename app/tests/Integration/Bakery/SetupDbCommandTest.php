@@ -198,6 +198,62 @@ class SetupDbCommandTest extends CoreTestCase
         $this->assertFileDoesNotExist($this->dbFile);
     }
 
+    /**
+     * Simulate when the command define the same database driver, but with new 
+     * config. This make sure the existing connection is properly purged.
+     *
+     * @depends testCommand
+     */
+    public function testCommandForPurge(): void
+    {
+        // Make a second file
+        $dbFile2 = __DIR__ . '/data/database/foo.sql';
+
+        // Make sure database file doesn't exist yet
+        $this->assertFileDoesNotExist($this->dbFile);
+        $this->assertFileDoesNotExist($dbFile2);
+
+        // Mock capsule to manipulate the result
+        // This simulate the entered config IS valid
+        $tester = Mockery::mock(DbParamTester::class)
+            ->shouldReceive('test')->times(1)->andThrow(new PDOException())
+            ->shouldReceive('test')->times(2)->andReturn(true)
+            ->getMock();
+        $this->ci->set(DbParamTester::class, $tester);
+
+        // Run command and assert result
+        /** @var SetupDbCommand */
+        $command = $this->ci->get(SetupDbCommand::class);
+        $result = BakeryTester::runCommand($command, userInput: [
+            '3',
+            $this->dbFile,
+        ]);
+        $result2 = BakeryTester::runCommand($command, input: ['--force' => true], userInput: [
+            '3',
+            $dbFile2,
+        ]);
+
+        // Assertions, make sure command is correctly executed
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertSame(0, $result2->getStatusCode());
+        $this->assertStringContainsString('Database config successfully saved', $result2->getDisplay());
+
+        // Assert config is ok, env was update by the command
+        /** @var Config */
+        $config = $this->ci->get(Config::class);
+        $this->assertSame($dbFile2, $config->get('db.connections.sqlite.database'));
+
+        /** @var Capsule */
+        $capsule = $this->ci->get(Capsule::class);
+        $this->assertSame($dbFile2, $capsule->getConnection()->getDatabaseName());
+
+        // Delete database file
+        unlink($this->dbFile);
+        unlink($dbFile2);
+        $this->assertFileDoesNotExist($this->dbFile);
+        $this->assertFileDoesNotExist($dbFile2);
+    }
+
     public function testCommandWithOptionsAndVerbose(): void
     {
         // Mock capsule to manipulate the result

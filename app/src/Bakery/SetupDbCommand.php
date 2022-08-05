@@ -361,6 +361,7 @@ class SetupDbCommand extends Command
         // Also set the default connection to the new value in the db.
         $this->capsule->addConnection($dbParams, $dbParams['driver']);
         $this->capsule->getDatabaseManager()->setDefaultConnection($dbParams['driver']);
+        $this->capsule->getDatabaseManager()->purge($dbParams['driver']);
 
         // Update Capsule and Builder services
         $connection = $this->capsule->getConnection($dbParams['driver']);
