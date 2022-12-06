@@ -71,7 +71,6 @@ class ShutdownHandler
 
         // Handle fatal errors and parse errors
         if ($error !== null && in_array($error['type'], array_keys($this->errorTypes), true)) {
-
             // Default to 'text/plain' if in CLI
             if (php_sapi_name() === 'cli') {
                 $contentType = 'text/plain';

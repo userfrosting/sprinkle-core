@@ -45,7 +45,6 @@ class RouteList
         bool $reverse = false,
         ?string $sortBy = null
     ): array {
-
         // Get routes list from Slim App
         $routes = $this->app->getRouteCollector()->getRoutes();
 
@@ -67,7 +66,6 @@ class RouteList
 
         // Apply sort
         if (!is_null($sortBy)) {
-
             // Normalize case
             $sortBy = strtolower($sortBy);
 

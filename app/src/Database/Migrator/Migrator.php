@@ -115,7 +115,6 @@ class Migrator
 
         // Loop dependencies and validate them
         foreach ($this->getDependenciesProperty($migrationClass) as $dependency) {
-
             // The dependency might already be installed. Check that first.
             // Skip if it's the case (we don't want it pending again).
             // This allows to accept stale (installed, but not available
@@ -238,7 +237,6 @@ class Migrator
         // We need to validate the dependencies of each installed migration
         // To make sure any of them doesn't depends on the one we wan to rollback.
         foreach ($installed as $installedMigration) {
-
             // Get all dependencies for $installed, make sure $migrations is not in them
             $dependencies = $this->getInstalledDependencies($installedMigration);
             if (in_array($migration, $dependencies, true)) {
@@ -262,7 +260,6 @@ class Migrator
 
         // Loop dependencies and validate them
         foreach ($this->getDependenciesProperty($migrationClass) as $dependency) {
-
             // Make sure dependency exist. Otherwise it's a dead end.
             if (!$this->locator->has($dependency)) {
                 throw new MigrationRollbackException("$migrationClass depends on $dependency, but it's not available.");
@@ -293,7 +290,6 @@ class Migrator
     protected function checkRollbackDependencies(array $migrations): void
     {
         foreach ($migrations as $migration) {
-
             // Exception will be thrown if can't rollback.
             $this->validateRollbackMigration($migration, $migrations);
 
@@ -329,7 +325,6 @@ class Migrator
         // Spin through ordered pending migrations, apply the changes to the
         // databases and log them to the repository.
         foreach ($pending as $migrationClass) {
-
             // Get the migration instance
             $migration = $this->locator->get($migrationClass);
 
@@ -538,7 +533,6 @@ class Migrator
     protected function runDownMigrations(array $migrations): void
     {
         foreach ($migrations as $migrationClass) {
-
             // Get the migration instance
             $migration = $this->locator->get($migrationClass);
 
@@ -573,7 +567,6 @@ class Migrator
         $log = [];
 
         foreach ($migrations as $migrationClass) {
-
             // Get the migration instance
             $migration = $this->locator->get($migrationClass);
 

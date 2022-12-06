@@ -27,7 +27,6 @@ class LocatorService implements ServicesProviderInterface
                 SprinkleManager $sprinkleManager,
                 EventDispatcherInterface $eventDispatcher
             ) {
-
                 // Create instance based on main sprinkle path
                 $mainSprinkle = $sprinkleManager->getMainSprinkle();
                 $locator = new ResourceLocator($mainSprinkle->getPath());

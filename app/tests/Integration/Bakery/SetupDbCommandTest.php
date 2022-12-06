@@ -199,7 +199,7 @@ class SetupDbCommandTest extends CoreTestCase
     }
 
     /**
-     * Simulate when the command define the same database driver, but with new 
+     * Simulate when the command define the same database driver, but with new
      * config. This make sure the existing connection is properly purged.
      *
      * @depends testCommand

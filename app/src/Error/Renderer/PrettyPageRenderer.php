@@ -43,7 +43,6 @@ final class PrettyPageRenderer implements ErrorRendererInterface
         int $statusCode,
         bool $displayErrorDetails = false
     ): string {
-
         // Show Whoops page if error details is active
         if ($displayErrorDetails) {
             return $this->whoops->handleException($exception);

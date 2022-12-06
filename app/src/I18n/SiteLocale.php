@@ -172,13 +172,11 @@ class SiteLocale implements SiteLocaleInterface
         $acceptLanguage = explode(',', $request->getHeaderLine('Accept-Language'));
 
         foreach ($acceptLanguage as $index => $browserLocale) {
-
             // Split to access locale & "q"
             $parts = explode(';', $browserLocale);
 
             // Ensure we've got at least one sub parts
             if (array_key_exists(0, $parts)) {
-
                 // Format locale for UF's i18n
                 $identifier = trim(str_replace('-', '_', $parts[0]));
 

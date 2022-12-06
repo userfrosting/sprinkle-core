@@ -1004,7 +1004,6 @@ class DatabaseTests extends TestCase
      */
     protected function generateJobs(): array
     {
-
         /*
          * Sample data
 

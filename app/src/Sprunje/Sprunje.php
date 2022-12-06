@@ -270,7 +270,6 @@ abstract class Sprunje
         $rows = [];
 
         $filteredQuery->chunk($this->csvChunk, function ($models) use (&$columnNames, &$rows) {
-
             // Perform any additional transformations on the dataset
             $collection = $this->applyTransformations($models);
 
@@ -357,7 +356,6 @@ abstract class Sprunje
     {
         $result = [];
         foreach ($this->listable as $name) {
-
             // Determine if a custom filter method has been defined
             $methodName = 'list' . Str::studly($name);
 
