@@ -10,7 +10,6 @@
 
 namespace UserFrosting\Sprinkle\Core\Database\Models;
 
-use DI\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Psr\Container\ContainerInterface;
