@@ -12,6 +12,7 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Events\Dispatcher;
@@ -69,6 +70,9 @@ class DatabaseService implements ServicesProviderInterface
 
                 return $db->getConnection($connection);
             },
+
+            // Alias for ConnectionInterface
+            ConnectionInterface::class => \DI\get(Connection::class),
         ];
     }
 }

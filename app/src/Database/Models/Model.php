@@ -10,8 +10,8 @@
 
 namespace UserFrosting\Sprinkle\Core\Database\Models;
 
+use DI\Container;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
-use Psr\Container\ContainerInterface;
 use UserFrosting\Sprinkle\Core\Database\Builder;
 use UserFrosting\Sprinkle\Core\Database\Models\Concerns\HasRelationships;
 
@@ -27,9 +27,11 @@ abstract class Model extends LaravelModel
     use HasRelationships;
 
     /**
-     * @var ContainerInterface The DI container for your application.
+     * @var Container The DI container for your application.
+     *
+     * Requires PHP-DI container specifically since "make" is used.
      */
-    public static ?ContainerInterface $ci = null;
+    public static ?Container $ci = null;
 
     /**
      * Determine if an attribute exists on the model - even if it is null.
@@ -93,28 +95,14 @@ abstract class Model extends LaravelModel
     }
 
     /**
-     * Overrides Laravel's base Model to return our custom query builder object.
+     * Overrides Laravel's base Model to return our custom _Query Builder_ object.
+     * Use CI to resolve a query builder each time.
      *
      * @return Builder
      */
     protected function newBaseQueryBuilder()
     {
-        $connection = $this->getConnection();
-
-        // TODO : To keep classmapper feature here, it would be the next line, But need the $ci... And I don't like the way it was done (in event)
-        // Ci would replace classmapper here, but it would need to be injected, so created by the container... always... A Trait would be better...
-        // So the class is hardcoded for now
-        // Would be:
-        // return $ci->make('UserFrosting\Sprinkle\Core\Database\Builder', [
-        //     $connection,
-        //     $connection->getQueryGrammar(),
-        //     $connection->getPostProcessor()
-        // ]);
-
-        return new Builder(
-            $connection,
-            $connection->getQueryGrammar(),
-            $connection->getPostProcessor()
-        );
+        /** @var Builder */
+        return static::$ci?->make(Builder::class);
     }
 }
