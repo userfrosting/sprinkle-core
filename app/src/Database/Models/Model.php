@@ -11,7 +11,9 @@
 namespace UserFrosting\Sprinkle\Core\Database\Models;
 
 use DI\Container;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
+use Psr\Container\ContainerInterface;
 use UserFrosting\Sprinkle\Core\Database\Builder;
 use UserFrosting\Sprinkle\Core\Database\Models\Concerns\HasRelationships;
 
@@ -27,11 +29,9 @@ abstract class Model extends LaravelModel
     use HasRelationships;
 
     /**
-     * @var Container The DI container for your application.
-     *
-     * Requires PHP-DI container specifically since "make" is used.
+     * @var ContainerInterface The DI container for your application.
      */
-    public static ?Container $ci = null;
+    public static ?ContainerInterface $ci = null;
 
     /**
      * Determine if an attribute exists on the model - even if it is null.
@@ -96,13 +96,14 @@ abstract class Model extends LaravelModel
 
     /**
      * Overrides Laravel's base Model to return our custom _Query Builder_ object.
-     * Use CI to resolve a query builder each time.
      *
      * @return Builder
      */
     protected function newBaseQueryBuilder()
     {
-        /** @var Builder */
-        return static::$ci?->make(Builder::class);
+        /** @var Connection */
+        $connection = static::$ci?->get(Connection::class);
+
+        return new Builder($connection);
     }
 }
