@@ -465,7 +465,7 @@ abstract class Sprunje
     {
         $page = $this->options['page'];
         $size = $this->options['size'];
-        
+
         if (!is_null($page) && !is_null($size) && $size !== 'all') {
             $offset = (int) $size * (int) $page;
             $query->skip($offset)->take((int) $size);
