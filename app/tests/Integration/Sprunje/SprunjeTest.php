@@ -128,6 +128,28 @@ class SprunjeTest extends CoreTestCase
         ], $sprunje->getArray());
     }
 
+    /**
+     * getQueryParams() will return string values for size and page. We need to 
+     * make sure that pagination still works when using string values, since 
+     * getQueryParams will mostly be used to pass options to Sprunje.
+     */
+    public function testWithPaginationOnStringOptions(): void
+    {
+        $sprunje = new TestSprunje([
+            'size' => '1',
+            'page' => '1', // First page is 0, so second row will be displayed.
+        ]);
+
+        $this->assertEquals([
+            'count'          => 3,
+            'count_filtered' => 3,
+            'rows'           => [
+                ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
+            ],
+            'listable' => $this->listable,
+        ], $sprunje->getArray());
+    }
+
     public function testWithSort(): void
     {
         $sprunje = new TestSprunje();

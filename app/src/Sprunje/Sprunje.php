@@ -46,7 +46,7 @@ abstract class Sprunje
      *  sorts: array<string, string>,
      *  filters: string[],
      *  size: string|int|null,
-     *  page: ?int,
+     *  page: string|int|null,
      *  format: 'csv'|'json',
      * } Default HTTP request parameters.
      */
@@ -119,7 +119,7 @@ abstract class Sprunje
      *  sorts?: array<string, string>,
      *  filters?: array<string, mixed>,
      *  size?: string|int|null,
-     *  page?: ?int,
+     *  page?: string|int|null,
      *  format?: string
      * } $options DEPRECATED. Use `$this->setOptions()` instead.
      */
@@ -142,7 +142,7 @@ abstract class Sprunje
      *  sorts?: array<string, string>,
      *  filters?: array<string, mixed>,
      *  size?: string|int|null,
-     *  page?: ?int,
+     *  page?: string|int|null,
      *  format?: string
      * } $options $options
      *
@@ -463,13 +463,12 @@ abstract class Sprunje
      */
     public function applyPagination(EloquentBuilder|QueryBuilder|Relation $query): static
     {
-        if (
-            (is_int($this->options['page'])) &&
-            (is_int($this->options['size']))
-        ) {
-            $offset = $this->options['size'] * $this->options['page'];
-            $query->skip($offset)
-                  ->take($this->options['size']);
+        $page = $this->options['page'];
+        $size = $this->options['size'];
+        
+        if (!is_null($page) && !is_null($size) && $size !== 'all') {
+            $offset = (int) $size * (int) $page;
+            $query->skip($offset)->take((int) $size);
         }
 
         return $this;
