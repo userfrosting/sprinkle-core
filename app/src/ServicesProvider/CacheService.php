@@ -13,6 +13,7 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 use Exception;
 use Illuminate\Cache\Repository as Cache;
 use Psr\Container\ContainerInterface;
+use UserFrosting\Cache\ArrayStore;
 use UserFrosting\Cache\MemcachedStore;
 use UserFrosting\Cache\RedisStore;
 use UserFrosting\Cache\TaggableFileStore;
@@ -41,6 +42,7 @@ class CacheService implements ServicesProviderInterface
                     'file'      => $ci->get(TaggableFileStore::class)->instance(),
                     'memcached' => $ci->get(MemcachedStore::class)->instance(),
                     'redis'     => $ci->get(RedisStore::class)->instance(),
+                    'array'     => $ci->get(ArrayStore::class)->instance(),
                     default     => throw new BadConfigException("Bad cache store type '{$config->get('cache.driver')}' specified in configuration file."),
                 };
             },

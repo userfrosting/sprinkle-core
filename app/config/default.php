@@ -65,7 +65,7 @@ return [
     * redis are used on the same server.
     */
     'cache' => [
-        'driver'     => 'file', // Supported drivers : `file`, `memcached`, `redis`
+        'driver'     => 'file', // Supported drivers : `file`, `memcached`, `redis`, `array`
         'prefix'     => 'userfrosting',
         'memcached'  => [
             'host'   => '127.0.0.1',

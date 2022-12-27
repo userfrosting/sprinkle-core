@@ -16,9 +16,7 @@ return [
      * Don't use persistent caching in tests
      */
     'cache' => [
-        'illuminate' => [
-            'default' => 'array',
-        ],
+        'driver' => 'array',
     ],
 
     /*
