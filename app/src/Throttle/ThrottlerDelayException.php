@@ -11,19 +11,18 @@
 namespace UserFrosting\Sprinkle\Core\Throttle;
 
 use Exception;
-use Throwable;
-use UserFrosting\Sprinkle\Core\Exceptions\Contracts\TwigRenderedException;
-use UserFrosting\Sprinkle\Core\Exceptions\Contracts\UserMessageException;
+use UserFrosting\Sprinkle\Core\Exceptions\Http\BadRequestException;
 use UserFrosting\Support\Message\UserMessage;
 
 /**
  * Exception thrown when the throttler delay.
  */
-final class ThrottlerDelayException extends Exception implements TwigRenderedException, UserMessageException
+final class ThrottlerDelayException extends BadRequestException
 {
     protected string $title = 'ERROR.RATE_LIMIT_EXCEEDED.TITLE';
-    protected string $description = 'ERROR.RATE_LIMIT_EXCEEDED.DESCRIPTION';
+    protected string|UserMessage $description = 'ERROR.RATE_LIMIT_EXCEEDED.DESCRIPTION';
     protected string $twigTemplate = 'pages/error/throttler.html.twig';
+    protected int $httpCode = 429;
 
     /**
      * @var int The delay before the user can re-attempt
@@ -33,32 +32,9 @@ final class ThrottlerDelayException extends Exception implements TwigRenderedExc
     /**
      * {@inheritDoc}
      */
-    public function __construct(string $message = '', int $code = 429, ?Throwable $previous = null)
-    {
-        parent::__construct($message, $code, $previous);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTemplate(): string
-    {
-        return $this->twigTemplate;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTitle(): string|UserMessage
-    {
-        return $this->title;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getDescription(): string|UserMessage
     {
+        // @phpstan-ignore-next-line - Property is a string
         return new UserMessage($this->description, ['delay' => $this->delay]);
     }
 
