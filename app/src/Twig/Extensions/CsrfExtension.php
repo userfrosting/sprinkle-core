@@ -41,7 +41,7 @@ class CsrfExtension extends AbstractExtension implements GlobalsInterface
 
         return [
             'csrf'   => [
-                'keys' => [
+                'keys'  => [
                     'name'  => $csrfNameKey,
                     'value' => $csrfValueKey,
                 ],

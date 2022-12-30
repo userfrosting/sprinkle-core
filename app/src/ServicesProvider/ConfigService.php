@@ -32,7 +32,7 @@ class ConfigService implements ServicesProviderInterface
     {
         return [
             // Set env mode in CI
-            'UF_MODE' => function (ResourceLocatorInterface $locator) {
+            'UF_MODE'                => function (ResourceLocatorInterface $locator) {
                 // Grab any relevant dotenv variables from the .env file
                 // located at the locator base path
                 try {
@@ -45,13 +45,13 @@ class ConfigService implements ServicesProviderInterface
                 return env('UF_MODE', '');
             },
 
-            Config::class => function (ArrayFileLoader $loader) {
+            Config::class            => function (ArrayFileLoader $loader) {
                 $config = new Config($loader->load());
 
                 return $config;
             },
 
-            ArrayFileLoader::class => function (ConfigPathBuilder $builder, ContainerInterface $ci) {
+            ArrayFileLoader::class   => function (ConfigPathBuilder $builder, ContainerInterface $ci) {
                 /** @var string */
                 $mode = $ci->get('UF_MODE');
 

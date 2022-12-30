@@ -74,7 +74,7 @@ class MailerTest extends TestCase
                 'isHtml'    => true,
                 'Timeout'   => 15,
             ],
-            'smtp_options' => [
+            'smtp_options'    => [
                 'ssl' => [
                     'verify_peer'       => true,
                     'verify_depth'      => 3,

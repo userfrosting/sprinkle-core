@@ -27,7 +27,7 @@ class WebpackService implements ServicesProviderInterface
 
                 return new EntrypointLookup(strval($path));
             },
-            JsonManifestInterface::class => function (Config $config) {
+            JsonManifestInterface::class     => function (Config $config) {
                 $path = $config->get('webpack.manifest');
 
                 return new JsonManifest(strval($path));

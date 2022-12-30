@@ -32,7 +32,7 @@ class LoggersService implements ServicesProviderInterface
              *
              * @return \Monolog\Logger
              */
-            DebugLogger::class => function (StreamHandler $handler, LineFormatter $formatter) {
+            DebugLogger::class    => function (StreamHandler $handler, LineFormatter $formatter) {
                 $formatter->setJsonPrettyPrint(true);
                 $handler->setFormatter($formatter);
 
@@ -49,7 +49,7 @@ class LoggersService implements ServicesProviderInterface
              *
              * @return \Monolog\Logger
              */
-            ErrorLogger::class => function (StreamHandler $handler, LineFormatter $formatter) {
+            ErrorLogger::class    => function (StreamHandler $handler, LineFormatter $formatter) {
                 $handler->setFormatter($formatter);
                 $handler->setLevel(Logger::WARNING);
 
@@ -67,7 +67,7 @@ class LoggersService implements ServicesProviderInterface
              *
              * @return \Monolog\Logger
              */
-            MailLogger::class => function (StreamHandler $handler, LineFormatter $formatter) {
+            MailLogger::class     => function (StreamHandler $handler, LineFormatter $formatter) {
                 $handler->setFormatter($formatter);
 
                 $logger = new MailLogger('mail');
@@ -83,7 +83,7 @@ class LoggersService implements ServicesProviderInterface
              *
              * @return \Monolog\Logger
              */
-            QueryLogger::class => function (StreamHandler $handler, LineFormatter $formatter) {
+            QueryLogger::class    => function (StreamHandler $handler, LineFormatter $formatter) {
                 $formatter->setJsonPrettyPrint(true);
                 $handler->setFormatter($formatter);
 
@@ -97,7 +97,7 @@ class LoggersService implements ServicesProviderInterface
             LineFormatter::class  => \DI\create()->constructor(null, null, true),
 
             // Define common StreamHandler with .
-            StreamHandler::class => function (Config $config) {
+            StreamHandler::class  => function (Config $config) {
                 return new StreamHandler($config->getString('logs.path'));
             },
         ];

@@ -38,7 +38,7 @@ class AlertStreamService implements ServicesProviderInterface
              *
              * @throws BadConfigException
              */
-            AlertStream::class => function (ContainerInterface $ci, Config $config) {
+            AlertStream::class        => function (ContainerInterface $ci, Config $config) {
                 return match ($config->get('alert.storage')) {
                     'cache'   => $ci->get(CacheAlertStream::class),
                     'session' => $ci->get(SessionAlertStream::class),
@@ -47,7 +47,7 @@ class AlertStreamService implements ServicesProviderInterface
             },
 
             // TODO : If config service is passed as argument, no need for this. A `setKey` on the interface would help.
-            CacheAlertStream::class => function (Config $config, Translator $translator, Cache $cache, Session $session) {
+            CacheAlertStream::class   => function (Config $config, Translator $translator, Cache $cache, Session $session) {
                 return new CacheAlertStream($config->get('alert.key'), $translator, $cache, $session->getId());
             },
 

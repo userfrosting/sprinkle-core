@@ -31,7 +31,7 @@ class TwigService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            Twig::class => function (
+            Twig::class                    => function (
                 ResourceLocatorInterface $locator,
                 Config $config,
                 TwigRepositoryInterface $extensionLoader,
@@ -67,7 +67,7 @@ class TwigService implements ServicesProviderInterface
                 return $twig;
             },
 
-            TwigMiddleware::class => function (App $app, Twig $twig) {
+            TwigMiddleware::class          => function (App $app, Twig $twig) {
                 return TwigMiddleware::create($app, $twig);
             },
 

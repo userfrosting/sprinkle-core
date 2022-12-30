@@ -37,7 +37,7 @@ class CacheService implements ServicesProviderInterface
              *
              * @throws BadConfigException
              */
-            Cache::class => function (ContainerInterface $ci, Config $config) {
+            Cache::class             => function (ContainerInterface $ci, Config $config) {
                 return match ($config->get('cache.driver')) {
                     'file'      => $ci->get(TaggableFileStore::class)->instance(),
                     'memcached' => $ci->get(MemcachedStore::class)->instance(),
@@ -63,7 +63,7 @@ class CacheService implements ServicesProviderInterface
             /**
              * Inject memcached config array into MemcachedStore. Also add common "prefix" key into config.
              */
-            MemcachedStore::class => function (Config $config) {
+            MemcachedStore::class    => function (Config $config) {
                 $config = array_merge($config->get('cache.memcached'), ['prefix' => $config->get('cache.prefix')]);
 
                 return new MemcachedStore($config);
@@ -72,7 +72,7 @@ class CacheService implements ServicesProviderInterface
             /**
              * Inject Redis config array into RedisStore. Also add common "prefix" key into config.
              */
-            RedisStore::class => function (Config $config) {
+            RedisStore::class        => function (Config $config) {
                 $config = array_merge($config->get('cache.redis'), ['prefix' => $config->get('cache.prefix')]);
 
                 return new RedisStore($config);

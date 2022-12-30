@@ -26,18 +26,18 @@ class VersionsService implements ServicesProviderInterface
     {
         return [
             // Minimum requirements
-            'PHP_MIN_VERSION'           => '^8.0',
-            'PHP_RECOMMENDED_VERSION'   => '^8.0',
-            'NODE_MIN_VERSION'          => '^12.17.0 || >=14.0.0',
-            'NPM_MIN_VERSION'           => '>=6.14.4',
+            'PHP_MIN_VERSION'              => '^8.0',
+            'PHP_RECOMMENDED_VERSION'      => '^8.0',
+            'NODE_MIN_VERSION'             => '^12.17.0 || >=14.0.0',
+            'NPM_MIN_VERSION'              => '>=6.14.4',
 
             // Installed version
-            'PHP_VERSION'  => (string) phpversion(),
-            'NODE_VERSION' => exec('node -v'), // TODO : Required Try catch
-            'NPM_VERSION'  => exec('npm -v'),
+            'PHP_VERSION'                  => (string) phpversion(),
+            'NODE_VERSION'                 => exec('node -v'), // TODO : Required Try catch
+            'NPM_VERSION'                  => exec('npm -v'),
 
             // Version validators
-            PhpVersionValidator::class => function (ContainerInterface $c) {
+            PhpVersionValidator::class     => function (ContainerInterface $c) {
                 return new PhpVersionValidator($c->get('PHP_VERSION'), $c->get('PHP_MIN_VERSION'));
             },
 
@@ -45,11 +45,11 @@ class VersionsService implements ServicesProviderInterface
                 return new PhpDeprecationValidator($c->get('PHP_VERSION'), $c->get('PHP_RECOMMENDED_VERSION'));
             },
 
-            NodeVersionValidator::class => function (ContainerInterface $c) {
+            NodeVersionValidator::class    => function (ContainerInterface $c) {
                 return new NodeVersionValidator($c->get('NODE_VERSION'), $c->get('NODE_MIN_VERSION'));
             },
 
-            NpmVersionValidator::class => function (ContainerInterface $c) {
+            NpmVersionValidator::class     => function (ContainerInterface $c) {
                 return new NpmVersionValidator($c->get('NPM_VERSION'), $c->get('NPM_MIN_VERSION'));
             },
         ];

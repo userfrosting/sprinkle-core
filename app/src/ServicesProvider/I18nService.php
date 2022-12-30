@@ -34,7 +34,7 @@ class I18nService implements ServicesProviderInterface
                 return new Dictionary($locale, $locator);
             },
 
-            LocaleInterface::class => function (SiteLocaleInterface $siteLocale) {
+            LocaleInterface::class     => function (SiteLocaleInterface $siteLocale) {
                 return new Locale($siteLocale->getLocaleIdentifier());
             },
 

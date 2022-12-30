@@ -228,11 +228,11 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
     public function getEventListeners(): array
     {
         return [
-            AppInitiatedEvent::class => [
+            AppInitiatedEvent::class             => [
                 RegisterShutdownHandler::class,
                 ModelInitiated::class,
             ],
-            BakeryInitiatedEvent::class => [
+            BakeryInitiatedEvent::class          => [
                 ModelInitiated::class,
             ],
             ResourceLocatorInitiatedEvent::class => [

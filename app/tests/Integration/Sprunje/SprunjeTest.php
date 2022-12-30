@@ -107,7 +107,7 @@ class SprunjeTest extends CoreTestCase
                 ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
                 ['id' => 3, 'name' => 'The foobar', 'description' => 'Le Foo et le Bar', 'type' => 1, 'active' => true],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
@@ -124,13 +124,13 @@ class SprunjeTest extends CoreTestCase
             'rows'           => [
                 ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
     /**
-     * getQueryParams() will return string values for size and page. We need to 
-     * make sure that pagination still works when using string values, since 
+     * getQueryParams() will return string values for size and page. We need to
+     * make sure that pagination still works when using string values, since
      * getQueryParams will mostly be used to pass options to Sprunje.
      */
     public function testWithPaginationOnStringOptions(): void
@@ -146,7 +146,7 @@ class SprunjeTest extends CoreTestCase
             'rows'           => [
                 ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
@@ -165,7 +165,7 @@ class SprunjeTest extends CoreTestCase
                 ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
                 ['id' => 1, 'name' => 'The foo', 'description' => 'Le Foo', 'type' => 1, 'active' => true],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
@@ -186,7 +186,7 @@ class SprunjeTest extends CoreTestCase
                 ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
                 ['id' => 3, 'name' => 'The foobar', 'description' => 'Le Foo et le Bar', 'type' => 1, 'active' => true],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
@@ -214,7 +214,7 @@ class SprunjeTest extends CoreTestCase
                 ['id' => 1, 'name' => 'The foo', 'description' => 'Le Foo', 'type' => 1, 'active' => true],
                 ['id' => 3, 'name' => 'The foobar', 'description' => 'Le Foo et le Bar', 'type' => 1, 'active' => true],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
@@ -249,7 +249,7 @@ class SprunjeTest extends CoreTestCase
                 ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
                 ['id' => 3, 'name' => 'The foobar', 'description' => 'Le Foo et le Bar', 'type' => 1, 'active' => true],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
@@ -270,7 +270,7 @@ class SprunjeTest extends CoreTestCase
                 ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
                 ['id' => 3, 'name' => 'The foobar', 'description' => 'Le Foo et le Bar', 'type' => 1, 'active' => true],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
@@ -289,7 +289,7 @@ class SprunjeTest extends CoreTestCase
                 // ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
                 ['id' => 3, 'name' => 'The foobar', 'description' => 'Le Foo et le Bar', 'type' => 1, 'active' => true],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
@@ -308,7 +308,7 @@ class SprunjeTest extends CoreTestCase
                 ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
                 // ['id' => 3, 'name' => 'The foobar', 'description' => 'Le Foo et le Bar', 'type' => 1, 'active' => true],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
@@ -344,7 +344,7 @@ class SprunjeTest extends CoreTestCase
                 ['id' => 2, 'name' => 'The bar'],
                 ['id' => 3, 'name' => 'The foobar'],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $sprunje->getArray());
     }
 
@@ -366,7 +366,7 @@ class SprunjeTest extends CoreTestCase
                 ['id' => 3, 'description' => 'Le Foo et le Bar'],
                 ['id' => 1, 'description' => 'Le Foo'],
             ],
-            'listable' => [],
+            'listable'       => [],
         ], $sprunje->getArray());
     }
 
@@ -448,7 +448,7 @@ class SprunjeTest extends CoreTestCase
                 ['id' => 2, 'name' => 'The bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
                 ['id' => 3, 'name' => 'The foobar', 'description' => 'Le Foo et le Bar', 'type' => 1, 'active' => true],
             ],
-            'listable' => $this->listable,
+            'listable'       => $this->listable,
         ], $response);
         $this->assertSame('application/json', $response->getHeaderLine('Content-Type'));
     }

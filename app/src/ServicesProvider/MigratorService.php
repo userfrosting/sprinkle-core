@@ -34,7 +34,7 @@ class MigratorService implements ServicesProviderInterface
                 return new DatabaseMigrationRepository($db, $repositoryTable);
             },
 
-            MigrationLocatorInterface::class => \DI\autowire(SprinkleMigrationLocator::class),
+            MigrationLocatorInterface::class    => \DI\autowire(SprinkleMigrationLocator::class),
         ];
     }
 }

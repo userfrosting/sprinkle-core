@@ -371,9 +371,9 @@ class DatabaseTests extends TestCase
 
         $expectedTasks = [
             [
-                'id'    => 2,
-                'name'  => 'Chopping',
-                'pivot' => [
+                'id'        => 2,
+                'name'      => 'Chopping',
+                'pivot'     => [
                     'assignable_id'   => 1,
                     'task_id'         => 2,
                     'assignable_type' => EloquentTestUser::class,
@@ -398,9 +398,9 @@ class DatabaseTests extends TestCase
                 ],
             ],
             [
-                'id'    => 3,
-                'name'  => 'Baleing',
-                'pivot' => [
+                'id'        => 3,
+                'name'      => 'Baleing',
+                'pivot'     => [
                     'assignable_id'   => 1,
                     'task_id'         => 3,
                     'assignable_type' => EloquentTestUser::class,
@@ -441,9 +441,9 @@ class DatabaseTests extends TestCase
 
         $expectedJobs = [
             [
-                'id'    => 2,
-                'slug'  => 'soldier',
-                'pivot' => [
+                'id'        => 2,
+                'slug'      => 'soldier',
+                'pivot'     => [
                     'user_id' => 1,
                     'role_id' => 2,
                 ],
@@ -469,9 +469,9 @@ class DatabaseTests extends TestCase
                 ],
             ],
             [
-                'id'    => 3,
-                'slug'  => 'egg-layer',
-                'pivot' => [
+                'id'        => 3,
+                'slug'      => 'egg-layer',
+                'pivot'     => [
                     'user_id' => 1,
                     'role_id' => 3,
                 ],
@@ -524,9 +524,9 @@ class DatabaseTests extends TestCase
             'name' => 'David',
             'jobs' => [
                 [
-                    'id'    => 2,
-                    'slug'  => 'soldier',
-                    'pivot' => [
+                    'id'        => 2,
+                    'slug'      => 'soldier',
+                    'pivot'     => [
                         'user_id' => 1,
                         'role_id' => 2,
                     ],
@@ -550,9 +550,9 @@ class DatabaseTests extends TestCase
                     ],
                 ],
                 [
-                    'id'    => 3,
-                    'slug'  => 'egg-layer',
-                    'pivot' => [
+                    'id'        => 3,
+                    'slug'      => 'egg-layer',
+                    'pivot'     => [
                         'user_id' => 1,
                         'role_id' => 3,
                     ],
@@ -575,9 +575,9 @@ class DatabaseTests extends TestCase
             'name' => 'Alex',
             'jobs' => [
                 [
-                    'id'    => 3,
-                    'slug'  => 'egg-layer',
-                    'pivot' => [
+                    'id'        => 3,
+                    'slug'      => 'egg-layer',
+                    'pivot'     => [
                         'user_id' => 2,
                         'role_id' => 3,
                     ],

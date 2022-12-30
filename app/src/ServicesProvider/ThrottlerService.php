@@ -29,7 +29,7 @@ class ThrottlerService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            Throttler::class => function (ThrottleModelInterface $model, Config $config) {
+            Throttler::class               => function (ThrottleModelInterface $model, Config $config) {
                 $throttler = new Throttler($model);
 
                 if ($config->has('throttles') && is_array($config->get('throttles'))) {
