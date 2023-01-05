@@ -10,8 +10,12 @@
 
 namespace UserFrosting\Sprinkle\Core\Error\Handler;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
+use UserFrosting\Alert\AlertStream;
+use UserFrosting\Sprinkle\Core\Exceptions\UserFacingException;
+use UserFrosting\Support\Message\UserMessage;
 
 /**
  * Generic handler for exceptions that will be presented to the end user.
@@ -19,6 +23,9 @@ use Throwable;
  */
 final class UserFacingExceptionHandler extends ExceptionHandler
 {
+    /** @Inject */
+    protected AlertStream $alert;
+
     /**
      * Don't log theses exceptions.
      */
@@ -41,5 +48,37 @@ final class UserFacingExceptionHandler extends ExceptionHandler
     protected function determineStatusCode(ServerRequestInterface $request, Throwable $exception): int
     {
         return intval($exception->getCode());
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Adds the exception message to the alert stream.
+     */
+    public function handle(ServerRequestInterface $request, Throwable $exception): ResponseInterface
+    {
+        if ($exception instanceof UserFacingException) {
+            $title = $this->translateExceptionPart($exception->getTitle());
+            $description = $this->translateExceptionPart($exception->getDescription());
+            $this->alert->addMessage('danger', "$title: $description");
+        }
+
+        return parent::handle($request, $exception);
+    }
+
+    /**
+     * Translate a string or UserMessage to a string.
+     *
+     * @param string|UserMessage $message
+     *
+     * @return string
+     */
+    protected function translateExceptionPart(string|UserMessage $message): string
+    {
+        if ($message instanceof UserMessage) {
+            return $this->translator->translate($message->message, $message->parameters);
+        }
+
+        return $this->translator->translate($message);
     }
 }

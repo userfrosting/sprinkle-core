@@ -20,8 +20,7 @@ use UserFrosting\Sprinkle\Core\Error\Handler\HttpExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Handler\PhpMailerExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Handler\UserFacingExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Handler\ValidationExceptionHandler;
-use UserFrosting\Sprinkle\Core\Exceptions\Http\BadRequestException;
-use UserFrosting\Sprinkle\Core\Exceptions\Http\NotFoundException;
+use UserFrosting\Sprinkle\Core\Exceptions\UserFacingException;
 use UserFrosting\Sprinkle\Core\Exceptions\ValidationException;
 
 class ErrorHandlerService implements ServicesProviderInterface
@@ -34,8 +33,7 @@ class ErrorHandlerService implements ServicesProviderInterface
              */
             ExceptionHandlerMiddleware::class => \DI\autowire()
                 ->method('registerHandler', HttpException::class, HttpExceptionHandler::class, true)
-                ->method('registerHandler', NotFoundException::class, UserFacingExceptionHandler::class, true)
-                ->method('registerHandler', BadRequestException::class, UserFacingExceptionHandler::class, true)
+                ->method('registerHandler', UserFacingException::class, UserFacingExceptionHandler::class, true)
                 ->method('registerHandler', PHPMailerException::class, PhpMailerExceptionHandler::class)
                 ->method('registerHandler', ValidationException::class, ValidationExceptionHandler::class),
         ];

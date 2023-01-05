@@ -11,13 +11,13 @@
 namespace UserFrosting\Sprinkle\Core\Throttle;
 
 use Exception;
-use UserFrosting\Sprinkle\Core\Exceptions\Http\BadRequestException;
+use UserFrosting\Sprinkle\Core\Exceptions\UserFacingException;
 use UserFrosting\Support\Message\UserMessage;
 
 /**
  * Exception thrown when the throttler delay.
  */
-final class ThrottlerDelayException extends BadRequestException
+final class ThrottlerDelayException extends UserFacingException
 {
     protected string $title = 'ERROR.RATE_LIMIT_EXCEEDED.TITLE';
     protected string|UserMessage $description = 'ERROR.RATE_LIMIT_EXCEEDED.DESCRIPTION';
