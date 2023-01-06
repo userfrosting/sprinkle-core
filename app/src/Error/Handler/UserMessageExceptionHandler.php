@@ -14,14 +14,14 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use UserFrosting\Alert\AlertStream;
-use UserFrosting\Sprinkle\Core\Exceptions\UserFacingException;
+use UserFrosting\Sprinkle\Core\Exceptions\Contracts\UserMessageException;
 use UserFrosting\Support\Message\UserMessage;
 
 /**
  * Generic handler for exceptions that will be presented to the end user.
  * Override the default behavior and status code.
  */
-final class UserFacingExceptionHandler extends ExceptionHandler
+final class UserMessageExceptionHandler extends ExceptionHandler
 {
     /** @Inject */
     protected AlertStream $alert;
@@ -57,7 +57,7 @@ final class UserFacingExceptionHandler extends ExceptionHandler
      */
     public function handle(ServerRequestInterface $request, Throwable $exception): ResponseInterface
     {
-        if ($exception instanceof UserFacingException) {
+        if ($exception instanceof UserMessageException) {
             $title = $this->translateExceptionPart($exception->getTitle());
             $description = $this->translateExceptionPart($exception->getDescription());
             $this->alert->addMessage('danger', "$title: $description");

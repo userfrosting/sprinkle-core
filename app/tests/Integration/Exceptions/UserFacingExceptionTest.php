@@ -28,6 +28,10 @@ class UserFacingExceptionTest extends TestCase
 
     public function testHTML(): void
     {
+        /** @var AlertStream */
+        $ms = $this->ci->get(AlertStream::class);
+        $ms->resetMessageStream();
+
         // Create request with method and url and fetch response
         $request = $this->createRequest('GET', '/UserFacingException');
         $response = $this->handleRequest($request);
@@ -36,8 +40,6 @@ class UserFacingExceptionTest extends TestCase
         $this->assertResponseStatus(400, $response);
 
         // Test message
-        /** @var AlertStream */
-        $ms = $this->ci->get(AlertStream::class);
         $messages = $ms->getAndClearMessages();
         $this->assertCount(1, $messages);
         $this->assertSame('danger', end($messages)['type']); // @phpstan-ignore-line

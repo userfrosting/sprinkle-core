@@ -11,42 +11,12 @@
 namespace UserFrosting\Sprinkle\Core\Sprunje;
 
 use Exception;
-use UserFrosting\Sprinkle\Core\Exceptions\Contracts\UserMessageException;
-use UserFrosting\Support\Message\UserMessage;
+use UserFrosting\Sprinkle\Core\Exceptions\UserFacingException;
 
 /**
  * Sprunje related exception.
  */
-class SprunjeException extends Exception implements UserMessageException
+class SprunjeException extends UserFacingException
 {
-    protected string|UserMessage $title = 'VALIDATE.SPRUNJE';
-    protected string|UserMessage $description;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTitle(): string|UserMessage
-    {
-        return $this->title;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getDescription(): string|UserMessage
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param string|UserMessage $description
-     *
-     * @return static
-     */
-    public function setDescription(string|UserMessage $description): static
-    {
-        $this->description = $description;
-
-        return $this;
-    }
+    protected string $title = 'VALIDATE.SPRUNJE';
 }
