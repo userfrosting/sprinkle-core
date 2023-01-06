@@ -22,16 +22,16 @@ use UserFrosting\Support\Message\UserMessage;
  * User facing exception shows a specific message and optional description meant
  * for to the user, unlike other exceptions which shows a generic message and
  * log detail for the developer. Theses can be used to show a specific error
- * message to the user, like `password not match` or `group not found` instead 
- * of a "400 Bad Request" error for example, while preserving the HTTP status 
+ * message to the user, like `password not match` or `group not found` instead
+ * of a "400 Bad Request" error for example, while preserving the HTTP status
  * code for REST API.
- * 
- * This class implements `TwigRenderedException` so the default status code page 
- * is not displayed, and the message can be shown to the user when this 
- * exception is thrown as an HTTP page. This class also implements 
- * `UserMessageException` so a specific message (not the one passed to the 
+ *
+ * This class implements `TwigRenderedException` so the default status code page
+ * is not displayed, and the message can be shown to the user when this
+ * exception is thrown as an HTTP page. This class also implements
+ * `UserMessageException` so a specific message (not the one passed to the
  * constructor) can be displayed and/or relayed to the Alert Stream.
- * 
+ *
  * This exception is handled by `UserMessageExceptionHandler` by default.
  *
  * This class is meant to be extended to create specific exceptions.
