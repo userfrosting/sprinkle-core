@@ -78,8 +78,11 @@ return [
             'port'     => 6379,
             'database' => 0,
         ],
-        // Cache twig file to disk
+        // Cache twig file to disk?
         'twig' => false,
+        // Cache routes? And filename for route cache.
+        'routerFile' => 'routes.cache',
+        'route'      => false,
     ],
 
     /*

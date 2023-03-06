@@ -11,6 +11,7 @@
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Illuminate\Cache\Repository as Cache;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,6 +38,9 @@ class ClearCacheCommand extends Command
 
     /** @Inject */
     protected CacheHelper $cacheHelper;
+
+    /** @Inject */
+    protected Filesystem $filesystem;
 
     /**
      * {@inheritdoc}
@@ -67,14 +71,13 @@ class ClearCacheCommand extends Command
         }
 
         // Clear router cache
-        // TODO : Requires rewrite of RouteServices
-        /*$this->io->writeln('<info> > Clearing Router cache file</info>', OutputInterface::VERBOSITY_VERBOSE);
+        $this->io->writeln('<info> > Clearing Router cache file</info>', OutputInterface::VERBOSITY_VERBOSE);
         if (!$this->clearRouterCache()) {
-            $filename = $this->config->get('settings.routerCacheFile');
-            $file = $this->locator->getResource("cache://$filename", true);
+            $file = $this->getRouteCacheFile();
             $this->io->error("Failed to delete Router cache file. Make sure you have write access to the `$file` file.");
-            exit(1);
-        }*/
+
+            return self::FAILURE;
+        }
 
         $this->io->success('Cache cleared !');
 
@@ -101,13 +104,32 @@ class ClearCacheCommand extends Command
     }
 
     /**
+     * Get the Router cache file path.
+     *
+     * @return string
+     */
+    protected function getRouteCacheFile(): string
+    {
+        $filename = $this->config->getString('cache.routerFile');
+        $file = $this->locator->findResource("cache://$filename", true);
+
+        return (string) $file;
+    }
+
+    /**
      * Clear the Router cache data file.
      *
      * @return bool true/false if operation is successful
      */
-    // TODO : Requires rewrite of RouteServices
-    // protected function clearRouterCache()
-    // {
-    //     return $this->ci->router->clearCache();
-    // }
+    protected function clearRouterCache(): bool
+    {
+        // Make sure file exist and delete it
+        $file = $this->getRouteCacheFile();
+        if ($this->filesystem->exists($file)) {
+            return $this->filesystem->delete($file);
+        }
+
+        // It's still considered a success if file doesn't exist
+        return true;
+    }
 }

@@ -47,6 +47,7 @@ use UserFrosting\Sprinkle\Core\Error\RegisterShutdownHandler;
 use UserFrosting\Sprinkle\Core\Event\ResourceLocatorInitiatedEvent;
 use UserFrosting\Sprinkle\Core\Listeners\ModelInitiated;
 use UserFrosting\Sprinkle\Core\Listeners\ResourceLocatorInitiated;
+use UserFrosting\Sprinkle\Core\Listeners\SetRouteCaching;
 use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\SessionMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\URIMiddleware;
@@ -231,9 +232,11 @@ class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, Even
             AppInitiatedEvent::class             => [
                 RegisterShutdownHandler::class,
                 ModelInitiated::class,
+                SetRouteCaching::class,
             ],
             BakeryInitiatedEvent::class          => [
                 ModelInitiated::class,
+                SetRouteCaching::class,
             ],
             ResourceLocatorInitiatedEvent::class => [
                 ResourceLocatorInitiated::class,

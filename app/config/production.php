@@ -19,10 +19,11 @@ return [
         'confirm_sensitive_command' => true,
     ],
     /*
-     * Enable Twig cache
+     * Enable Twig & route cache
      */
     'cache' => [
-        'twig' => true,
+        'twig'  => true,
+        'route' => true,
     ],
     /*
      * Turn off debug logs
@@ -37,12 +38,6 @@ return [
     */
     'logs' => [
         'exception' => true,
-    ],
-    /*
-     * Use router cache, disable full error details
-     */
-    'settings' => [
-        'routerCacheFile'     => 'routes.cache',
     ],
     /*
      * Enable analytics, disable more debugging
