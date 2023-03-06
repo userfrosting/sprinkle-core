@@ -36,7 +36,7 @@ final class BakeCommand extends Command
         'debug',
         'migrate',
         'webpack',
-        // 'clear-cache', // TODO
+        'clear-cache',
     ];
 
     /**

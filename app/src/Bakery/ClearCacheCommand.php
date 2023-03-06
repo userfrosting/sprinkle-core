@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use Illuminate\Cache\Repository as Cache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,6 +27,9 @@ class ClearCacheCommand extends Command
     use WithSymfonyStyle;
 
     /** @Inject */
+    protected Cache $cache;
+
+    /** @Inject */
     protected Config $config;
 
     /** @Inject */
@@ -37,7 +41,7 @@ class ClearCacheCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('clear-cache')
              ->setDescription('Clears the application cache. Includes cache service, Twig and Router cached data');
@@ -51,14 +55,15 @@ class ClearCacheCommand extends Command
         $this->io->title('Clearing cache');
 
         // Clear normal cache
-        $this->io->writeln('<info> > Clearing Illuminate cache instance</info>', OutputInterface::VERBOSITY_VERBOSE);
+        $this->io->writeln('<info> > Clearing Cache Instance</info>', OutputInterface::VERBOSITY_VERBOSE);
         $this->clearIlluminateCache();
 
         // Clear Twig cache
-        $this->io->writeln('<info> > Clearing Twig cached data</info>', OutputInterface::VERBOSITY_VERBOSE);
+        $this->io->writeln('<info> > Clearing Twig Cached Data</info>', OutputInterface::VERBOSITY_VERBOSE);
         if (!$this->clearTwigCache()) {
             $this->io->error('Failed to clear Twig cached data. Make sure you have write access to the `app/cache/twig` directory.');
-            exit(1);
+
+            return self::FAILURE;
         }
 
         // Clear router cache
@@ -81,7 +86,8 @@ class ClearCacheCommand extends Command
      */
     protected function clearIlluminateCache(): void
     {
-        $this->ci->cache->flush();
+        // @phpstan-ignore-next-line - False positive. PHPStan doesn't use the right class for cache.
+        $this->cache->flush();
     }
 
     /**
