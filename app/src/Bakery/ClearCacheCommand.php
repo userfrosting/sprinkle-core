@@ -87,7 +87,7 @@ class ClearCacheCommand extends Command
     /**
      * Flush the cached data from the cache service.
      */
-    protected function clearIlluminateCache(): void
+    public function clearIlluminateCache(): void
     {
         // @phpstan-ignore-next-line - False positive. PHPStan doesn't use the right class for cache.
         $this->cache->flush();
@@ -98,9 +98,26 @@ class ClearCacheCommand extends Command
      *
      * @return bool true/false if operation is successful
      */
-    protected function clearTwigCache(): bool
+    public function clearTwigCache(): bool
     {
         return $this->cacheHelper->clearCache();
+    }
+
+    /**
+     * Clear the Router cache data file.
+     *
+     * @return bool true/false if operation is successful
+     */
+    public function clearRouterCache(): bool
+    {
+        // Make sure file exist and delete it
+        $file = $this->getRouteCacheFile();
+        if ($this->filesystem->exists($file)) {
+            return $this->filesystem->delete($file);
+        }
+
+        // It's still considered a success if file doesn't exist
+        return true;
     }
 
     /**
@@ -114,22 +131,5 @@ class ClearCacheCommand extends Command
         $file = $this->locator->findResource("cache://$filename", true);
 
         return (string) $file;
-    }
-
-    /**
-     * Clear the Router cache data file.
-     *
-     * @return bool true/false if operation is successful
-     */
-    protected function clearRouterCache(): bool
-    {
-        // Make sure file exist and delete it
-        $file = $this->getRouteCacheFile();
-        if ($this->filesystem->exists($file)) {
-            return $this->filesystem->delete($file);
-        }
-
-        // It's still considered a success if file doesn't exist
-        return true;
     }
 }
