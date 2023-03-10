@@ -48,7 +48,10 @@ class SetRouteCaching
         if ($this->config->getBool('cache.route')) {
             $filename = $this->config->getString('cache.routerFile');
             $routerCacheFile = $this->locator->findResource("cache://$filename", true, true);
-            $this->app->getRouteCollector()->setCacheFile($routerCacheFile);
+            // Make sure the file is found
+            if (is_string($routerCacheFile)) {
+                $this->app->getRouteCollector()->setCacheFile($routerCacheFile);
+            }
         }
     }
 }
