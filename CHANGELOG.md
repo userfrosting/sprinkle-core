@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [5.0.0-alpha8](https://github.com/userfrosting/sprinkle-core/compare/5.0.0-alpha7...5.0.0-alpha8)
+- Update for PHP-DI 7
+
 ## [5.0.0-alpha7](https://github.com/userfrosting/sprinkle-core/compare/5.0.0-alpha6...5.0.0-alpha7)
 - Reenable clear-cache bakery command & route caching
 
