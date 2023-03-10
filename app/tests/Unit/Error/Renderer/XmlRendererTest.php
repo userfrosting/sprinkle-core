@@ -48,8 +48,8 @@ class XmlRendererTest extends TestCase
         // Assert
         $xml = simplexml_load_string($data);
         $this->assertNotFalse($xml);
-        $this->assertObjectHasAttribute('message', $xml);
-        $this->assertObjectNotHasAttribute('exception', $xml);
+        $this->assertTrue(property_exists($xml, 'message'));
+        $this->assertFalse(property_exists($xml, 'exception'));
     }
 
     public function testRenderWithDisplayError(): void
@@ -73,7 +73,7 @@ class XmlRendererTest extends TestCase
         // Assert
         $xml = simplexml_load_string($data);
         $this->assertNotFalse($xml);
-        $this->assertObjectHasAttribute('message', $xml);
-        $this->assertObjectHasAttribute('exception', $xml);
+        $this->assertTrue(property_exists($xml, 'message'));
+        $this->assertTrue(property_exists($xml, 'exception'));
     }
 }
