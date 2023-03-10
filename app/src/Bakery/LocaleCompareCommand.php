@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use DI\Attribute\Inject;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
@@ -32,7 +33,7 @@ class LocaleCompareCommand extends Command
     use LocaleOption;
     use WithSymfonyStyle;
 
-    /** @Inject */
+    #[Inject]
     protected ResourceLocatorInterface $locator;
 
     /**

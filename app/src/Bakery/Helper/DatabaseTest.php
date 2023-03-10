@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery\Helper;
 
+use DI\Attribute\Inject;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 /**
@@ -21,7 +22,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
  */
 trait DatabaseTest
 {
-    /** @Inject */
+    #[Inject]
     protected Capsule $capsule;
 
     /**

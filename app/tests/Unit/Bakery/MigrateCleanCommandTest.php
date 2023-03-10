@@ -44,6 +44,8 @@ class MigrateCleanCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(Migrator::class, $migrator);
         $ci->set(Config::class, $config);
+
+        /** @var MigrateCleanCommand */
         $command = $ci->get(MigrateCleanCommand::class);
         $result = BakeryTester::runCommand($command);
 

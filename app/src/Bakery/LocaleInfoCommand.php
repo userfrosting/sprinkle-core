@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use DI\Attribute\Inject;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,7 +28,7 @@ class LocaleInfoCommand extends Command
 {
     use WithSymfonyStyle;
 
-    /** @Inject */
+    #[Inject]
     protected SiteLocale $locale;
 
     /**

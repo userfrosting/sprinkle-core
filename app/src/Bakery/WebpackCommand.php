@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use DI\Attribute\Inject;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,10 +27,10 @@ final class WebpackCommand extends Command
 {
     use WithSymfonyStyle;
 
-    /** @Inject */
+    #[Inject]
     protected NodeVersionValidator $nodeVersionValidator;
 
-    /** @Inject */
+    #[Inject]
     protected NpmVersionValidator $npmVersionValidator;
 
     /**

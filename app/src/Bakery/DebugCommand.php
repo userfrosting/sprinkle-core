@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use DI\Attribute\Inject;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,22 +33,22 @@ class DebugCommand extends Command
     use DatabaseTest;
     use WithSymfonyStyle;
 
-    /** @Inject */
+    #[Inject]
     protected Config $config;
 
-    /** @Inject */
+    #[Inject]
     protected SprinkleManager $sprinkleManager;
 
-    /** @Inject */
+    #[Inject]
     protected PhpVersionValidator $phpVersionValidator;
 
-    /** @Inject */
+    #[Inject]
     protected PhpDeprecationValidator $phpDeprecationValidator;
 
-    /** @Inject */
+    #[Inject]
     protected NodeVersionValidator $nodeVersionValidator;
 
-    /** @Inject */
+    #[Inject]
     protected NpmVersionValidator $npmVersionValidator;
 
     /**

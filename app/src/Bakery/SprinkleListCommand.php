@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use DI\Attribute\Inject;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,7 +30,7 @@ class SprinkleListCommand extends Command
      */
     protected $headers = ['Sprinkle', 'Namespace', 'Path'];
 
-    /** @Inject */
+    #[Inject]
     protected SprinkleManager $sprinkleManager;
 
     /**

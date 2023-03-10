@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use DI\Attribute\Inject;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,7 +27,7 @@ class MigrateResetHardCommand extends Command
 {
     use WithSymfonyStyle;
 
-    /** @Inject */
+    #[Inject]
     protected Capsule $db;
 
     /**

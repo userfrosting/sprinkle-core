@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use DI\Attribute\Inject;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -29,13 +30,13 @@ class SeedCommand extends Command
 {
     use WithSymfonyStyle;
 
-    /** @Inject */
+    #[Inject]
     protected SeedRepositoryInterface $seeds;
 
-    /** @Inject */
+    #[Inject]
     protected Config $config;
 
-    /** @Inject */
+    #[Inject]
     protected Capsule $db;
 
     /**

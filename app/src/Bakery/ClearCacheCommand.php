@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use DI\Attribute\Inject;
 use Illuminate\Cache\Repository as Cache;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
@@ -27,19 +28,19 @@ class ClearCacheCommand extends Command
 {
     use WithSymfonyStyle;
 
-    /** @Inject */
+    #[Inject]
     protected Cache $cache;
 
-    /** @Inject */
+    #[Inject]
     protected Config $config;
 
-    /** @Inject */
+    #[Inject]
     protected ResourceLocatorInterface $locator;
 
-    /** @Inject */
+    #[Inject]
     protected CacheHelper $cacheHelper;
 
-    /** @Inject */
+    #[Inject]
     protected Filesystem $filesystem;
 
     /**

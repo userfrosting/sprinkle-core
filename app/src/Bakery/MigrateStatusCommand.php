@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use DI\Attribute\Inject;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Command\Command;
@@ -27,10 +28,10 @@ class MigrateStatusCommand extends Command
 {
     use WithSymfonyStyle;
 
-    /** @Inject */
+    #[Inject]
     protected Migrator $migrator;
 
-    /** @Inject */
+    #[Inject]
     protected Capsule $db;
 
     /**

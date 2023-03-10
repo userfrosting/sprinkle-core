@@ -15,6 +15,7 @@ use Lcharette\WebpackEncoreTwig\VersionedAssetsTwigExtension;
 use UserFrosting\Event\AppInitiatedEvent;
 use UserFrosting\Event\BakeryInitiatedEvent;
 use UserFrosting\Event\EventListenerRecipe;
+use UserFrosting\Sprinkle\BakeryRecipe;
 use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugCommand;
@@ -77,9 +78,16 @@ use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\CsrfExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\RoutesExtension;
+use UserFrosting\Sprinkle\MiddlewareRecipe;
 use UserFrosting\Sprinkle\SprinkleRecipe;
 
-class Core implements SprinkleRecipe, TwigExtensionRecipe, MigrationRecipe, EventListenerRecipe
+class Core implements
+    SprinkleRecipe,
+    TwigExtensionRecipe,
+    MigrationRecipe,
+    EventListenerRecipe,
+    MiddlewareRecipe,
+    BakeryRecipe
 {
     /**
      * {@inheritdoc}

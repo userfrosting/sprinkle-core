@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Error\Handler;
 
+use DI\Attribute\Inject;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -23,7 +24,7 @@ use UserFrosting\Support\Message\UserMessage;
  */
 final class UserMessageExceptionHandler extends ExceptionHandler
 {
-    /** @Inject */
+    #[Inject]
     protected AlertStream $alert;
 
     /**

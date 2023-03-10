@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery\Helper;
 
+use DI\Attribute\Inject;
 use UserFrosting\I18n\Locale;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 
@@ -22,7 +23,7 @@ use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
  */
 trait LocaleOption
 {
-    /** @Inject */
+    #[Inject]
     protected SiteLocale $locale;
 
     /**

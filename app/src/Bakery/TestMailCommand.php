@@ -11,6 +11,7 @@
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Carbon\Carbon;
+use DI\Attribute\Inject;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,10 +30,10 @@ final class TestMailCommand extends Command
 {
     use WithSymfonyStyle;
 
-    /** @Inject */
+    #[Inject]
     protected Config $config;
 
-    /** @Inject */
+    #[Inject]
     protected Mailer $mailer;
 
     /**

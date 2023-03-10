@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
+use DI\Attribute\Inject;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,13 +28,13 @@ class MigrateCleanCommand extends Command
 {
     use WithSymfonyStyle;
 
-    /** @Inject */
+    #[Inject]
     protected Migrator $migrator;
 
-    /** @Inject */
+    #[Inject]
     protected Capsule $db;
 
-    /** @Inject */
+    #[Inject]
     protected Config $config;
 
     /**
