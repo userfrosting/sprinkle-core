@@ -48,7 +48,8 @@ final class WebpackCommand extends Command
         $this->setName('webpack')
              ->setDescription('Build the assets using npm and Webpack Encore')
              ->setHelp(implode(' ', $help))
-             ->addOption('production', 'p', InputOption::VALUE_NONE, 'On deploy, create a production build');
+             ->addOption('production', 'p', InputOption::VALUE_NONE, 'On deploy, create a production build')
+             ->setAliases(['build-assets']);
     }
 
     /**
