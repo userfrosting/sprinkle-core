@@ -101,6 +101,7 @@ class ShutdownHandler
      * The exist is separated in it's own class to allows testing.
      *
      * @see https://stackoverflow.com/a/21578225/445757
+     *
      * @codeCoverageIgnore
      *
      * @param string $errorMessage
@@ -112,7 +113,7 @@ class ShutdownHandler
         echo $errorMessage;
 
         header('HTTP/1.1 500 Internal Server Error');
-        exit();
+        exit;
     }
 
     /**
