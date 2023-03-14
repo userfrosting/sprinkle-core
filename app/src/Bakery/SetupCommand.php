@@ -60,7 +60,9 @@ final class SetupCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var \Symfony\Component\Console\Application */
         $application = $this->getApplication();
+
         foreach ($this->aggregateCommands() as $commandName) {
             $command = $application->find($commandName);
             $command->run($input, $output);
@@ -70,7 +72,7 @@ final class SetupCommand extends Command
     }
 
     /**
-     * Aggregate commands to run using BakeCommandEvent.
+     * Aggregate commands to run using SetupCommandEvent.
      *
      * @return string[]
      */

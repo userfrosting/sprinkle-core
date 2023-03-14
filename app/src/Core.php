@@ -19,8 +19,11 @@ use UserFrosting\Sprinkle\BakeryRecipe;
 use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugConfigCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugDbCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugEventsCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugLocatorCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugVersionCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleCompareCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleDictionaryCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleInfoCommand;
@@ -116,8 +119,11 @@ class Core implements
             BakeCommand::class,
             ClearCacheCommand::class,
             DebugCommand::class,
+            DebugConfigCommand::class,
+            DebugDbCommand::class,
             DebugEventsCommand::class,
             DebugLocatorCommand::class,
+            DebugVersionCommand::class,
             LocaleCompareCommand::class,
             LocaleDictionaryCommand::class,
             LocaleInfoCommand::class,

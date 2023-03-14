@@ -22,7 +22,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use UserFrosting\Event\EventDispatcher;
 use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
-use UserFrosting\Sprinkle\Core\Bakery\Event\BakeCommandEvent;
 use UserFrosting\Sprinkle\Core\Bakery\Event\SetupCommandEvent;
 use UserFrosting\Sprinkle\Core\Bakery\SetupCommand;
 use UserFrosting\Testing\ContainerStub;
@@ -33,7 +32,7 @@ class SetupCommandTest extends TestCase
 
     public function testBaseCommand(): void
     {
-        // Setup services mock. Command will be set by BakeCommandEvent
+        // Setup services mock. Command will be set by SetupCommandEvent
         /** @var ListenerProviderInterface */
         $listener = Mockery::mock(ListenerProviderInterface::class)
             ->shouldReceive('getListenersForEvent')->andReturn([new SetupCommandListenerStub()])

@@ -12,6 +12,7 @@ namespace UserFrosting\Sprinkle\Core\Bakery\Helper;
 
 use DI\Attribute\Inject;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use PDOException;
 
 /**
  * Database Test Trait. Include method to test the db connection.
@@ -28,9 +29,8 @@ trait DatabaseTest
     /**
      * Test database connection directly using PDO.
      *
-     * TODO : Change Exception
-     * @throws \Exception
-     * @return bool       True if success
+     * @throws PDOException
+     * @return bool         True if success
      */
     protected function testDB(): bool
     {
@@ -38,11 +38,11 @@ trait DatabaseTest
             $connectionName = $this->capsule->getDatabaseManager()->getDefaultConnection();
             $connection = $this->capsule->getConnection($connectionName);
             $connection->getPdo();
-        } catch (\PDOException $e) {
-            $message = "Could not connect to the database '" . $connection->getName() . "' connection" . PHP_EOL;
+        } catch (PDOException $e) {
+            $message = 'Could not connect to the database connection' . PHP_EOL;
             $message .= 'Exception: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
             $message .= 'Please check your database configuration and/or google the exception shown above and run command again.';
-            throw new \Exception($message);
+            throw new PDOException($message, 0, $e);
         }
 
         return true;

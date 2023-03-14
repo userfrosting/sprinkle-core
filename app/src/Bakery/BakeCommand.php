@@ -79,6 +79,8 @@ final class BakeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io->writeln("<info>{$this->title}</info>");
+
+        /** @var \Symfony\Component\Console\Application */
         $application = $this->getApplication();
         foreach ($this->aggregateCommands() as $commandName) {
             $command = $application->find($commandName);
