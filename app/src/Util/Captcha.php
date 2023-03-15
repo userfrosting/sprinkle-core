@@ -134,7 +134,7 @@ class Captcha
         }
 
         //calculate center of text
-        $x = (150 - 0 - imagefontwidth(5) * strlen($this->code)) / 2 + 0 + 5;
+        $x = round((150 - 0 - imagefontwidth(5) * strlen($this->code)) / 2 + 0 + 5);
 
         //write string twice
         imagestring($image, 5, $x, 7, $this->code, $black);
