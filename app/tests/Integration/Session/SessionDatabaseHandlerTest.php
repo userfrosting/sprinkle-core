@@ -169,5 +169,6 @@ class SessionDatabaseHandlerTest extends TestCase
         // Make sure db was filled with something
         $this->assertNotEquals(0, SessionTable::count());
         $this->assertNotNull(SessionTable::find($session_id));
+        $this->assertSame(PHP_SESSION_NONE, $session->status());
     }
 }

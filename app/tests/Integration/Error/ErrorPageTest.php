@@ -10,6 +10,7 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Error;
 
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
@@ -41,9 +42,15 @@ class ErrorPageTest extends TestCase
      */
     public function testBadMethod(): void
     {
+        // Alerts is backed by CSRF, so we need to disable it
+        /** @var Config */
+        $config = $this->ci->get(Config::class);
+        $config->set('csrf.enabled', false);
+
         $request = $this->createJsonRequest('POST', '/alerts');
         $response = $this->handleRequest($request);
 
+        $this->assertJsonResponse('Method Not Allowed', $response, 'title');
         $this->assertResponseStatus(405, $response);
         $this->assertJsonStructure(['title', 'description', 'status'], $response);
         $this->assertJsonEquals(405, $response, 'status');

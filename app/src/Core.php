@@ -44,6 +44,7 @@ use UserFrosting\Sprinkle\Core\Bakery\SetupMailCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
 use UserFrosting\Sprinkle\Core\Bakery\WebpackCommand;
+use UserFrosting\Sprinkle\Core\Csrf\CsrfGuardMiddleware;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\SessionsTable;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\ThrottlesTable;
 use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerMiddleware;
@@ -59,7 +60,6 @@ use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
-use UserFrosting\Sprinkle\Core\ServicesProvider\CsrfService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\DatabaseService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ErrorHandlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\I18nService;
@@ -178,7 +178,6 @@ class Core implements
             AlertStreamService::class,
             CacheService::class,
             ConfigService::class,
-            // CsrfService::class,
             DatabaseService::class,
             ErrorHandlerService::class,
             I18nService::class,
@@ -205,6 +204,7 @@ class Core implements
     {
         return [
             LocaleMiddleware::class,
+            CsrfGuardMiddleware::class,
             SessionMiddleware::class,
             ExceptionHandlerMiddleware::class,
             URIMiddleware::class,
@@ -220,7 +220,7 @@ class Core implements
     {
         return [
             CoreExtension::class,
-            // CsrfExtension::class,
+            CsrfExtension::class,
             I18nExtension::class,
             AlertsExtension::class,
             RoutesExtension::class,

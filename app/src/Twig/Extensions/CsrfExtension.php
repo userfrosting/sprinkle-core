@@ -13,23 +13,21 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Twig\Extensions;
 
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\GlobalsInterface;
+use UserFrosting\Sprinkle\Core\Csrf\CsrfGuard;
 
-// TODO : Needs new CSRF service
-// TODO : Test this...
 class CsrfExtension extends AbstractExtension implements GlobalsInterface
 {
     /**
-     * @param Config $config
+     * @param CsrfGuard $csrf
      */
     public function __construct(
-        // protected Config $csrf // TODO
+        protected CsrfGuard $csrf
     ) {
     }
 
     /**
-     * Adds Twig global variables `csrf`.
-     *
-     * @return array[mixed]
+     * {@inheritdoc}
      */
     public function getGlobals(): array
     {

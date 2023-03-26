@@ -118,5 +118,6 @@ class SessionFileHandlerTest extends TestCase
         // Delete existing file
         $fs->delete($session_file);
         $this->assertFalse($fs->exists($session_file));
+        $this->assertSame(PHP_SESSION_NONE, $session->status());
     }
 }
