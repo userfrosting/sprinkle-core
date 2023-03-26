@@ -62,6 +62,7 @@ class CsrfGuard extends Guard
 
     /**
      * {@inheritDoc}
+     *
      * @phpstan-ignore-next-line
      */
     public function setStorage(&$storage = null): self
