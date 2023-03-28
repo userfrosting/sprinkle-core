@@ -28,6 +28,16 @@ class CsrfGuardMiddlewareTest extends TestCase
 {
     protected string $mainSprinkle = CsrfSprinkle::class;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // Enable CSRF for this test
+        /** @var Config */
+        $config = $this->ci->get(Config::class);
+        $config->set('csrf.enabled', true);
+    }
+
     public function testFailCsrf(): void
     {
         /** @var AlertStream */
@@ -119,8 +129,8 @@ class CsrfGuardMiddlewareTest extends TestCase
         $this->assertResponseStatus(200, $response);
         $body = (string) $response->getBody();
         $this->assertStringNotContainsString('<input type="hidden" name="" value="">', $body);
-        $this->assertStringContainsString($guard->getTokenName(), $body);
-        $this->assertStringContainsString($guard->getTokenValue(), $body);
+        $this->assertStringContainsString($guard->getTokenName(), $body); // @phpstan-ignore-line
+        $this->assertStringContainsString($guard->getTokenValue(), $body); // @phpstan-ignore-line
     }
 }
 

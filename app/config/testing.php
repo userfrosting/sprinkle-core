@@ -20,6 +20,13 @@ return [
     ],
 
     /*
+     * Disable CSRF protection in tests
+     */
+    'csrf' => [
+        'enabled' => false,
+    ],
+
+    /*
      * Define in memory db for testing
      */
     'db' => [
