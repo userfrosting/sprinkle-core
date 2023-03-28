@@ -8,7 +8,7 @@
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
-namespace UserFrosting\Sprinkle\Core\Tests\Integration\Controller;
+namespace UserFrosting\Sprinkle\Core\Tests\Integration\Csrf;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\App;
