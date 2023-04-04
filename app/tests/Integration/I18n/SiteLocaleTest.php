@@ -15,6 +15,7 @@ use Mockery as m;
 use Psr\Http\Message\ResponseInterface as Response;
 use UserFrosting\Config\Config;
 use UserFrosting\I18n\Locale;
+use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
@@ -29,7 +30,10 @@ class SiteLocaleTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    protected $testLocale = [
+    /**
+     * @var array<string|bool|null>
+     */
+    protected array $testLocale = [
         'fr_FR' => 'french', // Legacy setting
         'en_US' => true,
         'es_ES' => false,
@@ -54,7 +58,7 @@ class SiteLocaleTest extends TestCase
 
     public function testService(): void
     {
-        $this->assertInstanceOf(SiteLocale::class, $this->locale);
+        $this->assertInstanceOf(SiteLocale::class, $this->locale); // @phpstan-ignore-line
     }
 
     public function testFakeConfig(): void
@@ -78,7 +82,7 @@ class SiteLocaleTest extends TestCase
      * @depends testService
      * @depends testFakeConfig
      */
-    public function testgetAvailable(): void
+    public function testGetAvailable(): void
     {
         $locales = $this->locale->getAvailable();
 
@@ -88,9 +92,9 @@ class SiteLocaleTest extends TestCase
     }
 
     /**
-     * @depends testgetAvailable
+     * @depends testGetAvailable
      */
-    public function testgetAvailableOptions(): void
+    public function testGetAvailableOptions(): void
     {
         // Implement fake locale file location & locator
         $locator = new ResourceLocator(__DIR__);
@@ -126,6 +130,20 @@ class SiteLocaleTest extends TestCase
     {
         $this->config->set('site.locales.default', 'fr_FR');
         $this->assertSame('fr_FR', $this->locale->getLocaleIdentifier());
+    }
+
+    /**
+     * Make sure the translator is loaded with the correct SiteLocale dependency.
+     * Will return the default locale (fr_FR)
+     */
+    public function testGetLocaleIdentifierAndTranslator(): void
+    {
+        $this->config->set('site.locales.default', 'fr_FR');
+        $this->assertSame('fr_FR', $this->locale->getLocaleIdentifier());
+
+        $translator = $this->ci->get(Translator::class);
+        $this->assertInstanceOf(Translator::class, $translator);
+        $this->assertSame('fr_FR', $translator->getLocale()->getIdentifier());
     }
 
     /**
