@@ -206,8 +206,8 @@ class Core implements
             LocaleMiddleware::class,
             CsrfGuardMiddleware::class,
             SessionMiddleware::class,
-            ExceptionHandlerMiddleware::class,
             URIMiddleware::class,
+            ExceptionHandlerMiddleware::class,
         ];
     }
 
