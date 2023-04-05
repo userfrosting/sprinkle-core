@@ -74,7 +74,7 @@ class MigrateResetHardCommand extends Command
      * Hard reset the whole database to an empty state by dropping all tables.
      *
      * @param bool $force
-     * 
+     *
      * @return int Exit code
      */
     protected function performHardReset(bool $force): int
@@ -119,7 +119,7 @@ class MigrateResetHardCommand extends Command
 
     /**
      * Hard reset the whole database to an empty state by dropping all tables.
-     * 
+     *
      * @return int Exit code
      */
     protected function pretendHardReset(): int
