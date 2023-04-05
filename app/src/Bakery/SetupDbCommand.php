@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
@@ -210,7 +212,7 @@ class SetupDbCommand extends Command
         // Ask further questions based on driver
         if ($driver['driver'] == 'sqlite') {
             $path = $args->getOption('db_name');
-            $path = ($path == true) ? $path : $this->io->ask('Database path', $driver['defaultDBName']);
+            $path = ($path == true) ? $path : $this->io->ask('Database path', (string) $driver['defaultDBName']);
 
             // Check if file exists, attempt to create it otherwise
             if (!file_exists($path)) {
@@ -233,10 +235,10 @@ class SetupDbCommand extends Command
             $host = ($host == true) ? $host : $this->io->ask('Hostname', 'localhost');
 
             $port = $args->getOption('db_port');
-            $port = ($port == true) ? $port : $this->io->ask('Port', $driver['defaultPort']);
+            $port = ($port == true) ? $port : $this->io->ask('Port', (string) $driver['defaultPort']);
 
             $path = $args->getOption('db_name');
-            $path = ($path == true) ? $path : $this->io->ask('Database name', $driver['defaultDBName']);
+            $path = ($path == true) ? $path : $this->io->ask('Database name', (string) $driver['defaultDBName']);
 
             $user = $args->getOption('db_user');
             $user = ($user == true) ? $user : $this->io->ask('Username', 'userfrosting');

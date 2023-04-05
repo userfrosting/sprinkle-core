@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
@@ -134,7 +136,7 @@ class Captcha
         }
 
         //calculate center of text
-        $x = round((150 - 0 - imagefontwidth(5) * strlen($this->code)) / 2 + 0 + 5);
+        $x = (int) round((150 - 0 - imagefontwidth(5) * strlen($this->code)) / 2 + 0 + 5);
 
         //write string twice
         imagestring($image, 5, $x, 7, $this->code, $black);

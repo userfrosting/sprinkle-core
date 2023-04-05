@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
@@ -33,7 +35,7 @@ class MigrateResetHardCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('migrate:reset:hard')
              ->setDescription('Force reset the whole database to an empty state, by dropping all tables.')
@@ -50,9 +52,9 @@ class MigrateResetHardCommand extends Command
         $this->io->title('Database Migration Hard Reset');
 
         // Get options
-        $pretend = $input->getOption('pretend');
-        $force = $input->getOption('force');
-        $database = $input->getOption('database');
+        $pretend = (bool) $input->getOption('pretend');
+        $force = (bool) $input->getOption('force');
+        $database = strval($input->getOption('database'));
 
         // Set connection to the selected database
         if ($database != '') {
@@ -71,7 +73,9 @@ class MigrateResetHardCommand extends Command
     /**
      * Hard reset the whole database to an empty state by dropping all tables.
      *
-     * @param InputInterface $input
+     * @param bool $force
+     * 
+     * @return int Exit code
      */
     protected function performHardReset(bool $force): int
     {
@@ -83,7 +87,7 @@ class MigrateResetHardCommand extends Command
         $tables = $schema->listTableNames();
 
         // Stop if nothing to drop
-        if (empty($tables)) {
+        if (count($tables) === 0) {
             $this->io->success('No tables found');
 
             return self::SUCCESS;
@@ -115,8 +119,8 @@ class MigrateResetHardCommand extends Command
 
     /**
      * Hard reset the whole database to an empty state by dropping all tables.
-     *
-     * @param InputInterface $input
+     * 
+     * @return int Exit code
      */
     protected function pretendHardReset(): int
     {
@@ -132,7 +136,7 @@ class MigrateResetHardCommand extends Command
         $tables = $doctrineSchema->listTableNames();
 
         // Stop if nothing to drop
-        if (empty($tables)) {
+        if (count($tables) === 0) {
             $this->io->success('No tables found');
 
             return self::SUCCESS;
