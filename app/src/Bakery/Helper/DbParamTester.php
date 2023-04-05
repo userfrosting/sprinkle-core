@@ -24,7 +24,7 @@ class DbParamTester
      *
      * @param string[] $dbParams Database params
      *
-     * @throws PDOException If connection failed
+     * @throws \PDOException If connection failed
      *
      * @return true Return true if db is successful
      */

@@ -146,7 +146,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
         $batch = $this->getTable()->max('batch');
 
         // Default to 0 if it's null (empty table)
-        return $batch ?: 0;
+        return ($batch === null) ? intval($batch) : 0;
     }
 
     /**
