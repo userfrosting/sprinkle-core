@@ -79,7 +79,7 @@ class SessionFileHandlerTest extends TestCase
     public function testUsingSessionDouble(): void
     {
         // Destroy any active session from previous test
-        session_destroy();
+        @session_destroy();
 
         $fs = new Filesystem();
         $handler = new FileSessionHandler($fs, $this->testSessionDir, 120);

@@ -80,6 +80,7 @@ class SessionServiceTest extends TestCase
 
         // Assert CI get
         $this->assertInstanceOf(SessionHandlerInterface::class, $this->ci->get(SessionHandlerInterface::class));
+        $this->assertInstanceOf($class, $this->ci->get(SessionHandlerInterface::class)); // @phpstan-ignore-line
     }
 
     public function handlerDataProvider(): array

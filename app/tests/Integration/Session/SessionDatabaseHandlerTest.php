@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
@@ -10,27 +12,23 @@
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Session;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Session\DatabaseSessionHandler;
 use UserFrosting\Config\Config;
 use UserFrosting\Session\Session;
 use UserFrosting\Sprinkle\Core\Database\Models\Session as SessionTable;
 use UserFrosting\Sprinkle\Core\Testing\RefreshDatabase;
-use UserFrosting\Sprinkle\Core\Testing\withDatabaseSessionHandler;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
  * Integration tests for the session service.
  */
-// TODO : This whole test needs a rewrite using Mockery, not integration. Injection should be preferred for *SessionHandler.
-//        The service itself should be tested in a separate test case and focus only on the logic used to determine which Handler is used.
 class SessionDatabaseHandlerTest extends TestCase
 {
     use RefreshDatabase;
-    use withDatabaseSessionHandler;
 
-    protected ConnectionInterface $connection;
+    protected Connection $connection;
     protected Config $config;
 
     public function setUp(): void
@@ -40,42 +38,40 @@ class SessionDatabaseHandlerTest extends TestCase
         $this->refreshDatabase();
 
         // Set service alias
-        $this->connection = $this->ci->get(Capsule::class)->connection();
-        $this->config = $this->ci->get(Capsule::class);
+        $this->connection = $this->ci->get(Connection::class); // @phpstan-ignore-line
+        $this->config = $this->ci->get(Config::class); // @phpstan-ignore-line
     }
 
     /**
      * Test session table connection & existence
      */
-    // TODO : Require Migration definitions
-    /*public function testSessionTable()
+    public function testSessionTable(): void
     {
-        $table = $this->config->get('session.database.table');
+        $table = $this->config->getString('session.database.table');
 
         // Check connection is ok and returns what's expected from DatabaseSessionHandler
-        $this->assertInstanceOf(ConnectionInterface::class, $this->connection);
-        $this->assertInstanceOf(\Illuminate\Database\Query\Builder::class, $this->connection->table($table));
+        $this->assertInstanceOf(ConnectionInterface::class, $this->connection); // @phpstan-ignore-line
+        $this->assertInstanceOf(\Illuminate\Database\Query\Builder::class, $this->connection->table($table)); // @phpstan-ignore-line
 
         // Check table exist
         $this->assertTrue($this->connection->getSchemaBuilder()->hasTable($table));
-    }*/
+    }
 
     /**
      * @depends testSessionTable
      */
-    // TODO : Require Migration definitions
-    /*public function testSessionWrite()
+    public function testSessionWrite(): void
     {
         // Define random session ID
-        // TODO : Use md5 of datetime to avoid duplicate
-        $session_id = 'test' . rand(1, 100000);
+        $session_id = 'test' . md5(microtime());
 
         // Make sure db is empty at first
         $this->assertEquals(0, SessionTable::count());
         $this->assertNull(SessionTable::find($session_id));
 
         // Get handler
-        $handler = new DatabaseSessionHandler($this->connection, $this->config->get('session.database.table'), $this->config->get('session.minutes'));
+        /** @var DatabaseSessionHandler */
+        $handler = $this->ci->get(DatabaseSessionHandler::class);
 
         // Write session
         // https://github.com/laravel/framework/blob/5.8/src/Illuminate/Session/DatabaseSessionHandler.php#L132
@@ -101,52 +97,25 @@ class SessionDatabaseHandlerTest extends TestCase
         // Check db to make sure it's gone
         $this->assertEquals(0, SessionTable::count());
         $this->assertNull(SessionTable::find($session_id));
-    }*/
+    }
 
     /**
      * Simulate session service with database handler.
-     * We can't use the real service as it is created before we can even setup
-     * the in-memory database with the basic table we need
      *
      * @depends testSessionWrite
      */
-    // TODO : Require Migration definitions
-    /*public function testUsingSessionDouble()
+    public function testUsingSessionDouble(): void
     {
+        // Destroy any active session from previous test
+        @session_destroy();
 
-        $this->ci->get(Session::class)->destroy();
+        /** @var DatabaseSessionHandler */
+        $handler = $this->ci->get(DatabaseSessionHandler::class);
+        $session = new Session($handler, []);
 
-        $handler = new DatabaseSessionHandler($this->connection, $this->config->get('session.database.table'), $this->config->get('session.minutes'));
-        $session = new Session($handler, $this->config->get('session'));
-
-        $this->assertInstanceOf(Session::class, $session);
+        // Test handler is right
         $this->assertInstanceOf(DatabaseSessionHandler::class, $session->getHandler());
         $this->assertSame($handler, $session->getHandler());
-
-        $this->sessionTests($session);
-    }*/
-
-    /**
-     * @depends testUsingSessionDouble
-     */
-    // TODO : Require Migration definitions
-    /*public function testUsingSessionService()
-    {
-        // Reset CI Session
-        $this->useDatabaseSessionHandler();
-
-        // Make sure config is set
-        $this->sessionTests($this->ci->get(Session::class));
-    }*/
-
-    /**
-     * @param Session $session
-     */
-    protected function sessionTests(Session $session)
-    {
-        // Make sure session service have correct instance
-        $this->assertInstanceOf(Session::class, $session);
-        $this->assertInstanceOf(DatabaseSessionHandler::class, $session->getHandler());
 
         // Destroy previously defined session
         $session->destroy();
@@ -158,6 +127,7 @@ class SessionDatabaseHandlerTest extends TestCase
 
         // Get id
         $session_id = $session->getId();
+        $this->assertIsString($session_id);
 
         // Set something to the session
         $session->set('foo', 'bar');
