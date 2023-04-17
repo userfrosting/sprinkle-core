@@ -32,27 +32,38 @@ class DatabaseMigrationRepositoryTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    protected Builder | \Mockery\MockInterface $schemaBuilder;
-    protected QueryBuilder | \Mockery\MockInterface $queryBuilder;
-    protected Connection | \Mockery\MockInterface $connection;
-    protected Manager | \Mockery\MockInterface $capsule;
+    protected Builder $schemaBuilder;
+    protected QueryBuilder $queryBuilder;
+    protected Connection $connection;
+    protected Manager $capsule;
 
     public function setUp(): void
     {
         parent::setUp();
 
         // Create mock objects and their common expectations
-        $this->schemaBuilder = Mockery::mock(Builder::class)
+        /** @var Builder $schemaBuilder */
+        $schemaBuilder = Mockery::mock(Builder::class)
             ->shouldReceive('hasTable')->with('Migrafoo')->andReturn(true)->byDefault()
             ->getMock();
-        $this->queryBuilder = Mockery::mock(QueryBuilder::class);
-        $this->connection = Mockery::mock(Connection::class)
+        $this->schemaBuilder = $schemaBuilder;
+
+        /** @var QueryBuilder */
+        $queryBuilder = Mockery::mock(QueryBuilder::class);
+        $this->queryBuilder = $queryBuilder;
+
+        /** @var Connection */
+        $connection = Mockery::mock(Connection::class)
             ->shouldReceive('getSchemaBuilder')->andReturn($this->schemaBuilder)
             ->shouldReceive('table')->with('Migrafoo')->andReturn($this->queryBuilder)
             ->getMock();
-        $this->capsule = Mockery::mock(Manager::class)
+        $this->connection = $connection;
+
+        /** @var Manager */
+        $capsule = Mockery::mock(Manager::class)
             ->shouldReceive('getConnection')->andReturn($this->connection)
             ->getMock();
+        $this->capsule = $capsule;
     }
 
     protected function getRepo(): DatabaseMigrationRepository
@@ -66,7 +77,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repository = $this->getRepo();
 
         // Make first assertion about class creation.
-        $this->assertInstanceOf(MigrationRepositoryInterface::class, $repository);
+        $this->assertInstanceOf(MigrationRepositoryInterface::class, $repository); // @phpstan-ignore-line
 
         return $repository;
     }
@@ -93,7 +104,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testGetConnection(DatabaseMigrationRepository $repository): void
     {
         $this->assertNull($repository->getConnectionName());
-        $this->assertInstanceOf(Connection::class, $repository->getConnection());
+        $this->assertInstanceOf(Connection::class, $repository->getConnection()); // @phpstan-ignore-line
     }
 
     /**
@@ -106,7 +117,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     {
         $repository->setConnectionName('foo');
         $this->assertSame('foo', $repository->getConnectionName());
-        $this->assertInstanceOf(Connection::class, $repository->getConnection());
+        $this->assertInstanceOf(Connection::class, $repository->getConnection()); // @phpstan-ignore-line
     }
 
     /**
@@ -116,7 +127,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
      */
     public function testGetSchemaBuilder(DatabaseMigrationRepository $repository): void
     {
-        $this->assertInstanceOf(Builder::class, $repository->getSchemaBuilder());
+        $this->assertInstanceOf(Builder::class, $repository->getSchemaBuilder()); // @phpstan-ignore-line
     }
 
     /**
@@ -126,7 +137,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
      */
     public function testGetTable(DatabaseMigrationRepository $repository): void
     {
-        $this->assertInstanceOf(QueryBuilder::class, $repository->getTable());
+        $this->assertInstanceOf(QueryBuilder::class, $repository->getTable()); // @phpstan-ignore-line
     }
 
     /**
@@ -135,6 +146,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testRepositoryCreation(): void
     {
         // Set mock expectations
+        // @phpstan-ignore-next-line
         $this->schemaBuilder
             ->shouldReceive('hasTable')->with('Migrafoo')->once()->andReturn(true)
             ->shouldReceive('create')->with('Migrafoo', \Closure::class)->once()
@@ -157,10 +169,11 @@ class DatabaseMigrationRepositoryTest extends TestCase
      */
     public function testGetTableNoExist(): void
     {
+        // @phpstan-ignore-next-line
         $this->schemaBuilder
             ->shouldReceive('hasTable')->once()->andReturn(false)
             ->shouldReceive('create')->with('Migrafoo', \Closure::class)->once();
-        $this->assertInstanceOf(QueryBuilder::class, $this->getRepo()->getTable());
+        $this->assertInstanceOf(QueryBuilder::class, $this->getRepo()->getTable()); // @phpstan-ignore-line
     }
 
     /**
@@ -169,6 +182,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testRepositoryHasTableFalse(): void
     {
         // Set mock expectations
+        // @phpstan-ignore-next-line
         $this->schemaBuilder
             ->shouldReceive('hasTable')->with('Migrafoo')->once()->andReturn(false);
 
@@ -185,6 +199,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     {
         // Set mock expectations
         $exception = Mockery::mock(QueryException::class);
+        // @phpstan-ignore-next-line
         $this->schemaBuilder
             ->shouldReceive('hasTable')->with('Migrafoo')->once()->andThrow($exception);
 
@@ -200,6 +215,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testGetLastBatchNumberAndGetNextBatchNumber(): void
     {
         // Set mock expectations
+        // @phpstan-ignore-next-line
         $this->queryBuilder
             ->shouldReceive('max')->twice()->with('batch')->andReturn(3);
 
@@ -218,6 +234,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testGetLastBatchNumberForEmptyTable(): void
     {
         // Set mock expectations
+        // @phpstan-ignore-next-line
         $this->queryBuilder
             ->shouldReceive('max')->once()->with('batch')->andReturn(null);
 
@@ -237,6 +254,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
             ['migration' => 'bar']
         ]);
 
+        // @phpstan-ignore-next-line
         $this->queryBuilder
             ->shouldReceive('orderBy')->once()->with('id', 'asc')->andReturn($this->queryBuilder)
             ->shouldReceive('get')->once()->andReturn($result);
@@ -258,6 +276,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
             ['migration' => 'foo'],
         ]);
 
+        // @phpstan-ignore-next-line
         $this->queryBuilder
             ->shouldReceive('max')->once()->with('batch')->andReturn(3)
             ->shouldReceive('orderBy')->once()->with('id', 'desc')->andReturn($this->queryBuilder)
@@ -277,8 +296,9 @@ class DatabaseMigrationRepositoryTest extends TestCase
     public function testGet(): void
     {
         // Set mock expectations
-        $result = new \stdClass(['migration' => 'foo', 'batch' => 1]);
+        $result = new \stdClass();
 
+        // @phpstan-ignore-next-line
         $this->queryBuilder
             ->shouldReceive('where')->with('migration', 'foo')->twice()->andReturn($this->queryBuilder)
             ->shouldReceive('first')->once()->andReturn($result)
@@ -290,7 +310,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // This is mostly mock expectations check. See Integration test
         $this->assertTrue($repository->has('foo'));
         $migration = $repository->get('foo');
-        $this->assertIsObject($migration);
+        $this->assertIsObject($migration); // @phpstan-ignore-line
         $this->assertSame($result, $migration);
     }
 
@@ -299,6 +319,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
      */
     public function testGetWithNull(): void
     {
+        // @phpstan-ignore-next-line
         $this->queryBuilder
             ->shouldReceive('where')->with('migration', 'foo')->twice()->andReturn($this->queryBuilder)
             ->shouldReceive('first')->once()->andReturn(null)
@@ -321,6 +342,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
             ['migration' => 'bar', 'batch' => 2],
         ]);
 
+        // @phpstan-ignore-next-line
         $this->queryBuilder
             ->shouldReceive('max')->once()->with('batch')->andReturn(2)
             ->shouldReceive('where')->once()->with('batch', 2)->andReturn($this->queryBuilder)
@@ -338,6 +360,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
      */
     public function testLogAndDelete(): void
     {
+        // @phpstan-ignore-next-line
         $this->queryBuilder
             ->shouldReceive('insert')->once()->with(['migration' => 'foo', 'batch' => 2])->andReturn(true)
             ->shouldReceive('where')->once()->with('migration', 'foobar')->andReturn($this->queryBuilder)
@@ -345,11 +368,12 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repository = $this->getRepo();
 
         $this->assertTrue($repository->log('foo', 2));
-        $this->assertNull($repository->remove('foobar'));
+        $this->assertNull($repository->remove('foobar')); // @phpstan-ignore-line
     }
 
     public function testLogNoBatchNumber(): void
     {
+        // @phpstan-ignore-next-line
         $this->queryBuilder
             ->shouldReceive('insert')->once()->with(['migration' => 'foo', 'batch' => 2])->andReturn(true)
             ->shouldReceive('max')->once()->with('batch')->andReturn(1);
