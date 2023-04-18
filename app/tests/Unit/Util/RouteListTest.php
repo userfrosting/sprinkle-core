@@ -56,6 +56,8 @@ class RouteListTest extends TestCase
         // Set mock in CI and get class
         $ci = ContainerStub::create();
         $ci->set(App::class, $app);
+
+        /** @var RouteList */
         $routeList = $ci->get(RouteList::class);
 
         // Assert some output
@@ -89,6 +91,8 @@ class RouteListTest extends TestCase
         // Set mock in CI and get class
         $ci = ContainerStub::create();
         $ci->set(App::class, $app);
+        
+        /** @var RouteList */
         $routeList = $ci->get(RouteList::class);
 
         // Assert some output
@@ -123,6 +127,8 @@ class RouteListTest extends TestCase
         // Set mock in CI and get class
         $ci = ContainerStub::create();
         $ci->set(App::class, $app);
+        
+        /** @var RouteList */
         $routeList = $ci->get(RouteList::class);
 
         // Assert some output
@@ -182,6 +188,8 @@ class RouteListTest extends TestCase
         // Set mock in CI and get class
         $ci = ContainerStub::create();
         $ci->set(App::class, $app);
+        
+        /** @var RouteList */
         $routeList = $ci->get(RouteList::class);
 
         // Assert some output
@@ -217,6 +225,8 @@ class RouteListTest extends TestCase
         // Set mock in CI and get class
         $ci = ContainerStub::create();
         $ci->set(App::class, $app);
+        
+        /** @var RouteList */
         $routeList = $ci->get(RouteList::class);
 
         // Assert some output

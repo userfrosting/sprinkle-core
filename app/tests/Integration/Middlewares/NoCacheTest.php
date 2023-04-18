@@ -55,7 +55,7 @@ class NoCacheTestRoute implements RouteDefinitionInterface
         $app->get('/cache', [$this, 'action']);
     }
 
-    public function action(Response $response)
+    public function action(Response $response): Response
     {
         $payload = json_encode([], JSON_THROW_ON_ERROR);
         $response->getBody()->write($payload);
