@@ -21,7 +21,7 @@ jobs:
     name: PHPUnit - PHP ${{ matrix.php_versions }} - Memory SQLite
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
@@ -31,9 +31,9 @@ jobs:
           coverage: xdebug
           tools: pecl, composer
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 18
       
       - name: Setup Redis-server
         uses: supercharge/redis-github-action@1.1.0
@@ -86,9 +86,9 @@ jobs:
         coverage: xdebug
         tools: pecl, composer
 
-    - uses: actions/setup-node@v2
+    - uses: actions/setup-node@v3
       with:
-        node-version: 14
+        node-version: 18
     
     - name: Setup Redis-server
       uses: supercharge/redis-github-action@1.1.0
@@ -155,9 +155,9 @@ jobs:
           coverage: xdebug
           tools: pecl, composer
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 18
       
       - name: Setup Redis-server
         uses: supercharge/redis-github-action@1.1.0
@@ -219,9 +219,9 @@ jobs:
           postgresql user: 'userfrosting'
           postgresql password: 'password'
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 18
       
       - name: Setup Redis-server
         uses: supercharge/redis-github-action@1.1.0
@@ -271,9 +271,9 @@ jobs:
         coverage: xdebug
         tools: pecl, composer
 
-    - uses: actions/setup-node@v2
+    - uses: actions/setup-node@v3
       with:
-        node-version: 14
+        node-version: 18
     
     - name: Install Dependencies
       run: composer install --prefer-dist --no-progress
