@@ -13,12 +13,12 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use DI\Attribute\Inject;
-use Illuminate\Cache\Repository as Cache;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Cache\Cache;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Twig\CacheHelper;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;

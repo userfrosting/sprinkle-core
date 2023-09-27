@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\ServicesProvider;
 
 use Illuminate\Cache\ArrayStore;
-use Illuminate\Cache\Repository as Cache;
+use UserFrosting\Cache\Cache;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 

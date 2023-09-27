@@ -12,10 +12,10 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
-use Illuminate\Cache\Repository as Cache;
 use Illuminate\Filesystem\Filesystem;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use UserFrosting\Cache\Cache;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
 use UserFrosting\Sprinkle\Core\Twig\CacheHelper;
