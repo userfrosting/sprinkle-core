@@ -12,11 +12,11 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
+use Illuminate\Cache\Repository as Cache;
 use Psr\Container\ContainerInterface;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Alert\CacheAlertStream;
 use UserFrosting\Alert\SessionAlertStream;
-use UserFrosting\Cache\Cache;
 use UserFrosting\Config\Config;
 use UserFrosting\I18n\Translator;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;

@@ -13,13 +13,13 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\ServicesProvider;
 
 use DI\Container;
+use Illuminate\Cache\Repository as Cache;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Alert\AlertStream;
 use UserFrosting\Alert\CacheAlertStream;
 use UserFrosting\Alert\SessionAlertStream;
-use UserFrosting\Cache\Cache;
 use UserFrosting\Config\Config;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Session\Session;
