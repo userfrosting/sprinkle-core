@@ -258,7 +258,7 @@ class SprunjeStub extends Sprunje
         'name',
     ];
 
-    protected function baseQuery(): EloquentBuilder|QueryBuilder|Relation|Model
+    protected function baseQuery()
     {
         // We use a partial mock for Builder, because we need to be able to run some of its actual methods.
         // For example, we need to be able to run the `where` method with a closure.
@@ -313,7 +313,7 @@ class ModelSprunjeStub extends Sprunje
         parent::__construct($options);
     }
 
-    protected function baseQuery(): EloquentBuilder|QueryBuilder|Relation|Model
+    protected function baseQuery()
     {
         return $this->model;
     }

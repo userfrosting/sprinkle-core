@@ -635,7 +635,7 @@ abstract class Sprunje
      *
      * @return EloquentBuilder|QueryBuilder|Relation|Model
      */
-    abstract protected function baseQuery(): EloquentBuilder|QueryBuilder|Relation|Model;
+    abstract protected function baseQuery();
 
     /**
      * Returns a list of distinct values for a specified column.
