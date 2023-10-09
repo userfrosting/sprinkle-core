@@ -18,7 +18,7 @@
             {% block head_extra %}{% endblock %}
 
             {% block stylesheets %}
-                {# Override this block in a child layout template or page template to override site-level stylesheets. #}
+                {# Override this file in a child sprinkle to override site-level stylesheets. #}
                 {% include 'content/stylesheets_site.html.twig' %}
 
                 {# Override this block in a child layout template or page template to specify or override stylesheets for groups of similar pages. #}
@@ -53,7 +53,7 @@
                 {% include "pages/partials/config.js.twig" %}
                 </script>
 
-                {# Override this block in a child layout template or page template to override site-level scripts. #}
+                {# Override this file in a child sprinkle to override site-level scripts. #}
                 {% include 'content/scripts_site.html.twig' %}
 
                 {# Override this block in a child layout template or page template to specify or override scripts for groups of similar pages. #}
