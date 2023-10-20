@@ -27,8 +27,8 @@ return [
     */
     'address_book' => [
         'admin' => [
-            'email' => env('SMTP_USER'),
-            'name'  => 'Site Administrator',
+            'email' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
+            'name'  => env('MAIL_FROM_NAME', 'Site Administrator'),
         ],
     ],
 
