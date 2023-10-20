@@ -14,7 +14,6 @@ namespace UserFrosting\Sprinkle\Core\Listeners;
 
 use UserFrosting\Sprinkle\Core\Event\ResourceLocatorInitiatedEvent;
 use UserFrosting\Sprinkle\SprinkleManager;
-use UserFrosting\UniformResourceLocator\Resource;
 use UserFrosting\UniformResourceLocator\ResourceStream;
 
 /**

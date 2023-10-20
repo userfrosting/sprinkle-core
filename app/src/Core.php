@@ -245,12 +245,12 @@ class Core implements
     public function getEventListeners(): array
     {
         return [
-            AppInitiatedEvent::class             => [
+            AppInitiatedEvent::class => [
                 RegisterShutdownHandler::class,
                 ModelInitiated::class,
                 SetRouteCaching::class,
             ],
-            BakeryInitiatedEvent::class          => [
+            BakeryInitiatedEvent::class => [
                 ModelInitiated::class,
                 SetRouteCaching::class,
             ],
