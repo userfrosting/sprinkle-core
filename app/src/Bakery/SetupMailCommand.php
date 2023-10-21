@@ -320,13 +320,17 @@ class SetupMailCommand extends Command
     }
 
     /**
-     * Check if the app/.env SMTP portion is defined or not.
+     * Check if SMTP host is defined or not, either in the env or config.
+     * Note the host is the only one required to be defined in every scenario.
      *
-     * @return bool true if SMTP is configured in .env file
+     * @return bool true if SMTP_HOST is configured.
      */
     protected function isSmtpConfigured(): bool
     {
-        if ($this->dotenvEditor->keyExists('MAIL_MAILER') || $this->dotenvEditor->keyExists('SMTP_HOST')) {
+        $mailer = $this->dotenvEditor->keyExists('MAIL_MAILER') ? $this->dotenvEditor->getValue('MAIL_MAILER') : $this->config->get('mail.mailer');
+        $host = $this->dotenvEditor->keyExists('SMTP_HOST') ? $this->dotenvEditor->getValue('SMTP_HOST') : $this->config->get('mail.host');
+
+        if ($mailer === 'mail' || $mailer === 'smtp' && $host !== '' && $host !== null) {
             return true;
         } else {
             return false;

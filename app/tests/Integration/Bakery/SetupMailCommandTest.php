@@ -210,7 +210,24 @@ class SetupMailCommandTest extends CoreTestCase
         // Force env to trigger warning
         $dotenvEditor = new DotenvEditor();
         $dotenvEditor->load(__DIR__ . '/data/env/.env');
-        $dotenvEditor->setKey('MAIL_MAILER', 'smtp');
+        $dotenvEditor->setKey('SMTP_HOST', 'smtp.foo');
+        $dotenvEditor->save();
+
+        /** @var SetupMailCommand */
+        $command = $this->ci->get(SetupMailCommand::class);
+        $result = BakeryTester::runCommand($command);
+
+        // Assertions
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('Mail appears to be already setup in .env file.', $result->getDisplay());
+    }
+
+    public function testCommandForAlreadyConfiguredNonSMTP(): void
+    {
+        // Force env to trigger warning
+        $dotenvEditor = new DotenvEditor();
+        $dotenvEditor->load(__DIR__ . '/data/env/.env');
+        $dotenvEditor->setKey('MAIL_MAILER', 'mail');
         $dotenvEditor->save();
 
         /** @var SetupMailCommand */
