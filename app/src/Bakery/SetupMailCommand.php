@@ -107,6 +107,11 @@ class SetupMailCommand extends Command
         $this->dotenvEditor->load($envPath);
         $this->dotenvEditor->save();
 
+        // Display config in verbose mode
+        if ($this->io->isVerbose()) {
+            $this->displayConfig();
+        }
+
         // Get command options
         $force = (bool) $input->getOption('force');
 
@@ -120,7 +125,7 @@ class SetupMailCommand extends Command
         // There may be some custom config or global env values defined on the server.
         // We'll check for that and ask for confirmation in this case.
         if ($this->compareEnvToConfig()) {
-            $this->io->warning("Current mail configuration from config service differ from the configuration defined in `$envPath`. Global system environment variables might be defined, and it might not be required to setup mail again.");
+            $this->io->warning("Current mail configuration from config service differ from the configuration defined in `$envPath`. Configuration might not use environment variables, or a global system environment variables might be defined. It might not be required to setup mail again.");
 
             if (!$this->io->confirm('Continue with mail setup?', false)) {
                 return self::SUCCESS;
@@ -321,14 +326,7 @@ class SetupMailCommand extends Command
      */
     protected function isSmtpConfigured(): bool
     {
-        if ($this->dotenvEditor->keyExists('MAIL_MAILER') || (
-            $this->dotenvEditor->keyExists('SMTP_HOST') &&
-            $this->dotenvEditor->keyExists('SMTP_USER') &&
-            $this->dotenvEditor->keyExists('SMTP_PASSWORD') &&
-            $this->dotenvEditor->keyExists('SMTP_PORT') &&
-            $this->dotenvEditor->keyExists('SMTP_AUTH') &&
-            $this->dotenvEditor->keyExists('SMTP_SECURE')
-        )) {
+        if ($this->dotenvEditor->keyExists('MAIL_MAILER') || $this->dotenvEditor->keyExists('SMTP_HOST')) {
             return true;
         } else {
             return false;
@@ -352,31 +350,65 @@ class SetupMailCommand extends Command
     }
 
     /**
-     * Returns true if config doesn't match .env file params.
+     * There may be some custom config or global env values defined on the server.
+     * We'll returns true if config doesn't match .env file params and ask for
+     * confirmation in this case.
      *
      * @return bool
      */
     protected function compareEnvToConfig(): bool
     {
+        // Get env keys. Use the config default if not defined.
+        // This way, if the DOTENV is defined, it's value will be compared to
+        // the config. Otherwise, the config default will be compare to itself.
+        $env = [
+            'MAIL_MAILER'   => ($this->dotenvEditor->keyExists('MAIL_MAILER')) ? $this->dotenvEditor->getValue('MAIL_MAILER') : $this->config->get('mail.mailer'),
+            'SMTP_HOST'     => ($this->dotenvEditor->keyExists('SMTP_HOST')) ? $this->dotenvEditor->getValue('SMTP_HOST') : $this->config->get('mail.host'),
+            'SMTP_USER'     => ($this->dotenvEditor->keyExists('SMTP_USER')) ? $this->dotenvEditor->getValue('SMTP_USER') : $this->config->get('mail.user'),
+            'SMTP_PASSWORD' => ($this->dotenvEditor->keyExists('SMTP_PASSWORD')) ? $this->dotenvEditor->getValue('SMTP_PASSWORD') : $this->config->get('mail.password'),
+            'SMTP_PORT'     => ($this->dotenvEditor->keyExists('SMTP_PORT')) ? $this->dotenvEditor->getValue('SMTP_PORT') : $this->config->get('mail.port'),
+            'SMTP_AUTH'     => ($this->dotenvEditor->keyExists('SMTP_AUTH')) ? $this->dotenvEditor->getValue('SMTP_AUTH') : $this->config->get('mail.auth'),
+            'SMTP_SECURE'   => ($this->dotenvEditor->keyExists('SMTP_SECURE')) ? $this->dotenvEditor->getValue('SMTP_SECURE') : $this->config->get('mail.secure'),
+        ];
+
+        return $this->config->get('mail.mailer') != $env['MAIL_MAILER'] ||
+            $this->config->get('mail.host') != $env['SMTP_HOST'] ||
+            $this->config->get('mail.username') != $env['SMTP_USER'] ||
+            $this->config->get('mail.password') != $env['SMTP_PASSWORD'] ||
+            $this->config->get('mail.port') != $env['SMTP_PORT'] ||
+            $this->config->get('mail.auth') != $env['SMTP_AUTH'] ||
+            $this->config->get('mail.secure') != $env['SMTP_SECURE'];
+    }
+
+    /**
+     * Display current mail config, comparing the config file to the .env file.
+     */
+    protected function displayConfig(): void
+    {
+        $this->io->section('Current Configuration');
+
         // Get keys
-        $keys = [
+        $env = [
             'MAIL_MAILER'   => ($this->dotenvEditor->keyExists('MAIL_MAILER')) ? $this->dotenvEditor->getValue('MAIL_MAILER') : 'smtp',
             'SMTP_HOST'     => ($this->dotenvEditor->keyExists('SMTP_HOST')) ? $this->dotenvEditor->getValue('SMTP_HOST') : '',
             'SMTP_USER'     => ($this->dotenvEditor->keyExists('SMTP_USER')) ? $this->dotenvEditor->getValue('SMTP_USER') : '',
-            'SMTP_PASSWORD' => ($this->dotenvEditor->keyExists('SMTP_PASSWORD')) ? $this->dotenvEditor->getValue('SMTP_PASSWORD') : '',
+            'SMTP_PASSWORD' => ($this->dotenvEditor->keyExists('SMTP_PASSWORD')) ? '*********' : '',
             'SMTP_PORT'     => ($this->dotenvEditor->keyExists('SMTP_PORT')) ? $this->dotenvEditor->getValue('SMTP_PORT') : '',
             'SMTP_AUTH'     => ($this->dotenvEditor->keyExists('SMTP_AUTH')) ? $this->dotenvEditor->getValue('SMTP_AUTH') : '',
             'SMTP_SECURE'   => ($this->dotenvEditor->keyExists('SMTP_SECURE')) ? $this->dotenvEditor->getValue('SMTP_SECURE') : '',
         ];
 
-        // There may be some custom config or global env values defined on the server.
-        // We'll check for that and ask for confirmation in this case.
-        return $this->config->get('mail.mailer') != $keys['MAIL_MAILER'] ||
-            $this->config->get('mail.host') != $keys['SMTP_HOST'] ||
-            $this->config->get('mail.username') != $keys['SMTP_USER'] ||
-            $this->config->get('mail.password') != $keys['SMTP_PASSWORD'] ||
-            $this->config->get('mail.port') != $keys['SMTP_PORT'] ||
-            $this->config->get('mail.auth') != $keys['SMTP_AUTH'] ||
-            $this->config->get('mail.secure') != $keys['SMTP_SECURE'];
+        // Format Password from env & config for display
+        $password = (is_string($this->config->get('mail.password')) && $this->config->get('mail.password') !== '') ? '*********' : '';
+
+        $this->io->table(['Param', 'Config', 'Env'], [
+            ['MAILER', $this->config->get('mail.mailer'), $env['MAIL_MAILER']],
+            ['HOST', $this->config->get('mail.host'), $env['SMTP_HOST']],
+            ['USERNAME', $this->config->get('mail.username'), $env['SMTP_USER']],
+            ['PASSWORD', $password, $env['SMTP_PASSWORD']],
+            ['PORT', $this->config->get('mail.port'), $env['SMTP_PORT']],
+            ['AUTH', $this->config->get('mail.auth'), $env['SMTP_AUTH']],
+            ['SECURE', $this->config->get('mail.secure'), $env['SMTP_SECURE']],
+        ]);
     }
 }

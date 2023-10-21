@@ -25,6 +25,7 @@ use UserFrosting\Sprinkle\Core\Bakery\DebugConfigCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugDbCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugEventsCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugLocatorCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugMailCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugVersionCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleCompareCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleDictionaryCommand;
@@ -125,6 +126,7 @@ class Core implements
             DebugDbCommand::class,
             DebugEventsCommand::class,
             DebugLocatorCommand::class,
+            DebugMailCommand::class,
             DebugVersionCommand::class,
             LocaleCompareCommand::class,
             LocaleDictionaryCommand::class,

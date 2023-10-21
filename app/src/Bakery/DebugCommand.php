@@ -41,6 +41,7 @@ class DebugCommand extends Command
      * @var string[] Commands to run when in verbose mode
      */
     protected array $verboseCommands = [
+        'debug:mail',
         'debug:locator',
         'debug:events',
     ];

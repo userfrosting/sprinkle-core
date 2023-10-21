@@ -224,15 +224,21 @@ class SetupMailCommandTest extends CoreTestCase
 
     public function testCommandForDifferentEnvFromConfig(): void
     {
-        // Force env to trigger warning
+        // Add an env file, so we can compare the config to it
         $dotenvEditor = new DotenvEditor();
         $dotenvEditor->load(__DIR__ . '/data/env/.env');
-        $dotenvEditor->setKey('SMTP_HOST', 'smtp.test.com');
+        $dotenvEditor->setKey('SMTP_HOST', 'smtp.foo');
         $dotenvEditor->save();
 
+        // Force config to not obey env to trigger warning
+        /** @var Config */
+        $config = $this->ci->get(Config::class);
+        $config->set('mail.host', 'smtp.bar');
+
+        // Need to force, as dotenv is present
         /** @var SetupMailCommand */
         $command = $this->ci->get(SetupMailCommand::class);
-        $result = BakeryTester::runCommand($command);
+        $result = BakeryTester::runCommand($command, input: ['--force' => true]);
 
         // Assertions
         $this->assertSame(0, $result->getStatusCode());

@@ -326,16 +326,6 @@ return [
 
     /*
     * ----------------------------------------------------------------------
-    * Filesystem paths
-    * ----------------------------------------------------------------------
-    */
-    // 'path' => [
-    //     'document_root'     => str_replace(DIRECTORY_SEPARATOR, \UserFrosting\DS, $_SERVER['DOCUMENT_ROOT']),
-    //     'public_relative'   => dirname($_SERVER['SCRIPT_NAME']), // The location of `index.php` relative to the document root.  Use for sites installed in subdirectories of your web server's document root.
-    // ],
-
-    /*
-    * ----------------------------------------------------------------------
     * Session Config
     * ----------------------------------------------------------------------
     * Custom PHP Sessions Handler config. Sessions can be store in file or
