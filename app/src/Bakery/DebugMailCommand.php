@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
@@ -53,6 +54,9 @@ class DebugMailCommand extends Command
 
         // Display database info
         $this->io->definitionList(
+            ['From Email'   => $this->config->get('address_book.admin.email')],
+            ['From Name'    => $this->config->get('address_book.admin.name')],
+            new TableSeparator(),
             ['MAILER'       => $this->config->get('mail.mailer')],
             ['HOST'         => $this->config->get('mail.host')],
             ['USERNAME'     => $this->config->get('mail.username')],
