@@ -26,7 +26,7 @@ use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 class FilePermissionMiddleware implements MiddlewareInterface
 {
     /**
-     * Inject dependencies
+     * Inject dependencies.
      *
      * @param ResourceLocatorInterface $locator
      * @param Config                   $config
