@@ -424,4 +424,17 @@ return [
         'entrypoints' => 'assets://entrypoints.json',
         'manifest'    => 'assets://manifest.json',
     ],
+
+    /**
+     * ----------------------------------------------------------------------
+     * Writable Stream Config
+     * ----------------------------------------------------------------------
+     * Resource stream to check for write permission. True means it should be
+     * writeable, false means it should not be writable.
+     */
+    'writable' => [
+        'logs://'     => true,
+        'cache://'    => true,
+        'sessions://' => true,
+    ],
 ];

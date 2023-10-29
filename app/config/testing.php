@@ -74,4 +74,13 @@ return [
     'session' => [
         'handler' => env('TEST_SESSION_HANDLER', 'array'),
     ],
+
+    /*
+     * Don't force writable directories in tests.
+     */
+    'writable' => [
+        'logs://'     => null,
+        'cache://'    => null,
+        'sessions://' => null,
+    ],
 ];
