@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
-use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
@@ -30,12 +28,7 @@ class MigratorService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            MigrationRepositoryInterface::class => function (Capsule $db, Config $config) {
-                $repositoryTable = strval($config->get('migrations.repository_table'));
-
-                return new DatabaseMigrationRepository($db, $repositoryTable);
-            },
-
+            MigrationRepositoryInterface::class => \DI\autowire(DatabaseMigrationRepository::class),
             MigrationLocatorInterface::class    => \DI\autowire(SprinkleMigrationLocator::class),
         ];
     }

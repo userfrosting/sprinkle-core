@@ -12,8 +12,11 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Schema\Builder;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use UserFrosting\Sprinkle\Core\Database\Migrator\DatabaseMigrationRepository;
+use UserFrosting\Sprinkle\Core\Database\Models\MigrationTable;
+use UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
@@ -21,15 +24,40 @@ use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
  */
 class DatabaseMigrationRepositoryTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
+    public function testRepositoryCreation(): void
+    {
+        // Repository should not exists before migration is instantiated
+        /** @var Builder */
+        $builder = $this->ci->get(Builder::class);
+        $this->assertFalse($builder->hasTable('migrationTest'));
+
+        // Replace the default model with a custom one for testing
+        $this->ci->set(MigrationTable::class, new TestMigration());
+        $repository = $this->ci->get(DatabaseMigrationRepository::class);
+
+        // Table should exist
+        $this->assertTrue($builder->hasTable('migrationTest'));
+        $this->assertTrue($repository->exists());
+
+        // Check table structure
+        $this->assertSame([
+            'id',
+            'migration',
+            'batch',
+        ], $builder->getColumnListing('migrationTest'));
+
+        // Delete repository
+        $repository->delete();
+        $this->assertFalse($builder->hasTable('migrationTest'));
+        $this->assertFalse($repository->exists());
+    }
+
     public function testRepository(): void
     {
-        $db = $this->ci->get(Capsule::class);
-        $repository = new DatabaseMigrationRepository($db, 'migrationTest');
-
-        // Create repository
-        $this->assertFalse($repository->exists());
-        $repository->create();
-        $this->assertTrue($repository->exists());
+        $this->ci->set(MigrationTable::class, new TestMigration());
+        $repository = $this->ci->get(DatabaseMigrationRepository::class);
 
         // Init batch number
         $this->assertSame(0, $repository->getLastBatchNumber());
@@ -38,7 +66,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // Get all migrations (empty)
         $this->assertSame([], $repository->list());
 
-        // Insert 2 from the same batch, plus tow other batch
+        // Insert 2 from the same batch, plus two other batch
         $repository->log('foo', 2);
         $repository->log('bar', 2);
         $repository->log('foobar', 3);
@@ -58,6 +86,9 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertSame(4, $repository->getLastBatchNumber());
         $this->assertSame(5, $repository->getNextBatchNumber());
 
+        // Test Last
+        $this->assertSame(['barfoo'], $repository->last());
+
         // Get single Migration
         $this->assertTrue($repository->has('foobar'));
         $migration = $repository->get('foobar');
@@ -71,9 +102,29 @@ class DatabaseMigrationRepositoryTest extends TestCase
             'bar',
             'barfoo',
         ], $repository->list());
+    }
+
+    public function testMigrationNotFound(): void
+    {
+        $this->ci->set(MigrationTable::class, new TestMigration());
+        $repository = $this->ci->get(DatabaseMigrationRepository::class);
+
+        $this->expectException(MigrationNotFoundException::class);
+        $repository->get('foo');
+    }
 
         // Delete repository
         $repository->delete();
         $this->assertFalse($repository->exists());
     }
+}
+
+// N.B.: Stub doesn't need to be a real migration class, just needs to be a class that exists
+class MigrationClassStub
+{
+}
+
+class TestMigration extends MigrationTable
+{
+    protected $table = 'migrationTest';
 }

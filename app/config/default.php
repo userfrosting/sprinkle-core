@@ -316,16 +316,6 @@ return [
 
     /*
     * ----------------------------------------------------------------------
-    * Migration Service Config
-    * ----------------------------------------------------------------------
-    * `repository_table` is the table with the list of ran migrations
-    */
-    'migrations' => [
-        'repository_table' => 'migrations',
-    ],
-
-    /*
-    * ----------------------------------------------------------------------
     * Session Config
     * ----------------------------------------------------------------------
     * Custom PHP Sessions Handler config. Sessions can be store in file or

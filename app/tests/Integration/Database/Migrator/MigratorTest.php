@@ -29,55 +29,25 @@ class MigratorTest extends TestCase
 {
     protected string $mainSprinkle = TestMigrateSprinkle::class;
 
-    /**
-     * @var Builder
-     */
-    protected Builder $schema;
-
-    /**
-     * Setup migration instances used for all tests
-     */
-    public function setUp(): void
-    {
-        // Boot parent TestCase, which will set up the database and connections for us.
-        parent::setUp();
-
-        // Alias schema Builder
-        $this->schema = $this->ci->get(Builder::class);
-    }
-
-    public function testConstructor(): Migrator
+    public function testGetters(): void
     {
         /** @var Migrator */
         $migrator = $this->ci->get(Migrator::class);
 
         // Test Constructor
-        $this->assertInstanceOf(Migrator::class, $migrator);
-        $this->assertInstanceOf(MigrationRepositoryInterface::class, $migrator->getRepository());
-        $this->assertInstanceOf(MigrationLocatorInterface::class, $migrator->getLocator());
-
-        // Test repository exist for next assertions
-        $config = $this->ci->get(Config::class);
-        $migrationTable = $config->get('migrations.repository_table');
-        $this->assertFalse($this->schema->hasTable($migrationTable));
-        $this->assertFalse($migrator->getRepository()->exists());
-        $migrator->getRepository()->create();
-        $this->assertTrue($this->schema->hasTable($migrationTable));
-        $this->assertTrue($migrator->getRepository()->exists());
-
-        return $migrator;
+        $this->assertInstanceOf(Migrator::class, $migrator); // @phpstan-ignore-line
+        $this->assertInstanceOf(MigrationRepositoryInterface::class, $migrator->getRepository()); // @phpstan-ignore-line
+        $this->assertInstanceOf(MigrationLocatorInterface::class, $migrator->getLocator()); // @phpstan-ignore-line
     }
 
-    /**
-     * @depends testConstructor
-     */
-    public function testPretendToMigrate(Migrator $migrator): void
+    public function testPretendToMigrate(): void
     {
+        $migrator = $this->ci->get(Migrator::class);
+        
+        // Initial state, table doesn't exist.
         // N.B.: Requires to get schema from connection, as otherwise it might
         // not work (different :memory: instance)
         $schema = $migrator->getConnection()->getSchemaBuilder();
-
-        // Initial state, table doesn't exist.
         $this->assertFalse($schema->hasTable('test'));
 
         // Pretend to migrate
@@ -94,16 +64,12 @@ class MigratorTest extends TestCase
         $this->assertFalse($schema->hasTable('test'));
     }
 
-    /**
-     * @depends testConstructor
-     */
-    public function testMigrate(Migrator $migrator): void
+    public function testMigrate(): void
     {
-        // N.B.: Requires to get schema from connection, as otherwise it might
-        // not work (different :memory: instance)
-        $schema = $migrator->getConnection()->getSchemaBuilder();
-
+        $migrator = $this->ci->get(Migrator::class);
+                
         // Initial state, table doesn't exist.
+        $schema = $migrator->getConnection()->getSchemaBuilder();
         $this->assertFalse($schema->hasTable('test'));
 
         // Migrate
@@ -116,29 +82,20 @@ class MigratorTest extends TestCase
         $this->assertTrue($schema->hasTable('test'));
     }
 
-    /**
-     * @depends testConstructor
-     * @depends testMigrate
-     */
-    public function testMigrateWithNoOutstanding(Migrator $migrator): void
+    public function testMigrateWithNoOutstanding(): void
     {
-        $result = $migrator->migrate();
-        $this->assertSame([], $result);
+        $migrator = $this->ci->get(Migrator::class);
+        $this->assertNotSame([], $migrator->migrate());
+        $this->assertSame([], $migrator->migrate());
     }
 
-    /**
-     * @depends testConstructor
-     * @depends testMigrate
-     *
-     * N.B.: Depends on testMigrate, so `StubMigrationA` is installed.
-     */
-    public function testPretendToRollback(Migrator $migrator): void
+    public function testPretendToRollback(): void
     {
-        // N.B.: Requires to get schema from connection, as otherwise it might
-        // not work (different :memory: instance)
-        $schema = $migrator->getConnection()->getSchemaBuilder();
-
+        $migrator = $this->ci->get(Migrator::class);
+        
         // Initial state, table exist.
+        $migrator->migrate();
+        $schema = $migrator->getConnection()->getSchemaBuilder();
         $this->assertTrue($schema->hasTable('test'));
 
         // Pretend to rollback
@@ -155,19 +112,13 @@ class MigratorTest extends TestCase
         $this->assertTrue($schema->hasTable('test'));
     }
 
-    /**
-     * @depends testConstructor
-     * @depends testMigrate
-     *
-     * N.B.: Depends on testMigrate, so `StubMigrationA` is installed.
-     */
-    public function testRollback(Migrator $migrator): void
+    public function testRollback(): void
     {
-        // N.B.: Requires to get schema from connection, as otherwise it might
-        // not work (different :memory: instance)
-        $schema = $migrator->getConnection()->getSchemaBuilder();
-
+        $migrator = $this->ci->get(Migrator::class);
+        
         // Initial state, table exist.
+        $migrator->migrate();
+        $schema = $migrator->getConnection()->getSchemaBuilder();
         $this->assertTrue($schema->hasTable('test'));
 
         // Rollback
@@ -180,21 +131,18 @@ class MigratorTest extends TestCase
         $this->assertFalse($schema->hasTable('test'));
     }
 
-    /**
-     * @depends testConstructor
-     * @depends testRollback
-     */
-    public function testRollbackWithNoOutstanding(Migrator $migrator): void
+    public function testRollbackWithNoOutstanding(): void
     {
-        $result = $migrator->rollback();
-        $this->assertSame([], $result);
+        $migrator = $this->ci->get(Migrator::class);
+        $migrator->migrate();
+        $this->assertNotSame([], $migrator->rollback());
+        $this->assertSame([], $migrator->rollback());
     }
 
-    /**
-     * @depends testConstructor
-     */
-    public function testReset(Migrator $migrator): void
+    public function testReset(): void
     {
+        $migrator = $this->ci->get(Migrator::class);
+        
         // Test it's empty
         $result = $migrator->pretendToReset();
         $this->assertSame([], $result);
