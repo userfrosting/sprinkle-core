@@ -167,7 +167,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function delete(): void
     {
-        $this->getSchemaBuilder()->drop($this->model->getTable());
+        $this->getSchemaBuilder()->dropIfExists($this->model->getTable());
     }
 
     /**

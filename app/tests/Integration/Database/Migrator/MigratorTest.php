@@ -23,10 +23,39 @@ use UserFrosting\Testing\TestCase;
 
 /**
  * Migrator Tests
+ *
+ * N.B.: This can can't use the refresh database trait, since the trait uses
+ * part of the code we are testing.
  */
 class MigratorTest extends TestCase
 {
     protected string $mainSprinkle = TestMigrateSprinkle::class;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // Manually reset the repository and database between test
+        $this->resetDatabase();
+    }
+
+    public function tearDown(): void
+    {
+        // Manually reset the repository and database between test
+        $this->resetDatabase();
+
+        parent::tearDown();
+    }
+
+    protected function resetDatabase(): void
+    {
+        $repo = $this->ci->get(MigrationRepositoryInterface::class);
+        $repo->delete();
+        $repo->create();
+
+        $builder = $this->ci->get(Builder::class);
+        $builder->dropIfExists('test');
+    }
 
     public function testGetters(): void
     {

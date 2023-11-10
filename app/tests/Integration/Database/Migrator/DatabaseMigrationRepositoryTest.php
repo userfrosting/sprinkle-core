@@ -21,6 +21,9 @@ use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**
  * DatabaseMigrationRepository Test
+ *
+ * N.B.: This can can't use the refresh database trait, since the trait uses
+ * part of the code we are testing.
  */
 class DatabaseMigrationRepositoryTest extends TestCase
 {
@@ -31,9 +34,10 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // Repository should not exists before migration is instantiated
         /** @var Builder */
         $builder = $this->ci->get(Builder::class);
-        $this->assertFalse($builder->hasTable('migrationTest'));
+        $builder->dropIfExists('migrationTest');
 
         // Replace the default model with a custom one for testing
+        $this->assertFalse($builder->hasTable('migrationTest'));
         $this->ci->set(MigrationTable::class, new TestMigration());
         $repository = $this->ci->get(DatabaseMigrationRepository::class);
 
@@ -52,6 +56,9 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repository->delete();
         $this->assertFalse($builder->hasTable('migrationTest'));
         $this->assertFalse($repository->exists());
+
+        // Assert deleting when table doesn't exist doesn't throw an error
+        $repository->delete();
     }
 
     public function testRepository(): void
@@ -102,6 +109,9 @@ class DatabaseMigrationRepositoryTest extends TestCase
             'bar',
             'barfoo',
         ], $repository->list());
+
+        // Delete repository for next test
+        $repository->delete();
     }
 
     public function testMigrationNotFound(): void
@@ -111,6 +121,9 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
         $this->expectException(MigrationNotFoundException::class);
         $repository->get('foo');
+
+        // Delete repository for next test
+        $repository->delete();
     }
 
     /**
@@ -150,6 +163,9 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // Delete
         $repository->remove(MigrationClassStub::class);
         $this->assertFalse($repository->has(MigrationClassStub::class));
+
+        // Delete repository for next test
+        $repository->delete();
     }
 }
 
