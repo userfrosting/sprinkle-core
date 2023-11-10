@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 use UserFrosting\Sprinkle\Core\Core;
 use UserFrosting\Sprinkle\Core\Database\Migration;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
@@ -45,7 +46,7 @@ class MigratorTest extends TestCase
         // Initial state, table doesn't exist.
         // N.B.: Requires to get schema from connection, as otherwise it might
         // not work (different :memory: instance)
-        $schema = $migrator->getConnection()->getSchemaBuilder();
+        $schema = $this->ci->get(Builder::class);
         $this->assertFalse($schema->hasTable('test'));
 
         // Pretend to migrate
@@ -67,7 +68,7 @@ class MigratorTest extends TestCase
         $migrator = $this->ci->get(Migrator::class);
 
         // Initial state, table doesn't exist.
-        $schema = $migrator->getConnection()->getSchemaBuilder();
+        $schema = $this->ci->get(Builder::class);
         $this->assertFalse($schema->hasTable('test'));
 
         // Migrate
@@ -93,7 +94,7 @@ class MigratorTest extends TestCase
 
         // Initial state, table exist.
         $migrator->migrate();
-        $schema = $migrator->getConnection()->getSchemaBuilder();
+        $schema = $this->ci->get(Builder::class);
         $this->assertTrue($schema->hasTable('test'));
 
         // Pretend to rollback
@@ -116,7 +117,7 @@ class MigratorTest extends TestCase
 
         // Initial state, table exist.
         $migrator->migrate();
-        $schema = $migrator->getConnection()->getSchemaBuilder();
+        $schema = $this->ci->get(Builder::class);
         $this->assertTrue($schema->hasTable('test'));
 
         // Rollback
@@ -148,7 +149,7 @@ class MigratorTest extends TestCase
         // Install migration
         $result = $migrator->migrate();
         $this->assertSame([StubMigrationA::class], $result);
-        $schema = $migrator->getConnection()->getSchemaBuilder();
+        $schema = $this->ci->get(Builder::class);
         $this->assertTrue($schema->hasTable('test'));
 
         // Test pretend to reset
@@ -160,7 +161,7 @@ class MigratorTest extends TestCase
         // Test reset
         $result = $migrator->reset();
         $this->assertSame([StubMigrationA::class], $result);
-        $schema = $migrator->getConnection()->getSchemaBuilder();
+        $schema = $this->ci->get(Builder::class);
         $this->assertFalse($schema->hasTable('test'));
     }
 

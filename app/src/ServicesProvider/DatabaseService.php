@@ -33,7 +33,7 @@ class DatabaseService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            Capsule::class             => function (Config $config, LogExecutedQuery $logger) {
+            Capsule::class => function (Config $config, LogExecutedQuery $logger) {
                 $capsule = new Capsule();
 
                 // Add each defined connection in the config
@@ -63,11 +63,11 @@ class DatabaseService implements ServicesProviderInterface
                 return $capsule;
             },
 
-            Builder::class             => function (Connection $connection) {
+            Builder::class => function (Connection $connection) {
                 return $connection->getSchemaBuilder();
             },
 
-            Connection::class          => function (Capsule $db) {
+            Connection::class => function (Capsule $db) {
                 $connection = $db->getDatabaseManager()->getDefaultConnection();
 
                 return $db->getConnection($connection);

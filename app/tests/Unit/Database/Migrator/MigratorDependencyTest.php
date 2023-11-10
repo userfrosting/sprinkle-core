@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -59,11 +58,7 @@ class MigratorDependencyTest extends TestCase
             ->getMock();
 
         $connection = Mockery::mock(Connection::class);
-        $database = Mockery::mock(Capsule::class)
-            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
-            ->getMock();
-
-        $analyser = new Migrator($installed, $available, $database);
+        $analyser = new Migrator($installed, $available, $connection);
 
         $this->assertInstanceOf(Migrator::class, $analyser);
 
@@ -161,11 +156,7 @@ class MigratorDependencyTest extends TestCase
             ->getMock();
 
         $connection = Mockery::mock(Connection::class);
-        $database = Mockery::mock(Capsule::class)
-            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
-            ->getMock();
-
-        $analyser = new Migrator($installed, $available, $database);
+        $analyser = new Migrator($installed, $available, $connection);
 
         $this->assertSame([
             StubAnalyserMigrationC::class, // C is before B because B depend on C
@@ -193,11 +184,7 @@ class MigratorDependencyTest extends TestCase
             ->getMock();
 
         $connection = Mockery::mock(Connection::class);
-        $database = Mockery::mock(Capsule::class)
-            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
-            ->getMock();
-
-        $analyser = new Migrator($installed, $available, $database);
+        $analyser = new Migrator($installed, $available, $connection);
 
         $this->expectException(MigrationDependencyNotMetException::class);
         $this->expectExceptionMessage(StubAnalyserMigrationG::class . ' depends on ' . StubAnalyserMigrationF::class . ", but it's not available.");

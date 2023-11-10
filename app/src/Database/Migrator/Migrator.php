@@ -12,9 +12,7 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\Grammars\Grammar;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationDependencyNotMetException;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
 
@@ -24,21 +22,14 @@ use UserFrosting\Sprinkle\Core\Exceptions\MigrationRollbackException;
 class Migrator
 {
     /**
-     * @var string|null The connection name (default: null)
-     */
-    protected ?string $connection = null;
-
-    /**
-     * Constructor.
-     *
-     * @param MigrationRepositoryInterface $repository The migration repository
-     * @param MigrationLocatorInterface    $locator    The Migration locator
-     * @param Capsule                      $db         The database
+     * @param MigrationRepositoryInterface $repository   The migration repository
+     * @param MigrationLocatorInterface    $locator      The Migration locator
+     * @param Connection                   $dbConnection The database connection
      */
     public function __construct(
         protected MigrationRepositoryInterface $repository,
         protected MigrationLocatorInterface $locator,
-        protected Capsule $db,
+        protected Connection $dbConnection,
     ) {
     }
 
@@ -336,7 +327,7 @@ class Migrator
             };
 
             // TODO : See if Transaction still needs to be used
-            if ($this->getSchemaGrammar()->supportsSchemaTransactions()) {
+            if ($this->transactionsSupported()) {
                 $this->getConnection()->transaction($callback);
             } else {
                 $callback();
@@ -544,7 +535,7 @@ class Migrator
             };
 
             // TODO : See if Transaction still needs to be used
-            if ($this->getSchemaGrammar()->supportsSchemaTransactions()) {
+            if ($this->transactionsSupported()) {
                 $this->getConnection()->transaction($callback);
             } else {
                 $callback();
@@ -644,40 +635,20 @@ class Migrator
      *
      * @return Connection
      */
-    public function getConnection(): Connection
+    protected function getConnection(): Connection
     {
-        return $this->db->getConnection($this->getConnectionName());
+        return $this->dbConnection;
     }
 
     /**
-     * Set database connection name.
+     * Return if database transaction are supported by current db connection.
      *
-     * @param string|null $connection
+     * @return bool
      */
-    public function setConnectionName(?string $connection): static
+    protected function transactionsSupported(): bool
     {
-        $this->connection = $connection;
-
-        return $this;
-    }
-
-    /**
-     * Resolve the database connection instance.
-     *
-     * @return string|null The connection name (default: null, aka the default connection)
-     */
-    public function getConnectionName(): ?string
-    {
-        return $this->connection;
-    }
-
-    /**
-     * Get instance of Schema Grammar.
-     *
-     * @return Grammar
-     */
-    protected function getSchemaGrammar(): Grammar
-    {
-        return $this->getConnection()->getSchemaGrammar();
+        return $this->getConnection()
+                    ->getSchemaGrammar()
+                    ->supportsSchemaTransactions();
     }
 }
