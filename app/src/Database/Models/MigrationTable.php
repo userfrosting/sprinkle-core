@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
  * Migrations Model.
  *
  * @mixin \Illuminate\Database\Query\Builder
+ *
  * @method static Builder forMigration(string $migration)
  *
  * Represents the migration table, containing the ran migrations.
