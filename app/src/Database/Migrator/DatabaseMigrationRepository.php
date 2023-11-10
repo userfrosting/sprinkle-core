@@ -74,7 +74,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function get(string $migration): object
     {
-        $result = $this->model::where('migration', $migration)->first();
+        $result = $this->model::forMigration($migration)->first();
 
         // Throw error if null
         if ($result === null) {
@@ -89,7 +89,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function has(string $migration): bool
     {
-        return $this->model::where('migration', $migration)->exists();
+        return $this->model::forMigration($migration)->exists();
     }
 
     /**
@@ -125,7 +125,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function remove(string $migration): void
     {
-        $this->model::where('migration', $migration)->delete();
+        $this->model::forMigration($migration)->delete();
     }
 
     /**
@@ -193,6 +193,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      *
      * @return \Illuminate\Database\Connection
      */
+    // TODO : Inject Connection instead
     public function getConnection(): Connection
     {
         return $this->model->getConnection();

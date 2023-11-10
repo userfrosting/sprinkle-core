@@ -13,8 +13,6 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Database\Migrator;
 
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Builder;
-use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Core;
 use UserFrosting\Sprinkle\Core\Database\Migration;
 use UserFrosting\Sprinkle\Core\Database\Migrator\MigrationLocatorInterface;
@@ -43,7 +41,7 @@ class MigratorTest extends TestCase
     public function testPretendToMigrate(): void
     {
         $migrator = $this->ci->get(Migrator::class);
-        
+
         // Initial state, table doesn't exist.
         // N.B.: Requires to get schema from connection, as otherwise it might
         // not work (different :memory: instance)
@@ -67,7 +65,7 @@ class MigratorTest extends TestCase
     public function testMigrate(): void
     {
         $migrator = $this->ci->get(Migrator::class);
-                
+
         // Initial state, table doesn't exist.
         $schema = $migrator->getConnection()->getSchemaBuilder();
         $this->assertFalse($schema->hasTable('test'));
@@ -92,7 +90,7 @@ class MigratorTest extends TestCase
     public function testPretendToRollback(): void
     {
         $migrator = $this->ci->get(Migrator::class);
-        
+
         // Initial state, table exist.
         $migrator->migrate();
         $schema = $migrator->getConnection()->getSchemaBuilder();
@@ -115,7 +113,7 @@ class MigratorTest extends TestCase
     public function testRollback(): void
     {
         $migrator = $this->ci->get(Migrator::class);
-        
+
         // Initial state, table exist.
         $migrator->migrate();
         $schema = $migrator->getConnection()->getSchemaBuilder();
@@ -142,7 +140,7 @@ class MigratorTest extends TestCase
     public function testReset(): void
     {
         $migrator = $this->ci->get(Migrator::class);
-        
+
         // Test it's empty
         $result = $migrator->pretendToReset();
         $this->assertSame([], $result);
@@ -164,6 +162,27 @@ class MigratorTest extends TestCase
         $this->assertSame([StubMigrationA::class], $result);
         $schema = $migrator->getConnection()->getSchemaBuilder();
         $this->assertFalse($schema->hasTable('test'));
+    }
+
+    /**
+     * Legacy support for old migration class name.
+     * UF V4 stored the migrations with a leading slash, which was removed in
+     * UF V5, since we now use `::Class` to get the class name, instead of an
+     * hardcoded string.
+     * @see : https://github.com/userfrosting/UserFrosting/blob/adb574f378fb0af1c5eaa3be71458869431e7410/app/sprinkles/core/src/Database/Migrator/MigrationLocator.php#L86
+     */
+    public function testMigrateLegacy(): void
+    {
+        $migrator = $this->ci->get(Migrator::class);
+
+        $repository = $migrator->getRepository();
+        $repository->log('\\' . StubMigrationA::class);
+
+        // Migrate
+        $pending = $migrator->getPending();
+
+        // Assert results
+        $this->assertSame([], $pending);
     }
 }
 

@@ -113,9 +113,43 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repository->get('foo');
     }
 
-        // Delete repository
-        $repository->delete();
-        $this->assertFalse($repository->exists());
+    /**
+     * Legacy support for old migration class name.
+     * UF V4 stored the migrations with a leading slash, which was removed in
+     * UF V5, since we now use `::Class` to get the class name, instead of an
+     * hardcoded string.
+     * @see : https://github.com/userfrosting/UserFrosting/blob/adb574f378fb0af1c5eaa3be71458869431e7410/app/sprinkles/core/src/Database/Migrator/MigrationLocator.php#L86
+     */
+    public function testLegacyMigrations(): void
+    {
+        // Replace the default model with a custom one for testing
+        $this->ci->set(MigrationTable::class, new TestMigration());
+        $repository = $this->ci->get(DatabaseMigrationRepository::class);
+
+        // Log the migration with the old class name ("\" at the beginning)
+        $repository->log('\\' . MigrationClassStub::class);
+
+        // Check if the migration exists, should be, for legacy support. Accept both standard
+        $this->assertSame([MigrationClassStub::class], $repository->list());
+        $this->assertTrue($repository->has(MigrationClassStub::class));
+        $this->assertTrue($repository->has('\\' . MigrationClassStub::class));
+        $this->assertSame(MigrationClassStub::class, $repository->all()[0]->migration);
+
+        // Test with new format
+        $result = $repository->get(MigrationClassStub::class);
+        $this->assertInstanceOf(TestMigration::class, $result);
+        $this->assertSame(MigrationClassStub::class, $result->migration);
+
+        // Test get with legacy format
+        $result = $repository->get('\\' . MigrationClassStub::class);
+        $this->assertSame(MigrationClassStub::class, $result->migration);
+
+        // Test last
+        $this->assertSame([MigrationClassStub::class], $repository->last());
+
+        // Delete
+        $repository->remove(MigrationClassStub::class);
+        $this->assertFalse($repository->has(MigrationClassStub::class));
     }
 }
 

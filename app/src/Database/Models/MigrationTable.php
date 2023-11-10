@@ -12,10 +12,13 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Database\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+
 /**
  * Migrations Model.
  *
  * @mixin \Illuminate\Database\Query\Builder
+ * @method static Builder forMigration(string $migration)
  *
  * Represents the migration table, containing the ran migrations.
  */
@@ -38,4 +41,32 @@ class MigrationTable extends Model
         'migration',
         'batch',
     ];
+
+    /**
+     * Accessor used to remove leading backslash from legacy (V4) migrations
+     * records.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public function getMigrationAttribute($value)
+    {
+        return ltrim($value, '\\');
+    }
+
+    /**
+     * Scope a query to only include migrations records for a given migration
+     * class. Filter both new and legacy (V4) records.
+     *
+     * @param Builder $query
+     * @param string  $migration
+     *
+     * @return Builder
+     */
+    public function scopeForMigration(Builder $query, string $migration)
+    {
+        return $query->where('migration', $migration)
+                     ->orWhere('migration', '\\' . $migration);
+    }
 }

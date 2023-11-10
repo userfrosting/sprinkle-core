@@ -42,7 +42,7 @@ interface MigrationRepositoryInterface
      *
      * @param string $migration The migration
      *
-     * @throws MigrationNotFoundException Should be thrown if migration isn't found.
+     * @throws \UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException Should be thrown if migration isn't found.
      *
      * @return object The migration object
      */
