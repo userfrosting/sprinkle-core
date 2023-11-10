@@ -45,12 +45,13 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertTrue($builder->hasTable('migrationTest'));
         $this->assertTrue($repository->exists());
 
-        // Check table structure
-        $this->assertSame([
-            'id',
-            'migration',
-            'batch',
-        ], $builder->getColumnListing('migrationTest'));
+        // Check table structure. Need to sort, because order of columns can be
+        // different based on database driver
+        $expected = ['id', 'migration', 'batch'];
+        $actual = $builder->getColumnListing('migrationTest');
+        sort($expected);
+        sort($actual);
+        $this->assertSame($expected, $actual);
 
         // Delete repository
         $repository->delete();
