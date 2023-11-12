@@ -17,36 +17,33 @@ use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\Filesystem;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use UserFrosting\Config\Config;
-use UserFrosting\Sprinkle\Core\Facades\Storage;
 use UserFrosting\Sprinkle\Core\Filesystem\FilesystemManager;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
+use UserFrosting\UniformResourceLocator\ResourceStream;
 
-/**
- * FilesystemTest class.
- * Tests a basic filesystem.
- */
-// TODO : Most could be moved to a Unit Test.
 class FilesystemTest extends TestCase
 {
-    /** @var string Testing storage path */
-    private string $testDir;
-
-    /** @var string Test disk name */
-    private string $testDisk = 'testing';
-
-    protected Config $config;
-
-    /**
-     * Setup TestDatabase
-     */
     public function setUp(): void
     {
-        // Boot parent TestCase, which will set up the database and connections for us.
         parent::setUp();
 
-        $this->config = $this->ci->get(Config::class);
+        // Setup test config
+        $config = $this->ci->get(Config::class);
+        $config->set('filesystems.disks.testing', [
+            'driver' => 'local',
+            'root'   => 'testing://',
+            'url'    => 'files/testing/',
+        ]);
+        $config->set('filesystems.disks.testingDriver', [
+            'driver' => 'localTest',
+            'root'   => 'testing://testingDriver',
+        ]);
 
-        $this->testDir = $this->config->get("filesystems.disks.{$this->testDisk}.root");
+        // Set up the locator stream in the testing directory
+        /** @var ResourceLocatorInterface */
+        $locator = $this->ci->get(ResourceLocatorInterface::class);
+        $locator->addStream(new ResourceStream('testing', __DIR__ . '/storage/testing', true));
     }
 
     /**
@@ -54,8 +51,9 @@ class FilesystemTest extends TestCase
      */
     public function testService(): FilesystemAdapter
     {
-        // Force this test to use the testing disk
-        $this->config->set('filesystems.default', $this->testDisk);
+        // Set the default filesystem to the testing disk
+        $config = $this->ci->get(Config::class);
+        $config->set('filesystems.default', 'testing');
 
         // Filesystem service will return an instance of FilesystemManger
         $filesystem = $this->ci->get(FilesystemManager::class);
@@ -63,23 +61,23 @@ class FilesystemTest extends TestCase
 
         // Main aspect of our FilesystemManager is to adapt our config structure
         // to Laravel class we'll make sure here the forced config actually works
-        $this->assertEquals($this->testDisk, $filesystem->getDefaultDriver());
+        $this->assertEquals('testing', $filesystem->getDefaultDriver());
 
         // The disk won't return a Manager, but an Adapter.
-        $disk = $filesystem->disk($this->testDisk);
+        $disk = $filesystem->disk('testing');
         $this->assertInstanceOf(FilesystemAdapter::class, $disk);
 
         return $disk;
     }
 
-    /**
-     * @depends testService
-     */
-    // TODO : Requires reimplementation of Facade
-    /*public function testFacade(): void
+    public function testDefaultCloud(): void
     {
-        $this->assertInstanceOf(FilesystemAdapter::class, Storage::disk($this->testDisk));
-    }*/
+        // Set the default cloud to the testing disk
+        $config = $this->ci->get(Config::class);
+        $config->set('filesystems.cloud', 'testingDriver');
+        $filesystem = $this->ci->get(FilesystemManager::class);
+        $this->assertEquals('testingDriver', $filesystem->getDefaultCloudDriver());
+    }
 
     /**
      * @param FilesystemAdapter $files
@@ -87,9 +85,12 @@ class FilesystemTest extends TestCase
      */
     public function testAdapter(FilesystemAdapter $files): void
     {
+        // Test "path", make sure the path is translated correctly via locator
+        $this->assertEquals(__DIR__ . '/storage/testing/', $files->path(''));
+
         // Test basic "put"
         $this->assertTrue($files->put('file.txt', 'Something inside'));
-        $this->assertStringEqualsFile($this->testDir . '/file.txt', 'Something inside');
+        $this->assertStringEqualsFile('testing://file.txt', 'Something inside');
 
         // Test "exist" & "get"
         // We'll assume Laravel test covers the rest ;)
@@ -98,7 +99,7 @@ class FilesystemTest extends TestCase
 
         // We'll delete the test file now
         $this->assertTrue($files->delete('file.txt'));
-        $this->assertFileDoesNotExist($this->testDir . '/file.txt');
+        $this->assertFileDoesNotExist('testing://file.txt');
     }
 
     /**
@@ -127,7 +128,7 @@ class FilesystemTest extends TestCase
         $url = $files->url('file.txt');
         $this->assertEquals('files/testing/file.txt', $url);
         $this->assertTrue($files->delete('file.txt'));
-        $this->assertFileDoesNotExist($this->testDir . '/file.txt');
+        $this->assertFileDoesNotExist('testing://file.txt');
     }
 
     /**
@@ -149,8 +150,9 @@ class FilesystemTest extends TestCase
     public function testAddingAdapter(): void
     {
         $filesystemManager = $this->ci->get(FilesystemManager::class);
-
         $filesystemManager->extend('localTest', function ($configService, $config) {
+            $locator = $this->ci->get(ResourceLocatorInterface::class);
+            $config['root'] = $locator->findResource($config['root'], all: true);
             $adapter = new LocalAdapter($config['root']);
 
             return new Filesystem($adapter);
@@ -160,7 +162,25 @@ class FilesystemTest extends TestCase
         $this->assertInstanceOf(FilesystemAdapter::class, $disk);
 
         // Make sure the path was set correctly
-        $path = $disk->path('');
-        $this->assertEquals('storage/testingDriver' . DIRECTORY_SEPARATOR, $path); // N.B.: DIRECTORY_SEPARATOR is required for windows.
+        $this->assertEquals(__DIR__ . '/storage/testing/testingDriver/', $disk->path(''));
+    }
+
+    public function testAddingDriver(): void
+    {
+        $filesystemManager = $this->ci->get(FilesystemManager::class);
+
+        $adapter = new LocalAdapter(__DIR__ . '/storage/testing/testingDriver');
+        $filesystem = new Filesystem($adapter);
+        $driver = new FilesystemAdapter($filesystem);
+
+        $filesystemManager->extend('localTest', function ($configService, $config) use ($driver) {
+            return $driver;
+        });
+
+        $disk = $filesystemManager->disk('testingDriver');
+        $this->assertInstanceOf(FilesystemAdapter::class, $disk);
+
+        // Make sure the path was set correctly
+        $this->assertEquals(__DIR__ . '/storage/testing/testingDriver/', $disk->path(''));
     }
 }

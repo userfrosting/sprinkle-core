@@ -230,7 +230,7 @@ return [
              */
             'local' => [
                 'driver' => 'local',
-                'root'   => 'storage', //TODO: Replace with locator; \UserFrosting\STORAGE_DIR,
+                'root'   => 'storage://',
             ],
             /*
             * Public files are directly accessible through the webserver for
@@ -238,10 +238,9 @@ return [
             * Direct access from http://{url}/files/, physically located in `/public/files`
             * Great storage disk for assets (images, avatar, etc).
             */
-            // TODO : Link back to public using locator
             'public' => [
                 'driver' => 'local',
-                'root'   => 'storage://', //\UserFrosting\STORAGE_PUBLIC_DIR,
+                'root'   => 'public://files',
                 'url'    => 'files/',
             ],
             /*

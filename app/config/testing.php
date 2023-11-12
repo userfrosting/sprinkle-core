@@ -52,23 +52,6 @@ return [
     ],
 
     /*
-     * Use testing filesystem for tests
-     */
-    'filesystems' => [
-        'disks' => [
-            'testing' => [
-                'driver' => 'local',
-                'root'   => 'storage/testing', //TODO : Replace with locator; \UserFrosting\STORAGE_DIR . \UserFrosting\DS . 'testing',
-                'url'    => 'files/testing/',
-            ],
-            'testingDriver' => [
-                'driver' => 'localTest',
-                'root'   => 'storage/testingDriver', //TODO : Replace with locator; \UserFrosting\STORAGE_DIR . \UserFrosting\DS . 'testingDriver',
-            ],
-        ],
-    ],
-
-    /*
      * Disable native sessions in tests
      */
     'session' => [

@@ -16,6 +16,7 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager as LaravelFilesystemManager;
 use League\Flysystem\FilesystemInterface;
 use UserFrosting\Config\Config;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * Filesystem disk manager service.
@@ -25,10 +26,13 @@ class FilesystemManager extends LaravelFilesystemManager
     /**
      * Create a new filesystem manager instance.
      *
-     * @param Config $config
+     * @param Config                   $config
+     * @param ResourceLocatorInterface $locator
      */
-    public function __construct(protected Config $config)
-    {
+    public function __construct(
+        protected Config $config,
+        protected ResourceLocatorInterface $locator,
+    ) {
     }
 
     /**
@@ -79,5 +83,18 @@ class FilesystemManager extends LaravelFilesystemManager
     public function getDefaultCloudDriver(): string
     {
         return $this->config->get('filesystems.cloud');
+    }
+
+    /**
+     * Overwrite the local driver creation to replace root by locator.
+     *
+     * @param  array                                       $config
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function createLocalDriver(array $config)
+    {
+        $config['root'] = $this->locator->findResource($config['root'], all: true);
+
+        return parent::createLocalDriver($config);
     }
 }
