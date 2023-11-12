@@ -2,7 +2,7 @@
     "name": "userfrosting/sprinkle-core",
     "type": "userfrosting-sprinkle",
     "description": "Core module for UserFrosting.",
-    "keywords": ["php user management", "usercake", "bootstrap"],
+    "keywords": ["php user management", "UserFrosting", "Sprinkle"],
     "homepage": "https://github.com/userfrosting/UserFrosting",
     "license" : "MIT",
     "authors" : [
