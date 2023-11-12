@@ -87,7 +87,10 @@ class FilesystemTest extends TestCase
     public function testAdapter(FilesystemAdapter $files): void
     {
         // Test "path", make sure the path is translated correctly via locator
-        $this->assertEquals(Normalizer::normalizePath(__DIR__ . '/storage/testing/'), $files->path(''));
+        $this->assertEquals(
+            Normalizer::normalizePath(__DIR__ . '/storage/testing/'),
+            Normalizer::normalizePath($files->path(''))
+        );
 
         // Test basic "put"
         $this->assertTrue($files->put('file.txt', 'Something inside'));
@@ -163,7 +166,10 @@ class FilesystemTest extends TestCase
         $this->assertInstanceOf(FilesystemAdapter::class, $disk);
 
         // Make sure the path was set correctly
-        $this->assertEquals(Normalizer::normalizePath(__DIR__ . '/storage/testing/testingDriver/'), $disk->path(''));
+        $this->assertEquals(
+            Normalizer::normalizePath(__DIR__ . '/storage/testing/testingDriver/'),
+            Normalizer::normalizePath($disk->path(''))
+        );
     }
 
     public function testAddingDriver(): void
@@ -182,6 +188,9 @@ class FilesystemTest extends TestCase
         $this->assertInstanceOf(FilesystemAdapter::class, $disk);
 
         // Make sure the path was set correctly
-        $this->assertEquals(Normalizer::normalizePath(__DIR__ . '/storage/testing/testingDriver/'), $disk->path(''));
+        $this->assertEquals(
+            Normalizer::normalizePath(__DIR__ . '/storage/testing/testingDriver/'),
+            Normalizer::normalizePath($disk->path(''))
+        );
     }
 }
