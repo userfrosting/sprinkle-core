@@ -88,7 +88,8 @@ class FilesystemManager extends LaravelFilesystemManager
     /**
      * Overwrite the local driver creation to replace root by locator.
      *
-     * @param  array                                       $config
+     * @param array $config
+     *
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public function createLocalDriver(array $config)
