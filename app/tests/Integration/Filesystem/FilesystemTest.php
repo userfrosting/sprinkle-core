@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Filesystem\FilesystemManager;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
+use UserFrosting\UniformResourceLocator\Normalizer;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 use UserFrosting\UniformResourceLocator\ResourceStream;
 
@@ -86,7 +87,7 @@ class FilesystemTest extends TestCase
     public function testAdapter(FilesystemAdapter $files): void
     {
         // Test "path", make sure the path is translated correctly via locator
-        $this->assertEquals(__DIR__ . '/storage/testing/', $files->path(''));
+        $this->assertEquals(Normalizer::normalizePath(__DIR__ . '/storage/testing/'), $files->path(''));
 
         // Test basic "put"
         $this->assertTrue($files->put('file.txt', 'Something inside'));
@@ -162,7 +163,7 @@ class FilesystemTest extends TestCase
         $this->assertInstanceOf(FilesystemAdapter::class, $disk);
 
         // Make sure the path was set correctly
-        $this->assertEquals(__DIR__ . '/storage/testing/testingDriver/', $disk->path(''));
+        $this->assertEquals(Normalizer::normalizePath(__DIR__ . '/storage/testing/testingDriver/'), $disk->path(''));
     }
 
     public function testAddingDriver(): void
@@ -181,6 +182,6 @@ class FilesystemTest extends TestCase
         $this->assertInstanceOf(FilesystemAdapter::class, $disk);
 
         // Make sure the path was set correctly
-        $this->assertEquals(__DIR__ . '/storage/testing/testingDriver/', $disk->path(''));
+        $this->assertEquals(Normalizer::normalizePath(__DIR__ . '/storage/testing/testingDriver/'), $disk->path(''));
     }
 }
