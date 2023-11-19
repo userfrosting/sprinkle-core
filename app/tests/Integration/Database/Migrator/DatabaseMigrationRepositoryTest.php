@@ -41,6 +41,9 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->ci->set(MigrationTable::class, new TestMigration());
         $repository = $this->ci->get(DatabaseMigrationRepository::class);
 
+        // Create table
+        $repository->create();
+        
         // Table should exist
         $this->assertTrue($builder->hasTable('migrationTest'));
         $this->assertTrue($repository->exists());

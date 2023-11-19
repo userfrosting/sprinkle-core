@@ -35,10 +35,6 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
         protected Capsule $db,
         protected MigrationTable $model,
     ) {
-        // Make sure repository exist
-        if (!$this->exists()) {
-            $this->create();
-        }
     }
 
     /**
@@ -51,7 +47,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function all(?int $steps = null, bool $asc = true): Collection
     {
-        $query = $this->model::orderBy('id', ($asc) ? 'asc' : 'desc');
+        $query = $this->getTable()::orderBy('id', ($asc) ? 'asc' : 'desc');
 
         if (!is_null($steps)) {
             $batch = max($this->getNextBatchNumber() - $steps, 1);
@@ -74,7 +70,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function get(string $migration): object
     {
-        $result = $this->model::forMigration($migration)->first();
+        $result = $this->getTable()::forMigration($migration)->first();
 
         // Throw error if null
         if ($result === null) {
@@ -89,7 +85,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function has(string $migration): bool
     {
-        return $this->model::forMigration($migration)->exists();
+        return $this->getTable()::forMigration($migration)->exists();
     }
 
     /**
@@ -97,7 +93,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function last(): array
     {
-        $query = $this->model::where('batch', $this->getLastBatchNumber());
+        $query = $this->getTable()::where('batch', $this->getLastBatchNumber());
 
         return $query->orderBy('id', 'desc')->get()->pluck('migration')->all();
     }
@@ -112,7 +108,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             $batch = $this->getNextBatchNumber();
         }
 
-        $entry = new $this->model([
+        $table = $this->getTable();
+        $entry = new $table([
             'migration' => $migration,
             'batch'     => $batch,
         ]);
@@ -125,7 +122,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function remove(string $migration): void
     {
-        $this->model::forMigration($migration)->delete();
+        $this->getTable()::forMigration($migration)->delete();
     }
 
     /**
@@ -141,7 +138,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function getLastBatchNumber(): int
     {
-        $batch = $this->model::max('batch');
+        $batch = $this->getTable()::max('batch');
 
         // Default to 0 if it's null (empty table)
         return ($batch === null) ? 0 : intval($batch);
@@ -176,6 +173,20 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     public function exists(): bool
     {
         return $this->getSchemaBuilder()->hasTable($this->model->getTable());
+    }
+
+    /**
+     * Returns the table to use for the repository.
+     * Create the physical table if it doesn't exist.
+     */
+    public function getTable(): MigrationTable
+    {
+        // Make sure repository exist
+        if (!$this->exists()) {
+            $this->create();
+        }
+
+        return $this->model;
     }
 
     /**
