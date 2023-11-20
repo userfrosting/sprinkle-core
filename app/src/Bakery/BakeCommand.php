@@ -84,7 +84,12 @@ final class BakeCommand extends Command
         $application = $this->getApplication();
         foreach ($this->aggregateCommands() as $commandName) {
             $command = $application->find($commandName);
-            $command->run($input, $output);
+            $result = $command->run($input, $output);
+
+            // If the previous command fails, stop the process
+            if ($result === self::FAILURE) {
+                return $result;
+            }
         }
 
         return self::SUCCESS;

@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit\Database\Migrator;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -49,7 +50,11 @@ class MigratorRollbackTest extends TestCase
             ->getMock();
 
         $connection = Mockery::mock(Connection::class);
-        $analyser = new Migrator($installed, $available, $connection);
+        $database = Mockery::mock(Capsule::class)
+            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->getMock();
+
+        $analyser = new Migrator($installed, $available, $database);
 
         $result = $analyser->getMigrationsForRollback(1);
         $this->assertSame([StubAnalyserRollbackMigrationD::class], $result);
@@ -74,7 +79,11 @@ class MigratorRollbackTest extends TestCase
             ->getMock();
 
         $connection = Mockery::mock(Connection::class);
-        $analyser = new Migrator($installed, $available, $connection);
+        $database = Mockery::mock(Capsule::class)
+            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->getMock();
+
+        $analyser = new Migrator($installed, $available, $database);
 
         $result = $analyser->getMigrationsForReset();
         $this->assertSame([StubAnalyserRollbackMigrationD::class], $result);
@@ -108,7 +117,11 @@ class MigratorRollbackTest extends TestCase
             ->getMock();
 
         $connection = Mockery::mock(Connection::class);
-        $analyser = new Migrator($installed, $available, $connection);
+        $database = Mockery::mock(Capsule::class)
+            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->getMock();
+
+        $analyser = new Migrator($installed, $available, $database);
 
         // Run command
         $this->assertNull($analyser->validateRollbackMigration(StubAnalyserRollbackMigrationD::class));
@@ -127,7 +140,11 @@ class MigratorRollbackTest extends TestCase
             ->getMock();
         $available = Mockery::mock(MigrationLocatorInterface::class);
         $connection = Mockery::mock(Connection::class);
-        $analyser = new Migrator($installed, $available, $connection);
+        $database = Mockery::mock(Capsule::class)
+            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->getMock();
+
+        $analyser = new Migrator($installed, $available, $database);
 
         // Start by testing false
         $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationD::class));
@@ -163,7 +180,11 @@ class MigratorRollbackTest extends TestCase
             ])
             ->getMock();
         $connection = Mockery::mock(Connection::class);
-        $analyser = new Migrator($installed, $available, $connection);
+        $database = Mockery::mock(Capsule::class)
+            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->getMock();
+
+        $analyser = new Migrator($installed, $available, $database);
 
         // Start by testing false
         $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationD::class));
@@ -201,7 +222,11 @@ class MigratorRollbackTest extends TestCase
             ->shouldReceive('has')->with(StubAnalyserRollbackMigrationC::class)->twice()->andReturn(true)
             ->getMock();
         $connection = Mockery::mock(Connection::class);
-        $analyser = new Migrator($installed, $available, $connection);
+        $database = Mockery::mock(Capsule::class)
+            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->getMock();
+
+        $analyser = new Migrator($installed, $available, $database);
 
         // Run command
         $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationC::class));
@@ -239,7 +264,11 @@ class MigratorRollbackTest extends TestCase
             ->shouldReceive('has')->with(StubAnalyserRollbackMigrationC::class)->twice()->andReturn(false)
             ->getMock();
         $connection = Mockery::mock(Connection::class);
-        $analyser = new Migrator($installed, $available, $connection);
+        $database = Mockery::mock(Capsule::class)
+            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->getMock();
+
+        $analyser = new Migrator($installed, $available, $database);
 
         // Run command
         $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationA::class));
@@ -274,7 +303,11 @@ class MigratorRollbackTest extends TestCase
             ->shouldReceive('has')->with(StubAnalyserRollbackMigrationC::class)->twice()->andReturn(false)
             ->getMock();
         $connection = Mockery::mock(Connection::class);
-        $analyser = new Migrator($installed, $available, $connection);
+        $database = Mockery::mock(Capsule::class)
+            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->getMock();
+
+        $analyser = new Migrator($installed, $available, $database);
 
         // Run command
         $this->assertFalse($analyser->canRollbackMigration(StubAnalyserRollbackMigrationB::class));

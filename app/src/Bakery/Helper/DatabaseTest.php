@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Bakery\Helper;
 
 use DI\Attribute\Inject;
-use Illuminate\Database\Connection;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use PDOException;
 
 /**
@@ -21,12 +21,12 @@ use PDOException;
  *
  * N.B.: Make use of the Database Capsule Manager and not the Connection alias
  * service, as connection might not be up to date if another command (setup:db)
- * has changed the db config
+ * has changed the db config, even if the service is set on the container.
  */
 trait DatabaseTest
 {
     #[Inject]
-    protected Connection $connection;
+    protected Capsule $capsule;
 
     /**
      * Test database connection directly using PDO.
@@ -37,7 +37,12 @@ trait DatabaseTest
     protected function testDB(): bool
     {
         try {
-            $this->connection->getPdo();
+            $connectionName = $this->capsule->getDatabaseManager()->getDefaultConnection();
+            $connection = $this->capsule->getConnection($connectionName);
+            $pdo = $connection->getPdo();
+            if ($pdo === null) {
+                throw new PDOException('PDO not found');
+            }
         } catch (PDOException $e) {
             $message = 'Could not connect to the database connection' . PHP_EOL;
             $message .= 'Exception: ' . $e->getMessage() . PHP_EOL . PHP_EOL;

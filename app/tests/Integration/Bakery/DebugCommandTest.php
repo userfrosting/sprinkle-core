@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Bakery;
 
-use Illuminate\Database\Connection;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PDOException;
@@ -43,10 +43,10 @@ class DebugCommandTest extends CoreTestCase
     public function testCommandForFailDatabase(): void
     {
         // Setup mocks
-        $class = Mockery::mock(Connection::class)
-            ->shouldReceive('getPdo')->andThrow(PDOException::class)
+        $class = Mockery::mock(Capsule::class)
+            ->shouldReceive('getDatabaseManager')->andThrow(PDOException::class)
             ->getMock();
-        $this->ci->set(Connection::class, $class);
+        $this->ci->set(Capsule::class, $class);
 
         $result = $this->getCommandTester();
 

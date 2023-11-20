@@ -43,7 +43,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
 
         // Create table
         $repository->create();
-        
+
         // Table should exist
         $this->assertTrue($builder->hasTable('migrationTest'));
         $this->assertTrue($repository->exists());
