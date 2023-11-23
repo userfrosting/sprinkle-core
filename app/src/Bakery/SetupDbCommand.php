@@ -15,7 +15,6 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Collection;
 use PDOException;
 use Psr\Container\ContainerInterface;
@@ -348,6 +347,13 @@ class SetupDbCommand extends Command
      * values att all, but it's the easiest way other than
      * re-initializing the config class (and actually ArrayFileLoader).
      *
+     * WARNING : This will not update the CONNECTION service !!!
+     *           This is because the connection is already created, and PHP-DI
+     *           has already injected it elsewhere with the old value. We can
+     *           change something in it, but not "it". Updating the connection
+     *           in capsule still works, that's why further command inside bake
+     *           MUST use the config manager.
+     *
      * @param array<string, string> $dbParams The database credentials
      */
     protected function updateServices(array $dbParams): void
@@ -362,10 +368,5 @@ class SetupDbCommand extends Command
         $this->capsule->addConnection($dbParams, $dbParams['driver']);
         $this->capsule->getDatabaseManager()->setDefaultConnection($dbParams['driver']);
         $this->capsule->getDatabaseManager()->purge($dbParams['driver']);
-
-        // Update Capsule and Builder services
-        $connection = $this->capsule->getConnection($dbParams['driver']);
-        $this->ci->set(Connection::class, $connection);
-        $this->ci->set(Builder::class, $connection->getSchemaBuilder());
     }
 }

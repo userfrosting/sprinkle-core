@@ -67,6 +67,12 @@ class DatabaseService implements ServicesProviderInterface
                 return $connection->getSchemaBuilder();
             },
 
+            /**
+             * WARNING: This service might not be updated if the connection is
+             * dynamically changed, as the return value is cached by PHP-DI. It
+             * is recommended to inject "Capsule" instead, and use the
+             * "getConnection()" method to get the connection.
+             */
             Connection::class => function (Capsule $db) {
                 $connection = $db->getDatabaseManager()->getDefaultConnection();
 
