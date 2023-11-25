@@ -35,6 +35,9 @@ final class WebpackCommand extends Command
     #[Inject]
     protected NpmVersionValidator $npmVersionValidator;
 
+    #[Inject('UF_MODE')]
+    protected string $envMode;
+
     /**
      * {@inheritdoc}
      */
@@ -101,7 +104,7 @@ final class WebpackCommand extends Command
             $this->io->warning("$file not found. Skipping.");
         } else {
             // Execute command
-            $command = ($production) ? 'npm run build' : 'npm run dev';
+            $command = ($production || $this->envMode === 'production') ? 'npm run build' : 'npm run dev';
             if ($this->executeCommand($command) !== 0) {
                 $this->io->error('Webpack Encore run has failed');
 

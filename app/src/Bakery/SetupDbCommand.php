@@ -14,7 +14,6 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\Connection;
 use Illuminate\Support\Collection;
 use PDOException;
 use Psr\Container\ContainerInterface;

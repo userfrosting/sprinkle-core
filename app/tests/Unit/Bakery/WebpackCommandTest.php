@@ -55,6 +55,7 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
+        $ci->set('UF_MODE', '');
 
         /** @var WebpackCommand */
         $command = $ci->get(WebpackCommand::class);
@@ -62,6 +63,73 @@ class WebpackCommandTest extends TestCase
 
         // Assert some output
         $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('npm run dev', $result->getDisplay());
+        $this->assertStringContainsString('Assets Compiled', $result->getDisplay());
+    }
+
+    public function testCommandProductionEnv(): void
+    {
+        // Mock built-in error_get_last
+        $reflection_class = new ReflectionClass(WebpackCommand::class);
+        $namespace = $reflection_class->getNamespaceName();
+        PHPMockery::mock($namespace, 'getcwd')->andReturn('foo/');
+        PHPMockery::mock($namespace, 'file_exists')->andReturn(true);
+        PHPMockery::mock($namespace, 'passthru')->andReturn(null);
+
+        // Set Validator mock
+        $node = Mockery::mock(NodeVersionValidator::class)
+            ->shouldReceive('validate')->andReturn(true)
+            ->getMock();
+        $npm = Mockery::mock(NpmVersionValidator::class)
+            ->shouldReceive('validate')->andReturn(true)
+            ->getMock();
+
+        // Set mock in CI and run command
+        $ci = ContainerStub::create();
+        $ci->set(NodeVersionValidator::class, $node);
+        $ci->set(NpmVersionValidator::class, $npm);
+        $ci->set('UF_MODE', 'production'); // Set production mode
+
+        /** @var WebpackCommand */
+        $command = $ci->get(WebpackCommand::class);
+        $result = BakeryTester::runCommand($command);
+
+        // Assert some output
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('npm run build', $result->getDisplay());
+        $this->assertStringContainsString('Assets Compiled', $result->getDisplay());
+    }
+
+    public function testCommandProduction(): void
+    {
+        // Mock built-in error_get_last
+        $reflection_class = new ReflectionClass(WebpackCommand::class);
+        $namespace = $reflection_class->getNamespaceName();
+        PHPMockery::mock($namespace, 'getcwd')->andReturn('foo/');
+        PHPMockery::mock($namespace, 'file_exists')->andReturn(true);
+        PHPMockery::mock($namespace, 'passthru')->andReturn(null);
+
+        // Set Validator mock
+        $node = Mockery::mock(NodeVersionValidator::class)
+            ->shouldReceive('validate')->andReturn(true)
+            ->getMock();
+        $npm = Mockery::mock(NpmVersionValidator::class)
+            ->shouldReceive('validate')->andReturn(true)
+            ->getMock();
+
+        // Set mock in CI and run command
+        $ci = ContainerStub::create();
+        $ci->set(NodeVersionValidator::class, $node);
+        $ci->set(NpmVersionValidator::class, $npm);
+        $ci->set('UF_MODE', '');
+
+        /** @var WebpackCommand */
+        $command = $ci->get(WebpackCommand::class);
+        $result = BakeryTester::runCommand($command, input: ['--production' => true]);
+
+        // Assert some output
+        $this->assertSame(0, $result->getStatusCode());
+        $this->assertStringContainsString('npm run build', $result->getDisplay());
         $this->assertStringContainsString('Assets Compiled', $result->getDisplay());
     }
 
@@ -85,6 +153,7 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
+        $ci->set('UF_MODE', '');
 
         /** @var WebpackCommand */
         $command = $ci->get(WebpackCommand::class);
@@ -115,6 +184,7 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
+        $ci->set('UF_MODE', '');
 
         /** @var WebpackCommand */
         $command = $ci->get(WebpackCommand::class);
@@ -137,6 +207,7 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
+        $ci->set('UF_MODE', '');
 
         /** @var WebpackCommand */
         $command = $ci->get(WebpackCommand::class);
@@ -160,6 +231,7 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
+        $ci->set('UF_MODE', '');
 
         /** @var WebpackCommand */
         $command = $ci->get(WebpackCommand::class);
@@ -201,6 +273,7 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
+        $ci->set('UF_MODE', '');
 
         /** @var WebpackCommand */
         $command = $ci->get(WebpackCommand::class);
@@ -248,6 +321,7 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
+        $ci->set('UF_MODE', '');
 
         /** @var WebpackCommand */
         $command = $ci->get(WebpackCommand::class);
