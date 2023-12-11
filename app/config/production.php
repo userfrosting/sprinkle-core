@@ -55,7 +55,7 @@ return [
             'info' => false,
         ],
         'uri' => [
-            'public' => 'https://example.com', // This should be set in production to avoid errors !
+            'public' => env('URI_PUBLIC', ''), // This should be set in production !
         ],
     ],
     /*

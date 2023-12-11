@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [5.0.1](https://github.com/userfrosting/sprinkle-core/compare/5.0.0...5.0.1)
+- Add env for public URI, default back to empty string
+
 ## [5.0.0-alpha9](https://github.com/userfrosting/sprinkle-core/compare/5.0.0-alpha8...5.0.0-alpha9)
 - Reenable CSRF protection for all routes.
 - Update `DebugCommand` : Split command into multiple subcommand and use `DebugCommandEvent` and `DebugVerboseCommandEvent` so custom command can be added to the debug command, like the `bake` command.
