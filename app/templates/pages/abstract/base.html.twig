@@ -28,16 +28,6 @@
                 {% block stylesheets_page %}{% endblock %}
             {% endblock %}
 
-            {# Site author link #}
-            {% if site.uri.author %}
-                <link href="{% block page_author_link %}{{ site.uri.author }}{% endblock %}" rel="author" />
-            {% endif %}
-
-            {# Site publisher link #}
-            {% if site.uri.publisher %}
-                <link href="{% block page_publisher_link %}{{ site.uri.publisher }}{% endblock %}" rel="publisher" />
-            {% endif %}
-
             {% include "pages/partials/analytics.html.twig" %}
         </head>
     {% endblock %}
