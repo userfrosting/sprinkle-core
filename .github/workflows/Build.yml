@@ -4,7 +4,7 @@ on:
   push:
     branches: ['*']
   pull_request:
-    branches: ['5.0']
+    branches: ['5.0', '5.1']
   workflow_dispatch:
   # schedule:
   # - cron: "0 0 * * 5"
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php_versions: ['8.0', '8.1', '8.2']
+        php_versions: ['8.1', '8.2', '8.3']
 
     runs-on: ubuntu-latest
     name: PHPUnit - PHP ${{ matrix.php_versions }} - Memory SQLite
@@ -64,7 +64,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php_versions: ['8.0', '8.1', '8.2']
+        php_versions: ['8.1', '8.2', '8.3']
 
     runs-on: ubuntu-latest
     name: PHPUnit - PHP ${{ matrix.php_versions }} - MySQL
@@ -137,7 +137,7 @@ jobs:
       strategy:
         fail-fast: false
         matrix:
-          php_versions: ['8.0', '8.1', '8.2']
+          php_versions: ['8.1', '8.2', '8.3']
 
       runs-on: ubuntu-latest
       name: PHPUnit - PHP ${{ matrix.php_versions }} - SQLite
@@ -193,7 +193,7 @@ jobs:
       strategy:
         fail-fast: false
         matrix:
-          php_versions: ['8.0', '8.1', '8.2']
+          php_versions: ['8.1', '8.2', '8.3']
 
       runs-on: ubuntu-latest
       name: PHPUnit - PHP ${{ matrix.php_versions }} - PostgreSQL
@@ -255,7 +255,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-          php_versions: ['8.0', '8.1', '8.2']
+          php_versions: ['8.1', '8.2', '8.3']
 
     runs-on: windows-latest
     name: PHPUnit - PHP ${{ matrix.php_versions }} - Windows
