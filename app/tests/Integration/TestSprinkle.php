@@ -35,14 +35,6 @@ class TestSprinkle implements SprinkleRecipe
     /**
      * {@inheritdoc}
      */
-    public function getBakeryCommands(): array
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getSprinkles(): array
     {
         return [];
@@ -60,14 +52,6 @@ class TestSprinkle implements SprinkleRecipe
      * {@inheritdoc}
      */
     public function getServices(): array
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMiddlewares(): array
     {
         return [];
     }

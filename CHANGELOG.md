@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [5.1.0](https://github.com/userfrosting/sprinkle-core/compare/5.0.1...5.1.0)
 - Drop PHP 8.1 support, add PHP 8.3 support
 - Update to Laravel 10
+- Update to PHPUnit 10
 
 ## [5.0.1](https://github.com/userfrosting/sprinkle-core/compare/5.0.0...5.0.1)
 - Add env for public URI, default back to empty string

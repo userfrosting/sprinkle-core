@@ -28,7 +28,7 @@ class NodeVersionValidatorTest extends AbstractVersionValidatorTester
      *
      * @return array<string|bool>[] [version, sanitized, valid]
      */
-    public function versionProvider(): array
+    public static function versionProvider(): array
     {
         return [
             ['v12.18.1', 'v12.18.1', true],

@@ -28,7 +28,7 @@ class PhpVersionValidatorTest extends AbstractVersionValidatorTester
      *
      * @return array<string|bool>[] [version, sanitized, valid]
      */
-    public function versionProvider(): array
+    public static function versionProvider(): array
     {
         return [
             ['7.2.3', '7.2.3', false],

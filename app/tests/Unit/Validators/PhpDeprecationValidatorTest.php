@@ -29,7 +29,7 @@ class PhpDeprecationValidatorTest extends AbstractVersionValidatorTester
      *
      * @return array<string|bool>[] [version, sanitized, deprecated]
      */
-    public function versionProvider(): array
+    public static function versionProvider(): array
     {
         return [
             ['7.4.13', '7.4.13', false],

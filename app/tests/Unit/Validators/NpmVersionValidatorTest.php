@@ -28,7 +28,7 @@ class NpmVersionValidatorTest extends AbstractVersionValidatorTester
      *
      * @return array<string|bool>[] [version, sanitized, valid]
      */
-    public function versionProvider(): array
+    public static function versionProvider(): array
     {
         return [
             [' 6.14.10 ', '6.14.10', true], // Trim

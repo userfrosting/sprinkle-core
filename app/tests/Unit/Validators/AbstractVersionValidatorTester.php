@@ -61,5 +61,5 @@ abstract class AbstractVersionValidatorTester extends TestCase
      *
      * @return array<string|bool>[] [version, sanitized, valid]
      */
-    abstract public function versionProvider(): array;
+    abstract public static function versionProvider(): array;
 }

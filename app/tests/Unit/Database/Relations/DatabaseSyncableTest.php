@@ -85,7 +85,7 @@ class DatabaseSyncableTest extends TestCase
         return new HasManySyncable($builder, $parent, 'table.foreign_key', 'id');
     }
 
-    public function syncMethodHasManyListProvider()
+    public static function syncMethodHasManyListProvider()
     {
         return [
             // First test set

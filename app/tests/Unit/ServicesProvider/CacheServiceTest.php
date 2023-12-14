@@ -67,7 +67,7 @@ class CacheServiceTest extends TestCase
         $this->assertInstanceOf(Cache::class, $this->ci->get(Cache::class));
     }
 
-    public function driverDataProvider(): array
+    public static function driverDataProvider(): array
     {
         return [
             ['file', TaggableFileStore::class],

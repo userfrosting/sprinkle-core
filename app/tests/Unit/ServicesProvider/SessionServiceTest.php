@@ -85,7 +85,7 @@ class SessionServiceTest extends TestCase
         $this->assertInstanceOf($class, $this->ci->get(SessionHandlerInterface::class)); // @phpstan-ignore-line
     }
 
-    public function handlerDataProvider(): array
+    public static function handlerDataProvider(): array
     {
         return [
             ['file', FileSessionHandler::class],
