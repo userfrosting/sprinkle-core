@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Filesystem;
 
 use Illuminate\Filesystem\FilesystemAdapter;
-use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Filesystem\FilesystemManager;
@@ -149,39 +149,17 @@ class FilesystemTest extends TestCase
 
     /**
      * @depends testNonExistingAdapter
-     * @see https://github.com/thephpleague/flysystem/blob/13352d2303b67ecfc1306ef1fdb507df1a0fc79f/src/Adapter/Local.php#L47
      */
-    public function testAddingAdapter(): void
+    public function testCallCustomCreator(): void
     {
         $filesystemManager = $this->ci->get(FilesystemManager::class);
         $filesystemManager->extend('localTest', function ($configService, $config) {
             $locator = $this->ci->get(ResourceLocatorInterface::class);
             $config['root'] = $locator->findResource($config['root'], all: true);
             $adapter = new LocalAdapter($config['root']);
+            $filesystem = new Filesystem($adapter);
 
-            return new Filesystem($adapter);
-        });
-
-        $disk = $filesystemManager->disk('testingDriver');
-        $this->assertInstanceOf(FilesystemAdapter::class, $disk);
-
-        // Make sure the path was set correctly
-        $this->assertEquals(
-            Normalizer::normalizePath(__DIR__ . '/storage/testing/testingDriver/'),
-            Normalizer::normalizePath($disk->path(''))
-        );
-    }
-
-    public function testAddingDriver(): void
-    {
-        $filesystemManager = $this->ci->get(FilesystemManager::class);
-
-        $adapter = new LocalAdapter(__DIR__ . '/storage/testing/testingDriver');
-        $filesystem = new Filesystem($adapter);
-        $driver = new FilesystemAdapter($filesystem);
-
-        $filesystemManager->extend('localTest', function ($configService, $config) use ($driver) {
-            return $driver;
+            return new FilesystemAdapter($filesystem, $adapter, $config);
         });
 
         $disk = $filesystemManager->disk('testingDriver');

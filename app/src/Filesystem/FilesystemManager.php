@@ -14,7 +14,6 @@ namespace UserFrosting\Sprinkle\Core\Filesystem;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager as LaravelFilesystemManager;
-use League\Flysystem\FilesystemInterface;
 use UserFrosting\Config\Config;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
@@ -44,13 +43,7 @@ class FilesystemManager extends LaravelFilesystemManager
      */
     protected function callCustomCreator(array $config): Filesystem
     {
-        $driver = $this->customCreators[$config['driver']]($this->config, $config);
-
-        if ($driver instanceof FilesystemInterface) {
-            return $this->adapt($driver);
-        }
-
-        return $driver;
+        return $this->customCreators[$config['driver']]($this->config, $config);
     }
 
     /**
