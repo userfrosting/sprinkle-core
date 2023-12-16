@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update to Laravel 10
 - Update to PHPUnit 10
 - Update to Monolog 3
+- Test against MariaDB [#1238](https://github.com/userfrosting/UserFrosting/issues/1238)
 
 ## [5.0.1](https://github.com/userfrosting/sprinkle-core/compare/5.0.0...5.0.1)
 - Add env for public URI, default back to empty string
