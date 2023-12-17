@@ -40,22 +40,22 @@ class AlertStreamService implements ServicesProviderInterface
              *
              * @throws BadConfigException
              */
-            AlertStream::class        => function (ContainerInterface $ci, Config $config) {
-                return match ($config->get('alert.storage')) {
+            AlertStream::class => function (ContainerInterface $ci, Config $config) {
+                $storage = $config->getString('alert.storage');
+
+                return match ($storage) {
                     'cache'   => $ci->get(CacheAlertStream::class),
                     'session' => $ci->get(SessionAlertStream::class),
-                    default   => throw new BadConfigException("Bad alert storage handler type '{$config->get('alert.storage')}' specified in configuration file."),
+                    default   => throw new BadConfigException("Bad alert storage handler type '$storage' specified in configuration file."),
                 };
             },
 
-            // TODO : If config service is passed as argument, no need for this. A `setKey` on the interface would help.
-            CacheAlertStream::class   => function (Config $config, Translator $translator, Cache $cache, Session $session) {
-                return new CacheAlertStream($config->get('alert.key'), $translator, $cache, $session->getId());
+            CacheAlertStream::class => function (Config $config, Translator $translator, Cache $cache, Session $session) {
+                return new CacheAlertStream($config->getString('alert.key'), $translator, $cache, $session->getId());
             },
 
-            // TODO : If config service is passed as argument, no need for this. A `setKey` on the interface would help.
             SessionAlertStream::class => function (Config $config, Translator $translator, Session $session) {
-                return new SessionAlertStream($config->get('alert.key'), $translator, $session);
+                return new SessionAlertStream($config->getString('alert.key'), $translator, $session);
             },
         ];
     }
