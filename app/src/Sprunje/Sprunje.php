@@ -37,9 +37,9 @@ abstract class Sprunje
     protected string $name = 'export';
 
     /**
-     * @var EloquentBuilder|QueryBuilder|Relation The base (unfiltered) query.
+     * @var EloquentBuilder|QueryBuilder The base (unfiltered) query.
      */
-    protected EloquentBuilder|QueryBuilder|Relation $query;
+    protected EloquentBuilder|QueryBuilder $query;
 
     /**
      * @var array{
@@ -266,6 +266,7 @@ abstract class Sprunje
 
         $csv = Writer::createFromFileObject(new \SplTempFileObject());
 
+        // Defines variables for columns and rows arrays
         $columnNames = [];
         $rows = [];
 
@@ -273,31 +274,30 @@ abstract class Sprunje
             // Perform any additional transformations on the dataset
             $collection = $this->applyTransformations($models);
 
-            // Flatten collection while simultaneously building the column names from the union of each element's keys
-            $collection->transform(function ($item, $key) use (&$columnNames) {
-                $item = Arr::dot($item->toArray());
-                foreach ($item as $itemKey => $itemValue) {
-                    if (!in_array($itemKey, $columnNames, true)) {
-                        $columnNames[] = $itemKey;
-                    }
-                }
-
-                return $item;
+            // Flatten collection to a list of rows from the database
+            $tableRows = $collection->map(function (Model $item) {
+                return Arr::dot($item->toArray());
             });
 
-            // Insert the data as rows in the CSV document
-            $collection->each(function ($item) use ($columnNames, &$rows) {
-                $row = [];
-                foreach ($columnNames as $itemKey) {
-                    // Only add the value if it is set and not an array. Laravel's array_dot sometimes creates empty child arrays :(
-                    // See https://github.com/laravel/framework/pull/13009
-                    if (isset($item[$itemKey]) && !is_array($item[$itemKey])) {
-                        $row[] = $item[$itemKey];
-                    } else {
-                        $row[] = '';
+            // First build the columns list from the union of each element's keys
+            // Loops each table rows, and then loop each rows columns
+            $tableRows->each(function ($tableRow) use (&$columnNames) {
+                foreach ($tableRow as $column => $value) {
+                    if (!in_array($column, $columnNames, true)) {
+                        $columnNames[] = $column;
                     }
                 }
+            });
 
+            // Insert the data as rows in the CSV document. Build from the
+            // columns array, in case order is different between tableRows.
+            $tableRows->each(function ($tableRow) use ($columnNames, &$rows) {
+                $row = [];
+                foreach ($columnNames as $column) {
+                    // Only add the value if it is set and not an array. Laravel's array_dot sometimes creates empty child arrays :(
+                    // See https://github.com/laravel/framework/pull/13009
+                    $row[] = (isset($tableRow[$column]) && !is_array($tableRow[$column])) ? $tableRow[$column] : '';
+                }
                 $rows[] = $row;
             });
         });
@@ -313,7 +313,7 @@ abstract class Sprunje
      *
      * Returns the filtered, paginated result set and the counts.
      *
-     * @return array{int, int, Collection}
+     * @return array{int, int, Collection<int, Model>}
      */
     public function getModels(): array
     {
@@ -371,11 +371,11 @@ abstract class Sprunje
     }
 
     /**
-     * Get the underlying queriable object in its current state.
+     * Get the underlying queryable object in its current state.
      *
-     * @return EloquentBuilder|QueryBuilder|Relation
+     * @return EloquentBuilder|QueryBuilder
      */
-    public function getQuery(): EloquentBuilder|QueryBuilder|Relation
+    public function getQuery(): EloquentBuilder|QueryBuilder
     {
         return $this->query;
     }
@@ -383,11 +383,11 @@ abstract class Sprunje
     /**
      * Set the underlying QueryBuilder object.
      *
-     * @param EloquentBuilder|QueryBuilder|Relation $query
+     * @param EloquentBuilder|QueryBuilder $query
      *
      * @return static
      */
-    public function setQuery(EloquentBuilder|QueryBuilder|Relation $query): static
+    public function setQuery(EloquentBuilder|QueryBuilder $query): static
     {
         $this->query = $query;
 
@@ -397,11 +397,11 @@ abstract class Sprunje
     /**
      * Apply any filters from the options, calling a custom filter callback when appropriate.
      *
-     * @param EloquentBuilder|QueryBuilder|Relation $query
+     * @param EloquentBuilder|QueryBuilder $query
      *
      * @return static
      */
-    public function applyFilters(EloquentBuilder|QueryBuilder|Relation $query): static
+    public function applyFilters(EloquentBuilder|QueryBuilder $query): static
     {
         foreach ($this->options['filters'] as $name => $value) {
             // Check that this filter is allowed
@@ -424,11 +424,11 @@ abstract class Sprunje
     /**
      * Apply any sorts from the options, calling a custom sorter callback when appropriate.
      *
-     * @param EloquentBuilder|QueryBuilder|Relation $query
+     * @param EloquentBuilder|QueryBuilder $query
      *
      * @return static
      */
-    public function applySorts(EloquentBuilder|QueryBuilder|Relation $query): static
+    public function applySorts(EloquentBuilder|QueryBuilder $query): static
     {
         foreach ($this->options['sorts'] as $name => $direction) {
             // Check that this sort is allowed
@@ -457,11 +457,11 @@ abstract class Sprunje
     /**
      * Apply pagination based on the `page` and `size` options.
      *
-     * @param EloquentBuilder|QueryBuilder|Relation $query
+     * @param EloquentBuilder|QueryBuilder $query
      *
      * @return static
      */
-    public function applyPagination(EloquentBuilder|QueryBuilder|Relation $query): static
+    public function applyPagination(EloquentBuilder|QueryBuilder $query): static
     {
         $page = $this->options['page'];
         $size = $this->options['size'];
@@ -547,12 +547,12 @@ abstract class Sprunje
     /**
      * Match any filter in `filterable`.
      *
-     * @param EloquentBuilder|QueryBuilder|Relation $query
-     * @param mixed                                 $value
+     * @param EloquentBuilder|QueryBuilder $query
+     * @param mixed                        $value
      *
      * @return static
      */
-    protected function filterAll(EloquentBuilder|QueryBuilder|Relation $query, mixed $value): static
+    protected function filterAll(EloquentBuilder|QueryBuilder $query, mixed $value): static
     {
         foreach ($this->filterable as $name) {
             if (Str::studly($name) != 'all' && !in_array($name, $this->excludeForAll, true)) {
@@ -569,13 +569,13 @@ abstract class Sprunje
     /**
      * Build the filter query for a single field.
      *
-     * @param EloquentBuilder|QueryBuilder|Relation $query
-     * @param string                                $name
-     * @param mixed                                 $value
+     * @param EloquentBuilder|QueryBuilder $query
+     * @param string                       $name
+     * @param mixed                        $value
      *
      * @return static
      */
-    protected function buildFilterQuery(EloquentBuilder|QueryBuilder|Relation $query, string $name, mixed $value): static
+    protected function buildFilterQuery(EloquentBuilder|QueryBuilder $query, string $name, mixed $value): static
     {
         $methodName = 'filter' . Str::studly($name);
 
@@ -594,13 +594,13 @@ abstract class Sprunje
      * Perform a 'like' query on a single field, separating the value string on the or separator and
      * matching any of the supplied values.
      *
-     * @param EloquentBuilder|QueryBuilder|Relation $query
-     * @param string                                $name
-     * @param mixed                                 $value
+     * @param EloquentBuilder|QueryBuilder $query
+     * @param string                       $name
+     * @param mixed                        $value
      *
      * @return static
      */
-    protected function buildFilterDefaultFieldQuery(EloquentBuilder|QueryBuilder|Relation $query, string $name, mixed $value): static
+    protected function buildFilterDefaultFieldQuery(EloquentBuilder|QueryBuilder $query, string $name, mixed $value): static
     {
         if (is_bool($value)) {
             // Bool doesn't behave correctly when cast to string (false is empty instead of 0).
@@ -621,9 +621,9 @@ abstract class Sprunje
      * Set any transformations you wish to apply to the collection, after the query is executed.
      * This method is meant to be customized in child class.
      *
-     * @param Collection $collection
+     * @param Collection<int, Model> $collection
      *
-     * @return Collection
+     * @return Collection<int, Model>
      */
     protected function applyTransformations(Collection $collection): Collection
     {
@@ -633,7 +633,7 @@ abstract class Sprunje
     /**
      * Set the initial query used by your Sprunje.
      *
-     * @return EloquentBuilder|QueryBuilder|Relation|Model
+     * @return EloquentBuilder|QueryBuilder|Model
      */
     abstract protected function baseQuery();
 
@@ -647,6 +647,7 @@ abstract class Sprunje
      */
     protected function getColumnValues(string $column): array
     {
+        /** @var Collection<int, mixed[]> */
         $rawValues = $this->query->select($column)
                                  ->distinct()
                                  ->orderBy($column, 'asc')
@@ -663,11 +664,11 @@ abstract class Sprunje
     /**
      * Get the unpaginated count of items (before filtering) in this query.
      *
-     * @param EloquentBuilder|QueryBuilder|Relation $query
+     * @param EloquentBuilder|QueryBuilder $query
      *
      * @return int
      */
-    protected function count(EloquentBuilder|QueryBuilder|Relation $query): int
+    protected function count(EloquentBuilder|QueryBuilder $query): int
     {
         return $query->count();
     }
@@ -675,11 +676,11 @@ abstract class Sprunje
     /**
      * Get the unpaginated count of items (after filtering) in this query.
      *
-     * @param EloquentBuilder|QueryBuilder|Relation $query
+     * @param EloquentBuilder|QueryBuilder $query
      *
      * @return int
      */
-    protected function countFiltered(EloquentBuilder|QueryBuilder|Relation $query): int
+    protected function countFiltered(EloquentBuilder|QueryBuilder $query): int
     {
         return $query->count();
     }

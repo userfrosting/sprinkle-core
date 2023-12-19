@@ -291,6 +291,11 @@ class SprunjeStub extends Sprunje
 
 class TransformedSprunjeStub extends SprunjeStub
 {
+    /**
+     * @param Collection<int, \Illuminate\Database\Eloquent\Model> $collection
+     *
+     * @return Collection<int, \Illuminate\Database\Eloquent\Model>
+     */
     protected function applyTransformations(Collection $collection): Collection
     {
         $collection = $collection->map(function ($item, $key) {
