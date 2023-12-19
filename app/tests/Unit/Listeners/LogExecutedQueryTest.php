@@ -18,7 +18,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Sprinkle\Core\Listeners\LogExecutedQuery;
-use UserFrosting\Sprinkle\Core\Log\QueryLogger;
+use UserFrosting\Sprinkle\Core\Log\QueryLoggerInterface;
 
 /**
  * Integration tests for `alerts` service.
@@ -48,7 +48,7 @@ class LogExecutedQueryTest extends TestCase
         $event = new QueryExecuted($sql, $bindings, $time, $connection);
 
         // Create Logger mocks
-        $logger = Mockery::mock(QueryLogger::class)
+        $logger = Mockery::mock(QueryLoggerInterface::class)
             ->shouldReceive('debug')->with($string, $data)->once()
             ->getMock();
 

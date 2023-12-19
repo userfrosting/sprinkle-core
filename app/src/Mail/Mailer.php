@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Mail;
 
-use Monolog\Logger;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use PHPMailer\PHPMailer\PHPMailer;
+use UserFrosting\Sprinkle\Core\Log\MailLoggerInterface;
 
 /**
  * Mailer Class.
@@ -23,9 +23,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 class Mailer
 {
     /**
-     * @var Logger
+     * @var MailLoggerInterface
      */
-    protected Logger $logger;
+    protected MailLoggerInterface $logger;
 
     /**
      * @var PHPMailer
@@ -35,13 +35,13 @@ class Mailer
     /**
      * Create a new Mailer instance.
      *
-     * @param Logger         $logger    A Monolog logger, used to dump debugging info for SMTP server transactions.
-     * @param mixed[]        $config    An array of configuration parameters for phpMailer.
-     * @param PHPMailer|null $phpMailer Instance of phpMailer. Set to null to instantiate it.
+     * @param MailLoggerInterface $logger    A Monolog logger, used to dump debugging info for SMTP server transactions.
+     * @param mixed[]             $config    An array of configuration parameters for phpMailer.
+     * @param PHPMailer|null      $phpMailer Instance of phpMailer. Set to null to instantiate it.
      *
      * @throws PHPMailerException Wrong mailer config value given.
      */
-    public function __construct(Logger $logger, array $config = [], ?PHPMailer $phpMailer = null)
+    public function __construct(MailLoggerInterface $logger, array $config = [], ?PHPMailer $phpMailer = null)
     {
         $this->logger = $logger;
 

@@ -12,11 +12,36 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Log;
 
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Monolog alias for dependency injection.
  */
-class MailLogger extends Logger
+final class MailLogger extends AbstractLogger implements MailLoggerInterface
 {
+    protected LoggerInterface $logger;
+
+    public function __construct(
+        StreamHandler $handler,
+        LineFormatter $formatter,
+    ) {
+        $handler->setFormatter($formatter);
+
+        $this->logger = new Logger('mail');
+        $this->logger->pushHandler($handler);
+    }
+
+    /**
+     * @param mixed              $level
+     * @param string|\Stringable $message
+     * @param mixed[]            $context
+     */
+    public function log($level, string|\Stringable $message, array $context = []): void
+    {
+        $this->logger->log($level, $message, $context);
+    }
 }

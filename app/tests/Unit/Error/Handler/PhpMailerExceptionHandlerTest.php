@@ -27,7 +27,7 @@ use UserFrosting\Sprinkle\Core\Error\Handler\PhpMailerExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PlainTextRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
-use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
+use UserFrosting\Sprinkle\Core\Log\ErrorLoggerInterface;
 
 /**
  * PhpMailerExceptionHandler Test
@@ -87,8 +87,8 @@ class PhpMailerExceptionHandlerTest extends TestCase
             ->shouldReceive('translate')->with('ERROR.MAIL')->times(2)->andReturn('Error mail') // <-- Here important part
             ->getMock();
 
-        /** @var ErrorLogger $logger */
-        $logger = Mockery::mock(ErrorLogger::class)
+        /** @var ErrorLoggerInterface $logger */
+        $logger = Mockery::mock(ErrorLoggerInterface::class)
             ->shouldReceive('error')->with('Some text body')->once()
             ->getMock();
 

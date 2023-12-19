@@ -15,14 +15,18 @@ namespace UserFrosting\Sprinkle\Core\Tests\Unit\ServicesProvider;
 use DI\Container;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Monolog\Logger;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Log\DebugLogger;
+use UserFrosting\Sprinkle\Core\Log\DebugLoggerInterface;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
+use UserFrosting\Sprinkle\Core\Log\ErrorLoggerInterface;
 use UserFrosting\Sprinkle\Core\Log\MailLogger;
+use UserFrosting\Sprinkle\Core\Log\MailLoggerInterface;
 use UserFrosting\Sprinkle\Core\Log\QueryLogger;
+use UserFrosting\Sprinkle\Core\Log\QueryLoggerInterface;
 use UserFrosting\Sprinkle\Core\ServicesProvider\LoggersService;
 use UserFrosting\Testing\ContainerStub;
 
@@ -51,31 +55,30 @@ class LoggersServiceTest extends TestCase
         $this->ci->set(Config::class, $locator);
     }
 
-    public function testDebugLogger(): void
+    /**
+     * @param class-string $interface
+     * @param class-string $class
+     *
+     * @dataProvider loggerProvider
+     */
+    public function testLogger(string $interface, string $class): void
     {
-        $this->assertInstanceOf(Logger::class, $this->ci->get(DebugLogger::class));
-        $this->assertInstanceOf(LoggerInterface::class, $this->ci->get(DebugLogger::class));
-        $this->assertInstanceOf(DebugLogger::class, $this->ci->get(DebugLogger::class));
+        $object = $this->ci->get($interface);
+        $this->assertInstanceOf($class, $object);
+        $this->assertInstanceOf(LoggerInterface::class, $object);
+        $this->assertInstanceOf($interface, $object);
     }
 
-    public function testErrorLogger(): void
+    /**
+     * @return array<array<class-string, class-string>>
+     */
+    public static function loggerProvider(): array
     {
-        $this->assertInstanceOf(Logger::class, $this->ci->get(ErrorLogger::class));
-        $this->assertInstanceOf(LoggerInterface::class, $this->ci->get(ErrorLogger::class));
-        $this->assertInstanceOf(ErrorLogger::class, $this->ci->get(ErrorLogger::class));
-    }
-
-    public function testMailLogger(): void
-    {
-        $this->assertInstanceOf(Logger::class, $this->ci->get(MailLogger::class));
-        $this->assertInstanceOf(LoggerInterface::class, $this->ci->get(MailLogger::class));
-        $this->assertInstanceOf(MailLogger::class, $this->ci->get(MailLogger::class));
-    }
-
-    public function testQueryLogger(): void
-    {
-        $this->assertInstanceOf(Logger::class, $this->ci->get(QueryLogger::class));
-        $this->assertInstanceOf(LoggerInterface::class, $this->ci->get(QueryLogger::class));
-        $this->assertInstanceOf(QueryLogger::class, $this->ci->get(QueryLogger::class));
+        return [
+            [DebugLoggerInterface::class, DebugLogger::class],
+            [ErrorLoggerInterface::class, ErrorLogger::class],
+            [MailLoggerInterface::class, MailLogger::class],
+            [QueryLoggerInterface::class, QueryLogger::class],
+        ];
     }
 }

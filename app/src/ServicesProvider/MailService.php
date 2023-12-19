@@ -14,7 +14,7 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
-use UserFrosting\Sprinkle\Core\Log\MailLogger;
+use UserFrosting\Sprinkle\Core\Log\MailLoggerInterface;
 use UserFrosting\Sprinkle\Core\Mail\Mailer;
 
 /*
@@ -25,7 +25,7 @@ class MailService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            Mailer::class => function (Config $config, MailLogger $logger) {
+            Mailer::class => function (Config $config, MailLoggerInterface $logger) {
                 $mailer = new Mailer($logger, $config->get('mail'));
 
                 return $mailer;

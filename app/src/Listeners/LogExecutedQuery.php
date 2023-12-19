@@ -13,14 +13,14 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Listeners;
 
 use Illuminate\Database\Events\QueryExecuted;
-use UserFrosting\Sprinkle\Core\Log\QueryLogger;
+use UserFrosting\Sprinkle\Core\Log\QueryLoggerInterface;
 
 /**
  * Event listener for the QueryExecuted event.
  */
 class LogExecutedQuery
 {
-    public function __construct(protected QueryLogger $logger)
+    public function __construct(protected QueryLoggerInterface $logger)
     {
     }
 

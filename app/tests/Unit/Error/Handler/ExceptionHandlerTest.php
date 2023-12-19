@@ -30,7 +30,7 @@ use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PlainTextRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
 use UserFrosting\Sprinkle\Core\Exceptions\Contracts\UserMessageException;
-use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
+use UserFrosting\Sprinkle\Core\Log\ErrorLoggerInterface;
 use UserFrosting\Sprinkle\Core\Tests\Unit\Error\TestException;
 use UserFrosting\Support\Exception\BadInstanceOfException;
 use UserFrosting\Support\Message\UserMessage;
@@ -102,8 +102,8 @@ class ExceptionHandlerTest extends TestCase
             ->shouldReceive('translate')->with('ERROR.500.DESCRIPTION')->times(2)->andReturn('Error description')
             ->getMock();
 
-        /** @var ErrorLogger $logger */
-        $logger = Mockery::mock(ErrorLogger::class)
+        /** @var ErrorLoggerInterface $logger */
+        $logger = Mockery::mock(ErrorLoggerInterface::class)
             ->shouldReceive('error')->with('Some text body')->once()
             ->getMock();
 
@@ -169,8 +169,8 @@ class ExceptionHandlerTest extends TestCase
             ->shouldReceive('translate')->with('User %param', ['param' => 'Description'])->times(1)->andReturn('User Description')
             ->getMock();
 
-        /** @var ErrorLogger $logger */
-        $logger = Mockery::mock(ErrorLogger::class);
+        /** @var ErrorLoggerInterface $logger */
+        $logger = Mockery::mock(ErrorLoggerInterface::class);
 
         /** @var ServerRequestInterface $request */
         $request = Mockery::mock(ServerRequestInterface::class)
@@ -234,8 +234,8 @@ class ExceptionHandlerTest extends TestCase
             ->shouldReceive('translate')->with('User Description')->times(1)->andReturn('Error description')
             ->getMock();
 
-        /** @var ErrorLogger $logger */
-        $logger = Mockery::mock(ErrorLogger::class);
+        /** @var ErrorLoggerInterface $logger */
+        $logger = Mockery::mock(ErrorLoggerInterface::class);
 
         /** @var ServerRequestInterface $request */
         $request = Mockery::mock(ServerRequestInterface::class)
@@ -306,8 +306,8 @@ class ExceptionHandlerTest extends TestCase
             ->shouldReceive('translate')->with('ERROR.DESCRIPTION')->once()->andReturn('Error description') // Different key
             ->getMock();
 
-        /** @var ErrorLogger $logger */
-        $logger = Mockery::mock(ErrorLogger::class);
+        /** @var ErrorLoggerInterface $logger */
+        $logger = Mockery::mock(ErrorLoggerInterface::class);
 
         /** @var ServerRequestInterface $request */
         $request = Mockery::mock(ServerRequestInterface::class)
@@ -347,8 +347,8 @@ class ExceptionHandlerTest extends TestCase
         /** @var Translator $translator */
         $translator = Mockery::mock(Translator::class);
 
-        /** @var ErrorLogger $logger */
-        $logger = Mockery::mock(ErrorLogger::class);
+        /** @var ErrorLoggerInterface $logger */
+        $logger = Mockery::mock(ErrorLoggerInterface::class);
 
         /** @var ServerRequestInterface $request */
         $request = Mockery::mock(ServerRequestInterface::class)
@@ -384,8 +384,8 @@ class ExceptionHandlerTest extends TestCase
         /** @var Translator $translator */
         $translator = Mockery::mock(Translator::class);
 
-        /** @var ErrorLogger $logger */
-        $logger = Mockery::mock(ErrorLogger::class);
+        /** @var ErrorLoggerInterface $logger */
+        $logger = Mockery::mock(ErrorLoggerInterface::class);
 
         /** @var ServerRequestInterface $request */
         $request = Mockery::mock(ServerRequestInterface::class)
@@ -417,8 +417,8 @@ class ExceptionHandlerTest extends TestCase
         /** @var Translator $translator */
         $translator = Mockery::mock(Translator::class);
 
-        /** @var ErrorLogger $logger */
-        $logger = Mockery::mock(ErrorLogger::class);
+        /** @var ErrorLoggerInterface $logger */
+        $logger = Mockery::mock(ErrorLoggerInterface::class);
 
         // Get handler
         $handler = new ExceptionHandler($ci, $responseFactory, $config, $translator, $logger);

@@ -26,7 +26,7 @@ use UserFrosting\Sprinkle\Core\Error\Renderer\PlainTextRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
 use UserFrosting\Sprinkle\Core\Error\Renderer\XmlRenderer;
 use UserFrosting\Sprinkle\Core\Exceptions\Contracts\UserMessageException;
-use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
+use UserFrosting\Sprinkle\Core\Log\ErrorLoggerInterface;
 use UserFrosting\Sprinkle\Core\Util\DeterminesContentTypeTrait;
 use UserFrosting\Sprinkle\Core\Util\Message\Message;
 use UserFrosting\Support\Exception\BadInstanceOfException;
@@ -66,7 +66,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
         protected ResponseFactory $responseFactory,
         protected Config $config,
         protected Translator $translator,
-        protected ErrorLogger $logger,
+        protected ErrorLoggerInterface $logger,
     ) {
     }
 

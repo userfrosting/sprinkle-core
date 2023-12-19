@@ -14,92 +14,32 @@ namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Log\DebugLogger;
+use UserFrosting\Sprinkle\Core\Log\DebugLoggerInterface;
 use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
+use UserFrosting\Sprinkle\Core\Log\ErrorLoggerInterface;
 use UserFrosting\Sprinkle\Core\Log\MailLogger;
+use UserFrosting\Sprinkle\Core\Log\MailLoggerInterface;
 use UserFrosting\Sprinkle\Core\Log\QueryLogger;
+use UserFrosting\Sprinkle\Core\Log\QueryLoggerInterface;
 
 class LoggersService implements ServicesProviderInterface
 {
     public function register(): array
     {
         return [
-            /**
-             * Debug logging with Monolog.
-             *
-             * Extend this service to push additional handlers onto the 'debug' log stack.
-             *
-             * @return \Monolog\Logger
-             */
-            DebugLogger::class    => function (StreamHandler $handler, LineFormatter $formatter) {
-                $formatter->setJsonPrettyPrint(true);
-                $handler->setFormatter($formatter);
-
-                $logger = new DebugLogger('debug');
-                $logger->pushHandler($handler);
-
-                return $logger;
-            },
-
-            /**
-             * Error logging with Monolog.
-             *
-             * Extend this service to push additional handlers onto the 'error' log stack.
-             *
-             * @return \Monolog\Logger
-             */
-            ErrorLogger::class    => function (StreamHandler $handler, LineFormatter $formatter) {
-                $handler->setFormatter($formatter);
-                $handler->setLevel(Logger::WARNING);
-
-                $logger = new ErrorLogger('errors');
-                $logger->pushHandler($handler);
-
-                return $logger;
-            },
-
-            /**
-             * Mail logging service.
-             *
-             * PHPMailer will use this to log SMTP activity.
-             * Extend this service to push additional handlers onto the 'mail' log stack.
-             *
-             * @return \Monolog\Logger
-             */
-            MailLogger::class     => function (StreamHandler $handler, LineFormatter $formatter) {
-                $handler->setFormatter($formatter);
-
-                $logger = new MailLogger('mail');
-                $logger->pushHandler($handler);
-
-                return $logger;
-            },
-
-            /**
-             * Laravel query logging with Monolog.
-             *
-             * Extend this service to push additional handlers onto the 'query' log stack.
-             *
-             * @return \Monolog\Logger
-             */
-            QueryLogger::class    => function (StreamHandler $handler, LineFormatter $formatter) {
-                $formatter->setJsonPrettyPrint(true);
-                $handler->setFormatter($formatter);
-
-                $logger = new QueryLogger('query');
-                $logger->pushHandler($handler);
-
-                return $logger;
-            },
+            DebugLoggerInterface::class => \DI\autowire(DebugLogger::class),
+            ErrorLoggerInterface::class => \DI\autowire(ErrorLogger::class),
+            MailLoggerInterface::class  => \DI\autowire(MailLogger::class),
+            QueryLoggerInterface::class => \DI\autowire(QueryLogger::class),
 
             // Define formatter with `allowInlineLineBreaks` by default
-            LineFormatter::class  => \DI\create()->constructor(null, null, true),
+            LineFormatter::class => \DI\create()->constructor(null, null, true),
 
-            // Define common StreamHandler with .
-            StreamHandler::class  => function (Config $config) {
+            // Define common StreamHandler with our log path from config
+            StreamHandler::class => function (Config $config) {
                 return new StreamHandler($config->getString('logs.path'));
             },
         ];

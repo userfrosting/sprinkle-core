@@ -14,10 +14,10 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Mail;
 
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Monolog\Logger;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPUnit\Framework\TestCase;
+use UserFrosting\Sprinkle\Core\Log\MailLoggerInterface;
 use UserFrosting\Sprinkle\Core\Mail\EmailRecipient;
 use UserFrosting\Sprinkle\Core\Mail\Mailer;
 use UserFrosting\Sprinkle\Core\Mail\StaticMailMessage;
@@ -31,7 +31,7 @@ class MailerTest extends TestCase
 
     public function testNoConfig(): void
     {
-        $logger = Mockery::mock(Logger::class);
+        $logger = Mockery::mock(MailLoggerInterface::class);
         $phpMailer = Mockery::mock(PHPMailer::class);
         $config = [];
 
@@ -41,7 +41,7 @@ class MailerTest extends TestCase
 
     public function testBadConfig(): void
     {
-        $logger = Mockery::mock(Logger::class);
+        $logger = Mockery::mock(MailLoggerInterface::class);
         $phpMailer = Mockery::mock(PHPMailer::class);
         $config = ['mailer' => 'foo'];
 
@@ -51,8 +51,8 @@ class MailerTest extends TestCase
 
     public function testSmtp(): void
     {
-        /** @var Logger */
-        $logger = Mockery::mock(Logger::class)
+        /** @var MailLoggerInterface */
+        $logger = Mockery::mock(MailLoggerInterface::class)
             ->shouldNotReceive('debug')
             ->getMock();
 
@@ -111,8 +111,8 @@ class MailerTest extends TestCase
 
     public function testMailAndDistinct(): void
     {
-        /** @var Logger */
-        $logger = Mockery::mock(Logger::class)
+        /** @var MailLoggerInterface */
+        $logger = Mockery::mock(MailLoggerInterface::class)
             ->shouldNotReceive('debug')
             ->getMock();
 
@@ -142,8 +142,8 @@ class MailerTest extends TestCase
 
     public function testQMail(): void
     {
-        /** @var Logger */
-        $logger = Mockery::mock(Logger::class)
+        /** @var MailLoggerInterface */
+        $logger = Mockery::mock(MailLoggerInterface::class)
             ->shouldNotReceive('debug')
             ->getMock();
 
@@ -171,8 +171,8 @@ class MailerTest extends TestCase
 
     public function testSendmail(): void
     {
-        /** @var Logger */
-        $logger = Mockery::mock(Logger::class)
+        /** @var MailLoggerInterface */
+        $logger = Mockery::mock(MailLoggerInterface::class)
             ->shouldNotReceive('debug')
             ->getMock();
 
@@ -194,8 +194,8 @@ class MailerTest extends TestCase
 
     public function testWithDebug(): void
     {
-        /** @var Logger */
-        $logger = Mockery::mock(Logger::class)
+        /** @var MailLoggerInterface */
+        $logger = Mockery::mock(MailLoggerInterface::class)
             ->shouldReceive('debug')->once()
             ->getMock();
 

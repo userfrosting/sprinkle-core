@@ -19,7 +19,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Listeners\LogExecutedQuery;
-use UserFrosting\Sprinkle\Core\Log\QueryLogger;
+use UserFrosting\Sprinkle\Core\Log\QueryLoggerInterface;
 use UserFrosting\Sprinkle\Core\ServicesProvider\DatabaseService;
 use UserFrosting\Testing\ContainerStub;
 
@@ -61,7 +61,7 @@ class DatabaseServiceTest extends TestCase
         $this->ci->set(Config::class, $config);
 
         // Set mock QueryLogger
-        $this->ci->set(QueryLogger::class, Mockery::mock(QueryLogger::class));
+        $this->ci->set(QueryLoggerInterface::class, Mockery::mock(QueryLoggerInterface::class));
 
         // Get service
         $this->assertInstanceOf(Capsule::class, $this->ci->get(Capsule::class));

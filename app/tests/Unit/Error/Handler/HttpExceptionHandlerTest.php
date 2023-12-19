@@ -28,7 +28,7 @@ use UserFrosting\Sprinkle\Core\Error\Handler\ExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Handler\HttpExceptionHandler;
 use UserFrosting\Sprinkle\Core\Error\Renderer\ErrorRendererInterface;
 use UserFrosting\Sprinkle\Core\Error\Renderer\PrettyPageRenderer;
-use UserFrosting\Sprinkle\Core\Log\ErrorLogger;
+use UserFrosting\Sprinkle\Core\Log\ErrorLoggerInterface;
 use UserFrosting\Sprinkle\Core\Tests\Unit\Error\TestException;
 
 /**
@@ -91,8 +91,8 @@ class HttpExceptionHandlerTest extends TestCase
             ->shouldReceive('translate')->with('ERROR.500.DESCRIPTION')->times(1)->andReturn('Error description')
             ->getMock();
 
-        /** @var ErrorLogger $logger */
-        $logger = Mockery::mock(ErrorLogger::class);
+        /** @var ErrorLoggerInterface $logger */
+        $logger = Mockery::mock(ErrorLoggerInterface::class);
 
         /** @var ServerRequestInterface $request */
         $request = Mockery::mock(ServerRequestInterface::class)
@@ -163,8 +163,8 @@ class HttpExceptionHandlerTest extends TestCase
             ->shouldReceive('translate')->with('ERROR.404.DESCRIPTION')->times(1)->andReturn('Error description')
             ->getMock();
 
-        /** @var ErrorLogger $logger */
-        $logger = Mockery::mock(ErrorLogger::class);
+        /** @var ErrorLoggerInterface $logger */
+        $logger = Mockery::mock(ErrorLoggerInterface::class);
 
         /** @var ServerRequestInterface $request */
         $request = Mockery::mock(ServerRequestInterface::class)
