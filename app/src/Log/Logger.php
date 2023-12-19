@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * General Monolog wrapper for easier dependency injection.
+ *
  * @see https://github.com/Seldaek/monolog/pull/1861
  *
  * This class should be used as a base to create specific loggers.
