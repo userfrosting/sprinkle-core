@@ -71,14 +71,14 @@ class Throttler
 
         // Fetch all throttle events of the specified type, that match the specified rule
         if ($throttleRule->getMethod() === 'ip') {
-            /** @var Collection<ThrottleModelInterface> */
+            /** @var Collection<int, ThrottleModelInterface> */
             $events = $this->throttleModel
                 ->where('type', $type)
                 ->where('created_at', '>', $startTime)
                 ->where('ip', $_SERVER['REMOTE_ADDR'])
                 ->get();
         } else {
-            /** @var Collection<ThrottleModelInterface> */
+            /** @var Collection<int, ThrottleModelInterface> */
             $events = $this->throttleModel
                 ->where('type', $type)
                 ->where('created_at', '>', $startTime)
@@ -164,8 +164,8 @@ class Throttler
     /**
      * Returns the current delay for a specified throttle rule.
      *
-     * @param Collection<ThrottleModelInterface> $events       a Collection of throttle events.
-     * @param ThrottleRule                       $throttleRule a rule representing the strategy to use for throttling a particular type of event.
+     * @param Collection<int, ThrottleModelInterface> $events       a Collection of throttle events.
+     * @param ThrottleRule                            $throttleRule a rule representing the strategy to use for throttling a particular type of event.
      *
      * @return int seconds remaining until a particular event is permitted to be attempted again.
      */
