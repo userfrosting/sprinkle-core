@@ -14,17 +14,12 @@ namespace UserFrosting\Sprinkle\Core\Log;
 
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use Psr\Log\AbstractLogger;
-use Psr\Log\LoggerInterface;
 
 /**
- * Monolog alias for dependency injection.
+ * Query Monolog wrapper.
  */
-final class QueryLogger extends AbstractLogger implements QueryLoggerInterface
+final class QueryLogger extends Logger implements QueryLoggerInterface
 {
-    protected LoggerInterface $logger;
-
     public function __construct(
         StreamHandler $handler,
         LineFormatter $formatter,
@@ -32,17 +27,6 @@ final class QueryLogger extends AbstractLogger implements QueryLoggerInterface
         $formatter->setJsonPrettyPrint(true);
         $handler->setFormatter($formatter);
 
-        $this->logger = new Logger('query');
-        $this->logger->pushHandler($handler);
-    }
-
-    /**
-     * @param mixed              $level
-     * @param string|\Stringable $message
-     * @param mixed[]            $context
-     */
-    public function log($level, string|\Stringable $message, array $context = []): void
-    {
-        $this->logger->log($level, $message, $context);
+        parent::__construct($handler, 'query');
     }
 }
