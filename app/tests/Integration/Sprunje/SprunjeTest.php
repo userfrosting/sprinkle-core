@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Tests\Integration\Sprunje;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Schema\Blueprint;
@@ -53,6 +54,8 @@ class SprunjeTest extends CoreTestCase
         $builder = $this->ci->get(Builder::class);
         $migration = new TestTableMigration($builder);
         $migration->up();
+        $migration = new TestRelationTableMigration($builder);
+        $migration->up();
 
         // Insert some data
         $this->createData();
@@ -64,6 +67,8 @@ class SprunjeTest extends CoreTestCase
         /** @var Builder */
         $builder = $this->ci->get(Builder::class);
         $migration = new TestTableMigration($builder);
+        $migration->down();
+        $migration = new TestRelationTableMigration($builder);
         $migration->down();
 
         parent::tearDown();
@@ -91,6 +96,12 @@ class SprunjeTest extends CoreTestCase
             'description' => 'Le Foo et le Bar',
             'type'        => 1,
             'active'      => true
+        ]))->save();
+
+        (new TestSprunjeRelationModel([
+            'id'              => 1,
+            'name'            => 'Relation with 2',
+            'test_sprunje_id' => 2,
         ]))->save();
     }
 
@@ -451,6 +462,21 @@ class SprunjeTest extends CoreTestCase
         ], $response);
         $this->assertSame('application/json', $response->getHeaderLine('Content-Type'));
     }
+
+    /** Sprunje were the base query is a relation */
+    public function testRelationSprunje(): void
+    {
+        $sprunje = new RelationTestSprunje();
+
+        $this->assertEquals([
+            'count'          => 1,
+            'count_filtered' => 1,
+            'rows'           => [
+                ['id' => 2, 'name' => 'bar', 'description' => 'Le Bar', 'type' => 2, 'active' => false],
+            ],
+            'listable'       => [],
+        ], $sprunje->getArray());
+    }
 }
 
 class TestSprunje extends Sprunje
@@ -495,12 +521,12 @@ class TestSprunje extends Sprunje
         return $collection;
     }
 
-    protected function sortName(EloquentBuilder|QueryBuilder|Relation $query, string $direction): static
+    protected function sortName(EloquentBuilder|QueryBuilder $query, string $direction): static
     {
         return $this;
     }
 
-    protected function filterName(EloquentBuilder|QueryBuilder|Relation $query, string $value): static
+    protected function filterName(EloquentBuilder|QueryBuilder $query, string $value): static
     {
         return $this;
     }
@@ -535,6 +561,19 @@ class ArrayTestSprunje extends TestSprunje
     }
 }
 
+/** Sprunje were the base query is a relation. Will return the same as TestSprunje */
+class RelationTestSprunje extends Sprunje
+{
+    protected function baseQuery()
+    {
+        /** @var TestSprunjeRelationModel */
+        $query = TestSprunjeRelationModel::findOrFail(1);
+        $query = $query->testSprunje();
+
+        return $query;
+    }
+}
+
 class TestSprunjeModel extends UfModel
 {
     protected $table = 'test_sprunje';
@@ -557,6 +596,25 @@ class TestSprunjeModel extends UfModel
     ];
 }
 
+class TestSprunjeRelationModel extends UfModel
+{
+    protected $table = 'test_sprunje_relation';
+
+    protected $fillable = [
+        'id',
+        'test_sprunje_id',
+        'name',
+    ];
+
+    /** @var bool */
+    public $timestamps = false;
+
+    public function testSprunje(): BelongsTo
+    {
+        return $this->belongsTo(TestSprunjeModel::class);
+    }
+}
+
 /**
  * Custom migration for testing.
  */
@@ -576,5 +634,22 @@ class TestTableMigration extends Migration
     public function down(): void
     {
         $this->schema->drop('test_sprunje');
+    }
+}
+
+class TestRelationTableMigration extends Migration
+{
+    public function up(): void
+    {
+        $this->schema->create('test_sprunje_relation', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->integer('test_sprunje_id')->unsigned();
+        });
+    }
+
+    public function down(): void
+    {
+        $this->schema->drop('test_sprunje_relation');
     }
 }

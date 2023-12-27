@@ -128,8 +128,11 @@ abstract class Sprunje
         $this->setOptions($options);
 
         // Start a new query on any Model instances
-        if (is_a($query = $this->baseQuery(), Model::class)) {
+        $query = $this->baseQuery();
+        if (is_a($query, Model::class)) {
             $this->query = $query->newQuery();
+        } elseif (is_a($query, Relation::class)) {
+            $this->query = $query->getQuery();
         } else {
             $this->query = $query;
         }
@@ -633,7 +636,7 @@ abstract class Sprunje
     /**
      * Set the initial query used by your Sprunje.
      *
-     * @return EloquentBuilder|QueryBuilder|Model
+     * @return EloquentBuilder|QueryBuilder|Model|Relation
      */
     abstract protected function baseQuery();
 
