@@ -22,9 +22,7 @@ use UserFrosting\Sprinkle\Core\Database\Relations\Concerns\Unique;
 /**
  * A BelongsToMany relationship that queries through an additional intermediate model.
  *
- * @author Alex Weissman (https://alexanderweissman.com)
- *
- * @see https://github.com/laravel/framework/blob/5.8/src/Illuminate/Database/Eloquent/Relations/BelongsToMany.php
+ * @see https://github.com/illuminate/database/blob/10.x/Eloquent/Relations/BelongsToMany.php
  */
 class BelongsToManyThrough extends BelongsToMany
 {
@@ -33,25 +31,34 @@ class BelongsToManyThrough extends BelongsToMany
     /**
      * The relation through which we are joining.
      *
-     * @var Relation
+     * @var BelongsToMany
      */
-    protected $intermediateRelation;
+    protected BelongsToMany $intermediateRelation;
 
     /**
      * Create a new belongs to many relationship instance.
      *
-     * @param \Illuminate\Database\Eloquent\Builder            $query
-     * @param \Illuminate\Database\Eloquent\Model              $parent
-     * @param \Illuminate\Database\Eloquent\Relations\Relation $intermediateRelation
-     * @param string                                           $table
-     * @param string                                           $foreignPivotKey
-     * @param string                                           $relatedPivotKey
-     * @param string                                           $parentKey
-     * @param string                                           $relatedKey
-     * @param string                                           $relationName
+     * @param Builder                                                  $query
+     * @param Model                                                    $parent
+     * @param BelongsToMany                                            $intermediateRelation
+     * @param string|class-string<\Illuminate\Database\Eloquent\Model> $table
+     * @param string                                                   $foreignPivotKey
+     * @param string                                                   $relatedPivotKey
+     * @param string                                                   $parentKey
+     * @param string                                                   $relatedKey
+     * @param string|null                                              $relationName
      */
-    public function __construct(Builder $query, Model $parent, Relation $intermediateRelation, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null)
-    {
+    public function __construct(
+        Builder $query,
+        Model $parent,
+        BelongsToMany $intermediateRelation,
+        string $table,
+        string $foreignPivotKey,
+        string $relatedPivotKey,
+        string $parentKey,
+        string $relatedKey,
+        ?string $relationName = null
+    ) {
         $this->intermediateRelation = $intermediateRelation;
 
         parent::__construct($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
@@ -65,7 +72,7 @@ class BelongsToManyThrough extends BelongsToMany
      *
      * @return string
      */
-    public function getParentKeyName()
+    public function getParentKeyName(): string
     {
         return $this->intermediateRelation->newExistingPivot()->getForeignKey();
     }
@@ -77,7 +84,7 @@ class BelongsToManyThrough extends BelongsToMany
      *
      * @return string
      */
-    public function getExistenceCompareKey()
+    public function getExistenceCompareKey(): string
     {
         return $this->intermediateRelation->getQualifiedForeignPivotKeyName();
     }
@@ -85,12 +92,12 @@ class BelongsToManyThrough extends BelongsToMany
     /**
      * Add a "via" query to load the intermediate models through which the child models are related.
      *
-     * @param string   $viaRelationName
-     * @param callable $viaCallback
+     * @param string|null $viaRelationName
+     * @param callable    $viaCallback
      *
      * @return self
      */
-    public function withVia($viaRelationName = null, $viaCallback = null)
+    public function withVia(?string $viaRelationName = null, callable $viaCallback = null): self
     {
         $this->tertiaryRelated = $this->intermediateRelation->getRelated();
 
@@ -111,22 +118,24 @@ class BelongsToManyThrough extends BelongsToMany
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param array $models
+     * @param Model[] $models
      */
+    // @phpstan-ignore-next-line - Issue is on Laravel's side
     public function addEagerConstraints(array $models)
     {
         // Constraint to only load models where the intermediate relation's foreign key matches the parent model
         $intermediateForeignKeyName = $this->intermediateRelation->getQualifiedForeignPivotKeyName();
 
-        return $this->query->whereIn($intermediateForeignKeyName, $this->getKeys($models));
+        // @phpstan-ignore-next-line - Laravel limitation
+        $this->query->whereIn($intermediateForeignKeyName, $this->getKeys($models));
     }
 
     /**
      * Set the where clause for the relation query.
      *
-     * @return self
+     * @return $this
      */
-    protected function addWhereConstraints()
+    protected function addWhereConstraints(): self
     {
         $parentKeyName = $this->getParentKeyName();
 
@@ -142,13 +151,14 @@ class BelongsToManyThrough extends BelongsToMany
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param array                                    $models
-     * @param \Illuminate\Database\Eloquent\Collection $results
-     * @param string                                   $relation
+     * @param Model[]                $models
+     * @param Collection<int, Model> $results
+     * @param string                 $relation
      *
-     * @return array
+     * @return Model[]
      */
-    public function match(array $models, Collection $results, $relation)
+    // @phpstan-ignore-next-line - Issue is on Laravel's side
+    public function match(array $models, Collection $results, $relation): array
     {
         // Build dictionary of parent (e.g. user) to related (e.g. permission) models
         list($dictionary, $nestedViaDictionary) = $this->buildDictionary($results, $this->getParentKeyName());
@@ -158,7 +168,7 @@ class BelongsToManyThrough extends BelongsToMany
         // the parent models. Then we will return the hydrated models back out.
         foreach ($models as $model) {
             if (isset($dictionary[$key = $model->getKey()])) {
-                /** @var array */
+                /** @var Model[] */
                 $items = $dictionary[$key];
 
                 // Eliminate any duplicates
@@ -171,6 +181,7 @@ class BelongsToManyThrough extends BelongsToMany
 
                 // Remove the tertiary pivot key from the condensed models
                 foreach ($items as $relatedModel) {
+                    // @phpstan-ignore-next-line
                     unset($relatedModel->pivot->{$this->foreignPivotKey});
                 }
 
@@ -187,11 +198,12 @@ class BelongsToManyThrough extends BelongsToMany
     /**
      * Unset tertiary pivots on a collection or array of models.
      *
-     * @param \Illuminate\Database\Eloquent\Collection $models
+     * @param Collection<int, Model> $models
      */
-    protected function unsetTertiaryPivots(Collection $models)
+    protected function unsetTertiaryPivots(Collection $models): void
     {
         foreach ($models as $model) {
+            // @phpstan-ignore-next-line
             unset($model->pivot->{$this->foreignPivotKey});
         }
     }
@@ -199,13 +211,13 @@ class BelongsToManyThrough extends BelongsToMany
     /**
      * Set the join clause for the relation query.
      *
-     * @param \Illuminate\Database\Eloquent\Builder|null $query
+     * @param Builder|null $query
      *
-     * @return self
+     * @return $this
      */
-    protected function performJoin($query = null)
+    protected function performJoin($query = null): self
     {
-        $query = $query ?: $this->query;
+        $query = $query ?? $this->query;
 
         parent::performJoin($query);
 
@@ -216,6 +228,7 @@ class BelongsToManyThrough extends BelongsToMany
 
         $key = $this->intermediateRelation->getQualifiedRelatedPivotKeyName();
 
+        // @phpstan-ignore-next-line - Laravel magic functions
         $query->join($intermediateTable, $key, '=', $this->getQualifiedForeignPivotKeyName());
 
         return $this;
@@ -226,9 +239,9 @@ class BelongsToManyThrough extends BelongsToMany
      *
      * "pivot_" is prefixed to each column for easy removal later.
      *
-     * @return array
+     * @return string[]
      */
-    protected function aliasedPivotColumns()
+    protected function aliasedPivotColumns(): array
     {
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey];
         $aliasedPivotColumns = collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {

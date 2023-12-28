@@ -22,7 +22,7 @@ use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 /**
  * Test custom relations in `/src/Database/Relations`.
  */
-class DatabaseTests extends TestCase
+class DatabaseTest extends TestCase
 {
     /**
      * @var Builder
@@ -792,6 +792,38 @@ class DatabaseTests extends TestCase
 
         $this->assertBelongsToManyThroughForDavid($usersWithPermissions[0]['permissions']);
         $this->assertBelongsToManyThroughForAlex($usersWithPermissions[1]['permissions']);
+    }
+
+    /**
+     * Test withVia and custom callback
+     * @depends testTableCreation
+     * @depends testBelongsToManyThrough
+     * @depends testBelongsToManyThroughWithVia
+     */
+    public function testBelongsToManyThroughWithViaCallback(): void
+    {
+        $this->generateRolesWithPermissions();
+
+        $user = EloquentTestUser::create(['name' => 'David']);
+
+        $user->roles()->attach([1, 2]);
+
+        // Test retrieval of via models as well
+        $permissions = $user->permissions()->withVia('roles_via', function (&$roleQuery) {
+            $roleQuery->with('permissions');
+        })->get()->toArray();
+        $this->assertEquals('uri_harvest', $permissions[0]['roles_via'][0]['permissions'][0]['slug']);
+
+        $user2 = EloquentTestUser::create(['name' => 'Alex']);
+        $user2->roles()->attach([2, 3]);
+
+        // Test eager loading
+        $users = EloquentTestUser::with(['permissions' => function ($query) {
+            return $query->withVia('roles_via', function (&$roleQuery) {
+                $roleQuery->with('permissions');
+            });
+        }])->get()->toArray();
+        $this->assertEquals('uri_harvest', $users[0]['permissions'][0]['roles_via'][0]['permissions'][0]['slug']);
     }
 
     /**
