@@ -16,12 +16,17 @@ app/.env
 composer.lock
 package-lock.json
 
-# Ignore log, cache, sessions and storage directories in sprinkle
-app/cache/
-app/database/
-app/logs/
-app/sessions/
-app/storage/
+# Ignore log, cache, sessions and storage directories content
+app/cache/*
+!app/cache/.gitkeep
+app/database/*
+!app/database/.gitkeep
+app/logs/*
+!app/logs/.gitkeep
+app/sessions/*
+!app/sessions/.gitkeep
+app/storage/*
+!app/storage/.gitkeep
 
 # Ignore Composer vendor
 vendor/

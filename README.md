@@ -21,9 +21,11 @@ UserFrosting is a secure, modern user management system written in PHP and built
 
 This **Core Sprinkle** provides most of the "heavy lifting" PHP code. It provides all the necessary services for database, templating, error handling, mail support, request throttling, and more.
 
-## Installation
+## Installation in your UserFrosting project
+To use this sprinkle in your UserFrosting project, follow theses instructions (*N.B.: This sprinkle is enabled by default when using the base app template*).
+
 1. Require in your [UserFrosting](https://github.com/userfrosting/UserFrosting) project : 
-    ``` 
+    ```
     composer require userfrosting/sprinkle-core
     ```
 
@@ -41,6 +43,38 @@ This **Core Sprinkle** provides most of the "heavy lifting" PHP code. It provide
     ```bash
     php bakery bake
     ```
+
+## Install locally and run tests
+You can also install this sprinkle locally. This can be useful to debug or contribute to this sprinkle. 
+
+1. Clone repo :
+    ```
+    git clone https://github.com/userfrosting/sprinkle-core.git
+    ```
+2. Change directory
+    ```
+    cd sprinkle-core
+    ```
+3. Install dependencies :
+    ```
+    composer install
+    ```
+4. Run bake command :
+    ```
+    php bakery bake
+    ```
+
+From this point, you can use the same command as with any other sprinkle. 
+
+Tests can be run using the bundled PHPUnit :
+```
+vendor/bin/phpunit
+```
+
+Same for PHPStan, for code quality :
+```
+vendor/bin/phpstan analyse app/src/
+```
 
 ## Documentation
 See main [UserFrosting Documentation](https://learn.userfrosting.com) for more information.
