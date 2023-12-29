@@ -17,8 +17,9 @@ use Illuminate\Database\Eloquent\Factories\Factory as LaravelFactory;
 
 /**
  * Adapt Laravel Factory abstract class for use with UserFrosting.
- * 
+ *
  * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
  * @extends LaravelFactory<TModel>
  */
 abstract class Factory extends LaravelFactory
