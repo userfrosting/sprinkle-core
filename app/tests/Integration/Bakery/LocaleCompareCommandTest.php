@@ -69,6 +69,18 @@ class LocaleCompareCommandTest extends TestCase
         $this->assertStringContainsString('Comparing `en_US` with `fr_FR`', $result->getDisplay());
     }
 
+    public function testCommandWithNotFoundLocale(): void
+    {
+        $result = BakeryTester::runCommand($this->command, [
+            '--left'  => 'foo_BAR', // Doesn't exist
+            '--right' => 'fr_FR',
+        ]);
+
+        // Assert result
+        $this->assertSame(1, $result->getStatusCode());
+        $this->assertStringContainsString('Locale `foo_BAR` is not available', $result->getDisplay());
+    }
+
     /**
      * @depends testCommandWithArguments
      */
@@ -91,7 +103,7 @@ class LocaleCompareCommandTest extends TestCase
     /**
      * @depends testCommandWithArguments
      */
-    public function testCommand(): void
+    public function testCommandWithInput(): void
     {
         $result = BakeryTester::runCommand(
             command: $this->command,

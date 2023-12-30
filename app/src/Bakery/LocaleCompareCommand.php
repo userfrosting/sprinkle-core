@@ -24,6 +24,7 @@ use UserFrosting\I18n\Compare;
 use UserFrosting\I18n\Dictionary;
 use UserFrosting\I18n\DictionaryInterface;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\LocaleOption;
+use UserFrosting\Sprinkle\Core\Exceptions\NotFoundException;
 use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
@@ -59,8 +60,14 @@ class LocaleCompareCommand extends Command
         $this->io->title('Locale Comparison');
 
         // Get locale to compare
-        $leftLocale = $this->getLocale((string) $input->getOption('left'));
-        $rightLocale = $this->getLocale((string) $input->getOption('right'));
+        try {
+            $leftLocale = $this->getLocale((string) $input->getOption('left'));
+            $rightLocale = $this->getLocale((string) $input->getOption('right'));
+        } catch (NotFoundException $e) {
+            $this->io->error($e->getMessage());
+
+            return self::FAILURE;
+        }
 
         $this->io->section("Comparing `{$leftLocale->getIdentifier()}` with `{$rightLocale->getIdentifier()}`");
 
