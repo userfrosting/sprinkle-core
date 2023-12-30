@@ -59,8 +59,8 @@ class MigrateCleanCommand extends Command
         $this->io->title('Migration clean');
 
         // Get options
-        $database = $input->getOption('database');
-        $force = $input->getOption('force');
+        $database = (string) $input->getOption('database');
+        $force = (bool) $input->getOption('force');
 
         // Set connection to the selected database
         if ($database != '') {
@@ -71,20 +71,20 @@ class MigrateCleanCommand extends Command
         // Get stale migrations
         $stale = $this->migrator->getStale();
 
-        if (empty($stale)) {
+        if (count($stale) === 0) {
             $this->io->note('No stale migrations found');
 
             return self::SUCCESS;
         }
 
         // Show migrations about to be ran
-        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
             $this->io->section('Stale migrations');
             $this->io->listing($stale);
         }
 
         // Confirm action if required (for example in production mode).
-        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command') && !$force) {
             if (!$this->io->confirm('Continue and remove stale migrations ?', false)) {
                 return self::SUCCESS;
             }

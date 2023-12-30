@@ -56,6 +56,9 @@ class DebugConfigCommand extends Command
         // Get connection
         $connection = $this->config->get('db.default');
 
+        // Get password for later
+        $password = $this->config->get('db.connections.' . $connection . '.password');
+
         // Display database info
         $this->io->title('Database config');
         $this->io->definitionList(
@@ -66,7 +69,7 @@ class DebugConfigCommand extends Command
             ['PORT'         => $this->config->get('db.connections.' . $connection . '.port')],
             ['DATABASE'     => $this->config->get('db.connections.' . $connection . '.database')],
             ['USERNAME'     => $this->config->get('db.connections.' . $connection . '.username')],
-            ['PASSWORD'     => ($this->config->get('db.connections.' . $connection . '.password') ? '*********' : '')]
+            ['PASSWORD'     => (is_string($password)) ? '*********' : '']
         );
 
         return self::SUCCESS;

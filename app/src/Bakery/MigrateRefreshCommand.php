@@ -63,8 +63,8 @@ class MigrateRefreshCommand extends Command
 
         // Get options
         $steps = (int) $input->getOption('steps');
-        $pretend = $input->getOption('pretend');
-        $force = $input->getOption('force');
+        $pretend = (bool) $input->getOption('pretend');
+        $force = (bool) $input->getOption('force');
 
         // Set connection to the selected database
         $database = $input->getOption('database');
@@ -108,20 +108,20 @@ class MigrateRefreshCommand extends Command
         }
 
         // Don't go further if no migration to rollback
-        if (empty($migrations)) {
+        if (count($migrations) === 0) {
             $this->io->warning('Nothing to refresh');
 
             return self::SUCCESS;
         }
 
         // Show migrations about to be rollback
-        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
             $this->io->section('Migrations to refresh');
             $this->io->listing($migrations);
         }
 
         // Confirm action if required (for example in production mode).
-        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command') && !$force) {
             if (!$this->io->confirm('Do you really wish to continue ?', false)) {
                 return self::SUCCESS;
             }
@@ -136,7 +136,7 @@ class MigrateRefreshCommand extends Command
             return self::FAILURE;
         }
 
-        if (empty($rollbacked)) {
+        if (count($rollbacked) === 0) {
             // N.B.: Should not happens, only if two operations get executed
             // while waiting for confirmation.
             $this->io->warning('Nothing rollbacked !');
@@ -174,7 +174,7 @@ class MigrateRefreshCommand extends Command
         }
 
         // Display info
-        if (empty($migrated)) {
+        if (count($migrated) === 0) {
             // N.B.: Should not happens, only if pending get empty while
             // waiting for confirmation
             $this->io->warning('Nothing migrated !');

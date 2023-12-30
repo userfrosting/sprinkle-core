@@ -51,8 +51,8 @@ class MigrateRollbackCommand extends Command
              ->addOption('pretend', 'p', InputOption::VALUE_NONE, 'Run actions in "dry run" mode.')
              ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force the operation to run without confirmation.')
              ->addOption('database', 'd', InputOption::VALUE_REQUIRED, 'The database connection to use.')
-             ->addOption('steps', 's', InputOption::VALUE_REQUIRED, 'Number of batch to rollback.', 1)
-             ->addOption('migration', 'm', InputOption::VALUE_REQUIRED, 'The specific migration to rollback.');
+             ->addOption('steps', 's', InputOption::VALUE_REQUIRED, 'Number of batch to rollback.', 1);
+        //  ->addOption('migration', 'm', InputOption::VALUE_REQUIRED, 'The specific migration to rollback.');
     }
 
     /**
@@ -64,9 +64,9 @@ class MigrateRollbackCommand extends Command
 
         // Get options
         $steps = (int) $input->getOption('steps');
-        $pretend = $input->getOption('pretend');
-        $migration = $input->getOption('migration');
-        $force = $input->getOption('force');
+        $pretend = (bool) $input->getOption('pretend');
+        // $migration = (string) $input->getOption('migration');
+        $force = (bool) $input->getOption('force');
 
         // Set connection to the selected database
         $database = $input->getOption('database');
@@ -111,20 +111,20 @@ class MigrateRollbackCommand extends Command
         }
 
         // Don't go further if no migration to rollback
-        if (empty($migrations)) {
+        if (count($migrations) === 0) {
             $this->io->success('Nothing to rollback');
 
             return self::SUCCESS;
         }
 
         // Show migrations about to be rollback
-        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
             $this->io->section('Migrations to rollback');
             $this->io->listing($migrations);
         }
 
         // Confirm action if required (for example in production mode).
-        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command') && !$force) {
             if (!$this->io->confirm('Do you really wish to continue ?', false)) {
                 return self::SUCCESS;
             }
@@ -139,7 +139,7 @@ class MigrateRollbackCommand extends Command
             return self::FAILURE;
         }
 
-        if (empty($rollbacked)) {
+        if (count($rollbacked) === 0) {
             // N.B.: Should not happens, only if tow operation get executed
             // while waiting for confirmation.
             $this->io->warning('Nothing rollbacked !');
@@ -175,7 +175,7 @@ class MigrateRollbackCommand extends Command
             return self::FAILURE;
         }
 
-        if (empty($data)) {
+        if (count($data) === 0) {
             $this->io->success('Nothing to rollback');
 
             return self::SUCCESS;

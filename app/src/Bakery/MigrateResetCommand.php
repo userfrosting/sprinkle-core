@@ -61,9 +61,9 @@ class MigrateResetCommand extends Command
         $this->io->title('Database Migration Reset');
 
         // Get options
-        $pretend = $input->getOption('pretend');
-        $force = $input->getOption('force');
-        $database = $input->getOption('database');
+        $pretend = (bool) $input->getOption('pretend');
+        $force = (bool) $input->getOption('force');
+        $database = (string) $input->getOption('database');
 
         // Set connection to the selected database
         if ($database != '') {
@@ -98,20 +98,20 @@ class MigrateResetCommand extends Command
         }
 
         // Don't go further if no migration to reset
-        if (empty($migrations)) {
+        if (count($migrations) === 0) {
             $this->io->success('Nothing to reset');
 
             return self::SUCCESS;
         }
 
         // Show migrations about to be reset
-        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
             $this->io->section('Migrations to reset');
             $this->io->listing($migrations);
         }
 
         // Confirm action if required (for example in production mode).
-        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command') && !$force) {
             if (!$this->io->confirm('Do you really wish to continue ?', false)) {
                 return self::SUCCESS;
             }
@@ -126,7 +126,7 @@ class MigrateResetCommand extends Command
             return self::FAILURE;
         }
 
-        if (empty($rollbacked)) {
+        if (count($rollbacked) === 0) {
             // N.B.: Should not happens, only if tow operation get executed
             // while waiting for confirmation.
             $this->io->warning('Nothing was reset !');
@@ -168,7 +168,7 @@ class MigrateResetCommand extends Command
             return self::FAILURE;
         }
 
-        if (empty($data)) {
+        if (count($data) === 0) {
             $this->io->success('Nothing to reset');
 
             return self::SUCCESS;

@@ -95,7 +95,7 @@ class LocaleCompareCommand extends Command
         $table->setColumnMaxWidth(1, 50);
         $table->setColumnMaxWidth(2, 50);
 
-        if (empty($diff)) {
+        if (count($diff) === 0) {
             $table->addRow([new TableCell('No difference between the two locales.', ['colspan' => 3])]);
         } else {
             foreach ($diff as $key => $value) {
@@ -126,7 +126,7 @@ class LocaleCompareCommand extends Command
         $table->setHeaders(['Key', $leftDictionary->getLocale()->getIdentifier(), $rightDictionary->getLocale()->getIdentifier()]);
         $table->setColumnMaxWidth(1, 50);
 
-        if (empty($diff)) {
+        if (count($diff) === 0) {
             $table->addRow([new TableCell('No missing keys.', ['colspan' => 3])]);
         } else {
             foreach ($diff as $key) {
@@ -184,7 +184,7 @@ class LocaleCompareCommand extends Command
         $table = new Table($this->io);
         $table->setHeaders(['Key']);
 
-        if (empty($diff)) {
+        if (count($diff) === 0) {
             $table->addRow(['No empty values.']);
         } else {
             foreach ($diff as $key => $value) {

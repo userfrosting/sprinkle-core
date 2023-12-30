@@ -39,10 +39,7 @@ trait DatabaseTest
         try {
             $connectionName = $this->capsule->getDatabaseManager()->getDefaultConnection();
             $connection = $this->capsule->getConnection($connectionName);
-            $pdo = $connection->getPdo();
-            if ($pdo === null) {
-                throw new PDOException('PDO not found');
-            }
+            $connection->getPdo();
         } catch (PDOException $e) {
             $message = 'Could not connect to the database connection' . PHP_EOL;
             $message .= 'Exception: ' . $e->getMessage() . PHP_EOL . PHP_EOL;
