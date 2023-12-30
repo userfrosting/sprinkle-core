@@ -12,6 +12,9 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
+use ArrayAccess;
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * Logs all migrations that have been run.
  */
@@ -23,9 +26,9 @@ interface MigrationRepositoryInterface
      * @param int|null $steps Number of batch to return. Null to return all.
      * @param bool     $asc   True for ascending order, false for descending.
      *
-     * @return object
+     * @return ArrayAccess<int, Model>
      */
-    public function all(?int $steps = null, bool $asc = true): object;
+    public function all(?int $steps = null, bool $asc = true): ArrayAccess;
 
     /**
      * Get the list of ran migrations.
@@ -44,9 +47,9 @@ interface MigrationRepositoryInterface
      *
      * @throws \UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException Should be thrown if migration isn't found.
      *
-     * @return object The migration object
+     * @return Model The migration object
      */
-    public function get(string $migration): object;
+    public function get(string $migration): Model;
 
     /**
      * Check if the requested migration exist in the repository.

@@ -14,6 +14,7 @@ namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Collection;
@@ -38,12 +39,9 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
-     * Get list of migrations, with all details regarding batch and cie.
+     * {@inheritDoc}
      *
-     * @param int|null $steps Number of batch to return. Null to return all.
-     * @param bool     $asc   True for ascending order, false for descending.
-     *
-     * @return Collection Collection of migration from db in the order they where ran
+     * @return Collection<int, Model>
      */
     public function all(?int $steps = null, bool $asc = true): Collection
     {
@@ -67,13 +65,15 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @return Model
      */
-    public function get(string $migration): object
+    public function get(string $migration): Model
     {
         $result = $this->getTable()::forMigration($migration)->first();
 
         // Throw error if null
-        if ($result === null) {
+        if (!$result instanceof Model) {
             throw new MigrationNotFoundException();
         }
 
@@ -192,7 +192,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * Returns the schema builder instance.
      *
-     * @return \Illuminate\Database\Schema\Builder
+     * @return Builder
      */
     public function getSchemaBuilder(): Builder
     {
@@ -202,9 +202,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     /**
      * Resolve the database connection instance.
      *
-     * @return \Illuminate\Database\Connection
+     * @return Connection
      */
-    // TODO : Inject Connection instead
     public function getConnection(): Connection
     {
         return $this->model->getConnection();
