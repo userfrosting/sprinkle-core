@@ -14,10 +14,8 @@ namespace UserFrosting\Sprinkle\Core\Database\Migrator;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
-use Illuminate\Support\Collection;
 use UserFrosting\Sprinkle\Core\Database\Models\MigrationTable;
 use UserFrosting\Sprinkle\Core\Exceptions\MigrationNotFoundException;
 
@@ -40,10 +38,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
 
     /**
      * {@inheritDoc}
-     *
-     * @return Collection<int, Model>
      */
-    public function all(?int $steps = null, bool $asc = true): Collection
+    public function all(?int $steps = null, bool $asc = true): array
     {
         $query = $this->getTable()::orderBy('id', ($asc) ? 'asc' : 'desc');
 
@@ -52,7 +48,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             $query->where('batch', '>=', $batch);
         }
 
-        return $query->get();
+        /** @var array<array{migration: string, batch: int}> */
+        return $query->get()->toArray();
     }
 
     /**
@@ -60,24 +57,25 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      */
     public function list(?int $steps = null, bool $asc = true): array
     {
-        return $this->all($steps, $asc)->pluck('migration')->all();
+        $all = $this->all($steps, $asc);
+
+        return array_column($all, 'migration');
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @return Model
      */
-    public function get(string $migration): Model
+    public function get(string $migration): array
     {
         $result = $this->getTable()::forMigration($migration)->first();
 
         // Throw error if null
-        if (!$result instanceof Model) {
+        if (!$result instanceof MigrationTable) {
             throw new MigrationNotFoundException();
         }
 
-        return $result;
+        /** @var array{migration: string, batch: int} */
+        return $result->toArray();
     }
 
     /**

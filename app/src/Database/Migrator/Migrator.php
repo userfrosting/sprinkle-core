@@ -438,7 +438,7 @@ class Migrator
         // Rollback the migration
         // TODO : `rollbackMigrations` can stay apart, as reset and single rollback also use it
         // TODO : Use Analyser here, then loop them and "runDown"
-        return $this->rollbackMigrations([$migration->migration], $options);
+        return $this->rollbackMigrations([$migration['migration']], $options);
 
         // Apply change to database
         $this->runDownMigrations([$migrations]);

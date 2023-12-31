@@ -109,7 +109,7 @@ class MigrateStatusCommandTest extends TestCase
 
         // Setup repository mock
         $repository = Mockery::mock(DatabaseMigrationRepository::class)
-            ->shouldReceive('all')->once()->andReturn(collect([]))
+            ->shouldReceive('all')->once()->andReturn([])
             ->getMock();
 
         // Setup migrator mock
@@ -162,11 +162,12 @@ class MigrateStatusCommandTest extends TestCase
         BakeryTester::runCommand($command);
     }
 
-    protected function getInstalledMigrationStub()
+    /** @return array<array{migration: string, batch: int}> */
+    protected function getInstalledMigrationStub(): array
     {
-        return collect([
-            (object) ['migration' => 'foo', 'batch' => 1],
-            (object) ['migration' => 'bar', 'batch' => 2],
-        ]);
+        return [
+            ['migration' => 'foo', 'batch' => 1],
+            ['migration' => 'bar', 'batch' => 2],
+        ];
     }
 }

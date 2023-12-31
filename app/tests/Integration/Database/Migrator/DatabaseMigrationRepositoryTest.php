@@ -103,8 +103,8 @@ class DatabaseMigrationRepositoryTest extends TestCase
         // Get single Migration
         $this->assertTrue($repository->has('foobar'));
         $migration = $repository->get('foobar');
-        $this->assertSame('foobar', $migration->migration);
-        $this->assertSame(3, (int) $migration->batch);
+        $this->assertSame('foobar', $migration['migration']);
+        $this->assertSame(3, (int) $migration['batch']);
 
         // Delete Migration
         $repository->remove('foobar');
@@ -150,16 +150,15 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertSame([MigrationClassStub::class], $repository->list());
         $this->assertTrue($repository->has(MigrationClassStub::class));
         $this->assertTrue($repository->has('\\' . MigrationClassStub::class));
-        $this->assertSame(MigrationClassStub::class, $repository->all()[0]->migration);
+        $this->assertSame(MigrationClassStub::class, $repository->all()[0]['migration']);
 
         // Test with new format
         $result = $repository->get(MigrationClassStub::class);
-        $this->assertInstanceOf(TestMigration::class, $result);
-        $this->assertSame(MigrationClassStub::class, $result->migration);
+        $this->assertSame(MigrationClassStub::class, $result['migration']);
 
         // Test get with legacy format
         $result = $repository->get('\\' . MigrationClassStub::class);
-        $this->assertSame(MigrationClassStub::class, $result->migration);
+        $this->assertSame(MigrationClassStub::class, $result['migration']);
 
         // Test last
         $this->assertSame([MigrationClassStub::class], $repository->last());

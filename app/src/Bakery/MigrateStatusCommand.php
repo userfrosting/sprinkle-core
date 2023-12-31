@@ -14,7 +14,6 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use DI\Attribute\Inject;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Support\Collection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -91,21 +90,23 @@ class MigrateStatusCommand extends Command
      * Return an array of [migration, available] association.
      * A migration is available if it's in the available stack (class is in the Filesystem).
      *
-     * @param array $installed   The ran migrations
-     * @param array $isAvailable The available migrations
+     * @param array<array{migration: string, batch: int}> $installed   The ran migrations
+     * @param string[]                                    $isAvailable The available migrations
      *
-     * @return array An array of [migration, available] association
+     * @return array<array{string, string, int}> An array of [migration, available] association
      */
-    protected function getRows(Collection $installed, array $isAvailable): array
+    protected function getRows(array $installed, array $isAvailable): array
     {
-        return $installed->map(function ($migration) use ($isAvailable) {
-            if (in_array($migration->migration, $isAvailable)) {
+        $row = array_map(function (array $migration) use ($isAvailable): array {
+            if (in_array($migration['migration'], $isAvailable, true)) {
                 $isAvailable = '<info>Yes</info>';
             } else {
                 $isAvailable = '<fg=red>No</fg=red>';
             }
 
-            return [$migration->migration, $isAvailable, $migration->batch];
-        })->toArray();
+            return [$migration['migration'], $isAvailable, $migration['batch']];
+        }, $installed);
+
+        return $row;
     }
 }
