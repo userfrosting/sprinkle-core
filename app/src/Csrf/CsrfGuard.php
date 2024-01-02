@@ -35,7 +35,7 @@ class CsrfGuard extends Guard
         Session $session,
         App $app,
     ) {
-        $csrfKey = $config->getString('session.keys.csrf');
+        $csrfKey = $config->getString('session.keys.csrf', 'site.csrf');
 
         // Workaround so that we can pass storage into CSRF guard.
         // If we tried to directly pass the indexed portion of `session` (for example, $ci->session['site.csrf']),
@@ -53,12 +53,12 @@ class CsrfGuard extends Guard
 
         parent::__construct(
             $app->getResponseFactory(),
-            $config->getString('csrf.name'),
+            $config->getString('csrf.name', 'csrf'),
             $csrfStorage,
             $onFailure,
-            $config->getInt('csrf.storage_limit'),
-            $config->getInt('csrf.strength'),
-            $config->getBool('csrf.persistent_token')
+            $config->getInt('csrf.storage_limit', 200),
+            $config->getInt('csrf.strength', 16),
+            $config->getBool('csrf.persistent_token', true)
         );
     }
 

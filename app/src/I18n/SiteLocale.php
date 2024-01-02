@@ -93,7 +93,7 @@ class SiteLocale implements SiteLocaleInterface
     public function getAvailableIdentifiers(): array
     {
         // Get all keys where value is true
-        $available = array_filter($this->config->getArray('site.locales.available'));
+        $available = array_filter($this->config->getArray('site.locales.available', []));
 
         // Add the default to the list. it will always be available
         $default = $this->getDefaultLocale();
@@ -107,15 +107,17 @@ class SiteLocale implements SiteLocaleInterface
     /**
      * Returns the default locale from the config.
      *
+     * @param string $fallback Fallback locale to use if no default or empty string is set in the config
+     *
      * @return string
      */
-    public function getDefaultLocale(): string
+    public function getDefaultLocale(string $fallback = 'en_US'): string
     {
-        $defaultIdentifier = $this->config->get('site.locales.default');
+        $defaultIdentifier = $this->config->getString('site.locales.default', $fallback);
 
         // Make sure the locale config is a valid string. Otherwise, fallback to en_US
-        if (!is_string($defaultIdentifier) || $defaultIdentifier == '') {
-            return 'en_US';
+        if ($defaultIdentifier === '') {
+            return $fallback;
         }
 
         return $defaultIdentifier;

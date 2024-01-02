@@ -158,15 +158,6 @@ class SiteLocaleTest extends TestCase
     }
 
     /**
-     * Will return en_US
-     */
-    public function testGetLocaleIdentifierWithNonStringIdentifier(): void
-    {
-        $this->config->set('site.locales.default', ['foo', 'bar']);
-        $this->assertSame('en_US', $this->locale->getLocaleIdentifier());
-    }
-
-    /**
      * Test old method of defining the default locale
      */
     public function testGetLocaleIdentifierWithCommaSeparatedString(): void

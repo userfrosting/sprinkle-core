@@ -47,7 +47,7 @@ class SessionDatabaseHandlerTest extends TestCase
      */
     public function testSessionTable(): void
     {
-        $table = $this->config->getString('session.database.table');
+        $table = $this->config->getString('session.database.table', '');
 
         // Check connection is ok and returns what's expected from DatabaseSessionHandler
         $this->assertInstanceOf(ConnectionInterface::class, $this->connection); // @phpstan-ignore-line

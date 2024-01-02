@@ -45,7 +45,7 @@ class SetRouteCaching
      */
     public function __invoke(AppInitiatedEvent|BakeryInitiatedEvent $event): void
     {
-        if ($this->config->getBool('cache.route')) {
+        if ($this->config->getBool('cache.route', false)) {
             $filename = $this->config->getString('cache.routerFile');
             $routerCacheFile = $this->locator->findResource("cache://$filename", true, true);
             // Make sure the file is found
