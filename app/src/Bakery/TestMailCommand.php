@@ -60,7 +60,7 @@ final class TestMailCommand extends Command
         if (is_string($input->getOption('to'))) {
             $to = $input->getOption('to');
         } else {
-            $to = $this->config->getString('address_book.admin.email');
+            $to = $this->config->getString('address_book.admin.email', '');
         }
 
         $this->io->writeln("Sending test email to : $to");
@@ -69,7 +69,7 @@ final class TestMailCommand extends Command
         $title = $this->config->getString('site.title') . ' - Test email';
         $body = sprintf('A test email has been submitted from %s on %s.', $this->config->getString('site.title'), Carbon::now()->format('Y-m-d H:i:s'));
         $message = new StaticMailMessage($title, $body);
-        $message->from($this->config->getArray('address_book.admin')) // @phpstan-ignore-line
+        $message->from($this->config->getArray('address_book.admin', []))
                 ->addEmailRecipient(new EmailRecipient($to, $to));
 
         try {

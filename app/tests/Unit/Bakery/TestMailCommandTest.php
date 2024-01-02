@@ -36,9 +36,9 @@ class TestMailCommandTest extends TestCase
     {
         // Set mocks
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getString')->with('address_book.admin.email')->once()->andReturn('example@example.com')
+            ->shouldReceive('getString')->with('address_book.admin.email', '')->once()->andReturn('example@example.com')
             ->shouldReceive('getString')->with('site.title')->times(2)->andReturn('userFrosting')
-            ->shouldReceive('getArray')->with('address_book.admin')->once()->andReturn([
+            ->shouldReceive('getArray')->with('address_book.admin', [])->once()->andReturn([
                 'email' => 'admin@example.com',
                 'name'  => 'Site Administrator'
             ])
@@ -67,7 +67,7 @@ class TestMailCommandTest extends TestCase
         $config = Mockery::mock(Config::class)
             ->shouldNotReceive('getString')->with('address_book.admin.email')
             ->shouldReceive('getString')->with('site.title')->times(2)->andReturn('userFrosting')
-            ->shouldReceive('getArray')->with('address_book.admin')->once()->andReturn([
+            ->shouldReceive('getArray')->with('address_book.admin', [])->once()->andReturn([
                 'email' => 'admin@example.com',
                 'name'  => 'Site Administrator'
             ])
@@ -94,9 +94,9 @@ class TestMailCommandTest extends TestCase
     {
         // Set mocks
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getString')->with('address_book.admin.email')->once()->andReturn('example@example.com')
+            ->shouldReceive('getString')->with('address_book.admin.email', '')->once()->andReturn('example@example.com')
             ->shouldReceive('getString')->with('site.title')->times(2)->andReturn('userFrosting')
-            ->shouldReceive('getArray')->with('address_book.admin')->once()->andReturn([
+            ->shouldReceive('getArray')->with('address_book.admin', [])->once()->andReturn([
                 'email' => 'admin@example.com',
                 'name'  => 'Site Administrator'
             ])

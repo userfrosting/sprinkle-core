@@ -42,9 +42,15 @@ class SeedCommandTest extends TestCase
             ->shouldReceive('get')->with($seed::class)->once()->andReturn($seed)
             ->getMock();
 
+        // Setup config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(false)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(SeedRepositoryInterface::class, $seeds);
+        $ci->set(Config::class, $config);
         $command = $ci->get(SeedCommand::class);
         $result = BakeryTester::runCommand($command, userInput: ['0']);
 
@@ -84,9 +90,15 @@ class SeedCommandTest extends TestCase
             ->shouldReceive('get')->with($seed::class)->once()->andReturn($seed)
             ->getMock();
 
+        // Setup config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(false)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(SeedRepositoryInterface::class, $seeds);
+        $ci->set(Config::class, $config);
         $command = $ci->get(SeedCommand::class);
         $result = BakeryTester::runCommand($command, input: ['class' => [$seed::class]], verbosity: OutputInterface::VERBOSITY_VERBOSE);
 
@@ -132,15 +144,21 @@ class SeedCommandTest extends TestCase
             ->shouldReceive('get')->with($seed::class)->once()->andReturn($seed)
             ->getMock();
 
+        // Setup config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(false)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(SeedRepositoryInterface::class, $seeds);
+        $ci->set(Config::class, $config);
         $command = $ci->get(SeedCommand::class);
         $result = BakeryTester::runCommand($command, input: ['class' => [$seed::class]], verbosity: OutputInterface::VERBOSITY_VERBOSE);
 
         // Assert some output
-        $this->assertSame(1, $result->getStatusCode());
         $this->assertStringContainsString($message, $result->getDisplay());
+        $this->assertSame(1, $result->getStatusCode());
     }
 
     public function testCommandWithClassArgumentAndConfirmation(): void
@@ -156,7 +174,7 @@ class SeedCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(true)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(true)
             ->getMock();
 
         // Set mock in CI and run command
@@ -186,7 +204,7 @@ class SeedCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(true)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(true)
             ->getMock();
 
         // Set mock in CI and run command
@@ -216,7 +234,7 @@ class SeedCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('get')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(true)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(true)
             ->getMock();
 
         // Set mock in CI and run command
@@ -245,9 +263,15 @@ class SeedCommandTest extends TestCase
             ->shouldReceive('get')->with($seed::class)->once()->andReturn($seed)
             ->getMock();
 
+        // Setup config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(false)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(SeedRepositoryInterface::class, $seeds);
+        $ci->set(Config::class, $config);
         $command = $ci->get(SeedCommand::class);
         $result = BakeryTester::runCommand($command, input: ['--database' => 'foobar'], userInput: ['0']);
 

@@ -65,7 +65,7 @@ class MigrateRollbackCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(false)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(false)
             ->getMock();
 
         // Set mock in CI and run command
@@ -93,7 +93,7 @@ class MigrateRollbackCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(true)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(true)
             ->getMock();
 
         // Set mock in CI and run command
@@ -124,7 +124,7 @@ class MigrateRollbackCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(true)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(true)
             ->getMock();
 
         // Set mock in CI and run command
@@ -154,7 +154,7 @@ class MigrateRollbackCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(false)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(false)
             ->getMock();
 
         // Set mock in CI and run command
@@ -182,7 +182,7 @@ class MigrateRollbackCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(false)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(false)
             ->getMock();
 
         // Set mock in CI and run command
@@ -237,7 +237,7 @@ class MigrateRollbackCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(false)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(false)
             ->getMock();
 
         // Set mock in CI and run command
@@ -288,7 +288,7 @@ class MigrateRollbackCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(false)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(false)
             ->getMock();
 
         // Set mock in CI and run command
@@ -313,7 +313,7 @@ class MigrateRollbackCommandTest extends TestCase
 
         // Setup config mock
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command')->times(2)->andReturn(false)
+            ->shouldReceive('getBool')->with('bakery.confirm_sensitive_command', true)->times(2)->andReturn(false)
             ->getMock();
 
         // Set mock in CI and run command

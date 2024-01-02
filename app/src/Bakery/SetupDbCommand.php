@@ -14,7 +14,6 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 
 use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Support\Collection;
 use PDOException;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -189,26 +188,31 @@ class SetupDbCommand extends Command
     {
         // Get the db driver choices
         $drivers = $this->databaseDrivers();
-        $driversList = $drivers->pluck('name')->toArray();
+        $driversList = array_column($drivers, 'name');
 
         // Ask for database type if not defined in command arguments
         if ($args->getOption('db_driver') == true) {
             $selectedDriver = $args->getOption('db_driver');
-            $driver = $drivers->where('driver', $selectedDriver)->first();
+            $driver = array_filter($drivers, function ($value) use ($selectedDriver) {
+                return $value['driver'] == $selectedDriver;
+            });
         } else {
             $selectedDriver = $this->io->choice('Database type', $driversList);
-            $driver = $drivers->where('name', $selectedDriver)->first();
+            $driver = array_filter($drivers, function ($value) use ($selectedDriver) {
+                return $value['name'] == $selectedDriver;
+            });
         }
 
-        // Get the selected driver. Make sure driver was found
-        if (!is_array($driver)) {
+        // Get the selected driver (first one in array). Make sure driver was found.
+        $driver = array_shift($driver);
+        if ($driver === null) {
             throw new Exception('Invalid database driver: ' . strval($selectedDriver));
         }
 
         // Ask further questions based on driver
-        if ($driver['driver'] == 'sqlite') {
-            $path = $args->getOption('db_name');
-            $path = ($path == true) ? $path : $this->io->ask('Database path', (string) $driver['defaultDBName']);
+        if ($driver['driver'] === 'sqlite') {
+            $path = (string) $args->getOption('db_name');
+            $path = ($path == true) ? $path : (string) $this->io->ask('Database path', $driver['defaultDBName']);
 
             // Check if file exists, attempt to create it otherwise
             if (!file_exists($path)) {
@@ -222,36 +226,36 @@ class SetupDbCommand extends Command
                 'driver'   => 'sqlite',
                 'host'     => '127.0.0.1',
                 'port'     => '',
-                'database' => strval($path),
+                'database' => $path,
                 'username' => '',
                 'password' => '',
             ];
         } else {
-            $host = $args->getOption('db_host');
-            $host = ($host == true) ? $host : $this->io->ask('Hostname', 'localhost');
+            $host = (string) $args->getOption('db_host');
+            $host = ($host == true) ? $host : (string) $this->io->ask('Hostname', 'localhost');
 
-            $port = $args->getOption('db_port');
-            $port = ($port == true) ? $port : $this->io->ask('Port', (string) $driver['defaultPort']);
+            $port = (string) $args->getOption('db_port');
+            $port = ($port == true) ? $port : (string) $this->io->ask('Port', (string) $driver['defaultPort']);
 
-            $path = $args->getOption('db_name');
-            $path = ($path == true) ? $path : $this->io->ask('Database name', (string) $driver['defaultDBName']);
+            $path = (string) $args->getOption('db_name');
+            $path = ($path == true) ? $path : (string) $this->io->ask('Database name', $driver['defaultDBName']);
 
-            $user = $args->getOption('db_user');
-            $user = ($user == true) ? $user : $this->io->ask('Username', 'userfrosting');
+            $user = (string) $args->getOption('db_user');
+            $user = ($user == true) ? $user : (string) $this->io->ask('Username', 'userfrosting');
 
             // Use custom validator to accept empty password
-            $password = $args->getOption('db_password');
-            $password = ($password == true) ? $password : $this->io->askHidden('Password', function ($password) {
+            $password = (string) $args->getOption('db_password');
+            $password = ($password == true) ? $password : (string) $this->io->askHidden('Password', function ($password) {
                 return $password;
             });
 
             return [
-                'driver'   => strval($driver['driver']),
-                'host'     => strval($host),
-                'port'     => strval($port),
-                'database' => strval($path),
-                'username' => strval($user),
-                'password' => strval($password),
+                'driver'   => $driver['driver'],
+                'host'     => $host,
+                'port'     => $port,
+                'database' => $path,
+                'username' => $user,
+                'password' => $password,
             ];
         }
     }
@@ -275,11 +279,11 @@ class SetupDbCommand extends Command
     /**
      * Return the database choices for the env setup.
      *
-     * @return Collection<string, string|int>
+     * @return array{driver: string, name: string, defaultDBName:string, defaultPort:int}[]
      */
-    protected function databaseDrivers(): Collection
+    protected function databaseDrivers(): array
     {
-        return collect([
+        return [
             [
                 'driver'        => 'mysql',
                 'name'          => 'MySQL / MariaDB',
@@ -301,10 +305,10 @@ class SetupDbCommand extends Command
             [
                 'driver'        => 'sqlite',
                 'name'          => 'SQLite',
-                'defaultDBName' => $this->locator->getResource('database://userfrosting.db', true),
-                'defaultPort'   => null,
+                'defaultDBName' => (string) $this->locator->getResource('database://userfrosting.db', true),
+                'defaultPort'   => 0,
             ],
-        ]);
+        ];
     }
 
     /**
@@ -315,9 +319,9 @@ class SetupDbCommand extends Command
     protected function getDatabaseDriversList(): array
     {
         $dbDriverList = $this->databaseDrivers();
-        $dbDriverList = $dbDriverList->pluck('driver');
+        $dbDriverList = array_column($dbDriverList, 'driver');
 
-        return $dbDriverList->toArray();
+        return $dbDriverList;
     }
 
     /**
@@ -359,7 +363,7 @@ class SetupDbCommand extends Command
     {
         // Update config first
         $this->config->set('db.default', $dbParams['driver']);
-        $driverConfig = $this->config->getArray('db.connections.' . $dbParams['driver']);
+        $driverConfig = $this->config->getArray('db.connections.' . $dbParams['driver'], []);
         $driverConfig = array_merge($driverConfig, $dbParams);
         $this->config->set('db.connections.' . $dbParams['driver'], $driverConfig);
 

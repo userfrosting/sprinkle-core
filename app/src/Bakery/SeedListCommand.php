@@ -47,7 +47,7 @@ class SeedListCommand extends Command
     {
         $this->io->title('Seeds List');
         $seeds = $this->seeds->list();
-        if (empty($seeds)) {
+        if (count($seeds) === 0) {
             $this->io->note('No seeds founds');
         } else {
             $this->io->listing($seeds);

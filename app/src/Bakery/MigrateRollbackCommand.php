@@ -118,13 +118,13 @@ class MigrateRollbackCommand extends Command
         }
 
         // Show migrations about to be rollback
-        if ($this->config->getBool('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command', true) || $this->io->isVerbose()) {
             $this->io->section('Migrations to rollback');
             $this->io->listing($migrations);
         }
 
         // Confirm action if required (for example in production mode).
-        if ($this->config->getBool('bakery.confirm_sensitive_command') && !$force) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command', true) && !$force) {
             if (!$this->io->confirm('Do you really wish to continue ?', false)) {
                 return self::SUCCESS;
             }

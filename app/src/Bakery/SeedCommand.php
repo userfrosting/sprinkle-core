@@ -69,7 +69,7 @@ class SeedCommand extends Command
     /**
      * Perform seed operation.
      *
-     * @param array       $classes
+     * @param string[]    $classes
      * @param bool        $force
      * @param string|null $database
      *
@@ -80,17 +80,17 @@ class SeedCommand extends Command
         $this->io->title('Seeder');
 
         // Set connection to the selected database
-        if ($database != '') {
+        if (is_string($database) && $database != '') {
             $this->io->info("Running {$this->getName()} with `$database` database connection");
             $this->db->getDatabaseManager()->setDefaultConnection($database);
         }
 
         // If class is empty, ask to choose one.
-        if (empty($classes)) {
+        if (count($classes) === 0) {
             $list = $this->seeds->list();
 
             // Abort if no registered seeds
-            if (empty($list)) {
+            if (count($list) === 0) {
                 $this->io->warning('No available seeds founds');
 
                 return self::SUCCESS;
@@ -110,13 +110,13 @@ class SeedCommand extends Command
         }
 
         // Display what's about to be run
-        if ($this->config->get('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command', true) || $this->io->isVerbose()) {
             $this->io->section('Seed(s) to apply');
             $this->io->listing($classes);
         }
 
         // Confirm action if required (for example in production mode).
-        if ($this->config->get('bakery.confirm_sensitive_command') && !$force) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command', true) && !$force) {
             if (!$this->io->confirm('Do you really wish to continue ?', false)) {
                 return self::SUCCESS;
             }

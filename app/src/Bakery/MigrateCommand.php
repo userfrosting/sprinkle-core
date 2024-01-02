@@ -114,13 +114,13 @@ class MigrateCommand extends Command
         }
 
         // Show migrations about to be ran
-        if ($this->config->getBool('bakery.confirm_sensitive_command') || $this->io->isVerbose()) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command', true) || $this->io->isVerbose()) {
             $this->io->section('Pending migrations');
             $this->io->listing($pending);
         }
 
         // Confirm action if required (for example in production mode).
-        if ($this->config->getBool('bakery.confirm_sensitive_command') && !$force) {
+        if ($this->config->getBool('bakery.confirm_sensitive_command', true) && !$force) {
             if (!$this->io->confirm('Do you really wish to continue ?', false)) {
                 return self::SUCCESS;
             }
