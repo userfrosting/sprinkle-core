@@ -20,7 +20,7 @@ interface TwigExtensionRecipe
     /**
      * Return an array of all registered Twig Extensions.
      *
-     * @return string[]
+     * @return class-string<\Twig\Extension\ExtensionInterface>[]
      */
     public function getTwigExtensions(): array;
 }

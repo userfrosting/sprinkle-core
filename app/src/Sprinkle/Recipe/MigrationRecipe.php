@@ -20,7 +20,7 @@ interface MigrationRecipe
     /**
      * Return an array of all registered Migrations.
      *
-     * @return string[]
+     * @return class-string<\UserFrosting\Sprinkle\Core\Database\MigrationInterface>[]
      */
     public function getMigrations(): array;
 }

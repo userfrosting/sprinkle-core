@@ -97,6 +97,8 @@ class Core implements
     BakeryRecipe
 {
     /**
+     * Return the Sprinkle name.
+     *
      * {@inheritdoc}
      */
     public function getName(): string
@@ -105,6 +107,8 @@ class Core implements
     }
 
     /**
+     * Return the Sprinkle dir path.
+     *
      * {@inheritdoc}
      */
     public function getPath(): string
@@ -113,6 +117,8 @@ class Core implements
     }
 
     /**
+     * Return an array of all registered Bakery Commands.
+     *
      * {@inheritdoc}
      *
      * @codeCoverageIgnore
@@ -153,6 +159,8 @@ class Core implements
     }
 
     /**
+     * Return dependent sprinkles.
+     *
      * {@inheritdoc}
      */
     public function getSprinkles(): array
@@ -163,7 +171,7 @@ class Core implements
     /**
      * Returns a list of routes definition in PHP files.
      *
-     * @return string[]
+     * {@inheritDoc}
      */
     public function getRoutes(): array
     {
@@ -173,9 +181,9 @@ class Core implements
     }
 
     /**
-     * Returns a list of all PHP-DI services/container definitions files.
+     * Returns a list of all PHP-DI services/container definitions class.
      *
-     * @return string[]
+     * {@inheritDoc}
      */
     public function getServices(): array
     {
@@ -203,7 +211,7 @@ class Core implements
     /**
      * Returns a list of all Middlewares classes.
      *
-     * @return \Psr\Http\Server\MiddlewareInterface[]
+     * {@inheritDoc}
      */
     public function getMiddlewares(): array
     {
@@ -220,7 +228,7 @@ class Core implements
     /**
      * Return an array of all registered Twig Extensions.
      *
-     * @return \Twig\Extension\ExtensionInterface[]
+     * {@inheritDoc}
      */
     public function getTwigExtensions(): array
     {
@@ -235,6 +243,11 @@ class Core implements
         ];
     }
 
+    /**
+     * Return an array of all registered Migrations.
+     *
+     * {@inheritDoc}
+     */
     public function getMigrations(): array
     {
         return [
@@ -244,7 +257,9 @@ class Core implements
     }
 
     /**
-     * {@inheritDoc}
+     * Return a map of all registered event listener.
+     *
+     * {@inheritdoc}
      */
     public function getEventListeners(): array
     {
