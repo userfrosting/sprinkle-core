@@ -15,8 +15,8 @@ namespace UserFrosting\Sprinkle\Core\Tests\Integration\Error\Handler;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
-use UserFrosting\Fortress\RequestSchema\RequestSchemaRepository;
-use UserFrosting\Fortress\ServerSideValidator;
+use UserFrosting\Fortress\RequestSchema;
+use UserFrosting\Fortress\Validator\ServerSideValidator;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Routes\RouteDefinitionInterface;
 use UserFrosting\Sprinkle\Core\Core;
@@ -61,7 +61,7 @@ class TestRoutes implements RouteDefinitionInterface
     public function register(App $app): void
     {
         $app->get('/test', function (Request $request, Response $response, Translator $translator) {
-            $schema = new RequestSchemaRepository([
+            $schema = new RequestSchema([
                 'email' => [
                     'validators' => [
                         'email' => [
@@ -71,12 +71,12 @@ class TestRoutes implements RouteDefinitionInterface
                 ],
             ]);
 
-            $validator = new ServerSideValidator($schema, $translator);
-            $validator->validate([
+            $validator = new ServerSideValidator($translator);
+            $error = $validator->validate($schema, [
                 'email' => 'david',
             ]);
             $e = new ValidationException();
-            $e->addErrors($validator->errors()); // @phpstan-ignore-line
+            $e->addErrors($error);
 
             throw $e;
         });
