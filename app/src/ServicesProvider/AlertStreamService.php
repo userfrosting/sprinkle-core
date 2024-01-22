@@ -51,11 +51,22 @@ class AlertStreamService implements ServicesProviderInterface
             },
 
             CacheAlertStream::class => function (Config $config, Translator $translator, Cache $cache, Session $session) {
-                return new CacheAlertStream($config->getString('alert.key'), $translator, $cache, $session->getId());
+                $sessionId = $session->getId();
+
+                return new CacheAlertStream(
+                    $config->getString('alert.key', 'site.alerts'),
+                    $translator,
+                    $cache,
+                    ($sessionId === false) ? '' : $sessionId
+                );
             },
 
             SessionAlertStream::class => function (Config $config, Translator $translator, Session $session) {
-                return new SessionAlertStream($config->getString('alert.key'), $translator, $session);
+                return new SessionAlertStream(
+                    $config->getString('alert.key', 'site.alerts'),
+                    $translator,
+                    $session
+                );
             },
         ];
     }

@@ -51,7 +51,7 @@ class AlertStreamServiceTest extends TestCase
         // Create mocks
         $config = Mockery::mock(Config::class)
             ->shouldReceive('getString')->with('alert.storage')->andReturn('cache')
-            ->shouldReceive('getString')->with('alert.key')->andReturn('foo')
+            ->shouldReceive('getString')->with('alert.key', 'site.alerts')->andReturn('foo')
             ->getMock();
 
         $session = Mockery::mock(Session::class)
@@ -73,7 +73,7 @@ class AlertStreamServiceTest extends TestCase
         // Create mocks
         $config = Mockery::mock(Config::class)
             ->shouldReceive('getString')->with('alert.storage')->andReturn('session')
-            ->shouldReceive('getString')->with('alert.key')->andReturn('foo')
+            ->shouldReceive('getString')->with('alert.key', 'site.alerts')->andReturn('foo')
             ->getMock();
 
         // Set mocks in CI
