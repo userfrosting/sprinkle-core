@@ -20,9 +20,9 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 class Builder extends QueryBuilder
 {
     /**
-     * @var array List of excluded columns
+     * @var string[]|null List of excluded columns
      */
-    protected $excludedColumns = null;
+    protected array|null $excludedColumns = null;
 
     /**
      * Perform a "begins with" pattern match on a specified column in a query.
@@ -53,11 +53,11 @@ class Builder extends QueryBuilder
     /**
      * Add columns to be excluded from the query.
      *
-     * @param array|string $column The column(s) to exclude
+     * @param string[]|string $column The column(s) to exclude
      *
-     * @return self
+     * @return static
      */
-    public function exclude($column)
+    public function exclude($column): static
     {
         $column = is_array($column) ? $column : func_get_args();
 
@@ -122,7 +122,7 @@ class Builder extends QueryBuilder
     /**
      * Remove excluded columns from the select column list.
      */
-    protected function removeExcludedSelectColumns()
+    protected function removeExcludedSelectColumns(): void
     {
         // Convert current column list and excluded column list to fully-qualified list
         $this->columns = $this->convertColumnsToFullyQualified($this->columns);

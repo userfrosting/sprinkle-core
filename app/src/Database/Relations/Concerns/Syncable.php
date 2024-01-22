@@ -14,8 +14,6 @@ namespace UserFrosting\Sprinkle\Core\Database\Relations\Concerns;
 
 /**
  * Implements the `sync` method for HasMany relationships.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 trait Syncable
 {
@@ -27,10 +25,14 @@ trait Syncable
      * @param bool        $forceCreate    Ignore mass assignment restrictions on child models.
      * @param string|null $relatedKeyName The primary key used to determine which child models are new, updated, or deleted.
      *
-     * @return array List of changes (created, deleted, updated).
+     * @return mixed[] List of changes (created, deleted, updated).
      */
-    public function sync(array $data, bool $deleting = true, bool $forceCreate = false, ?string $relatedKeyName = null): array
-    {
+    public function sync(
+        array $data,
+        bool $deleting = true,
+        bool $forceCreate = false,
+        ?string $relatedKeyName = null
+    ): array {
         $changes = [
             'created' => [],
             'deleted' => [],
@@ -54,7 +56,7 @@ trait Syncable
         foreach ($data as $row) {
             // We determine "updatable" rows as those whose $relatedKeyName (usually 'id') is set, not empty, and
             // match a related row in the database.
-            if (isset($row[$relatedKeyName]) && !empty($row[$relatedKeyName]) && in_array($row[$relatedKeyName], $current)) {
+            if (isset($row[$relatedKeyName]) && !empty($row[$relatedKeyName]) && in_array($row[$relatedKeyName], $current, true)) {
                 $id = $row[$relatedKeyName];
                 $updateRows[$id] = $row;
             } else {
@@ -119,7 +121,7 @@ trait Syncable
      */
     protected function castKeys(array $keys): array
     {
-        return (array) array_map(function ($v) {
+        return array_map(function ($v) {
             return $this->castKey($v);
         }, $keys);
     }

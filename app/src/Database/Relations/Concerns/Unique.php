@@ -19,8 +19,6 @@ use Illuminate\Database\Query\Expression;
 
 /**
  * Enforce uniqueness for BelongsToManyUnique, MorphToManyUnique, and BelongsToManyThrough.
- *
- * @author Alex Weissman (https://alexanderweissman.com)
  */
 trait Unique
 {
@@ -147,7 +145,7 @@ trait Unique
         $this->tertiaryRelated = new $tertiaryRelated();
 
         // Try to guess the tertiary related key from the tertiaryRelated model.
-        $this->tertiaryKey = $tertiaryKey ?: $this->tertiaryRelated->getForeignKey();
+        $this->tertiaryKey = $tertiaryKey ?? $this->tertiaryRelated->getForeignKey();
 
         // Also add the tertiary key as a pivot
         $this->withPivot($this->tertiaryKey);
@@ -261,9 +259,9 @@ trait Unique
      * If we are applying either a limit or offset, we'll first determine a limited/offset list of model ids
      * to select from in the final query.
      *
-     * @param Builder $query
-     * @param int     $limit
-     * @param int     $offset
+     * @param Builder  $query
+     * @param int|null $limit
+     * @param int|null $offset
      *
      * @return Builder
      */
@@ -289,11 +287,11 @@ trait Unique
 
         $constrainedBuilder->withGlobalScope($identifier, $uniqueIdScope);
 
-        if ($limit) {
+        if ($limit !== null) {
             $constrainedBuilder->limit($limit);
         }
 
-        if ($offset) {
+        if ($offset !== null) {
             $constrainedBuilder->offset($offset);
         }
 
@@ -334,7 +332,7 @@ trait Unique
         $columns = $this->query->getQuery()->columns ? [] : $columns;
 
         // Add any necessary pagination on the related models
-        if ($this->limit || $this->offset) {
+        if (!is_null($this->limit) || !is_null($this->offset)) {
             $this->getPaginatedQuery($this->query, $this->limit, $this->offset);
         }
 
