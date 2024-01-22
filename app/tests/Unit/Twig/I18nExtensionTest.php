@@ -30,6 +30,7 @@ class I18nExtensionTest extends TestCase
 
     public function testTranslateIntegration(): void
     {
+        /** @var Translator */
         $translator = Mockery::mock(Translator::class)
             ->shouldReceive('translate')
             ->with('USER', 2)
@@ -37,6 +38,7 @@ class I18nExtensionTest extends TestCase
             ->andReturn('foobar')
             ->getMock();
 
+        /** @var SiteLocale */
         $siteLocale = Mockery::mock(SiteLocale::class)
             ->shouldReceive('getLocaleIdentifier')->andReturn('fr_FR')
             ->getMock();

@@ -70,7 +70,7 @@ class LoggersServiceTest extends TestCase
     }
 
     /**
-     * @return array<array<class-string, class-string>>
+     * @return array<class-string>[]
      */
     public static function loggerProvider(): array
     {

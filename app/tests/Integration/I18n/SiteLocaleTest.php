@@ -88,9 +88,8 @@ class SiteLocaleTest extends TestCase
     {
         $locales = $this->locale->getAvailable();
 
-        $this->assertIsArray($locales);
         $this->assertCount(2, $locales);
-        $this->assertInstanceOf(Locale::class, $locales[0]);
+        $this->assertSame('fr_FR', $locales[0]->getIdentifier());
     }
 
     /**
@@ -108,10 +107,7 @@ class SiteLocaleTest extends TestCase
             'en_US' => 'English',
             'fr_FR' => 'Tomato', // Just to be sure the fake locale are loaded ;)
         ];
-
         $options = $this->locale->getAvailableOptions();
-
-        $this->assertIsArray($options);
         $this->assertSame($expected, $options);
     }
 

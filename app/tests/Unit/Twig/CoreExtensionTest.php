@@ -34,6 +34,7 @@ class CoreExtensionTest extends TestCase
     {
         parent::setUp();
 
+        /** @var Config */
         $config = Mockery::mock(Config::class)
             ->shouldReceive('get')->with('site')->andReturn(['foo' => 'bar'])
             ->getMock();

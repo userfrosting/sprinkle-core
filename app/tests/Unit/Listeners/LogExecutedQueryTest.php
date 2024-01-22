@@ -34,7 +34,7 @@ class LogExecutedQueryTest extends TestCase
         $string = 'Query executed on database [foobar]:';
         $sql = "select * from 'users' where name = ?";
         $bindings = ['foobar'];
-        $time = '1.12';
+        $time = 1.12;
         $data = [
             'query'    => $sql,
             'bindings' => $bindings,
@@ -42,12 +42,14 @@ class LogExecutedQueryTest extends TestCase
         ];
 
         // Create QueryExecuted Event Mock
+        /** @var SQLiteConnection */
         $connection = Mockery::mock(SQLiteConnection::class)
             ->shouldReceive('getName')->once()->andReturn('foobar')
             ->getMock();
         $event = new QueryExecuted($sql, $bindings, $time, $connection);
 
         // Create Logger mocks
+        /** @var QueryLoggerInterface */
         $logger = Mockery::mock(QueryLoggerInterface::class)
             ->shouldReceive('debug')->with($string, $data)->once()
             ->getMock();

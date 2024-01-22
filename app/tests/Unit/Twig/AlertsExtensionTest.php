@@ -38,6 +38,7 @@ class AlertsExtensionTest extends TestCase
         ];
 
         // Define mock AlertStream
+        /** @var AlertStream */
         $alertStream = Mockery::mock(AlertStream::class)
                     ->shouldReceive('getAndClearMessages')
                     ->once()
@@ -60,6 +61,7 @@ class AlertsExtensionTest extends TestCase
         ];
 
         // Define mock AlertStream
+        /** @var AlertStream */
         $alertStream = Mockery::mock(AlertStream::class)
                     ->shouldReceive('getAndClearMessages')
                     ->once()
@@ -82,6 +84,7 @@ class AlertsExtensionTest extends TestCase
         ];
 
         // Define mock AlertStream and register with Container
+        /** @var AlertStream */
         $alertStream = Mockery::mock(AlertStream::class)
                     ->shouldReceive('messages')
                     ->once()
