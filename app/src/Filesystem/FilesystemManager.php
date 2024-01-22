@@ -28,6 +28,7 @@ class FilesystemManager extends LaravelFilesystemManager
      * @param Config                   $config
      * @param ResourceLocatorInterface $locator
      */
+    // @phpstan-ignore-next-line - All $app references are replaced in methods below
     public function __construct(
         protected Config $config,
         protected ResourceLocatorInterface $locator,
@@ -37,7 +38,7 @@ class FilesystemManager extends LaravelFilesystemManager
     /**
      * Call a custom driver creator.
      *
-     * @param array $config
+     * @param mixed[] $config
      *
      * @return Filesystem
      */
@@ -51,7 +52,7 @@ class FilesystemManager extends LaravelFilesystemManager
      *
      * @param string $name
      *
-     * @return array
+     * @return mixed[]
      */
     protected function getConfig($name): array
     {
@@ -81,7 +82,7 @@ class FilesystemManager extends LaravelFilesystemManager
     /**
      * Overwrite the local driver creation to replace root by locator.
      *
-     * @param array $config
+     * @param mixed[] $config
      *
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
