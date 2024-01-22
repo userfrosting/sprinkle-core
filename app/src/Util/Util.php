@@ -29,8 +29,11 @@ class Util
      *
      * @return mixed[]
      */
-    public static function extractFields(&$inputArray, $fieldArray, $remove = true)
-    {
+    public static function extractFields(
+        array &$inputArray,
+        array $fieldArray,
+        bool $remove = true
+    ): array {
         $result = [];
 
         foreach ($fieldArray as $name) {
@@ -54,8 +57,9 @@ class Util
      *
      * @return string
      */
-    public static function extractDigits($str)
+    public static function extractDigits(string $str): string
     {
+        /** @var string */
         return preg_replace('/[^0-9]/', '', $str);
     }
 
@@ -66,15 +70,17 @@ class Util
      *
      * @return string
      */
-    public static function formatPhoneNumber($phone)
+    public static function formatPhoneNumber(string $phone): string
     {
         $num = static::extractDigits($phone);
 
         $len = strlen($num);
 
         if ($len == 7) {
+            /** @var string */
             $num = preg_replace('/([0-9]{3})([0-9]{4})/', '$1-$2', $num);
         } elseif ($len == 10) {
+            /** @var string */
             $num = preg_replace('/([0-9]{3})([0-9]{3})([0-9]{4})/', '($1) $2-$3', $num);
         }
 
@@ -85,13 +91,13 @@ class Util
      * Nicely format an array for printing.
      * See https://stackoverflow.com/a/9776726/2970321.
      *
-     * @param array $arr
+     * @param mixed[] $arr
      *
      * @return string
      */
-    public static function prettyPrintArray(array $arr)
+    public static function prettyPrintArray(array $arr): string
     {
-        $json = json_encode($arr);
+        $json = json_encode($arr, JSON_THROW_ON_ERROR);
         $result = '';
         $level = 0;
         $inQuotes = false;

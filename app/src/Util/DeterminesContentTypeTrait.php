@@ -27,7 +27,7 @@ trait DeterminesContentTypeTrait
      * as willdurand/negotiation for any other situation.
      *
      * @param ServerRequestInterface $request
-     * @param array                  $knownContentTypes
+     * @param string[]               $knownContentTypes
      * @param string                 $defaultType
      *
      * @return string
@@ -41,7 +41,7 @@ trait DeterminesContentTypeTrait
         $selectedContentTypes = array_intersect(explode(',', $acceptHeader), $knownContentTypes);
         $count = count($selectedContentTypes);
 
-        if ($count) {
+        if ($count !== 0) {
             $current = current($selectedContentTypes);
 
             /*
@@ -49,15 +49,16 @@ trait DeterminesContentTypeTrait
              * when multiple content types are provided via Accept header.
              */
             if ($current === 'text/plain' && $count > 1) {
+                /** @var string */
                 return next($selectedContentTypes);
             }
 
             return $current;
         }
 
-        if (preg_match('/\+(json|xml)/', $acceptHeader, $matches)) {
+        if (preg_match('/\+(json|xml)/', $acceptHeader, $matches) === 1) {
             $mediaType = 'application/' . $matches[1];
-            if (in_array($mediaType, $knownContentTypes)) {
+            if (in_array($mediaType, $knownContentTypes, true)) {
                 return $mediaType;
             }
         }
