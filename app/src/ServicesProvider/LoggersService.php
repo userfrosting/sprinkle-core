@@ -40,7 +40,7 @@ class LoggersService implements ServicesProviderInterface
 
             // Define common StreamHandler with our log path from config
             StreamHandler::class => function (Config $config) {
-                return new StreamHandler($config->getString('logs.path'));
+                return new StreamHandler($config->getString('logs.path', 'logs://userfrosting.log'));
             },
         ];
     }

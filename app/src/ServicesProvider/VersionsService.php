@@ -34,7 +34,7 @@ class VersionsService implements ServicesProviderInterface
             'NPM_MIN_VERSION'              => '>=9',
 
             // Installed version
-            'PHP_VERSION'                  => (string) phpversion(),
+            'PHP_VERSION'                  => phpversion(),
             'NODE_VERSION'                 => exec('node -v'), // TODO : Required Try catch
             'NPM_VERSION'                  => exec('npm -v'),
 

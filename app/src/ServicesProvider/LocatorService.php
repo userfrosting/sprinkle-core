@@ -41,6 +41,8 @@ class LocatorService implements ServicesProviderInterface
 
                 // Dispatch ResourceLocatorInitiated event
                 $event = new ResourceLocatorInitiatedEvent($locator);
+                
+                /** @var ResourceLocatorInitiatedEvent */
                 $event = $eventDispatcher->dispatch($event);
 
                 return $event->getLocator();

@@ -57,7 +57,7 @@ class CoreExtension extends AbstractExtension implements GlobalsInterface
     /**
      * Adds Twig global variables `site`.
      *
-     * @return mixed[]
+     * @return array<string, mixed>
      */
     public function getGlobals(): array
     {

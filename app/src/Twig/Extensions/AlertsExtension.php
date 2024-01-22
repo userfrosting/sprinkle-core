@@ -42,7 +42,7 @@ class AlertsExtension extends AbstractExtension
      *
      * @param bool $clear Clear
      *
-     * @return array Messages to display
+     * @return array<int, array{type: string, message: string, placeholders: mixed[]|int}> Messages to display
      */
     public function getAlerts(bool $clear = true): array
     {

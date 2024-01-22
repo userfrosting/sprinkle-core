@@ -44,7 +44,7 @@ class I18nExtension extends AbstractExtension implements GlobalsInterface
     /**
      * Adds Twig global variables `currentLocale`.
      *
-     * @return array[mixed]
+     * @return array<string, mixed>
      */
     public function getGlobals(): array
     {
