@@ -466,6 +466,7 @@ class MigratorTest extends TestCase
         $result = $migrator->pretendToRollback();
 
         // Assert results
+        // @phpstan-ignore-next-line
         $this->assertSame([
             $migration::class => $queries
         ], $result);
@@ -595,6 +596,7 @@ class MigratorTest extends TestCase
         $result = $migrator->pretendToReset();
 
         // Assert results
+        // @phpstan-ignore-next-line
         $this->assertSame([
             $migration::class => $queries
         ], $result);

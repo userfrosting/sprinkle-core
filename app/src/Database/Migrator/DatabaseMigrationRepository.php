@@ -48,7 +48,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             $query->where('batch', '>=', $batch);
         }
 
-        /** @var array<array{migration: string, batch: int}> */
+        /** @var array<array{migration: class-string, batch: int}> */
         return $query->get()->toArray();
     }
 
@@ -74,7 +74,7 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
             throw new MigrationNotFoundException();
         }
 
-        /** @var array{migration: string, batch: int} */
+        /** @var array{migration: class-string, batch: int} */
         return $result->toArray();
     }
 

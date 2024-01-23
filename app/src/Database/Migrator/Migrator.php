@@ -37,7 +37,7 @@ class Migrator
     /**
      * Get installed migrations.
      *
-     * @return string[] An array of migration class names in the order they where ran.
+     * @return class-string[] An array of migration class names in the order they where ran.
      */
     public function getInstalled(): array
     {
@@ -47,7 +47,7 @@ class Migrator
     /**
      * Get migrations available and registered to be run.
      *
-     * @return string[] An array of migration class names.
+     * @return class-string[] An array of migration class names.
      */
     public function getAvailable(): array
     {
@@ -57,7 +57,7 @@ class Migrator
     /**
      * Returns migration that are installed, but not available.
      *
-     * @return string[] An array of migration class names.
+     * @return class-string[] An array of migration class names.
      */
     public function getStale(): array
     {
@@ -70,7 +70,7 @@ class Migrator
      * Returns migration that are available, but not installed, in the order
      * they need to be run.
      *
-     * @return string[] An array of migration class names.
+     * @return class-string[] An array of migration class names.
      */
     public function getPending(): array
     {
@@ -96,9 +96,9 @@ class Migrator
      * We run across all step even if it's not required, as this is run
      * recursively across all dependencies.
      *
-     * @param string $migrationClass
+     * @param class-string $migrationClass
      *
-     * @return string[] This migration and it's dependencies.
+     * @return class-string[] This migration and it's dependencies.
      */
     protected function getPendingDependencies(string $migrationClass): array
     {
@@ -132,9 +132,9 @@ class Migrator
     /**
      * Returns the migration dependency list.
      *
-     * @param string $migration The migration class
+     * @param class-string $migration The migration class
      *
-     * @return string[] The dependency list
+     * @return class-string[] The dependency list
      */
     protected function getDependenciesProperty(string $migration): array
     {
@@ -156,7 +156,7 @@ class Migrator
      *
      * @param int $steps Number of steps to rollback. Default to 1 (last ran migration)
      *
-     * @return string[] An array of migration class to be rolled down.
+     * @return class-string[] An array of migration class to be rolled down.
      */
     public function getMigrationsForRollback(int $steps = 1): array
     {
@@ -174,7 +174,7 @@ class Migrator
      * migrations from being executed. If the array is returned, everything is
      * fine to proceed.
      *
-     * @return string[] An array of migration class to be rolled down.
+     * @return class-string[] An array of migration class to be rolled down.
      */
     public function getMigrationsForReset(): array
     {
@@ -188,7 +188,7 @@ class Migrator
     /**
      * Return if the specified migration class can be rollback or not.
      *
-     * @param string $migration
+     * @param class-string $migration
      *
      * @return bool True if can rollback, false if not.
      */
@@ -206,8 +206,8 @@ class Migrator
     /**
      * Test if a migration can be rollback.
      *
-     * @param string   $migration
-     * @param string[] $installed
+     * @param class-string   $migration
+     * @param class-string[] $installed
      *
      * @throws MigrationRollbackException If something prevent migration to be rollback
      */
@@ -243,9 +243,9 @@ class Migrator
      * We run across all step even if it's not required, as this is run
      * recursively across all dependencies.
      *
-     * @param string $migrationClass
+     * @param class-string $migrationClass
      *
-     * @return string[] This migration and it's dependencies.
+     * @return class-string[] This migration and it's dependencies.
      */
     protected function getInstalledDependencies(string $migrationClass): array
     {
@@ -279,7 +279,7 @@ class Migrator
      * changed. To avoid this, both install should cloned, then remove from this,
      * but the current solution is more optimized.
      *
-     * @param string[] $migrations
+     * @param class-string[] $migrations
      */
     protected function checkRollbackDependencies(array $migrations): void
     {
@@ -300,7 +300,7 @@ class Migrator
      *
      * @throws MigrationDependencyNotMetException if a dependencies is not met among pending migration.
      *
-     * @return string[] The list of ran migrations class
+     * @return class-string[] The list of ran migrations class
      */
     public function migrate(bool $step = false): array
     {
@@ -350,7 +350,7 @@ class Migrator
      *
      * @throws MigrationDependencyNotMetException if a dependencies is not met among pending migration.
      *
-     * @return array<string, mixed[]> The list of queries, grouped by migration.
+     * @return array<class-string, mixed[]> The list of queries, grouped by migration.
      */
     public function pretendToMigrate(): array
     {
@@ -393,7 +393,7 @@ class Migrator
      *
      * @throws MigrationRollbackException If something prevent migration to be rollback
      *
-     * @return string[] The list of rolledback migration classes
+     * @return class-string[] The list of rolledback migration classes
      */
     public function rollback(int $steps = 1): array
     {
@@ -415,8 +415,8 @@ class Migrator
     /**
      * Rollback a specific migration.
      *
-     * @param string $migrationClassName The Migration to rollback
-     * @param array  $options
+     * @param class-string $migrationClassName The Migration to rollback
+     * @param array        $options
      *
      * @return array The list of rolledback migration classes
      */
@@ -451,7 +451,7 @@ class Migrator
      *
      * @throws MigrationRollbackException If something prevent migration to be rollback
      *
-     * @return array<string, string[]> The list of queries, grouped by migration.
+     * @return array<class-string, string[]> The list of queries, grouped by migration.
      */
     public function pretendToRollback(int $steps = 1): array
     {
@@ -475,7 +475,7 @@ class Migrator
      *
      * @throws MigrationRollbackException If something prevent migration to be rollback
      *
-     * @return string[] An array of all the rolledback migration classes
+     * @return class-string[] An array of all the rolledback migration classes
      */
     public function reset(): array
     {
@@ -499,7 +499,7 @@ class Migrator
      *
      * @throws MigrationRollbackException If something prevent migration to be rollback
      *
-     * @return array<string, string[]> The list of queries, grouped by migration.
+     * @return array<class-string, string[]> The list of queries, grouped by migration.
      */
     public function pretendToReset(): array
     {
@@ -522,7 +522,7 @@ class Migrator
      * Spin through ordered pending migrations, apply the changes to the
      * databases and log them to the repository.
      *
-     * @param string[] $migrations The migrations classes to run down
+     * @param class-string[] $migrations The migrations classes to run down
      */
     protected function runDownMigrations(array $migrations): void
     {
@@ -551,9 +551,9 @@ class Migrator
      * Spin through ordered pending migrations, pretend to run them down and
      * return the queries log.
      *
-     * @param string[] $migrations The migrations classes to run down
+     * @param class-string[] $migrations The migrations classes to run down
      *
-     * @return array<string, string[]> The list of queries, grouped by migration.
+     * @return array<class-string, string[]> The list of queries, grouped by migration.
      */
     protected function pretendToRunDownMigrations(array $migrations): array
     {

@@ -69,9 +69,9 @@ class SeedCommand extends Command
     /**
      * Perform seed operation.
      *
-     * @param string[]    $classes
-     * @param bool        $force
-     * @param string|null $database
+     * @param class-string[] $classes
+     * @param bool           $force
+     * @param string|null    $database
      *
      * @return int
      */
@@ -142,9 +142,9 @@ class SeedCommand extends Command
     /**
      * Ask user to select the seeds to run.
      *
-     * @param string[] $list Available seeds
+     * @param class-string[] $list Available seeds
      *
-     * @return string[] Selected seeds
+     * @return class-string[] Selected seeds
      */
     protected function selectSeeds(array $list): array
     {
