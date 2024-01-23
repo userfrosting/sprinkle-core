@@ -24,6 +24,7 @@ use UserFrosting\Sprinkle\Core\Database\Models\Concerns\HasRelationships;
  * UserFrosting's base data model, from which all UserFrosting data classes extend.
  *
  * @mixin \Illuminate\Database\Eloquent\Builder
+ * @mixin \UserFrosting\Sprinkle\Core\Database\Builder
  */
 abstract class Model extends LaravelModel
 {

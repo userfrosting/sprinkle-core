@@ -50,10 +50,13 @@ class MigratorTest extends TestCase
         parent::setUp();
 
         // Create mock objects
-        $this->connection = Mockery::mock(Connection::class);
-        $this->database = Mockery::mock(Capsule::class)
-            ->shouldReceive('getConnection')->with(null)->andReturn($this->connection)
+        /** @var Capsule */
+        $database = Mockery::mock(Capsule::class)
+            ->shouldReceive('getConnection')
+            ->with(null)
+            ->andReturn(Mockery::mock(Connection::class))
             ->getMock();
+        $this->database = $database;
         $this->repository = Mockery::mock(MigrationRepositoryInterface::class);
         $this->locator = Mockery::mock(MigrationLocatorInterface::class);
     }

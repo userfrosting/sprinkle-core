@@ -35,9 +35,11 @@ class MigratorDependencyTest extends TestCase
 
         // Add installed
         /** @var MigrationRepositoryInterface */
-        $this->repository = $this->ci->get(MigrationRepositoryInterface::class);
-        $this->repository->log(StubAnalyserMigrationA::class, 1);
-        $this->repository->log(StubAnalyserMigrationD::class, 2);
+        $repository = $this->ci->get(MigrationRepositoryInterface::class);
+        $repository->log(StubAnalyserMigrationA::class, 1);
+        $repository->log(StubAnalyserMigrationD::class, 2); // @phpstan-ignore-line - D doesn't exist, which is the point
+
+        $this->repository = $repository;
     }
 
     public function tearDown(): void
@@ -59,7 +61,7 @@ class MigratorDependencyTest extends TestCase
 
         $this->assertSame([
             StubAnalyserMigrationA::class,
-            StubAnalyserMigrationD::class,
+            StubAnalyserMigrationD::class, // @phpstan-ignore-line
         ], $migrator->getInstalled());
     }
 
@@ -91,7 +93,8 @@ class MigratorDependencyTest extends TestCase
         $migrator = $this->ci->get(Migrator::class);
 
         $this->assertSame([
-            StubAnalyserMigrationD::class, // Installed, not available
+            // Installed, not available
+            StubAnalyserMigrationD::class, // @phpstan-ignore-line
         ], $migrator->getStale());
     }
 
@@ -101,7 +104,7 @@ class MigratorDependencyTest extends TestCase
     public function testGetPendingWithUnmatchedDependencies(): void
     {
         // Remove D from installed, then E will fail
-        $this->repository->remove(StubAnalyserMigrationD::class);
+        $this->repository->remove(StubAnalyserMigrationD::class); // @phpstan-ignore-line
 
         // Get migrator
         $migrator = $this->ci->get(Migrator::class);
@@ -113,7 +116,7 @@ class MigratorDependencyTest extends TestCase
 
         // Set exception expectation
         $this->expectException(MigrationDependencyNotMetException::class);
-        $this->expectExceptionMessage(StubAnalyserMigrationE::class . ' depends on ' . StubAnalyserMigrationD::class . ", but it's not available.");
+        $this->expectExceptionMessage(StubAnalyserMigrationE::class . ' depends on ' . StubAnalyserMigrationD::class . ", but it's not available."); // @phpstan-ignore-line
 
         // Get pending
         $migrator->getPending();
@@ -149,6 +152,7 @@ class StubAnalyserMigrationA implements MigrationInterface
 
 class StubAnalyserMigrationB extends StubAnalyserMigrationA
 {
+    /** @var class-string[] */
     public static $dependencies = [
         StubAnalyserMigrationC::class,
     ];
@@ -160,7 +164,9 @@ class StubAnalyserMigrationC extends StubAnalyserMigrationA
 
 class StubAnalyserMigrationE extends StubAnalyserMigrationA
 {
+    /** @var class-string[] */
     public static $dependencies = [
-        StubAnalyserMigrationD::class, // D doesn't exist on purpose, but it IS installed
+        // D doesn't exist on purpose, but it IS installed
+        StubAnalyserMigrationD::class, // @phpstan-ignore-line
     ];
 }

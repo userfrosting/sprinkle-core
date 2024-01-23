@@ -31,15 +31,17 @@ class MigratorDependencyTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    public function testConstruct(): Migrator
+    protected function getMigrator(): Migrator
     {
+        /** @var MigrationRepositoryInterface */
         $installed = Mockery::mock(MigrationRepositoryInterface::class)
             ->shouldReceive('list')->andReturn([
                 StubAnalyserMigrationA::class,
-                StubAnalyserMigrationD::class,
+                StubAnalyserMigrationD::class, // @phpstan-ignore-line - D doesn't exist, which is the point
             ])
             ->getMock();
 
+        /** @var MigrationLocatorInterface */
         $available = Mockery::mock(MigrationLocatorInterface::class)
             ->shouldReceive('list')->andReturn([
                 StubAnalyserMigrationA::class,
@@ -50,7 +52,7 @@ class MigratorDependencyTest extends TestCase
             ->shouldReceive('has')->with(StubAnalyserMigrationA::class)->andReturn(true)
             ->shouldReceive('has')->with(StubAnalyserMigrationB::class)->andReturn(true)
             ->shouldReceive('has')->with(StubAnalyserMigrationC::class)->andReturn(true)
-            ->shouldReceive('has')->with(StubAnalyserMigrationD::class)->andReturn(false)
+            ->shouldReceive('has')->with(StubAnalyserMigrationD::class)->andReturn(false) // @phpstan-ignore-line
             ->shouldReceive('has')->with(StubAnalyserMigrationE::class)->andReturn(true)
             ->shouldReceive('get')->with(StubAnalyserMigrationA::class)->andReturn(new StubAnalyserMigrationA())
             ->shouldReceive('get')->with(StubAnalyserMigrationB::class)->andReturn(new StubAnalyserMigrationB())
@@ -58,38 +60,30 @@ class MigratorDependencyTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserMigrationE::class)->andReturn(new StubAnalyserMigrationE())
             ->getMock();
 
-        $connection = Mockery::mock(Connection::class);
+        /** @var Capsule */
         $database = Mockery::mock(Capsule::class)
-            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->shouldReceive('getConnection')
+            ->with(null)
+            ->andReturn(Mockery::mock(Connection::class))
             ->getMock();
 
         $analyser = new Migrator($installed, $available, $database);
 
-        $this->assertInstanceOf(Migrator::class, $analyser);
-
         return $analyser;
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetInstalled(Migrator $analyser): void
+    public function testGetInstalled(): void
     {
+        $analyser = $this->getMigrator();
         $this->assertSame([
             StubAnalyserMigrationA::class,
-            StubAnalyserMigrationD::class,
+            StubAnalyserMigrationD::class, // @phpstan-ignore-line
         ], $analyser->getInstalled());
     }
 
-    /**
-     * @depends testConstruct
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetAvailable(Migrator $analyser): void
+    public function testGetAvailable(): void
     {
+        $analyser = $this->getMigrator();
         $this->assertSame([
             StubAnalyserMigrationA::class,
             StubAnalyserMigrationB::class,
@@ -98,15 +92,9 @@ class MigratorDependencyTest extends TestCase
         ], $analyser->getAvailable());
     }
 
-    /**
-     * @depends testConstruct
-     * @depends testGetInstalled
-     * @depends testGetAvailable
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetPending(Migrator $analyser): void
+    public function testGetPending(): void
     {
+        $analyser = $this->getMigrator();
         $this->assertSame([
             StubAnalyserMigrationC::class, // C is before B because B depend on C
             StubAnalyserMigrationB::class,
@@ -114,17 +102,11 @@ class MigratorDependencyTest extends TestCase
         ], $analyser->getPending());
     }
 
-    /**
-     * @depends testConstruct
-     * @depends testGetInstalled
-     * @depends testGetAvailable
-     *
-     * @param Migrator $analyser
-     */
-    public function testGetStale(Migrator $analyser): void
+    public function testGetStale(): void
     {
+        $analyser = $this->getMigrator();
         $this->assertSame([
-            StubAnalyserMigrationD::class,
+            StubAnalyserMigrationD::class, // @phpstan-ignore-line
         ], $analyser->getStale());
     }
 
@@ -133,13 +115,15 @@ class MigratorDependencyTest extends TestCase
      */
     public function testGetPendingThirdStageDependency(): void
     {
+        /** @var MigrationRepositoryInterface */
         $installed = Mockery::mock(MigrationRepositoryInterface::class)
             ->shouldReceive('list')->andReturn([
                 StubAnalyserMigrationA::class,
-                StubAnalyserMigrationD::class,
+                StubAnalyserMigrationD::class, // @phpstan-ignore-line
             ])
             ->getMock();
 
+        /** @var MigrationLocatorInterface */
         $available = Mockery::mock(MigrationLocatorInterface::class)
             ->shouldReceive('list')->andReturn([
                 StubAnalyserMigrationH::class, // Place H first
@@ -151,7 +135,7 @@ class MigratorDependencyTest extends TestCase
             ->shouldReceive('has')->with(StubAnalyserMigrationA::class)->andReturn(true)
             ->shouldReceive('has')->with(StubAnalyserMigrationB::class)->andReturn(true)
             ->shouldReceive('has')->with(StubAnalyserMigrationC::class)->andReturn(true)
-            ->shouldReceive('has')->with(StubAnalyserMigrationD::class)->andReturn(false)
+            ->shouldReceive('has')->with(StubAnalyserMigrationD::class)->andReturn(false) // @phpstan-ignore-line
             ->shouldReceive('has')->with(StubAnalyserMigrationE::class)->andReturn(true)
             ->shouldReceive('get')->with(StubAnalyserMigrationA::class)->andReturn(new StubAnalyserMigrationA())
             ->shouldReceive('get')->with(StubAnalyserMigrationB::class)->andReturn(new StubAnalyserMigrationB())
@@ -160,9 +144,11 @@ class MigratorDependencyTest extends TestCase
             ->shouldReceive('get')->with(StubAnalyserMigrationH::class)->andReturn(new StubAnalyserMigrationH())
             ->getMock();
 
-        $connection = Mockery::mock(Connection::class);
+        /** @var Capsule */
         $database = Mockery::mock(Capsule::class)
-            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->shouldReceive('getConnection')
+            ->with(null)
+            ->andReturn(Mockery::mock(Connection::class))
             ->getMock();
 
         $analyser = new Migrator($installed, $available, $database);
@@ -180,27 +166,31 @@ class MigratorDependencyTest extends TestCase
      */
     public function testGetPendingWithNonAvailable(): void
     {
+        /** @var MigrationRepositoryInterface */
         $installed = Mockery::mock(MigrationRepositoryInterface::class)
             ->shouldReceive('list')->andReturn([])
             ->getMock();
 
+        /** @var MigrationLocatorInterface */
         $available = Mockery::mock(MigrationLocatorInterface::class)
             ->shouldReceive('list')->andReturn([
                 StubAnalyserMigrationG::class,
             ])
-            ->shouldReceive('has')->with(StubAnalyserMigrationF::class)->andReturn(false)
+            ->shouldReceive('has')->with(StubAnalyserMigrationF::class)->andReturn(false) // @phpstan-ignore-line
             ->shouldReceive('get')->with(StubAnalyserMigrationG::class)->andReturn(new StubAnalyserMigrationG())
             ->getMock();
 
-        $connection = Mockery::mock(Connection::class);
+        /** @var Capsule */
         $database = Mockery::mock(Capsule::class)
-            ->shouldReceive('getConnection')->with(null)->andReturn($connection)
+            ->shouldReceive('getConnection')
+            ->with(null)
+            ->andReturn(Mockery::mock(Connection::class))
             ->getMock();
 
         $analyser = new Migrator($installed, $available, $database);
 
         $this->expectException(MigrationDependencyNotMetException::class);
-        $this->expectExceptionMessage(StubAnalyserMigrationG::class . ' depends on ' . StubAnalyserMigrationF::class . ", but it's not available.");
+        $this->expectExceptionMessage(StubAnalyserMigrationG::class . ' depends on ' . StubAnalyserMigrationF::class . ", but it's not available."); // @phpstan-ignore-line
 
         $analyser->getPending();
     }
@@ -219,6 +209,7 @@ class StubAnalyserMigrationA implements MigrationInterface
 
 class StubAnalyserMigrationB extends StubAnalyserMigrationA
 {
+    /** @var class-string[] */
     public static $dependencies = [
         StubAnalyserMigrationC::class,
     ];
@@ -230,20 +221,25 @@ class StubAnalyserMigrationC extends StubAnalyserMigrationA
 
 class StubAnalyserMigrationE extends StubAnalyserMigrationA
 {
+    /** @var class-string[] */
     public static $dependencies = [
-        StubAnalyserMigrationD::class, // D doesn't exist on purpose, but it IS installed
+        // D doesn't exist on purpose, but it IS installed
+        StubAnalyserMigrationD::class, // @phpstan-ignore-line
     ];
 }
 
 class StubAnalyserMigrationG extends StubAnalyserMigrationA
 {
+    /** @var class-string[] */
     public static $dependencies = [
-        StubAnalyserMigrationF::class, // F doesn't exist on purpose, and it's NOT installed
+        // F doesn't exist on purpose, and it's NOT installed
+        StubAnalyserMigrationF::class, // @phpstan-ignore-line
     ];
 }
 
 class StubAnalyserMigrationH extends StubAnalyserMigrationA
 {
+    /** @var class-string[] */
     public static $dependencies = [
         StubAnalyserMigrationB::class,
     ];

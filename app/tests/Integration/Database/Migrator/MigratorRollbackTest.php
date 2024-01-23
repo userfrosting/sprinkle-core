@@ -35,11 +35,13 @@ class MigratorRollbackTest extends TestCase
 
         // Add installed
         /** @var MigrationRepositoryInterface */
-        $this->repository = $this->ci->get(MigrationRepositoryInterface::class);
-        $this->repository->log(StubAnalyserRollbackMigrationA::class, 1);
-        $this->repository->log(StubAnalyserRollbackMigrationC::class, 2);
-        $this->repository->log(StubAnalyserRollbackMigrationB::class, 2);
-        $this->repository->log(StubAnalyserRollbackMigrationD::class, 3);
+        $repository = $this->ci->get(MigrationRepositoryInterface::class);
+        $repository->log(StubAnalyserRollbackMigrationA::class, 1);
+        $repository->log(StubAnalyserRollbackMigrationC::class, 2);
+        $repository->log(StubAnalyserRollbackMigrationB::class, 2);
+        $repository->log(StubAnalyserRollbackMigrationD::class, 3);
+
+        $this->repository = $repository;
     }
 
     public function tearDown(): void
@@ -172,6 +174,7 @@ class StubAnalyserRollbackMigrationA implements MigrationInterface
 
 class StubAnalyserRollbackMigrationB extends StubAnalyserRollbackMigrationA
 {
+    /** @var class-string[] */
     public static $dependencies = [
         StubAnalyserRollbackMigrationC::class,
     ];

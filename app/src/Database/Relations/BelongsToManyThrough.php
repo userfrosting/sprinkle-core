@@ -23,6 +23,8 @@ use UserFrosting\Sprinkle\Core\Database\Relations\Concerns\Unique;
  * A BelongsToMany relationship that queries through an additional intermediate model.
  *
  * @see https://github.com/illuminate/database/blob/10.x/Eloquent/Relations/BelongsToMany.php
+ *
+ * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class BelongsToManyThrough extends BelongsToMany
 {

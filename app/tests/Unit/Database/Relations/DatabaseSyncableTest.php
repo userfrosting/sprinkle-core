@@ -12,11 +12,14 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Tests\Unit;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Mockery as m;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use UserFrosting\Sprinkle\Core\Database\Builder;
 use UserFrosting\Sprinkle\Core\Database\Relations\HasManySyncable;
 
 /**
@@ -24,29 +27,18 @@ use UserFrosting\Sprinkle\Core\Database\Relations\HasManySyncable;
  */
 class DatabaseSyncableTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
+    use MockeryPHPUnitIntegration;
 
     /**
      * @dataProvider syncMethodHasManyListProvider
+     *
+     * @param mixed[] $list
      */
-    public function testSyncMethod($list)
+    public function testSyncMethod(array $list): void
     {
-        $relation = $this->getRelation();
-
-        // Simulate determination of related key from builder
-        $relation->getRelated()->shouldReceive('getKeyName')->once()->andReturn('id');
-
         // Simulate fetching of current relationships (1,2,3)
-        $query = m::mock(stdClass::class);
-        $relation->shouldReceive('newQuery')->once()->andReturn($query);
+        $query = Mockery::mock(stdClass::class);
         $query->shouldReceive('pluck')->once()->with('id')->andReturn(new Collection([1, 2, 3]));
-
-        // withoutGlobalScopes will get called exactly 3 times
-        $relation->getRelated()->shouldReceive('withoutGlobalScopes')->times(3)->andReturn($query);
 
         // Test deletions of items removed from relationship (1)
         $query->shouldReceive('whereIn')->once()->with('id', [1])->andReturn($query);
@@ -58,8 +50,26 @@ class DatabaseSyncableTest extends TestCase
         $query->shouldReceive('where')->once()->with('id', 3)->andReturn($query);
         $query->shouldReceive('update')->once()->with(['id' => 3, 'species' => 'Megascops'])->andReturn($query);
 
+        // Set up and simulate base expectations for arguments to relationship.
+        $related = Mockery::mock(Model::class);
+        $related->shouldReceive('getKeyName')->once()->andReturn('id'); // Simulate determination of related key from builder
+        $related->shouldReceive('withoutGlobalScopes')->times(3)->andReturn($query); // withoutGlobalScopes will get called exactly 3 times
+
+        $builder = Mockery::mock(EloquentBuilder::class);
+        $builder->shouldReceive('whereNotNull')->with('table.foreign_key');
+        $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
+        $builder->shouldReceive('getModel')->andReturn($related);
+
+        $parent = Mockery::mock(Model::class);
+        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
+        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
+
+        $relation = new HasManySyncable($builder, $parent, 'table.foreign_key', 'id');
+        $relation->shouldReceive('newQuery')->once()->andReturn($query); // @phpstan-ignore-line
+
         // Test creation of new items ('x')
-        $model = $this->expectCreatedModel($relation, [
+        $model = $this->expectCreatedModel($related, [
             'id' => 'x',
         ]);
         $model->shouldReceive('getAttribute')->with('id')->andReturn('x');
@@ -68,24 +78,9 @@ class DatabaseSyncableTest extends TestCase
     }
 
     /**
-     * Set up and simulate base expectations for arguments to relationship.
-     */
-    protected function getRelation()
-    {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
-        $builder->shouldReceive('whereNotNull')->with('table.foreign_key');
-        $builder->shouldReceive('where')->with('table.foreign_key', '=', 1);
-        $related = m::mock('Illuminate\Database\Eloquent\Model');
-        $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
-        $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $parent->shouldReceive('getCreatedAtColumn')->andReturn('created_at');
-        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-
-        return new HasManySyncable($builder, $parent, 'table.foreign_key', 'id');
-    }
-
-    public static function syncMethodHasManyListProvider()
+     * @return mixed[]
+     **/
+    public static function syncMethodHasManyListProvider(): array
     {
         return [
             // First test set
@@ -109,15 +104,31 @@ class DatabaseSyncableTest extends TestCase
         ];
     }
 
-    protected function expectNewModel($relation, $attributes = null)
+    /**
+     * @param Model&\Mockery\MockInterface $related
+     * @param ?mixed[]                     $attributes
+     *
+     * @return Model&\Mockery\MockInterface
+     */
+    protected function expectNewModel(Model $related, ?array $attributes = null): Model
     {
-        $relation->getRelated()->shouldReceive('newInstance')->once()->with($attributes)->andReturn($model = m::mock(Model::class));
+        $related->shouldReceive('newInstance')
+                ->once()
+                ->with($attributes)
+                ->andReturn($model = Mockery::mock(Model::class));
+
         $model->shouldReceive('setAttribute')->with('foreign_key', 1)->andReturn($model);
 
         return $model;
     }
 
-    protected function expectCreatedModel($relation, $attributes)
+    /**
+     * @param Model&\Mockery\MockInterface $relation
+     * @param mixed[]                      $attributes
+     *
+     * @return Model&\Mockery\MockInterface
+     */
+    protected function expectCreatedModel(Model $relation, ?array $attributes): Model
     {
         $model = $this->expectNewModel($relation, $attributes);
         $model->shouldReceive('save')->andReturn($model);
