@@ -27,8 +27,9 @@ class DbParamTester
      * @throws \PDOException If connection failed
      *
      * @return true Return true if db is successful
+     *
+     * @codeCoverageIgnore
      */
-    // TODO : Replace array with individual params
     public function test(array $dbParams): bool
     {
         // Setup a new db connection
