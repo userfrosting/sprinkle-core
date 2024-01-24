@@ -1,0 +1,21 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Dynamic call to static method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:exists\\(\\)\\.$#"
+			count: 1
+			path: app/src/Database/Migrator/DatabaseMigrationRepository.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:exclude\\(\\)\\.$#"
+			count: 3
+			path: app/tests/Integration/Database/DatabaseTest.php
+
+		-
+			message: "#^Dynamic call to static method Illuminate\\\\Database\\\\Eloquent\\\\Builder\\:\\:withCount\\(\\)\\.$#"
+			count: 1
+			path: app/tests/Integration/Database/DatabaseTest.php
+
+		-
+			message: "#^Dynamic call to static method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:orderBy\\(\\)\\.$#"
+			count: 1
+			path: app/tests/Integration/Database/DatabaseTest.php
