@@ -98,7 +98,7 @@ final class AssetsWebpackCommand extends Command
         // Select command based on command arguments
         $command = match (true) {
             ($production || $this->envMode === 'production') => 'npm run build',
-            ($watch)                                         => 'npm run watch',
+            $watch                                           => 'npm run watch',
             default                                          => 'npm run dev',
         };
 
