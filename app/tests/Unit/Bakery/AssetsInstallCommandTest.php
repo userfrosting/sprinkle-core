@@ -18,7 +18,8 @@ use phpmock\MockBuilder;
 use phpmock\mockery\PHPMockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use UserFrosting\Sprinkle\Core\Bakery\WebpackCommand;
+use UserFrosting\Sprinkle\Core\Bakery\AssetsInstallCommand;
+use UserFrosting\Sprinkle\Core\Bakery\Helper\ShellCommandHelper;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
 use UserFrosting\Sprinkle\Core\Validators\NodeVersionValidator;
 use UserFrosting\Sprinkle\Core\Validators\NpmVersionValidator;
@@ -26,21 +27,25 @@ use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;
 
 /**
- * Test `webpack` command.
+ * Test `assets:install` command.
  *
  * Warning : This test doesn't fully test the output format.
  */
-class WebpackCommandTest extends TestCase
+class AssetsInstallCommandTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
     public function testCommand(): void
     {
-        // Mock built-in error_get_last
-        $reflection_class = new ReflectionClass(WebpackCommand::class);
+        // Mock built-in function from main class
+        $reflection_class = new ReflectionClass(AssetsInstallCommand::class);
         $namespace = $reflection_class->getNamespaceName();
-        PHPMockery::mock($namespace, 'getcwd')->andReturn('foo/');
-        PHPMockery::mock($namespace, 'file_exists')->andReturn(true);
+        PHPMockery::mock($namespace, 'getcwd')->andReturn('foo');
+        PHPMockery::mock($namespace, 'file_exists')->andReturn(true, false);
+
+        // Mock passthru, from ShellCommandHelper
+        $reflection_class = new ReflectionClass(ShellCommandHelper::class);
+        $namespace = $reflection_class->getNamespaceName();
         PHPMockery::mock($namespace, 'passthru')->andReturn(null);
 
         // Set Validator mock
@@ -55,88 +60,22 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
 
-        /** @var WebpackCommand */
-        $command = $ci->get(WebpackCommand::class);
+        /** @var AssetsInstallCommand */
+        $command = $ci->get(AssetsInstallCommand::class);
         $result = BakeryTester::runCommand($command);
 
         // Assert some output
         $this->assertSame(0, $result->getStatusCode());
-        $this->assertStringContainsString('npm run dev', $result->getDisplay());
-        $this->assertStringContainsString('Assets Compiled', $result->getDisplay());
-    }
-
-    public function testCommandProductionEnv(): void
-    {
-        // Mock built-in error_get_last
-        $reflection_class = new ReflectionClass(WebpackCommand::class);
-        $namespace = $reflection_class->getNamespaceName();
-        PHPMockery::mock($namespace, 'getcwd')->andReturn('foo/');
-        PHPMockery::mock($namespace, 'file_exists')->andReturn(true);
-        PHPMockery::mock($namespace, 'passthru')->andReturn(null);
-
-        // Set Validator mock
-        $node = Mockery::mock(NodeVersionValidator::class)
-            ->shouldReceive('validate')->andReturn(true)
-            ->getMock();
-        $npm = Mockery::mock(NpmVersionValidator::class)
-            ->shouldReceive('validate')->andReturn(true)
-            ->getMock();
-
-        // Set mock in CI and run command
-        $ci = ContainerStub::create();
-        $ci->set(NodeVersionValidator::class, $node);
-        $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', 'production'); // Set production mode
-
-        /** @var WebpackCommand */
-        $command = $ci->get(WebpackCommand::class);
-        $result = BakeryTester::runCommand($command);
-
-        // Assert some output
-        $this->assertSame(0, $result->getStatusCode());
-        $this->assertStringContainsString('npm run build', $result->getDisplay());
-        $this->assertStringContainsString('Assets Compiled', $result->getDisplay());
-    }
-
-    public function testCommandProduction(): void
-    {
-        // Mock built-in error_get_last
-        $reflection_class = new ReflectionClass(WebpackCommand::class);
-        $namespace = $reflection_class->getNamespaceName();
-        PHPMockery::mock($namespace, 'getcwd')->andReturn('foo/');
-        PHPMockery::mock($namespace, 'file_exists')->andReturn(true);
-        PHPMockery::mock($namespace, 'passthru')->andReturn(null);
-
-        // Set Validator mock
-        $node = Mockery::mock(NodeVersionValidator::class)
-            ->shouldReceive('validate')->andReturn(true)
-            ->getMock();
-        $npm = Mockery::mock(NpmVersionValidator::class)
-            ->shouldReceive('validate')->andReturn(true)
-            ->getMock();
-
-        // Set mock in CI and run command
-        $ci = ContainerStub::create();
-        $ci->set(NodeVersionValidator::class, $node);
-        $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
-
-        /** @var WebpackCommand */
-        $command = $ci->get(WebpackCommand::class);
-        $result = BakeryTester::runCommand($command, input: ['--production' => true]);
-
-        // Assert some output
-        $this->assertSame(0, $result->getStatusCode());
-        $this->assertStringContainsString('npm run build', $result->getDisplay());
-        $this->assertStringContainsString('Assets Compiled', $result->getDisplay());
+        $this->assertStringContainsString('Lock file `foo/package.lock` not found. Will install latest versions.', $result->getDisplay());
+        $this->assertStringContainsString('npm install', $result->getDisplay());
+        $this->assertStringContainsString('Dependencies Installed', $result->getDisplay());
     }
 
     public function testCommandWithMissingFiles(): void
     {
         // Mock built-in error_get_last
-        $reflection_class = new ReflectionClass(WebpackCommand::class);
+        $reflection_class = new ReflectionClass(AssetsInstallCommand::class);
         $namespace = $reflection_class->getNamespaceName();
         PHPMockery::mock($namespace, 'getcwd')->andReturn('./foo');
         PHPMockery::mock($namespace, 'file_exists')->andReturn(false);
@@ -153,22 +92,20 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
 
-        /** @var WebpackCommand */
-        $command = $ci->get(WebpackCommand::class);
+        /** @var AssetsInstallCommand */
+        $command = $ci->get(AssetsInstallCommand::class);
         $result = BakeryTester::runCommand($command);
 
         // Assert some output
         $this->assertSame(0, $result->getStatusCode());
         $this->assertStringContainsString('./foo/package.json not found. Skipping.', $result->getDisplay());
-        $this->assertStringContainsString('./foo/webpack.config.js not found. Skipping.', $result->getDisplay());
     }
 
     public function testCommandWithErrorInGetcwd(): void
     {
         // Mock built-in error_get_last
-        $reflection_class = new ReflectionClass(WebpackCommand::class);
+        $reflection_class = new ReflectionClass(AssetsInstallCommand::class);
         $namespace = $reflection_class->getNamespaceName();
         PHPMockery::mock($namespace, 'getcwd')->andReturn(false);
 
@@ -184,10 +121,9 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
 
-        /** @var WebpackCommand */
-        $command = $ci->get(WebpackCommand::class);
+        /** @var AssetsInstallCommand */
+        $command = $ci->get(AssetsInstallCommand::class);
         $result = BakeryTester::runCommand($command);
 
         // Assert some output
@@ -207,10 +143,9 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
 
-        /** @var WebpackCommand */
-        $command = $ci->get(WebpackCommand::class);
+        /** @var AssetsInstallCommand */
+        $command = $ci->get(AssetsInstallCommand::class);
         $result = BakeryTester::runCommand($command);
 
         // Assert some output
@@ -231,10 +166,9 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
 
-        /** @var WebpackCommand */
-        $command = $ci->get(WebpackCommand::class);
+        /** @var AssetsInstallCommand */
+        $command = $ci->get(AssetsInstallCommand::class);
         $result = BakeryTester::runCommand($command);
 
         // Assert some output
@@ -244,14 +178,18 @@ class WebpackCommandTest extends TestCase
     public function testCommandWithNpmPassthruError(): void
     {
         // Mock built-in error_get_last
-        $reflection_class = new ReflectionClass(WebpackCommand::class);
+        $reflection_class = new ReflectionClass(AssetsInstallCommand::class);
         $namespace = $reflection_class->getNamespaceName();
-        PHPMockery::mock($namespace, 'getcwd')->andReturn('foo/');
+        PHPMockery::mock($namespace, 'getcwd')->andReturn('foo');
         PHPMockery::mock($namespace, 'file_exists')->andReturn(true);
+
+        // Mock passthru, from ShellCommandHelper
+        $reflection_class = new ReflectionClass(ShellCommandHelper::class);
+        $shellNamespace = $reflection_class->getNamespaceName();
 
         // Use `MockBuilder` for more control
         $builder = new MockBuilder();
-        $builder->setNamespace($namespace)
+        $builder->setNamespace($shellNamespace)
                 ->setName('passthru')
                 ->setFunction(
                     function (string $command, int &$exitCode) {
@@ -273,63 +211,15 @@ class WebpackCommandTest extends TestCase
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
+        // $ci->set('UF_MODE', '');
 
-        /** @var WebpackCommand */
-        $command = $ci->get(WebpackCommand::class);
+        /** @var AssetsInstallCommand */
+        $command = $ci->get(AssetsInstallCommand::class);
         $result = BakeryTester::runCommand($command);
 
         // Assert some output
         $this->assertSame(1, $result->getStatusCode());
         $this->assertStringContainsString('npm dependency installation has failed', $result->getDisplay());
-
-        // Disable mock manually
-        $mock->disable();
-    }
-
-    public function testCommandWithNodePassthruError(): void
-    {
-        // Mock built-in error_get_last
-        $reflection_class = new ReflectionClass(WebpackCommand::class);
-        $namespace = $reflection_class->getNamespaceName();
-        PHPMockery::mock($namespace, 'getcwd')->andReturn('foo/');
-        PHPMockery::mock($namespace, 'file_exists')->andReturn(true);
-
-        // Use `MockBuilder` for more control
-        $builder = new MockBuilder();
-        $builder->setNamespace($namespace)
-                ->setName('passthru')
-                ->setFunction(
-                    function (string $command, int &$exitCode) {
-                        if ($command !== 'npm install') {
-                            $exitCode = 1;
-                        }
-                    }
-                );
-        $mock = $builder->build();
-        $mock->enable();
-
-        // Set Validator mock
-        $node = Mockery::mock(NodeVersionValidator::class)
-            ->shouldReceive('validate')->andReturn(true)
-            ->getMock();
-        $npm = Mockery::mock(NpmVersionValidator::class)
-            ->shouldReceive('validate')->andReturn(true)
-            ->getMock();
-
-        // Set mock in CI and run command
-        $ci = ContainerStub::create();
-        $ci->set(NodeVersionValidator::class, $node);
-        $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
-
-        /** @var WebpackCommand */
-        $command = $ci->get(WebpackCommand::class);
-        $result = BakeryTester::runCommand($command);
-
-        // Assert some output
-        $this->assertSame(1, $result->getStatusCode());
-        $this->assertStringContainsString('Webpack Encore run has failed', $result->getDisplay());
 
         // Disable mock manually
         $mock->disable();

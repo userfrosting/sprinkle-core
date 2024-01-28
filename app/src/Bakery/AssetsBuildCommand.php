@@ -15,15 +15,16 @@ namespace UserFrosting\Sprinkle\Core\Bakery;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Bakery\Event\AssetsBuildCommandEvent;
 use UserFrosting\Sprinkle\Core\Bakery\Event\BakeCommandEvent;
 
 /**
- * Bake command.
- * Umbrella command used to run multiple sub-commands at once.
+ * Alias for common used assets building commands, for integration into `bake` command.
  */
-final class BakeCommand extends Command
+final class AssetsBuildCommand extends Command
 {
     use WithSymfonyStyle;
 
@@ -31,26 +32,9 @@ final class BakeCommand extends Command
      * @var string[] Commands to run
      */
     protected array $commands = [
-        'setup:db',
-        'setup:mail',
-        'debug',
-        'migrate',
-        'assets:build',
-        'clear-cache',
+        'assets:install',
+        'assets:webpack',
     ];
-
-    /**
-     * @var string The UserFrosting ASCII art.
-     */
-    public string $title = "
- _   _              ______             _   _
-| | | |             |  ___|           | | (_)
-| | | |___  ___ _ __| |_ _ __ ___  ___| |_ _ _ __   __ _
-| | | / __|/ _ \ '__|  _| '__/ _ \/ __| __| | '_ \ / _` |
-| |_| \__ \  __/ |  | | | | | (_) \__ \ |_| | | | | (_| |
- \___/|___/\___|_|  \_| |_|  \___/|___/\__|_|_| |_|\__, |
-                                                    __/ |
-                                                   |___/";
 
     /**
      * @param \UserFrosting\Event\EventDispatcher $eventDispatcher
@@ -68,9 +52,12 @@ final class BakeCommand extends Command
     {
         $list = implode(', ', $this->aggregateCommands());
 
-        $this->setName('bake')
-             ->setDescription('UserFrosting installation command')
-             ->setHelp('This command combine the following commands : ' . $list);
+        $this->setName('assets:build')
+             ->setDescription('Build the assets using npm and Webpack Encore')
+             ->addOption('production', 'p', InputOption::VALUE_NONE, 'Create a production build')
+             ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Watch for changes and recompile automatically')
+             ->setHelp("This command combine the following commands : <comment>{$list}</comment>. For more info, see <comment>https://learn.userfrosting.com/asset-management</comment>.")
+             ->setAliases(['build-assets', 'webpack']);
     }
 
     /**
@@ -78,8 +65,6 @@ final class BakeCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->io->writeln("<info>{$this->title}</info>");
-
         /** @var \Symfony\Component\Console\Application */
         $application = $this->getApplication();
         foreach ($this->aggregateCommands() as $commandName) {
@@ -102,7 +87,7 @@ final class BakeCommand extends Command
      */
     protected function aggregateCommands(): array
     {
-        $event = new BakeCommandEvent($this->commands);
+        $event = new AssetsBuildCommandEvent($this->commands);
         $event = $this->eventDispatcher->dispatch($event);
 
         return $event->getCommands();

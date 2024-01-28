@@ -18,6 +18,10 @@ use UserFrosting\Event\AppInitiatedEvent;
 use UserFrosting\Event\BakeryInitiatedEvent;
 use UserFrosting\Event\EventListenerRecipe;
 use UserFrosting\Sprinkle\BakeryRecipe;
+use UserFrosting\Sprinkle\Core\Bakery\AssetsBuildCommand;
+use UserFrosting\Sprinkle\Core\Bakery\AssetsInstallCommand;
+use UserFrosting\Sprinkle\Core\Bakery\AssetsUpdateCommand;
+use UserFrosting\Sprinkle\Core\Bakery\AssetsWebpackCommand;
 use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugCommand;
@@ -46,7 +50,6 @@ use UserFrosting\Sprinkle\Core\Bakery\SetupEnvCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupMailCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
-use UserFrosting\Sprinkle\Core\Bakery\WebpackCommand;
 use UserFrosting\Sprinkle\Core\Csrf\CsrfGuardMiddleware;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\SessionsTable;
 use UserFrosting\Sprinkle\Core\Database\Migrations\v400\ThrottlesTable;
@@ -126,6 +129,10 @@ class Core implements
     public function getBakeryCommands(): array
     {
         return [
+            AssetsBuildCommand::class,
+            AssetsUpdateCommand::class,
+            AssetsInstallCommand::class,
+            AssetsWebpackCommand::class,
             BakeCommand::class,
             ClearCacheCommand::class,
             DebugCommand::class,
@@ -154,7 +161,6 @@ class Core implements
             SetupMailCommand::class,
             SprinkleListCommand::class,
             TestMailCommand::class,
-            WebpackCommand::class,
         ];
     }
 

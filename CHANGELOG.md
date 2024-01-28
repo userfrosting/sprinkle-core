@@ -12,6 +12,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update to Monolog 3
 - Test against MariaDB [#1238](https://github.com/userfrosting/UserFrosting/issues/1238)
 
+### Bakery
+- Rework assets building command. This change allows new bakery command to update Npm assets, and eventually allows sprinkles to replace webpack with something else (eg. Vite). The new commands are :
+  - `assets:install` : Alias for `npm install`.
+  - `assets:update` : Alias for `npm update`.
+  - `assets:webpack` : Alias for `npm run dev`, `npm run build` and `npm run watch`, each used to run Webpack Encore.
+  - `assets:build` : Aggregator command for building assets. Include by default `assets:install` and `assets:webpack`. The `webpack` and `build-assets` command are now alias of this command. `bake` also uses this command now. Sub commands can be added to `assets:build` by listening to `AssetsBuildCommandEvent`.
+
 ## [5.0.1](https://github.com/userfrosting/sprinkle-core/compare/5.0.0...5.0.1)
 - Add env for public URI, default back to empty string
 

@@ -18,16 +18,18 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Sprinkle\Core\Bakery\Helper\ShellCommandHelper;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
 use UserFrosting\Sprinkle\Core\Validators\NodeVersionValidator;
 use UserFrosting\Sprinkle\Core\Validators\NpmVersionValidator;
 
 /**
- * Alias for common used webpack command, for integration into `bake` command.
+ * Alias for `npm run dev`, `npm run build` and `npm run watch` commands.
  */
-final class WebpackCommand extends Command
+final class AssetsWebpackCommand extends Command
 {
     use WithSymfonyStyle;
+    use ShellCommandHelper;
 
     #[Inject]
     protected NodeVersionValidator $nodeVersionValidator;
@@ -44,17 +46,17 @@ final class WebpackCommand extends Command
     protected function configure(): void
     {
         $help = [
-            'This command will install <info>npm</info> dependencies locally and run <info>Webpack Encore</info>.',
-            'It can be use it to automatically download and install the assets in the build directory.',
+            'This command run <info>Webpack Encore</info>, using the config defined in <info>webpack.config.js</info>.',
+            'It will automatically compile the frontend dependencies in the <info>public/assets/</info> directory.',
             'Everything will be executed in the same dir the bakery command is executed.',
-            'For more info, see <comment>https://learn.userfrosting.com/basics/installation</comment>',
+            'For more info, see <comment>https://learn.userfrosting.com/asset-management</comment>',
         ];
 
-        $this->setName('webpack')
-             ->setDescription('Build the assets using npm and Webpack Encore')
-             ->setHelp(implode(' ', $help))
-             ->addOption('production', 'p', InputOption::VALUE_NONE, 'On deploy, create a production build')
-             ->setAliases(['build-assets']);
+        $this->setName('assets:webpack')
+             ->setDescription('Alias for `npm run dev`, `npm run build` or `npm run dev` command')
+             ->addOption('production', 'p', InputOption::VALUE_NONE, 'Create a production build')
+             ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Watch for changes and recompile automatically')
+             ->setHelp(implode(' ', $help));
     }
 
     /**
@@ -64,6 +66,7 @@ final class WebpackCommand extends Command
     {
         // Get options
         $production = (bool) $input->getOption('production');
+        $watch = (bool) $input->getOption('watch');
 
         // Validate dependencies
         try {
@@ -83,54 +86,33 @@ final class WebpackCommand extends Command
             return self::FAILURE;
         }
 
-        // Install NPM
-        $this->io->section('Installing npm Dependencies');
-        $file = $path . '/package.json';
-        if (!file_exists($file)) {
-            $this->io->warning("$file not found. Skipping.");
-        } else {
-            // Execute command
-            if ($this->executeCommand('npm install') !== 0) {
-                $this->io->error('npm dependency installation has failed');
-
-                return self::FAILURE;
-            }
-        }
-
         // Execute Webpack
         $this->io->title('Running Webpack Encore');
         $file = $path . '/webpack.config.js';
         if (!file_exists($file)) {
             $this->io->warning("$file not found. Skipping.");
-        } else {
-            // Execute command
-            $command = ($production || $this->envMode === 'production') ? 'npm run build' : 'npm run dev';
-            if ($this->executeCommand($command) !== 0) {
-                $this->io->error('Webpack Encore run has failed');
 
-                return self::FAILURE;
-            }
+            return self::SUCCESS;
+        }
+
+        // Select command based on command arguments
+        $command = match (true) {
+            ($production || $this->envMode === 'production') => 'npm run build',
+            ($watch)                                         => 'npm run watch',
+            default                                          => 'npm run dev',
+        };
+
+        $this->io->section('Updating npm Dependencies');
+        $this->io->info("Running command: $command");
+        if ($this->executeCommand($command) !== 0) {
+            $this->io->error('Webpack Encore run has failed');
+
+            return self::FAILURE;
         }
 
         // If all went well and there's no fatal errors, we are successful
-        $this->io->success('Assets Compiled');
+        $this->io->success('Webpack Encore run completed');
 
         return self::SUCCESS;
-    }
-
-    /**
-     * Execute shell command and return exit code.
-     *
-     * @param string $command Shell command to execute
-     *
-     * @return int Return code from passthru
-     */
-    private function executeCommand(string $command): int
-    {
-        $this->io->writeln("> <comment>$command</comment>");
-        $exitCode = 0;
-        passthru($command, $exitCode);
-
-        return $exitCode;
     }
 }

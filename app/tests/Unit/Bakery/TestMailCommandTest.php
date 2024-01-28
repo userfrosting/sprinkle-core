@@ -18,7 +18,6 @@ use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use PHPUnit\Framework\TestCase;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Bakery\TestMailCommand;
-use UserFrosting\Sprinkle\Core\Bakery\WebpackCommand;
 use UserFrosting\Sprinkle\Core\Mail\Mailer;
 use UserFrosting\Testing\BakeryTester;
 use UserFrosting\Testing\ContainerStub;
@@ -52,7 +51,7 @@ class TestMailCommandTest extends TestCase
         $ci->set(Config::class, $config);
         $ci->set(Mailer::class, $mailer);
 
-        /** @var WebpackCommand */
+        /** @var TestMailCommand */
         $command = $ci->get(TestMailCommand::class);
         $result = BakeryTester::runCommand($command);
 
@@ -81,7 +80,7 @@ class TestMailCommandTest extends TestCase
         $ci->set(Config::class, $config);
         $ci->set(Mailer::class, $mailer);
 
-        /** @var WebpackCommand */
+        /** @var TestMailCommand */
         $command = $ci->get(TestMailCommand::class);
         $result = BakeryTester::runCommand($command, ['--to' => 'foo@bar.com']);
 
@@ -110,7 +109,7 @@ class TestMailCommandTest extends TestCase
         $ci->set(Config::class, $config);
         $ci->set(Mailer::class, $mailer);
 
-        /** @var WebpackCommand */
+        /** @var TestMailCommand */
         $command = $ci->get(TestMailCommand::class);
         $result = BakeryTester::runCommand($command);
 
