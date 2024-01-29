@@ -67,7 +67,7 @@ class AssetsInstallCommandTest extends TestCase
 
         // Assert some output
         $this->assertSame(0, $result->getStatusCode());
-        $this->assertStringContainsString('Lock file `foo/package.lock` not found. Will install latest versions.', $result->getDisplay());
+        $this->assertStringContainsString('Lock file `foo/package-lock.json` not found. Will install latest versions.', $result->getDisplay());
         $this->assertStringContainsString('npm install', $result->getDisplay());
         $this->assertStringContainsString('Dependencies Installed', $result->getDisplay());
     }

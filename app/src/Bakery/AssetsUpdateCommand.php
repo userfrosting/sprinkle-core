@@ -44,7 +44,7 @@ final class AssetsUpdateCommand extends Command
         $help = [
             'This command will <info>update</info> npm dependencies defined in <info>package.json</info>.',
             'It will automatically download and install the latest version of frontend dependencies in the <info>node_modules</info> directory.',
-            'It will install the latest possible version, ignoring <info>package.lock</info> file.',
+            'It will install the latest possible version, ignoring <info>package-lock.json</info> file.',
             'Everything will be executed in the same dir the bakery command is executed.',
             'For more info, see <comment>https://learn.userfrosting.com/asset-management</comment>',
         ];

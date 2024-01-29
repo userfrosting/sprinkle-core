@@ -44,7 +44,7 @@ final class AssetsInstallCommand extends Command
         $help = [
             'This command will <info>install</info> npm dependencies defined in <info>package.json</info>.',
             'It will automatically download and install the frontend dependencies in the <info>node_modules</info> directory.',
-            'This command doesn\'t update any dependencies. It will install the version locked in the <info>package.lock</info> file.',
+            'This command doesn\'t update any dependencies. It will install the version locked in the <info>package-lock.json</info> file.',
             'Everything will be executed in the same dir the bakery command is executed.',
             'For more info, see <comment>https://learn.userfrosting.com/asset-management</comment>',
         ];
@@ -86,14 +86,13 @@ final class AssetsInstallCommand extends Command
             return self::SUCCESS;
         }
 
-        // Check if package.lock exists
-        $lockFile = $path . '/package.lock';
+        // Check if package-lock.json exists
+        $lockFile = $path . '/package-lock.json';
         if (!file_exists($lockFile)) {
             $this->io->note("Lock file `$lockFile` not found. Will install latest versions.");
         }
 
         // Execute command
-        $this->io->section('Installing npm Dependencies');
         if ($this->executeCommand('npm install') !== 0) {
             $this->io->error('npm dependency installation has failed');
 
