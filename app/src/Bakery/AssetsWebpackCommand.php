@@ -87,7 +87,7 @@ final class AssetsWebpackCommand extends Command
         }
 
         // Execute Webpack
-        $this->io->title('Running Webpack Encore');
+        $this->io->section('Running Webpack Encore');
         $file = $path . '/webpack.config.js';
         if (!file_exists($file)) {
             $this->io->warning("$file not found. Skipping.");
@@ -102,7 +102,6 @@ final class AssetsWebpackCommand extends Command
             default                                          => 'npm run dev',
         };
 
-        $this->io->section('Updating npm Dependencies');
         $this->io->info("Running command: $command");
         if ($this->executeCommand($command) !== 0) {
             $this->io->error('Webpack Encore run has failed');
