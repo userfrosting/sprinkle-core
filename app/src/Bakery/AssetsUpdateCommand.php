@@ -59,6 +59,8 @@ final class AssetsUpdateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->io->title('Updating npm Dependencies');
+        
         // Validate dependencies
         try {
             $this->nodeVersionValidator->validate();
@@ -78,7 +80,6 @@ final class AssetsUpdateCommand extends Command
         }
 
         // Execute command
-        $this->io->section('Updating npm Dependencies');
         $file = $path . '/package.json';
         if (!file_exists($file)) {
             $this->io->warning("$file not found. Skipping.");

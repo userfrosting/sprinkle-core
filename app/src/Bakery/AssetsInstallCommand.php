@@ -59,6 +59,8 @@ final class AssetsInstallCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->io->title('Installing npm Dependencies');
+        
         // Validate dependencies
         try {
             $this->nodeVersionValidator->validate();
@@ -78,7 +80,6 @@ final class AssetsInstallCommand extends Command
         }
 
         // Install NPM
-        $this->io->section('Installing npm Dependencies');
         $file = $path . '/package.json';
         if (!file_exists($file)) {
             $this->io->warning("$file not found. Skipping.");
