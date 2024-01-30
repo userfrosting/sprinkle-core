@@ -60,7 +60,7 @@ final class AssetsUpdateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->io->title('Updating npm Dependencies');
-        
+
         // Validate dependencies
         try {
             $this->nodeVersionValidator->validate();
