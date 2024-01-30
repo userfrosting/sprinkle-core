@@ -65,7 +65,7 @@ final class AssetsWebpackCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->io->title('Running Webpack Encore');
-        
+
         // Get options
         $production = (bool) $input->getOption('production');
         $watch = (bool) $input->getOption('watch');

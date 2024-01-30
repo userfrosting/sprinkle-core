@@ -60,7 +60,7 @@ final class AssetsInstallCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->io->title('Installing npm Dependencies');
-        
+
         // Validate dependencies
         try {
             $this->nodeVersionValidator->validate();
