@@ -15,6 +15,8 @@ namespace UserFrosting\Sprinkle\Core\Tests\Unit\ServicesProvider;
 use DI\Container;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -47,15 +49,35 @@ class LoggersServiceTest extends TestCase
         // Create container with provider to test
         $provider = new LoggersService();
         $this->ci = ContainerStub::create($provider->register());
+    }
 
+    /**
+     * N.B.: This test make sure the service is created, but it doesn't check
+     * it's created correctly and monolog can be called.
+     *
+     * @param class-string $interface
+     * @param class-string $class
+     *
+     * @dataProvider loggerProvider
+     */
+    public function testLoggerCreation(string $interface, string $class): void
+    {
         // Set mock Config
         $locator = Mockery::mock(Config::class)
             ->shouldReceive('getString')->with('logs.path', 'logs://userfrosting.log')->once()->andReturn('logs://database.log')
             ->getMock();
         $this->ci->set(Config::class, $locator);
+
+        $object = $this->ci->get($interface);
+        $this->assertInstanceOf($class, $object);
+        $this->assertInstanceOf(LoggerInterface::class, $object);
+        $this->assertInstanceOf($interface, $object);
     }
 
     /**
+     * N.B.: This test make sure Monolog StreamHandler is called, but doesn't
+     * necessary check it's called correctly.
+     *
      * @param class-string $interface
      * @param class-string $class
      *
@@ -63,10 +85,23 @@ class LoggersServiceTest extends TestCase
      */
     public function testLogger(string $interface, string $class): void
     {
-        $object = $this->ci->get($interface);
-        $this->assertInstanceOf($class, $object);
-        $this->assertInstanceOf(LoggerInterface::class, $object);
-        $this->assertInstanceOf($interface, $object);
+        // Use test handler instead of StreamHandler
+        $handler = new TestHandler();
+
+        /** @var LoggerInterface */
+        $object = new $class($handler);
+
+        // Add two test records
+        $object->log(0, 'Test log', ['bar' => 'foo']);
+        $object->debug('Test debug log', ['foo' => 'bar']);
+
+        // Get records
+        $records = $handler->getRecords();
+        $this->assertCount(2, $records);
+        $this->assertSame('Test log', $records[0]['message']);
+        $this->assertSame(600, $records[0]['level']);
+        $this->assertSame('Test debug log', $records[1]['message']);
+        $this->assertSame(100, $records[1]['level']);
     }
 
     /**

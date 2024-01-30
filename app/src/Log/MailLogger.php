@@ -12,20 +12,15 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Log;
 
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\StreamHandler;
+use Monolog\Handler\HandlerInterface;
 
 /**
  * Mail Monolog wrapper.
  */
 final class MailLogger extends Logger implements MailLoggerInterface
 {
-    public function __construct(
-        StreamHandler $handler,
-        LineFormatter $formatter,
-    ) {
-        $handler->setFormatter($formatter);
-
+    public function __construct(HandlerInterface $handler)
+    {
         parent::__construct($handler, 'mail');
     }
 }

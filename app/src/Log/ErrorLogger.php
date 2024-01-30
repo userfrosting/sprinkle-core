@@ -12,22 +12,15 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Log;
 
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\StreamHandler;
-use Monolog\Level;
+use Monolog\Handler\HandlerInterface;
 
 /**
  * Error Monolog wrapper.
  */
 final class ErrorLogger extends Logger implements ErrorLoggerInterface
 {
-    public function __construct(
-        StreamHandler $handler,
-        LineFormatter $formatter,
-    ) {
-        $handler->setFormatter($formatter);
-        $handler->setLevel(Level::Warning);
-
+    public function __construct(HandlerInterface $handler)
+    {
         parent::__construct($handler, 'errors');
     }
 }

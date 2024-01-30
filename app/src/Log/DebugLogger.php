@@ -12,21 +12,15 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Log;
 
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\StreamHandler;
+use Monolog\Handler\HandlerInterface;
 
 /**
  * Debug Monolog wrapper.
  */
 final class DebugLogger extends Logger implements DebugLoggerInterface
 {
-    public function __construct(
-        StreamHandler $handler,
-        LineFormatter $formatter,
-    ) {
-        $formatter->setJsonPrettyPrint(true);
-        $handler->setFormatter($formatter);
-
+    public function __construct(HandlerInterface $handler)
+    {
         parent::__construct($handler, 'debug');
     }
 }
