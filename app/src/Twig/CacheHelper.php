@@ -21,10 +21,12 @@ use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 class CacheHelper
 {
     /**
-     * @param ResourceLocatorInterface $locator The lcoator service
+     * @param ResourceLocatorInterface $locator The locator service
      */
-    public function __construct(protected ResourceLocatorInterface $locator)
-    {
+    public function __construct(
+        protected ResourceLocatorInterface $locator,
+        protected ?Filesystem $filesystem = null,
+    ) {
     }
 
     /**
@@ -38,7 +40,7 @@ class CacheHelper
         $path = $this->locator->findResource('cache://twig', true);
 
         // Get Filesystem instance
-        $fs = new Filesystem();
+        $fs = $this->filesystem ?? new Filesystem();
 
         // Make sure directory exist and delete it
         if ($path !== null && $fs->exists($path)) {
