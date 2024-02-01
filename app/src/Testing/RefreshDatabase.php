@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Testing;
 
+use Exception;
 use Illuminate\Database\Connection;
 use Psr\Container\ContainerInterface;
 use UserFrosting\Sprinkle\Core\Database\Migrator\Migrator;
@@ -28,7 +29,7 @@ trait RefreshDatabase
     {
         // @phpstan-ignore-next-line Allow for extra protection in case Trait is misused.
         if (!isset($this->ci) || !$this->ci instanceof ContainerInterface) {
-            throw new \Exception('CI/Container not available. Make sure you extend the correct TestCase');
+            throw new Exception('CI/Container not available. Make sure you extend the correct TestCase');
         }
 
         $this->usingInMemoryDatabase() ? $this->refreshInMemoryDatabase() : $this->refreshTestDatabase();
