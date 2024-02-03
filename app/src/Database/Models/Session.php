@@ -12,14 +12,16 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Database\Models;
 
+use UserFrosting\Sprinkle\Core\Database\Models\Interfaces\SessionModelInterface;
+
 /**
  * Session Class.
  *
- * @mixin \Illuminate\Database\Query\Builder
- *
  * Represents a session object as stored in the database.
+ *
+ * @mixin \Illuminate\Database\Query\Builder
  */
-class Session extends Model
+class Session extends Model implements SessionModelInterface
 {
     /**
      * @var string The name of the table for the current model.
