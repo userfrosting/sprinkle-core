@@ -20,6 +20,9 @@ use Illuminate\Support\Str;
  */
 class Util
 {
+    protected static string $adjectivesFile = 'extra://adjectives.php';
+    protected static string $nounsFile = 'extra://nouns.php';
+
     /**
      * Extracts specific fields from one associative array, and places them into another.
      *
@@ -119,13 +122,15 @@ class Util
                 $inQuotes = !$inQuotes;
             } elseif (!$inQuotes) {
                 switch ($char) {
-                    case '}': case ']':
+                    case '}':
+                    case ']':
                         $level--;
                         $endsLineLevel = null;
                         $newLineLevel = $level;
                         break;
 
-                    case '{': case '[':
+                    case '{':
+                    case '[':
                         $level++;
 
                         // no break
@@ -137,11 +142,14 @@ class Util
                         $post = ' ';
                         break;
 
-                    case ' ': case '\t': case '\n': case '\r':
-                        $char = '';
-                        $endsLineLevel = $newLineLevel;
-                        $newLineLevel = null;
-                        break;
+                        // case ' ':
+                        // case '\t':
+                        // case '\n':
+                        // case '\r':
+                        //     $char = '';
+                        //     $endsLineLevel = $newLineLevel;
+                        //     $newLineLevel = null;
+                        //     break;
                 }
             } elseif ($char === '\\') {
                 $inEscape = true;
@@ -173,8 +181,8 @@ class Util
         int $maxTries = 10,
         string $separator = '-'
     ): string {
-        $adjectives = include 'extra://adjectives.php';
-        $nouns = include 'extra://nouns.php';
+        $adjectives = include self::$adjectivesFile;
+        $nouns = include self::$nounsFile;
 
         for ($n = 0; $n < $maxTries; $n++) {
             /** @var array<string> */
