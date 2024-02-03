@@ -759,6 +759,44 @@ class DatabaseTest extends TestCase
     }
 
     /**
+     * Test the ability of a BelongsToManyThrough relationship to retrieve and count paginated queries, with skip instead of offset
+     * @depends testTableCreation
+     * @depends testBelongsToManyThrough
+     */
+    public function testBelongsToManyThroughPaginatedSkip(): void
+    {
+        $this->generateRolesWithPermissions();
+
+        /** @var EloquentTestUser */
+        $user = EloquentTestUser::create(['name' => 'David']);
+
+        $user->roles()->attach([1, 2]);
+
+        $paginatedPermissions = $user->permissions()->take(2)->skip(1);
+
+        $this->assertEquals([
+            [
+                'id'    => 2,
+                'slug'  => 'uri_spit_acid',
+                'pivot' => [
+                    'user_id'       => 1,
+                    'permission_id' => 2,
+                ],
+            ],
+            [
+                'id'    => 3,
+                'slug'  => 'uri_slash',
+                'pivot' => [
+                    'user_id'       => 1,
+                    'permission_id' => 3,
+                ],
+            ],
+        ], $paginatedPermissions->get()->toArray());
+
+        $this->assertEquals(2, $paginatedPermissions->count());
+    }
+
+    /**
      * Test the ability of a BelongsToManyThrough relationship to retrieve and count paginated queries,
      * when we need to reference a virtual/computed column (for example in a sort).
      * @depends testTableCreation
@@ -1368,14 +1406,14 @@ class EloquentTestUser extends EloquentTestModel
     public function permissions(): BelongsToManyThrough
     {
         return $this->belongsToManyThrough(
-            EloquentTestPermission::class,
-            EloquentTestRole::class,
-            'role_users',
-            'user_id',
-            'role_id',
-            'permission_roles',
-            'role_id',
-            'permission_id'
+            related: EloquentTestPermission::class,
+            through: EloquentTestRole::class,
+            firstJoiningTable: 'role_users',
+            firstForeignPivotKey: 'user_id',
+            firstRelatedKey: 'role_id',
+            secondJoiningTable: 'permission_roles',
+            secondForeignPivotKey: 'role_id',
+            secondRelatedKey: 'permission_id'
         );
     }
 

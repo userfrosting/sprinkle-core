@@ -152,11 +152,9 @@ trait Unique
 
         $this->tertiaryRelationName = is_null($tertiaryRelationName) ? $this->tertiaryRelated->getTable() : $tertiaryRelationName;
 
-        $this->tertiaryCallback = is_null($tertiaryCallback)
-                            ? function () {
-                                //
-                            }
-        : $tertiaryCallback;
+        $this->tertiaryCallback = $tertiaryCallback ?? function () {
+            //
+        };
 
         return $this;
     }
