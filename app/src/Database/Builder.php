@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace UserFrosting\Sprinkle\Core\Database;
 
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Arr;
 
 /**
  * UserFrosting's custom Query Builder Class.
@@ -30,9 +31,9 @@ class Builder extends QueryBuilder
      * @param string $field The column to match
      * @param string $value The value to match
      *
-     * @return self
+     * @return static
      */
-    public function beginsWith($field, $value)
+    public function beginsWith(string $field, string $value): static
     {
         return $this->where($field, 'LIKE', "$value%");
     }
@@ -43,9 +44,9 @@ class Builder extends QueryBuilder
      * @param string $field The column to match
      * @param string $value The value to match
      *
-     * @return self
+     * @return static
      */
-    public function endsWith($field, $value)
+    public function endsWith(string $field, string $value): static
     {
         return $this->where($field, 'LIKE', "%$value");
     }
@@ -57,7 +58,7 @@ class Builder extends QueryBuilder
      *
      * @return static
      */
-    public function exclude($column): static
+    public function exclude(array|string $column): static
     {
         $column = is_array($column) ? $column : func_get_args();
 
@@ -72,9 +73,9 @@ class Builder extends QueryBuilder
      * @param string $field The column to match
      * @param string $value The value to match
      *
-     * @return self
+     * @return static
      */
-    public function like($field, $value)
+    public function like(string $field, string $value): static
     {
         return $this->where($field, 'LIKE', "%$value%");
     }
@@ -85,9 +86,9 @@ class Builder extends QueryBuilder
      * @param string $field The column to match
      * @param string $value The value to match
      *
-     * @return self
+     * @return static
      */
-    public function orLike($field, $value)
+    public function orLike(string $field, string $value): static
     {
         return $this->orWhere($field, 'LIKE', "%$value%");
     }
@@ -95,16 +96,16 @@ class Builder extends QueryBuilder
     /**
      * Execute the query as a "select" statement.
      *
-     * @param array $columns
+     * @param string[]|string $columns
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, \UserFrosting\Sprinkle\Core\Database\Models\Model>
      */
     public function get($columns = ['*'])
     {
         $original = $this->columns;
 
         if (is_null($original)) {
-            $this->columns = $columns;
+            $this->columns = Arr::wrap($columns);
         }
 
         // Exclude any explicitly excluded columns
@@ -141,11 +142,11 @@ class Builder extends QueryBuilder
     /**
      * Find any wildcard columns ('*'), remove it from the column list and replace with an explicit list of columns.
      *
-     * @param array $columns
+     * @param string[] $columns
      *
-     * @return array
+     * @return string[]
      */
-    protected function replaceWildcardColumns(array $columns)
+    protected function replaceWildcardColumns(array $columns): array
     {
         $wildcardTables = $this->findWildcardTables($columns);
 
@@ -163,23 +164,18 @@ class Builder extends QueryBuilder
     /**
      * Return a list of wildcard columns from the list of columns, mapping columns to their corresponding tables.
      *
-     * @param array $columns
+     * @param string[] $columns
      *
-     * @return array
+     * @return string[]
      */
-    protected function findWildcardTables(array $columns)
+    protected function findWildcardTables(array $columns): array
     {
         $tables = [];
 
         foreach ($columns as $column) {
-            if ($column == '*') {
-                $tables[$column] = $this->from;
-                continue;
-            }
-
             if (substr($column, -1) == '*') {
                 $tableName = explode('.', $column)[0];
-                if ($tableName) {
+                if ($tableName !== '') {
                     $tables[$column] = $tableName;
                 }
             }
@@ -191,11 +187,11 @@ class Builder extends QueryBuilder
     /**
      * Gets the fully qualified column names for a specified table.
      *
-     * @param string $table
+     * @param string|null $table
      *
-     * @return array
+     * @return string[]
      */
-    protected function getQualifiedColumnNames($table = null)
+    protected function getQualifiedColumnNames(?string $table = null): array
     {
         $schema = $this->getConnection()->getSchemaBuilder();
 
@@ -205,12 +201,12 @@ class Builder extends QueryBuilder
     /**
      * Fully qualify any unqualified columns in a list with this builder's table name.
      *
-     * @param array  $columns
-     * @param string $table
+     * @param string[] $columns
+     * @param string   $table
      *
-     * @return array
+     * @return string[]
      */
-    protected function convertColumnsToFullyQualified($columns, $table = null)
+    protected function convertColumnsToFullyQualified(array $columns, string $table = null): array
     {
         if (is_null($table)) {
             $table = $this->from;

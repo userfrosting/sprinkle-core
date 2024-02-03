@@ -1,6 +1,26 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\ConnectionInterface\\:\\:getSchemaBuilder\\(\\)\\.$#"
+			count: 1
+			path: app/src/Database/Builder.php
+
+		-
+			message: "#^Parameter \\#1 \\$columns \\(array\\<string\\>\\|string\\) of method UserFrosting\\\\Sprinkle\\\\Core\\\\Database\\\\Builder\\:\\:get\\(\\) should be contravariant with parameter \\$columns \\(array\\|string\\) of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:get\\(\\)$#"
+			count: 1
+			path: app/src/Database/Builder.php
+
+		-
+			message: "#^Parameter \\#1 \\$columns of method UserFrosting\\\\Sprinkle\\\\Core\\\\Database\\\\Builder\\:\\:convertColumnsToFullyQualified\\(\\) expects array\\<string\\>, array\\<string\\>\\|null given\\.$#"
+			count: 1
+			path: app/src/Database/Builder.php
+
+		-
+			message: "#^Parameter \\#1 \\$columns of method UserFrosting\\\\Sprinkle\\\\Core\\\\Database\\\\Builder\\:\\:convertColumnsToFullyQualified\\(\\) expects array\\<string\\>, array\\|null given\\.$#"
+			count: 1
+			path: app/src/Database/Builder.php
+
+		-
 			message: "#^Dynamic call to static method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:exists\\(\\)\\.$#"
 			count: 1
 			path: app/src/Database/Migrator/DatabaseMigrationRepository.php
