@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Database\Models\Concerns;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use UserFrosting\Sprinkle\Core\Database\Relations\BelongsToManyThrough;
 use UserFrosting\Sprinkle\Core\Database\Relations\BelongsToManyUnique;
@@ -278,23 +277,5 @@ trait HasRelationships
             $caller,
             $inverse
         );
-    }
-
-    /**
-     * Get the relationship name of the belongs to many.
-     *
-     * @return string
-     */
-    protected function getBelongsToManyCaller()
-    {
-        $self = __FUNCTION__;
-
-        $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($key, $trace) use ($self) {
-            $caller = $trace['function'];
-
-            return !in_array($caller, HasRelationships::$manyMethodsExtended, true) && $caller != $self;
-        });
-
-        return !is_null($caller) ? $caller['function'] : null;
     }
 }

@@ -636,7 +636,6 @@ class DatabaseTest extends TestCase
 
         /** @var EloquentTestUser */
         $user = EloquentTestUser::create(['name' => 'David']);
-
         $user->roles()->attach([1, 2]);
 
         // Test retrieval of via models as well
@@ -718,6 +717,31 @@ class DatabaseTest extends TestCase
         $this->assertInstanceOf(EloquentTestPermission::class, $users[0]->permissions[0]);
         $this->assertInstanceOf(EloquentTestPermission::class, $users[0]->permissions[1]);
         $this->assertInstanceOf(EloquentTestPermission::class, $users[0]->permissions[2]);
+    }
+
+    /**
+     * Test the `getRelationExistenceCountQuery` method of Unique trait.
+     * @depends testTableCreation
+     * @depends testBelongsToManyThrough
+     */
+    public function testGetRelationExistenceCountQuery(): void
+    {
+        $this->generateRolesWithPermissions();
+
+        /** @var EloquentTestUser */
+        $user = EloquentTestUser::create(['name' => 'David']);
+        $user->roles()->attach([1]);
+        $this->assertEquals(2, $user->permissions()->count());
+
+        /** @var EloquentTestUser */
+        $user2 = EloquentTestUser::create(['name' => 'Alex']);
+        $user2->roles()->attach([2, 3]);
+        $this->assertEquals(3, $user2->permissions()->count());
+
+        // Test has, which will call `getRelationExistenceCountQuery`
+        $this->assertSame(['David', 'Alex'], EloquentTestUser::has('roles')->get()->pluck('name')->toArray()); // @phpstan-ignore-line
+        $this->assertSame(['Alex'], EloquentTestUser::has('roles', count: 2)->get()->pluck('name')->toArray());  // @phpstan-ignore-line
+        $this->assertSame(['Alex'], EloquentTestUser::has('permissions', count: 3)->get()->pluck('name')->toArray());  // @phpstan-ignore-line
     }
 
     /**
