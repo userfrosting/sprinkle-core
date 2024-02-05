@@ -157,6 +157,8 @@ class TestObject extends Model
 {
     protected $table = 'objects';
     public $timestamps = false;
+    protected $primaryKey = null;
+    public $incrementing = false;
     protected $fillable = [
         'name',
         'description',
