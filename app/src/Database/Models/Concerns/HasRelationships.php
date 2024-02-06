@@ -132,14 +132,8 @@ trait HasRelationships
         // If no table names were provided, we can guess it by concatenating the parent
         // and through table names. The two model names are transformed to snake case
         // from their default CamelCase also.
-        if (is_null($firstJoiningTable)) {
-            $firstJoiningTable = $this->joiningTable($through);
-        }
-
-        if (is_null($secondJoiningTable)) {
-            $secondJoiningTable = $through->joiningTable($instance);
-        }
-
+        $firstJoiningTable = $firstJoiningTable ?? $this->joiningTable($through);
+        $secondJoiningTable = $secondJoiningTable ?? $through->joiningTable($instance);
         $firstForeignPivotKey = $firstForeignPivotKey ?? $this->getForeignKey();
         $firstRelatedKey = $firstRelatedKey ?? $through->getForeignKey();
         $secondForeignPivotKey = $secondForeignPivotKey ?? $through->getForeignKey();
@@ -206,9 +200,7 @@ trait HasRelationships
         // If no table name was provided, we can guess it by concatenating the two
         // models using underscores in alphabetical order. The two model names
         // are transformed to snake case from their default CamelCase also.
-        if (is_null($table)) {
-            $table = $this->joiningTable($related, $instance);
-        }
+        $table = $table ?? $this->joiningTable($related, $instance);
 
         return new BelongsToManyUnique(
             $instance->newQuery(),

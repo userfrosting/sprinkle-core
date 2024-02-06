@@ -112,7 +112,7 @@ class DatabaseTest extends TestCase
             $table->string('name');
         });
 
-        $this->schema->create('assignments', function ($table) {
+        $this->schema->create('assignables', function ($table) {
             $table->integer('task_id')->unsigned();
             $table->integer('location_id')->unsigned();
             $table->morphs('assignable');
@@ -140,7 +140,7 @@ class DatabaseTest extends TestCase
         $this->schema->drop('permissions');
         $this->schema->drop('tasks');
         $this->schema->drop('locations');
-        $this->schema->drop('assignments');
+        $this->schema->drop('assignables');
         $this->schema->drop('jobs');
 
         Relation::morphMap([], false);
@@ -159,7 +159,7 @@ class DatabaseTest extends TestCase
         $this->assertTrue($this->schema->hasTable('permissions'));
         $this->assertTrue($this->schema->hasTable('tasks'));
         $this->assertTrue($this->schema->hasTable('locations'));
-        $this->assertTrue($this->schema->hasTable('assignments'));
+        $this->assertTrue($this->schema->hasTable('assignables'));
         $this->assertTrue($this->schema->hasTable('jobs'));
     }
 
@@ -1447,11 +1447,10 @@ class EloquentTestUser extends EloquentTestModel
     public function assignmentTasks(): MorphToManyUnique
     {
         $relation = $this->morphToManyUnique(
-            EloquentTestTask::class,
-            'assignable',
-            'assignments',
-            null,
-            'task_id'   // Need to explicitly set this, since it doesn't match our related model name
+            related: EloquentTestTask::class,
+            name: 'assignable',
+            table: 'assignables',
+            relatedPivotKey: 'task_id'   // Need to explicitly set this, since it doesn't match our related model name
         );
 
         return $relation;
@@ -1463,11 +1462,10 @@ class EloquentTestUser extends EloquentTestModel
     public function tasks(): MorphToManyUnique
     {
         $relation = $this->morphToManyUnique(
-            EloquentTestTask::class,
-            'assignable',
-            'assignments',
-            null,
-            'task_id'   // Need to explicitly set this, since it doesn't match our related model name
+            related: EloquentTestTask::class,
+            name: 'assignable',
+            // table: 'assignments', // This is the default table name, so we don't need to specify it
+            relatedPivotKey: 'task_id'   // Need to explicitly set this, since it doesn't match our related model name
         )->withTertiary(EloquentTestLocation::class, null, 'location_id');
 
         return $relation;
@@ -1593,7 +1591,7 @@ class EloquentTestTask extends EloquentTestModel
     {
         return $this->belongsToMany(
             EloquentTestLocation::class,
-            'assignments',
+            'assignables',
             'task_id',
             'location_id'
         );
@@ -1618,7 +1616,7 @@ class EloquentTestLocation extends EloquentTestModel
  */
 class EloquentTestAssignment extends EloquentTestModel
 {
-    protected $table = 'assignments';
+    protected $table = 'assignables';
     protected $guarded = [];
     protected $primaryKey = null;
     public $incrementing = false;
