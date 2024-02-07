@@ -56,7 +56,7 @@ trait Syncable
         foreach ($data as $row) {
             // We determine "updatable" rows as those whose $relatedKeyName (usually 'id') is set, not empty, and
             // match a related row in the database.
-            if (isset($row[$relatedKeyName]) && !empty($row[$relatedKeyName]) && in_array($row[$relatedKeyName], $current, true)) {
+            if (isset($row[$relatedKeyName]) && in_array($row[$relatedKeyName], $current, true)) {
                 $id = $row[$relatedKeyName];
                 $updateRows[$id] = $row;
             } else {
@@ -69,7 +69,7 @@ trait Syncable
         $updateIds = array_keys($updateRows);
         $deleteIds = [];
         foreach ($current as $currentId) {
-            if (!in_array($currentId, $updateIds)) {
+            if (!in_array($currentId, $updateIds, true)) {
                 $deleteIds[] = $currentId;
             }
         }
@@ -115,9 +115,9 @@ trait Syncable
     /**
      * Cast the given keys to integers if they are numeric and string otherwise.
      *
-     * @param array $keys
+     * @param mixed[] $keys
      *
-     * @return array
+     * @return mixed[]
      */
     protected function castKeys(array $keys): array
     {

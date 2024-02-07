@@ -129,10 +129,10 @@ trait Unique
     /**
      * Add a query to load the nested tertiary models for this relationship.
      *
-     * @param string        $tertiaryRelated
-     * @param string|null   $tertiaryRelationName
-     * @param string|null   $tertiaryKey
-     * @param callable|null $tertiaryCallback
+     * @param class-string<Model> $tertiaryRelated
+     * @param string|null         $tertiaryRelationName
+     * @param string|null         $tertiaryKey
+     * @param callable|null       $tertiaryCallback
      *
      * @return self
      */
@@ -197,11 +197,11 @@ trait Unique
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param array      $models
-     * @param Collection $results
-     * @param string     $relation
+     * @param mixed[]           $models
+     * @param Collection<mixed> $results
+     * @param string            $relation
      *
-     * @return array
+     * @return mixed[]
      */
     public function match(array $models, Collection $results, $relation)
     {
@@ -213,7 +213,7 @@ trait Unique
         // the parent models. Then we will return the hydrated models back out.
         foreach ($models as $model) {
             if (isset($dictionary[$key = $model->getKey()])) {
-                /** @var array */
+                /** @var mixed[] */
                 $items = $dictionary[$key];
 
                 // Eliminate any duplicates
@@ -238,9 +238,9 @@ trait Unique
      * Execute the query as a "select" statement, getting all requested models
      * and matching up any tertiary models.
      *
-     * @param array $columns
+     * @param string[] $columns
      *
-     * @return Collection
+     * @return Collection<mixed>
      */
     public function get($columns = ['*'])
     {
@@ -306,7 +306,7 @@ trait Unique
      * This is not what we want here though, because our get() method removes records before
      * `match` has a chance to build out the substructures.
      *
-     * @return Collection
+     * @return Collection<mixed>
      */
     public function getEager()
     {
@@ -317,10 +317,10 @@ trait Unique
      * Get the hydrated models and eager load their relations, optionally
      * condensing the set of models before performing the eager loads.
      *
-     * @param array $columns
-     * @param bool  $condenseModels
+     * @param string[] $columns
+     * @param bool     $condenseModels
      *
-     * @return Collection
+     * @return Collection<mixed>
      */
     public function getModels($columns = ['*'], $condenseModels = true)
     {
@@ -423,7 +423,7 @@ trait Unique
         $nestedTertiaryDictionary = null;
         $tertiaryModels = null;
 
-        if ($this->tertiaryRelationName) {
+        if ($this->tertiaryRelationName !== null) {
             // Get all tertiary models from the result set matching any of the parent models.
             $tertiaryModels = $this->getTertiaryModels($results->all());
         }
@@ -492,7 +492,7 @@ trait Unique
      * @param Model $model
      * @param Model $tertiaryModel
      */
-    protected function transferPivotsToTertiary($model, $tertiaryModel)
+    protected function transferPivotsToTertiary($model, $tertiaryModel): void
     {
         $pivotAttributes = [];
         foreach ($this->pivotColumns as $column) {
@@ -545,7 +545,7 @@ trait Unique
      * @param array      $dictionary
      * @param Collection $results
      */
-    protected function matchTertiaryModels(array $dictionary, Collection $results)
+    protected function matchTertiaryModels(array $dictionary, Collection $results): void
     {
         // Now go through and set the tertiary relation on each child model
         foreach ($results as $model) {

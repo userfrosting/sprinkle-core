@@ -118,7 +118,8 @@ trait HasRelationships
         }
 
         // Create models for through and related
-        $through = new $through();
+        /** @var \UserFrosting\Sprinkle\Core\Database\Models\Model */
+        $throughInstance = new $through();
 
         // First, we'll need to determine the foreign key and "other key" for the
         // relationship. Once we have determined the keys we'll make the query
@@ -126,17 +127,17 @@ trait HasRelationships
         $instance = $this->newRelatedInstance($related);
 
         if (is_null($throughRelation)) {
-            $throughRelation = $through->getTable();
+            $throughRelation = $throughInstance->getTable();
         }
 
         // If no table names were provided, we can guess it by concatenating the parent
         // and through table names. The two model names are transformed to snake case
         // from their default CamelCase also.
         $firstJoiningTable = $firstJoiningTable ?? $this->joiningTable($through);
-        $secondJoiningTable = $secondJoiningTable ?? $through->joiningTable($instance);
+        $secondJoiningTable = $secondJoiningTable ?? $throughInstance->joiningTable($instance);
         $firstForeignPivotKey = $firstForeignPivotKey ?? $this->getForeignKey();
-        $firstRelatedKey = $firstRelatedKey ?? $through->getForeignKey();
-        $secondForeignPivotKey = $secondForeignPivotKey ?? $through->getForeignKey();
+        $firstRelatedKey = $firstRelatedKey ?? $throughInstance->getForeignKey();
+        $secondForeignPivotKey = $secondForeignPivotKey ?? $throughInstance->getForeignKey();
         $secondRelatedKey = $secondRelatedKey ?? $instance->getForeignKey();
 
         // This relationship maps the top model (this) to the through model.
