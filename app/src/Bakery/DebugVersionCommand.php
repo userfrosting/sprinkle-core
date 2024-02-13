@@ -23,6 +23,7 @@ use UserFrosting\Sprinkle\Core\Validators\NpmVersionValidator;
 use UserFrosting\Sprinkle\Core\Validators\PhpDeprecationValidator;
 use UserFrosting\Sprinkle\Core\Validators\PhpVersionValidator;
 use UserFrosting\Sprinkle\SprinkleManager;
+use UserFrosting\UniformResourceLocator\ResourceLocatorInterface;
 
 /**
  * debug:version CLI tool.
@@ -40,6 +41,7 @@ class DebugVersionCommand extends Command
      * @param PhpDeprecationValidator             $phpDeprecationValidator
      * @param NodeVersionValidator                $nodeVersionValidator
      * @param NpmVersionValidator                 $npmVersionValidator
+     * @param ResourceLocatorInterface            $locator
      */
     public function __construct(
         protected EventDispatcherInterface $eventDispatcher,
@@ -48,6 +50,7 @@ class DebugVersionCommand extends Command
         protected PhpDeprecationValidator $phpDeprecationValidator,
         protected NodeVersionValidator $nodeVersionValidator,
         protected NpmVersionValidator $npmVersionValidator,
+        protected ResourceLocatorInterface $locator,
     ) {
         parent::__construct();
     }
@@ -92,7 +95,8 @@ class DebugVersionCommand extends Command
         $this->io->definitionList(
             ['Framework version'  => \Composer\InstalledVersions::getPrettyVersion('userfrosting/framework')],
             ['OS Name'            => php_uname('s')],
-            ['Main Sprinkle Path' => $this->sprinkleManager->getMainSprinkle()->getPath()],
+            ['Main Sprinkle'      => $this->sprinkleManager->getMainSprinkle()->getName()],
+            ['Main Sprinkle Path' => $this->locator->getBasePath()],
             ['Environment mode'   => env('UF_MODE', 'default')],
             ['PHP Version'        => $this->phpVersionValidator->getInstalled()],
             ['Node Version'       => $this->nodeVersionValidator->getInstalled()],
