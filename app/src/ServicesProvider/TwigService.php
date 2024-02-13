@@ -33,7 +33,7 @@ class TwigService implements ServicesProviderInterface
     public function register(): array
     {
         return [
-            Twig::class                    => function (
+            Twig::class => function (
                 ResourceLocatorInterface $locator,
                 Config $config,
                 TwigRepositoryInterface $extensionLoader,
@@ -47,7 +47,10 @@ class TwigService implements ServicesProviderInterface
 
                 // Add Sprinkles' templates namespaces
                 foreach (array_reverse($templatePaths) as $templateResource) {
-                    $loader->addPath($templateResource->getAbsolutePath(), $templateResource->getLocation()?->getSlug() ?? '');
+                    $loader->addPath(
+                        $templateResource->getAbsolutePath(),
+                        $templateResource->getLocation()?->getName() ?? ''
+                    );
                 }
 
                 $twigEnv = $twig->getEnvironment();
@@ -69,7 +72,7 @@ class TwigService implements ServicesProviderInterface
                 return $twig;
             },
 
-            TwigMiddleware::class          => function (App $app, Twig $twig) {
+            TwigMiddleware::class => function (App $app, Twig $twig) {
                 return TwigMiddleware::create($app, $twig);
             },
 
