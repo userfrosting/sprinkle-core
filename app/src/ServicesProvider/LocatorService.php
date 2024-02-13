@@ -12,9 +12,11 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\ServicesProvider;
 
+use Illuminate\Support\Str;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Event\ResourceLocatorInitiatedEvent;
+use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\ComposerRecipe;
 use UserFrosting\Sprinkle\SprinkleManager;
 use UserFrosting\UniformResourceLocator\ResourceLocation;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
@@ -35,7 +37,10 @@ class LocatorService implements ServicesProviderInterface
 
                 // Register all sprinkles locations
                 foreach ($sprinkleManager->getSprinkles() as $sprinkle) {
-                    $location = new ResourceLocation($sprinkle->getName(), $sprinkle->getPath());
+                    $slug = ($sprinkle instanceof ComposerRecipe)
+                        ? $sprinkle->getComposerPackage()
+                        : Str::slug($sprinkle->getName());
+                    $location = new ResourceLocation($slug, $sprinkle->getPath());
                     $locator->addLocation($location);
                 }
 
