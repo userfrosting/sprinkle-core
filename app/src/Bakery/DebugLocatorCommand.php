@@ -58,7 +58,7 @@ class DebugLocatorCommand extends Command
         $this->io->section('Registered Locations (Sprinkles)');
         $locations = $this->locator->getLocations();
         $locationsTable = array_map([$this, 'mapLocation'], $locations);
-        $this->io->table(['Name', 'Slug', 'Path'], $locationsTable);
+        $this->io->table(['Name', 'Path'], $locationsTable);
 
         // Display Streams
         $this->io->section('Registered Streams');
@@ -87,7 +87,6 @@ class DebugLocatorCommand extends Command
     {
         return [
             'name' => $location->getName(),
-            'slug' => $location->getSlug(),
             'path' => $location->getPath(),
         ];
     }
