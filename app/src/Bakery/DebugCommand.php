@@ -44,6 +44,7 @@ class DebugCommand extends Command
         'debug:mail',
         'debug:locator',
         'debug:events',
+        'debug:twig',
     ];
 
     /**

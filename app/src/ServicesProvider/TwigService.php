@@ -16,6 +16,7 @@ use Slim\App;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Twig\Extension\DebugExtension;
+use Twig\Loader\FilesystemLoader;
 use UserFrosting\Config\Config;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
@@ -37,30 +38,19 @@ class TwigService implements ServicesProviderInterface
                 ResourceLocatorInterface $locator,
                 Config $config,
                 TwigRepositoryInterface $extensionLoader,
+                FilesystemLoader $loader,
             ) {
-                $templatePaths = $locator->getResources('templates://');
-                $templatePathsStrings = array_map('strval', $templatePaths);
-                $twig = Twig::create($templatePathsStrings);
-
-                /** @var \Twig\Loader\FilesystemLoader */
-                $loader = $twig->getLoader();
-
-                // Add Sprinkles' templates namespaces
-                foreach (array_reverse($templatePaths) as $templateResource) {
-                    $loader->addPath(
-                        $templateResource->getAbsolutePath(),
-                        $templateResource->getLocation()?->getName() ?? ''
-                    );
-                }
-
+                $twig = new Twig($loader);
                 $twigEnv = $twig->getEnvironment();
 
+                // Optionally set cache
                 if (boolval($config->get('cache.twig'))) {
                     $resource = $locator->getResource('cache://twig', true);
                     $path = $resource?->getAbsolutePath() ?? false;
                     $twigEnv->setCache($path);
                 }
 
+                // Optionally enable debug
                 if (boolval($config->get('debug.twig'))) {
                     $twigEnv->enableDebug();
                     $twig->addExtension(new DebugExtension());
@@ -70,6 +60,21 @@ class TwigService implements ServicesProviderInterface
                 $this->registerTwigExtensions($twig, $extensionLoader);
 
                 return $twig;
+            },
+
+            FilesystemLoader::class => function (ResourceLocatorInterface $locator) {
+                $loader = new FilesystemLoader();
+
+                // Add Sprinkles' templates namespaces, as a main path and a namespaced path
+                foreach ($locator->getResources('templates://') as $templateResource) {
+                    $loader->addPath($templateResource->getAbsolutePath());
+                    $loader->addPath(
+                        $templateResource->getAbsolutePath(),
+                        $templateResource->getLocation()?->getName() ?? ''
+                    );
+                }
+
+                return $loader;
             },
 
             TwigMiddleware::class => function (App $app, Twig $twig) {
