@@ -37,7 +37,7 @@ class SprinkleListCommand extends Command
         'Namespace',
         'Path',
         'Composer Package',
-        'Installed Version'
+        'Installed Version',
     ];
 
     #[Inject]
