@@ -37,9 +37,7 @@ class LocatorService implements ServicesProviderInterface
 
                 // Register all sprinkles locations
                 foreach ($sprinkleManager->getSprinkles() as $sprinkle) {
-                    $slug = ($sprinkle instanceof ComposerRecipe)
-                        ? $sprinkle->getComposerPackage()
-                        : Str::slug($sprinkle->getName());
+                    $slug = Str::slug($sprinkle->getName());
                     $location = new ResourceLocation($slug, $sprinkle->getPath());
                     $locator->addLocation($location);
                 }
