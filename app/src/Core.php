@@ -82,7 +82,6 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\VersionsService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\WebpackService;
-use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\ComposerRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
@@ -95,7 +94,6 @@ use UserFrosting\Sprinkle\SprinkleRecipe;
 
 class Core implements
     SprinkleRecipe,
-    ComposerRecipe,
     TwigExtensionRecipe,
     MigrationRecipe,
     EventListenerRecipe,
@@ -120,16 +118,6 @@ class Core implements
     public function getPath(): string
     {
         return __DIR__ . '/../';
-    }
-
-    /**
-     * Return the sprinkle Composer package.
-     *
-     * @return string
-     */
-    public function getComposerPackage(): string
-    {
-        return 'userfrosting/sprinkle-core';
     }
 
     /**

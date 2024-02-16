@@ -16,7 +16,6 @@ use Illuminate\Support\Str;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use UserFrosting\ServicesProvider\ServicesProviderInterface;
 use UserFrosting\Sprinkle\Core\Event\ResourceLocatorInitiatedEvent;
-use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\ComposerRecipe;
 use UserFrosting\Sprinkle\SprinkleManager;
 use UserFrosting\UniformResourceLocator\ResourceLocation;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
