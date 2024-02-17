@@ -27,5 +27,9 @@ class RoutesExtensionTest extends CoreTestCase
 
         $result = $view->fetchFromString("{{ urlFor('alerts') }}");
         $this->assertSame('/alerts', $result);
+
+        // Test with fallback
+        $result = $view->fetchFromString("{{ urlFor('index', [], [], '/foo') }}");
+        $this->assertSame('/foo', $result);
     }
 }

@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Twig\Extensions;
 
-use Slim\Interfaces\RouteParserInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use UserFrosting\Sprinkle\Core\Util\RouteParserInterface;
 
 class RoutesExtension extends AbstractExtension
 {
