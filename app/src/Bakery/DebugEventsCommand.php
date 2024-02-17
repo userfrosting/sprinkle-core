@@ -49,7 +49,7 @@ final class DebugEventsCommand extends Command
 
         $allListeners = $this->provider->getRegisteredListeners();
         foreach ($allListeners as $event => $listeners) {
-            $this->io->section('Listeners for event ' . $event);
+            $this->io->writeln("<info>> $event</info>");
             $this->io->listing($listeners);
         }
 

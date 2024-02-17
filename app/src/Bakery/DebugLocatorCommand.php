@@ -55,7 +55,7 @@ class DebugLocatorCommand extends Command
         $this->io->writeln($this->locator->getBasePath());
 
         // Display locations
-        $this->io->section('Registered Locations (Sprinkles)');
+        $this->io->section('Registered Locations');
         $locations = $this->locator->getLocations();
         $locationsTable = array_map([$this, 'mapLocation'], $locations);
         $this->io->table(['Name', 'Path'], $locationsTable);
