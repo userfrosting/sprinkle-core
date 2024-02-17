@@ -20,7 +20,7 @@ use Slim\Interfaces\RouteParserInterface as SlimRouteParserInterface;
 interface RouteParserInterface extends SlimRouteParserInterface
 {
     /**
-     * Build the path for a named route excluding the base path
+     * Build the path for a named route excluding the base path.
      *
      * @param string                $routeName     Route name
      * @param array<string, string> $data          Named argument replacement data
@@ -38,7 +38,7 @@ interface RouteParserInterface extends SlimRouteParserInterface
     ): string;
 
     /**
-     * Build the path for a named route including the base path
+     * Build the path for a named route including the base path.
      *
      * @param string                $routeName     Route name
      * @param array<string, string> $data          Named argument replacement data
@@ -56,7 +56,7 @@ interface RouteParserInterface extends SlimRouteParserInterface
     ): string;
 
     /**
-     * Get fully qualified URL for named route
+     * Get fully qualified URL for named route.
      *
      * @param UriInterface          $uri
      * @param string                $routeName     Route name
