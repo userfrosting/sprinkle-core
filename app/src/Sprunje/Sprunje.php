@@ -12,10 +12,9 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Sprunje;
 
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Contracts\Database\Eloquent\Builder as EloquentBuilderContract;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilderContract;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -37,9 +36,9 @@ abstract class Sprunje
     protected string $name = 'export';
 
     /**
-     * @var EloquentBuilder|QueryBuilder The base (unfiltered) query.
+     * @var EloquentBuilderContract|QueryBuilderContract The base (unfiltered) query.
      */
-    protected EloquentBuilder|QueryBuilder $query;
+    protected EloquentBuilderContract|QueryBuilderContract $query;
 
     /**
      * @var array{
@@ -130,12 +129,10 @@ abstract class Sprunje
         // Start a new query on any Model instances
         $query = $this->baseQuery();
         if (is_a($query, Model::class)) {
-            $this->query = $query->newQuery();
-        } elseif (is_a($query, Relation::class)) {
-            $this->query = $query->getQuery();
-        } else {
-            $this->query = $query;
+            $query = $query->newQuery();
         }
+
+        $this->query = $query;
     }
 
     /**
@@ -376,9 +373,9 @@ abstract class Sprunje
     /**
      * Get the underlying queryable object in its current state.
      *
-     * @return EloquentBuilder|QueryBuilder
+     * @return EloquentBuilderContract|QueryBuilderContract
      */
-    public function getQuery(): EloquentBuilder|QueryBuilder
+    public function getQuery(): EloquentBuilderContract|QueryBuilderContract
     {
         return $this->query;
     }
@@ -386,11 +383,11 @@ abstract class Sprunje
     /**
      * Set the underlying QueryBuilder object.
      *
-     * @param EloquentBuilder|QueryBuilder $query
+     * @param EloquentBuilderContract|QueryBuilderContract $query
      *
      * @return static
      */
-    public function setQuery(EloquentBuilder|QueryBuilder $query): static
+    public function setQuery(EloquentBuilderContract|QueryBuilderContract $query): static
     {
         $this->query = $query;
 
@@ -400,11 +397,11 @@ abstract class Sprunje
     /**
      * Apply any filters from the options, calling a custom filter callback when appropriate.
      *
-     * @param EloquentBuilder|QueryBuilder $query
+     * @param EloquentBuilderContract|QueryBuilderContract $query
      *
      * @return static
      */
-    public function applyFilters(EloquentBuilder|QueryBuilder $query): static
+    public function applyFilters(EloquentBuilderContract|QueryBuilderContract $query): static
     {
         foreach ($this->options['filters'] as $name => $value) {
             // Check that this filter is allowed
@@ -427,11 +424,11 @@ abstract class Sprunje
     /**
      * Apply any sorts from the options, calling a custom sorter callback when appropriate.
      *
-     * @param EloquentBuilder|QueryBuilder $query
+     * @param EloquentBuilderContract|QueryBuilderContract $query
      *
      * @return static
      */
-    public function applySorts(EloquentBuilder|QueryBuilder $query): static
+    public function applySorts(EloquentBuilderContract|QueryBuilderContract $query): static
     {
         foreach ($this->options['sorts'] as $name => $direction) {
             // Check that this sort is allowed
@@ -460,11 +457,11 @@ abstract class Sprunje
     /**
      * Apply pagination based on the `page` and `size` options.
      *
-     * @param EloquentBuilder|QueryBuilder $query
+     * @param EloquentBuilderContract|QueryBuilderContract $query
      *
      * @return static
      */
-    public function applyPagination(EloquentBuilder|QueryBuilder $query): static
+    public function applyPagination(EloquentBuilderContract|QueryBuilderContract $query): static
     {
         $page = $this->options['page'];
         $size = $this->options['size'];
@@ -550,12 +547,12 @@ abstract class Sprunje
     /**
      * Match any filter in `filterable`.
      *
-     * @param EloquentBuilder|QueryBuilder $query
-     * @param mixed                        $value
+     * @param EloquentBuilderContract|QueryBuilderContract $query
+     * @param mixed                                        $value
      *
      * @return static
      */
-    protected function filterAll(EloquentBuilder|QueryBuilder $query, mixed $value): static
+    protected function filterAll(EloquentBuilderContract|QueryBuilderContract $query, mixed $value): static
     {
         foreach ($this->filterable as $name) {
             if (Str::studly($name) != 'all' && !in_array($name, $this->excludeForAll, true)) {
@@ -572,13 +569,13 @@ abstract class Sprunje
     /**
      * Build the filter query for a single field.
      *
-     * @param EloquentBuilder|QueryBuilder $query
-     * @param string                       $name
-     * @param mixed                        $value
+     * @param EloquentBuilderContract|QueryBuilderContract $query
+     * @param string                                       $name
+     * @param mixed                                        $value
      *
      * @return static
      */
-    protected function buildFilterQuery(EloquentBuilder|QueryBuilder $query, string $name, mixed $value): static
+    protected function buildFilterQuery(EloquentBuilderContract|QueryBuilderContract $query, string $name, mixed $value): static
     {
         $methodName = 'filter' . Str::studly($name);
 
@@ -597,13 +594,13 @@ abstract class Sprunje
      * Perform a 'like' query on a single field, separating the value string on the or separator and
      * matching any of the supplied values.
      *
-     * @param EloquentBuilder|QueryBuilder $query
-     * @param string                       $name
-     * @param mixed                        $value
+     * @param EloquentBuilderContract|QueryBuilderContract $query
+     * @param string                                       $name
+     * @param mixed                                        $value
      *
      * @return static
      */
-    protected function buildFilterDefaultFieldQuery(EloquentBuilder|QueryBuilder $query, string $name, mixed $value): static
+    protected function buildFilterDefaultFieldQuery(EloquentBuilderContract|QueryBuilderContract $query, string $name, mixed $value): static
     {
         if (is_bool($value)) {
             // Bool doesn't behave correctly when cast to string (false is empty instead of 0).
@@ -636,7 +633,7 @@ abstract class Sprunje
     /**
      * Set the initial query used by your Sprunje.
      *
-     * @return EloquentBuilder|QueryBuilder|Model|Relation
+     * @return EloquentBuilderContract|QueryBuilderContract|Model
      */
     abstract protected function baseQuery();
 
@@ -667,11 +664,11 @@ abstract class Sprunje
     /**
      * Get the unpaginated count of items (before filtering) in this query.
      *
-     * @param EloquentBuilder|QueryBuilder $query
+     * @param EloquentBuilderContract|QueryBuilderContract $query
      *
      * @return int
      */
-    protected function count(EloquentBuilder|QueryBuilder $query): int
+    protected function count(EloquentBuilderContract|QueryBuilderContract $query): int
     {
         return $query->count();
     }
@@ -679,11 +676,11 @@ abstract class Sprunje
     /**
      * Get the unpaginated count of items (after filtering) in this query.
      *
-     * @param EloquentBuilder|QueryBuilder $query
+     * @param EloquentBuilderContract|QueryBuilderContract $query
      *
      * @return int
      */
-    protected function countFiltered(EloquentBuilder|QueryBuilder $query): int
+    protected function countFiltered(EloquentBuilderContract|QueryBuilderContract $query): int
     {
         return $query->count();
     }
