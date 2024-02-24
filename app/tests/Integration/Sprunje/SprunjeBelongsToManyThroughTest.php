@@ -185,6 +185,8 @@ class TestSprunjeRoleUserModel extends UfModel
 {
     protected $table = 'test_sprunje_role_users';
     protected $fillable = ['user_id', 'role_id'];
+    protected $primaryKey = null;
+    public $incrementing = false;
 
     /** @var bool */
     public $timestamps = false;
@@ -194,6 +196,8 @@ class TestSprunjeRolePermissionsModel extends UfModel
 {
     protected $table = 'test_sprunje_role_permissions';
     protected $fillable = ['permission_id', 'role_id'];
+    protected $primaryKey = null;
+    public $incrementing = false;
 
     /** @var bool */
     public $timestamps = false;
