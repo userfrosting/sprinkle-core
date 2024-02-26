@@ -56,8 +56,9 @@ class DatabaseService implements ServicesProviderInterface
                 $capsule->bootEloquent();
 
                 // Listen to QueryExecuted event and send debug to logger if required by config
+                // N.B.: Using [$logger, '__invoke'] because `listen` expects a callable
                 if ($config->getBool('debug.queries') === true) {
-                    $queryEventDispatcher->listen(QueryExecuted::class, $logger::class);
+                    $queryEventDispatcher->listen(QueryExecuted::class, [$logger, '__invoke']);
                 }
 
                 return $capsule;
