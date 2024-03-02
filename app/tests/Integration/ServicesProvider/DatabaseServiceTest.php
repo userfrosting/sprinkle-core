@@ -19,7 +19,6 @@ use Monolog\Handler\TestHandler;
 use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Log\QueryLogger;
 use UserFrosting\Sprinkle\Core\Log\QueryLoggerInterface;
-use UserFrosting\Sprinkle\Core\Testing\RefreshDatabase;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 
 /**

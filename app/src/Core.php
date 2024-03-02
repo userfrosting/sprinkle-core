@@ -45,6 +45,7 @@ use UserFrosting\Sprinkle\Core\Bakery\MigrateStatusCommand;
 use UserFrosting\Sprinkle\Core\Bakery\RouteListCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SeedCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SeedListCommand;
+use UserFrosting\Sprinkle\Core\Bakery\ServeCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupDbCommand;
 use UserFrosting\Sprinkle\Core\Bakery\SetupEnvCommand;
@@ -157,6 +158,7 @@ class Core implements
             RouteListCommand::class,
             SeedCommand::class,
             SeedListCommand::class,
+            ServeCommand::class,
             SetupCommand::class,
             SetupDbCommand::class,
             SetupEnvCommand::class,
