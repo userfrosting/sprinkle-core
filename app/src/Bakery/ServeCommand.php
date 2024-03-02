@@ -35,7 +35,7 @@ final class ServeCommand extends Command
         $help = [
             'Run the php built-in web server to test your application.',
             'This is a simple way to test your application without having to configure a full web server.',
-            'Hit `<info>ctrl+c</info>` to quit.'
+            'Hit `<info>ctrl+c</info>` to quit.',
         ];
 
         $this->setName('serve')
