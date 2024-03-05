@@ -86,6 +86,7 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\WebpackService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\AlertsExtension;
+use UserFrosting\Sprinkle\Core\Twig\Extensions\ConfigExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\CoreExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\CsrfExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
@@ -244,6 +245,7 @@ class Core implements
     {
         return [
             CoreExtension::class,
+            ConfigExtension::class,
             CsrfExtension::class,
             I18nExtension::class,
             AlertsExtension::class,
