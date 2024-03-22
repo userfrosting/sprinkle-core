@@ -11,13 +11,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update to PHPUnit 10
 - Update to Monolog 3
 - Test against MariaDB [#1238](https://github.com/userfrosting/UserFrosting/issues/1238)
+- The different loggers now implement their own interface
+- Change sprunje type-hinting, fixing issue with some many-to-many relations
+- New Twig function : `config`
+- Use our own RouterParser, wrapped around Slim's RouteParser. Allows to add 'fallback' routes when names routes are not found.
 
 ### Bakery
 - Rework assets building command. This change allows new bakery command to update Npm assets, and eventually allows sprinkles to replace webpack with something else (eg. Vite). The new commands are :
   - `assets:install` : Alias for `npm install`.
   - `assets:update` : Alias for `npm update`.
   - `assets:webpack` : Alias for `npm run dev`, `npm run build` and `npm run watch`, each used to run Webpack Encore.
-  - `assets:build` : Aggregator command for building assets. Include by default `assets:install` and `assets:webpack`. The `webpack` and `build-assets` command are now alias of this command. `bake` also uses this command now. Sub commands can be added to `assets:build` by listening to `AssetsBuildCommandEvent`.
+  - `assets:build` : Aggregator command for building assets. Includes by default `assets:install` and `assets:webpack`. Sub commands can be added to `assets:build` by listening to `AssetsBuildCommandEvent`.
+  - The old `webpack` and `build-assets` command are still available, and now alias `assets:build`. `bake` also uses `assets:build` now. 
+- New Bakery commands : `serve` & `debug:twig`
 
 ## [5.0.1](https://github.com/userfrosting/sprinkle-core/compare/5.0.0...5.0.1)
 - Add env for public URI, default back to empty string
