@@ -68,6 +68,9 @@ class SessionServiceTest extends TestCase
      * Test the right handler is returned depending on Config
      *
      * @dataProvider handlerDataProvider
+     *
+     * @param string       $name
+     * @param class-string $class
      */
     public function testConfig(string $name, string $class): void
     {

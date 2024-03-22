@@ -84,17 +84,17 @@ class SprunjeTest extends TestCase
             ],
         ]);
 
+        /** @var UfBuilder&\Mockery\MockInterface */
         $builder = $sprunje->getQuery();
 
         // Need to mock the new Builder instance that Laravel spawns in the where() closure.
         // See https://stackoverflow.com/questions/20701679/mocking-callbacks-in-laravel-4-mockery
-        // @phpstan-ignore-next-line - Our sprunje actually return \Mockery\MockInterface, but we can't typehint that.
-        $builder->shouldReceive('newQuery')->andReturn(
-            Mockery::mock(UfBuilder::class, function ($subQuery) {
-                $subQuery->makePartial();
-                $subQuery->shouldReceive('orWhere')->with('species', 'LIKE', '%Tyto%')->once()->andReturn($subQuery);
-            })
-        );
+        $subQuery = Mockery::mock(UfBuilder::class)
+            ->makePartial()
+            ->shouldReceive('orWhere')->with('species', 'LIKE', '%Tyto%')->once()->andReturnSelf()
+            ->getMock();
+        $builder->shouldReceive('newQuery')->andReturn($subQuery);
+
         $sprunje->applyFilters($builder);
     }
 

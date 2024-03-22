@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\Database;
 
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Arr;
 
@@ -202,14 +203,15 @@ class Builder extends QueryBuilder
      * Fully qualify any unqualified columns in a list with this builder's table name.
      *
      * @param string[] $columns
-     * @param string   $table
+     * @param string|null   $table
      *
      * @return string[]
      */
-    protected function convertColumnsToFullyQualified(array $columns, string $table = null): array
+    protected function convertColumnsToFullyQualified(array $columns, ?string $table = null): array
     {
         if (is_null($table)) {
             $table = $this->from;
+            $table = ($table instanceof Expression) ? $table->getValue($this->grammar) : $table;
         }
 
         array_walk($columns, function (&$item, $key) use ($table) {

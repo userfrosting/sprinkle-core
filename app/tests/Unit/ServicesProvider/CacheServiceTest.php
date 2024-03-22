@@ -49,6 +49,9 @@ class CacheServiceTest extends TestCase
      * Test the right store is returned depending on Config
      *
      * @dataProvider driverDataProvider
+     *
+     * @param string       $name
+     * @param class-string $class
      */
     public function testFileConfig(string $name, string $class): void
     {
