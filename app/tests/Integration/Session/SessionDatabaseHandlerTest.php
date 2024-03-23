@@ -6,7 +6,7 @@ declare(strict_types=1);
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/sprinkle-core
- * @copyright Copyright (c) 2021 Alexander Weissman & Louis Charette
+ * @copyright Copyright (c) 2013-2024 Alexander Weissman & Louis Charette
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
@@ -74,15 +74,15 @@ class SessionDatabaseHandlerTest extends TestCase
         $handler = $this->ci->get(DatabaseSessionHandler::class);
 
         // Write session
-        // https://github.com/laravel/framework/blob/5.8/src/Illuminate/Session/DatabaseSessionHandler.php#L132
+        // https://github.com/laravel/framework/blob/10.x/src/Illuminate/Session/DatabaseSessionHandler.php#L132
         $this->assertTrue($handler->write($session_id, 'foo'));
 
         // Closing the handler does nothing anyway
-        // https://github.com/laravel/framework/blob/5.8/src/Illuminate/Session/DatabaseSessionHandler.php#L78
+        // https://github.com/laravel/framework/blob/10.x/src/Illuminate/Session/DatabaseSessionHandler.php#L78
         $this->assertTrue($handler->close());
 
         // Read session
-        // https://github.com/laravel/framework/blob/5.8/src/Illuminate/Session/DatabaseSessionHandler.php#L86-L101
+        // https://github.com/laravel/framework/blob/10.x/src/Illuminate/Session/DatabaseSessionHandler.php#L86-L101
         $this->assertSame('foo', $handler->read($session_id));
 
         // Check manually that the file has been written
@@ -91,7 +91,7 @@ class SessionDatabaseHandlerTest extends TestCase
         $this->assertSame(base64_encode('foo'), SessionTable::find($session_id)->payload);
 
         // Destroy session
-        // https://github.com/laravel/framework/blob/5.8/src/Illuminate/Session/DatabaseSessionHandler.php#L256
+        // https://github.com/laravel/framework/blob/10.x/src/Illuminate/Session/DatabaseSessionHandler.php#L256
         $this->assertTrue($handler->destroy($session_id));
 
         // Check db to make sure it's gone

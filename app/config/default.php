@@ -6,7 +6,7 @@ declare(strict_types=1);
  * UserFrosting Core Sprinkle (http://www.userfrosting.com)
  *
  * @link      https://github.com/userfrosting/sprinkle-core
- * @copyright Copyright (c) 2021 Alexander Weissman & Louis Charette
+ * @copyright Copyright (c) 2013-2024 Alexander Weissman & Louis Charette
  * @license   https://github.com/userfrosting/sprinkle-core/blob/master/LICENSE.md (MIT License)
  */
 
@@ -61,7 +61,7 @@ return [
     * Cache Service Config
     * ----------------------------------------------------------------------
     * Redis & Memcached driver configuration
-    * See Laravel for more info : https://laravel.com/docs/5.8/cache
+    * See Laravel for more info : https://laravel.com/docs/10.x/cache
     *
     * Edit prefix to something unique when multiple instance of memcached /
     * redis are used on the same server.
@@ -262,7 +262,7 @@ return [
             ],
             /*
              * Rackspace Config. Config should go in .env file. see :
-             * https://laravel.com/docs/5.8/filesystem#configuration
+             * https://laravel.com/docs/10.x/filesystem#configuration
              *
              * As of version 4.3, https://github.com/thephpleague/flysystem-rackspace
              * is required inside a custom Sprinkle to use this filesystem.
