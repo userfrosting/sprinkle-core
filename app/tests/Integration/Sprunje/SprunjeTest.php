@@ -33,16 +33,20 @@ class SprunjeTest extends CoreTestCase
 {
     /** @var mixed[] */
     protected array $listable = [
+        'type' => [
+            ['value' => 1, 'text' => 'TYPE A'],
+            ['value' => 2, 'text' => 'TYPE B'],
+        ],
         'name' => [
             // N.B.: Values are sorted automatically
             ['value' => 'bar', 'text' => 'bar'],
             ['value' => 'foo', 'text' => 'foo'],
             ['value' => 'foobar', 'text' => 'foobar'],
         ],
-        'type' => [
-            ['value' => 1, 'text' => 'TYPE A'],
-            ['value' => 2, 'text' => 'TYPE B'],
-        ],
+        'active' => [
+            ['value' => false, 'text' => false],
+            ['value' => true, 'text' => true],
+        ]
     ];
 
     public function setUp(): void
@@ -203,11 +207,11 @@ class SprunjeTest extends CoreTestCase
     public function testWithSortException(): void
     {
         $sprunje = new TestSprunje([
-            'sorts' => ['description' => 'desc'],
+            'sorts' => ['active' => 'desc'],
         ]);
 
         $this->expectException(SprunjeException::class);
-        $this->expectExceptionMessage('Bad sort: description');
+        $this->expectExceptionMessage('Bad sort: active');
         $sprunje->getArray();
     }
 
@@ -491,11 +495,14 @@ class TestSprunje extends Sprunje
     protected array $sortable = [
         'id',
         'name',
+        'description',
+        'type',
     ];
 
     protected array $listable = [
-        'name',
         'type',
+        'name',
+        'active',
     ];
 
     protected function baseQuery()
