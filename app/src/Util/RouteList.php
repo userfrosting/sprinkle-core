@@ -23,6 +23,11 @@ use Slim\Interfaces\RouteInterface;
  */
 class RouteList
 {
+    /**
+     * Inject dependencies.
+     *
+     * @param App<\DI\Container> $app
+     */
     public function __construct(protected App $app)
     {
     }

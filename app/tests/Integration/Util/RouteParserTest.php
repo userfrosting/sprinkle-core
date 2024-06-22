@@ -36,7 +36,7 @@ class RouteParserTest extends CoreTestCase
     {
         parent::setUp();
 
-        /** @var App */
+        /** @var App<\DI\Container> */
         $app = $this->ci->get(App::class);
         $collector = $app->getRouteCollector();
         $collector->setBasePath('/Myfoo');

@@ -31,7 +31,7 @@ class SetRouteCaching
      *
      * @param Config                   $config
      * @param ResourceLocatorInterface $locator
-     * @param App                      $app
+     * @param App<\DI\Container>       $app
      */
     public function __construct(
         protected Config $config,

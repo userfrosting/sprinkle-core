@@ -647,8 +647,11 @@ abstract class Sprunje
      */
     protected function getColumnValues(string $column): array
     {
+        // Clone query, so we don't modify the initial one
+        $query = clone $this->query;
+
         /** @var Collection<int, mixed[]> */
-        $rawValues = $this->query->select($column)
+        $rawValues = $query->select($column)
                                  ->distinct()
                                  ->orderBy($column, 'asc')
                                  ->get();
