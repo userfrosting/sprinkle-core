@@ -31,7 +31,7 @@ use UserFrosting\Sprinkle\Core\Exceptions\CsrfMissingException;
 class CsrfGuard extends Guard
 {
     /**
-     * Overwrites the default constructor to inject dependencies
+     * Overwrites the default constructor to inject dependencies.
      *
      * @param Config             $config
      * @param Session            $session

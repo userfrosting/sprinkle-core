@@ -24,7 +24,7 @@ use Slim\Interfaces\RouteInterface;
 class RouteList
 {
     /**
-     * Inject dependencies
+     * Inject dependencies.
      *
      * @param App<\DI\Container> $app
      */
