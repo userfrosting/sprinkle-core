@@ -30,6 +30,13 @@ use UserFrosting\Sprinkle\Core\Exceptions\CsrfMissingException;
  */
 class CsrfGuard extends Guard
 {
+    /**
+     * Overwrites the default constructor to inject dependencies
+     *
+     * @param Config             $config
+     * @param Session            $session
+     * @param App<\DI\Container> $app
+     */
     public function __construct(
         protected Config $config,
         Session $session,

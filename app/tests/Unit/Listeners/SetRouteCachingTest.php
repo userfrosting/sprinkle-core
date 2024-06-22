@@ -44,7 +44,7 @@ class SetRouteCachingTest extends TestCase
             ->shouldReceive('setCacheFile')->with('/foo/route.cache')->once()
             ->getMock();
 
-        /** @var App */
+        /** @var App<\DI\Container> */
         $app = Mockery::mock(App::class)
             ->shouldReceive('getRouteCollector')->once()->andReturn($collector)
             ->getMock();
