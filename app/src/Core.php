@@ -85,6 +85,7 @@ use UserFrosting\Sprinkle\Core\ServicesProvider\SessionService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ThrottlerService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\TwigService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\VersionsService;
+use UserFrosting\Sprinkle\Core\ServicesProvider\ViteService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\WebpackService;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\MigrationRecipe;
 use UserFrosting\Sprinkle\Core\Sprinkle\Recipe\TwigExtensionRecipe;
@@ -96,6 +97,7 @@ use UserFrosting\Sprinkle\Core\Twig\Extensions\I18nExtension;
 use UserFrosting\Sprinkle\Core\Twig\Extensions\RoutesExtension;
 use UserFrosting\Sprinkle\MiddlewareRecipe;
 use UserFrosting\Sprinkle\SprinkleRecipe;
+use UserFrosting\ViteTwig\ViteTwigExtension;
 
 class Core implements
     SprinkleRecipe,
@@ -219,6 +221,7 @@ class Core implements
             ThrottlerService::class,
             TwigService::class,
             VersionsService::class,
+            ViteService::class,
             WebpackService::class,
         ];
     }
@@ -256,6 +259,7 @@ class Core implements
             RoutesExtension::class,
             EntrypointsTwigExtension::class,
             VersionedAssetsTwigExtension::class,
+            ViteTwigExtension::class,
         ];
     }
 

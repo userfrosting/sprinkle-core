@@ -54,9 +54,15 @@ return [
     'assets' => [
         'bundler' => env('ASSETS_BUNDLER'), // Either 'vite' or 'webpack'
         'vite'    => [
-            'dev'    => env('VITE_DEV_ENABLED'),
-            'base'   => '',
-            'server' => 'http://[::1]:3000/',
+            'manifest' => 'public://.vite/manifest.json',
+            'dev'      => env('VITE_DEV_ENABLED'),
+            'base'     => '',
+            'server'   => 'http://[::1]:3000/',
+        ],
+        // Defines path to Webpack Encore `entrypoints.json` and `manifest.json` files.
+        'webpack' => [
+            'entrypoints' => 'assets://entrypoints.json',
+            'manifest'    => 'assets://manifest.json',
         ],
     ],
 
@@ -417,17 +423,6 @@ return [
         'error_reporting'       => E_ALL, // Development - report all errors and suggestions
         'log_errors'            => false,
         'display_errors_native' => false, // Let PHP itself render errors natively.  Useful if a fatal error is raised in our custom shutdown handler.
-    ],
-
-    /**
-     * ----------------------------------------------------------------------
-     * Webpack Integration Settings
-     * ----------------------------------------------------------------------
-     * Defines path to Webpack Encore `entrypoints.json` and `manifest.json` files.
-     */
-    'webpack' => [
-        'entrypoints' => 'assets://entrypoints.json',
-        'manifest'    => 'assets://manifest.json',
     ],
 
     /**
