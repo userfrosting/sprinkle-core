@@ -56,8 +56,8 @@ return [
         'vite'    => [
             'dev'    => env('VITE_DEV_ENABLED'),
             'base'   => '',
-            'server' => 'http://[::1]:3000/'
-        ]
+            'server' => 'http://[::1]:3000/',
+        ],
     ],
 
     /*
