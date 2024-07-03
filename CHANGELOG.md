@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [6.0.0](https://github.com/userfrosting/sprinkle-core/compare/5.1.0...5.2.0)
+- Vite is now the default bundler.
+
 ## [5.2.0](https://github.com/userfrosting/sprinkle-core/compare/5.1.0...5.2.0)
 - [New Feature] Add [Vite](https://vitejs.dev) support :
   - New Vite Bakery command, `assets:vite`. This command can be used to 

@@ -47,11 +47,11 @@ class AssetsBuildCommandListener
      */
     public function __invoke(AssetsBuildCommandEvent $event): void
     {
-        $bundler = $this->config->getString('assets.bundler', 'webpack');
+        $bundler = $this->config->getString('assets.bundler', 'vite');
         $commands = match ($bundler) {
             'vite'    => $this->viteCommands,
             'webpack' => $this->webpackCommands,
-            default   => $this->webpackCommands,
+            default   => $this->viteCommands,
         };
 
         $event->addCommands($commands);
