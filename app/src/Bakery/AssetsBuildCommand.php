@@ -29,14 +29,6 @@ final class AssetsBuildCommand extends Command
     use WithSymfonyStyle;
 
     /**
-     * @var string[] Commands to run
-     */
-    protected array $commands = [
-        'assets:install',
-        'assets:webpack',
-    ];
-
-    /**
      * @param \UserFrosting\Event\EventDispatcher $eventDispatcher
      */
     public function __construct(
@@ -53,9 +45,9 @@ final class AssetsBuildCommand extends Command
         $list = implode(', ', $this->aggregateCommands());
 
         $this->setName('assets:build')
-             ->setDescription('Build the assets using npm and Webpack Encore')
+             ->setDescription('Build the assets using npm and Webpack Encore or Vite')
              ->addOption('production', 'p', InputOption::VALUE_NONE, 'Create a production build')
-             ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Watch for changes and recompile automatically')
+             ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Watch for changes and recompile automatically (Webpack only)')
              ->setHelp("This command combine the following commands : <comment>{$list}</comment>. For more info, see <comment>https://learn.userfrosting.com/asset-management</comment>.")
              ->setAliases(['build-assets', 'webpack']);
     }
@@ -87,7 +79,7 @@ final class AssetsBuildCommand extends Command
      */
     protected function aggregateCommands(): array
     {
-        $event = new AssetsBuildCommandEvent($this->commands);
+        $event = new AssetsBuildCommandEvent();
         $event = $this->eventDispatcher->dispatch($event);
 
         return $event->getCommands();

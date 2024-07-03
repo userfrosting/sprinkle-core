@@ -23,11 +23,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use UserFrosting\Bakery\WithSymfonyStyle;
 use UserFrosting\Event\EventDispatcher;
 use UserFrosting\Sprinkle\Core\Bakery\AssetsBuildCommand;
 use UserFrosting\Sprinkle\Core\Bakery\Event\AssetsBuildCommandEvent;
 use UserFrosting\Testing\ContainerStub;
 
+/**
+ * N.B.: This test doesn't actually call the predefined sub-commands. It only
+ * tests the listener can overwrite them, and the stub command are called.
+ */
 class AssetsBuildCommandTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
@@ -55,6 +60,7 @@ class AssetsBuildCommandTest extends TestCase
 
         // Assert some output
         $this->assertSame(0, $commandTester->getStatusCode());
+        $this->assertSame('SUCCESS', $commandTester->getDisplay());
     }
 
     public function testOneCommandFails(): void
@@ -80,6 +86,7 @@ class AssetsBuildCommandTest extends TestCase
 
         // Assert some output
         $this->assertSame(1, $commandTester->getStatusCode());
+        $this->assertSame('FAILURE', $commandTester->getDisplay());
     }
 
     public function testArgumentPassthrough(): void
@@ -138,6 +145,8 @@ class AssetsBuildCommandListenerStubParam
 
 class AssetsStubCommand extends Command
 {
+    use WithSymfonyStyle;
+
     protected function configure(): void
     {
         $this->setName('stub');
@@ -145,6 +154,8 @@ class AssetsStubCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->io->write('SUCCESS');
+
         return self::SUCCESS;
     }
 }
@@ -173,6 +184,8 @@ class AssetsAcceptParamStubCommand extends Command
 
 class AssetsStubFailCommand extends Command
 {
+    use WithSymfonyStyle;
+
     protected function configure(): void
     {
         $this->setName('fail');
@@ -180,6 +193,8 @@ class AssetsStubFailCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->io->write('FAILURE');
+
         return self::FAILURE;
     }
 }

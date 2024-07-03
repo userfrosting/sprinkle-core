@@ -30,6 +30,12 @@ class AbstractAggregateCommandEventTest extends TestCase
 
         $event->prependCommand('bar');
         $this->assertSame(['bar', 'foo'], $event->getCommands());
+
+        $event->addCommands(['foobar', '123']);
+        $this->assertSame(['bar', 'foo', 'foobar', '123'], $event->getCommands());
+
+        $event->prependCommands(['owl', 'egg']);
+        $this->assertSame(['owl', 'egg', 'bar', 'foo', 'foobar', '123'], $event->getCommands());
     }
 }
 

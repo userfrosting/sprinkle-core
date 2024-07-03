@@ -46,6 +46,22 @@ return [
 
     /*
     * ----------------------------------------------------------------------
+    * Asset bundler Config
+    * ----------------------------------------------------------------------
+    * Frontend assets can be handle either by Vite or Webpack. This section
+    * is used to define which bundler is used, and their configuration.
+    */
+    'assets' => [
+        'bundler' => env('ASSETS_BUNDLER'), // Either 'vite' or 'webpack'
+        'vite'    => [
+            'dev'    => env('VITE_DEV_ENABLED'),
+            'base'   => '',
+            'server' => 'http://[::1]:3000/'
+        ]
+    ],
+
+    /*
+    * ----------------------------------------------------------------------
     * Bakery Config
     * ----------------------------------------------------------------------
     * `confirm_sensitive_command` set to true will ask for confirmation before

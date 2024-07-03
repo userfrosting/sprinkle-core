@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [5.2.0](https://github.com/userfrosting/sprinkle-core/compare/5.1.0...5.2.0)
+- [New Feature] Add [Vite](https://vitejs.dev) support :
+  - New Vite Bakery command, `assets:vite`. This command can be used to 
+  - Add [Vite](https://vitejs.dev) Twig function : `vite_js`, `vite_css` and `vite_preload` to include Vite entrypoints into any Twig template. 
+  - The default bundler (Webpack or Vite) used by `assets:build` command can be defined using the `assets.bundler` config, or `ASSETS_BUNDLER` env variable. Webpack is used by default.
+  - Added `assets.vite` config array in `app/config/default.php` to configure Twig integration. 
+    - `assets.vite.dev` (bool) : Indicates whether the application is running in development mode (i.e. using vite server). Defaults to false. Tied to `VITE_DEV_ENABLED` env variable by default too.
+    - `assets.vite.base` (string) : Public base path from which Vite's published assets are served. The assets paths will be relative to the `outDir` in your vite configuration.
+    - `assets.vite.server` (string) : The vite server url, including port.
+- [Bakery] The default sub commands in `AssetsBuildCommand` are now in `AssetsBuildCommandListener`
+- [Bakery] Added the server option to `assets:webpack` to run HMR server (`npm run webpack:server`) plus use new npm command syntax.
+- [Bakery] `AbstractAggregateCommandEvent` construction is now optional. Added `addCommands` and `prependCommands`. All setters methods return `$this`.
 
 ## [5.1.1](https://github.com/userfrosting/sprinkle-core/compare/5.1.0...5.1.1)
 - Fix issue with sprunje using multiple listable fetched from database ([Chat Reference](https://chat.userfrosting.com/channel/support?msg=sgMq8sbAjsCN2ZGXj))

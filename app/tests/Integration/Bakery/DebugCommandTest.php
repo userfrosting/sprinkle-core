@@ -19,8 +19,15 @@ use PDOException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-use UserFrosting\Bakery\SprinkleCommandsRepository;
 use UserFrosting\Sprinkle\Core\Bakery\DebugCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugConfigCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugDbCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugEventsCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugLocatorCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugMailCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugTwigCommand;
+use UserFrosting\Sprinkle\Core\Bakery\DebugVersionCommand;
+use UserFrosting\Sprinkle\Core\Bakery\SprinkleListCommand;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase;
 use UserFrosting\Sprinkle\Core\Validators\PhpDeprecationValidator;
@@ -93,11 +100,21 @@ class DebugCommandTest extends CoreTestCase
         //       add the sub-command to the app
         $app = new Application();
 
-        // Add all registered commands to make it simple
-        /** @var \Symfony\Component\Console\Command\Command[] */
-        $commands = $this->ci->get(SprinkleCommandsRepository::class);
+        // Add all required commands
+        $commands = [
+            DebugCommand::class,
+            DebugVersionCommand::class,
+            DebugVersionCommand::class,
+            SprinkleListCommand::class,
+            DebugConfigCommand::class,
+            DebugDbCommand::class,
+            DebugMailCommand::class,
+            DebugLocatorCommand::class,
+            DebugEventsCommand::class,
+            DebugTwigCommand::class,
+        ];
         foreach ($commands as $command) {
-            $app->add($command);
+            $app->add($command = $this->ci->get($command));
         }
 
         // Get command to test
