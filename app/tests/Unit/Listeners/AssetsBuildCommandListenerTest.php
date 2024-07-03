@@ -30,7 +30,7 @@ class AssetsBuildCommandListenerTest extends TestCase
     {
         /** @var Config */
         $config = Mockery::mock(Config::class)
-            ->shouldReceive('getString')->with('assets.bundler', 'webpack')->once()->andReturn($bundler)
+            ->shouldReceive('getString')->with('assets.bundler', 'vite')->once()->andReturn($bundler)
             ->getMock();
 
         $event = new AssetsBuildCommandEvent();
@@ -48,7 +48,7 @@ class AssetsBuildCommandListenerTest extends TestCase
     {
         return [
             ['webpack', ['assets:install', 'assets:webpack']],
-            ['foobar', ['assets:install', 'assets:webpack']],
+            ['foobar', ['assets:install', 'assets:vite']],
             ['vite', ['assets:install', 'assets:vite']],
         ];
     }
