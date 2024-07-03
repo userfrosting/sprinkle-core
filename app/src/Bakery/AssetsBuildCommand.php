@@ -48,8 +48,7 @@ final class AssetsBuildCommand extends Command
              ->setDescription('Build the assets using npm and Webpack Encore or Vite')
              ->addOption('production', 'p', InputOption::VALUE_NONE, 'Create a production build')
              ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Watch for changes and recompile automatically (Webpack only)')
-             ->setHelp("This command combine the following commands : <comment>{$list}</comment>. For more info, see <comment>https://learn.userfrosting.com/asset-management</comment>.")
-             ->setAliases(['build-assets', 'webpack']);
+             ->setHelp("This command combine the following commands : <comment>{$list}</comment>. For more info, see <comment>https://learn.userfrosting.com/asset-management</comment>.");
     }
 
     /**

@@ -25,12 +25,12 @@ class WebpackService implements ServicesProviderInterface
     {
         return [
             EntrypointLookupInterface::class => function (Config $config) {
-                $path = $config->get('webpack.entrypoints');
+                $path = $config->get('assets.webpack.entrypoints');
 
                 return new EntrypointLookup(strval($path));
             },
             JsonManifestInterface::class     => function (Config $config) {
-                $path = $config->get('webpack.manifest');
+                $path = $config->get('assets.webpack.manifest');
 
                 return new JsonManifest(strval($path));
             },
