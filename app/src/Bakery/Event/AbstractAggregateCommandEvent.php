@@ -23,7 +23,7 @@ abstract class AbstractAggregateCommandEvent
     /**
      * @param string[] $commands
      */
-    public function __construct(protected array $commands)
+    public function __construct(protected array $commands = [])
     {
     }
 
@@ -37,25 +37,61 @@ abstract class AbstractAggregateCommandEvent
 
     /**
      * @param string[] $commands
+     *
+     * @return self
      */
-    public function setCommands(array $commands): void
+    public function setCommands(array $commands): self
     {
         $this->commands = $commands;
+
+        return $this;
     }
 
     /**
      * @param string $command
+     *
+     * @return self
      */
-    public function addCommand(string $command): void
+    public function addCommand(string $command): self
     {
         $this->commands[] = $command;
+
+        return $this;
+    }
+
+    /**
+     * @param string[] $commands
+     *
+     * @return self
+     */
+    public function addCommands(array $commands): self
+    {
+        $this->commands = array_merge($this->commands, $commands);
+
+        return $this;
     }
 
     /**
      * @param string $command
+     *
+     * @return self
      */
-    public function prependCommand(string $command): void
+    public function prependCommand(string $command): self
     {
         array_unshift($this->commands, $command);
+
+        return $this;
+    }
+
+    /**
+     * @param string[] $commands
+     *
+     * @return self
+     */
+    public function prependCommands(array $commands): self
+    {
+        $this->commands = array_merge($commands, $this->commands);
+
+        return $this;
     }
 }

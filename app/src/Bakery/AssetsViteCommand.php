@@ -24,10 +24,9 @@ use UserFrosting\Sprinkle\Core\Validators\NodeVersionValidator;
 use UserFrosting\Sprinkle\Core\Validators\NpmVersionValidator;
 
 /**
- * Alias for `npm run webpack:dev`, `npm run webpack:build`,
- * `npm run webpack:server` and `npm run webpack:watch` commands.
+ * Alias for `npm run vite:dev` and `npm run vite:build` commands.
  */
-final class AssetsWebpackCommand extends Command
+final class AssetsViteCommand extends Command
 {
     use WithSymfonyStyle;
     use ShellCommandHelper;
@@ -47,17 +46,15 @@ final class AssetsWebpackCommand extends Command
     protected function configure(): void
     {
         $help = [
-            'This command run <info>Webpack Encore</info>, using the config defined in <info>webpack.config.js</info>.',
-            'It will automatically compile the frontend dependencies in the <info>public/assets/</info> directory.',
+            'This command run <info>Vite</info>, using the config defined in <info>vite.config.js</info>.',
+            'It will automatically compile the frontend dependencies in the <info>public/assets/</info> directory, or use the Vite development server',
             'Everything will be executed in the same dir the bakery command is executed.',
             'For more info, see <comment>https://learn.userfrosting.com/asset-management</comment>',
         ];
 
-        $this->setName('assets:webpack')
-             ->setDescription('Alias for `npm run dev`, `npm run build` or `npm run dev` command')
-             ->addOption('production', 'p', InputOption::VALUE_NONE, 'Create a production build')
-             ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Watch for changes and recompile automatically')
-             ->addOption('server', 's', InputOption::VALUE_NONE, 'Run the development server with Hot Module Replacement (HMR)')
+        $this->setName('assets:vite')
+             ->setDescription('Alias for `npm run vite:dev` or `npm run vite:build` commands.')
+             ->addOption('production', 'p', InputOption::VALUE_NONE, 'Force the creation of a production build using `vite:build`')
              ->setHelp(implode(' ', $help));
     }
 
@@ -66,12 +63,10 @@ final class AssetsWebpackCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->io->title('Running Webpack Encore');
+        $this->io->title('Running Vite');
 
         // Get options
         $production = (bool) $input->getOption('production');
-        $watch = (bool) $input->getOption('watch');
-        $server = (bool) $input->getOption('server');
 
         // Validate dependencies
         try {
@@ -91,31 +86,28 @@ final class AssetsWebpackCommand extends Command
             return self::FAILURE;
         }
 
-        // Execute Webpack
-        $file = $path . '/webpack.config.js';
-        if (!file_exists($file)) {
-            $this->io->warning("$file not found. Skipping.");
+        // Execute Vite
+        if (!file_exists($path . '/vite.config.js') && !file_exists($path . '/vite.config.ts')) {
+            $this->io->warning('Vite config not found. Skipping.');
 
             return self::SUCCESS;
         }
 
         // Select command based on command arguments
         $command = match (true) {
-            ($production || $this->envMode === 'production') => 'npm run webpack:build',
-            $server                                          => 'npm run webpack:server',
-            $watch                                           => 'npm run webpack:watch',
-            default                                          => 'npm run webpack:dev',
+            ($production || $this->envMode === 'production') => 'npm run vite:build',
+            default                                          => 'npm run vite:dev',
         };
 
         $this->io->info("Running command: $command");
         if ($this->executeCommand($command) !== 0) {
-            $this->io->error('Webpack Encore run has failed');
+            $this->io->error('Vite command has failed');
 
             return self::FAILURE;
         }
 
         // If all went well and there's no fatal errors, we are successful
-        $this->io->success('Webpack Encore run completed');
+        $this->io->success('Vite command completed');
 
         return self::SUCCESS;
     }

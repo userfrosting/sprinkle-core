@@ -21,6 +21,7 @@ use UserFrosting\Sprinkle\BakeryRecipe;
 use UserFrosting\Sprinkle\Core\Bakery\AssetsBuildCommand;
 use UserFrosting\Sprinkle\Core\Bakery\AssetsInstallCommand;
 use UserFrosting\Sprinkle\Core\Bakery\AssetsUpdateCommand;
+use UserFrosting\Sprinkle\Core\Bakery\AssetsViteCommand;
 use UserFrosting\Sprinkle\Core\Bakery\AssetsWebpackCommand;
 use UserFrosting\Sprinkle\Core\Bakery\BakeCommand;
 use UserFrosting\Sprinkle\Core\Bakery\ClearCacheCommand;
@@ -32,6 +33,7 @@ use UserFrosting\Sprinkle\Core\Bakery\DebugLocatorCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugMailCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugTwigCommand;
 use UserFrosting\Sprinkle\Core\Bakery\DebugVersionCommand;
+use UserFrosting\Sprinkle\Core\Bakery\Event\AssetsBuildCommandEvent;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleCompareCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleDictionaryCommand;
 use UserFrosting\Sprinkle\Core\Bakery\LocaleInfoCommand;
@@ -58,6 +60,7 @@ use UserFrosting\Sprinkle\Core\Database\Migrations\v400\ThrottlesTable;
 use UserFrosting\Sprinkle\Core\Error\ExceptionHandlerMiddleware;
 use UserFrosting\Sprinkle\Core\Error\RegisterShutdownHandler;
 use UserFrosting\Sprinkle\Core\Event\ResourceLocatorInitiatedEvent;
+use UserFrosting\Sprinkle\Core\Listeners\AssetsBuildCommandListener;
 use UserFrosting\Sprinkle\Core\Listeners\ModelInitiated;
 use UserFrosting\Sprinkle\Core\Listeners\ResourceLocatorInitiated;
 use UserFrosting\Sprinkle\Core\Listeners\SetRouteCaching;
@@ -136,6 +139,7 @@ class Core implements
             AssetsUpdateCommand::class,
             AssetsInstallCommand::class,
             AssetsWebpackCommand::class,
+            AssetsViteCommand::class,
             BakeCommand::class,
             ClearCacheCommand::class,
             DebugCommand::class,
@@ -287,6 +291,9 @@ class Core implements
             ],
             ResourceLocatorInitiatedEvent::class => [
                 ResourceLocatorInitiated::class,
+            ],
+            AssetsBuildCommandEvent::class => [
+                AssetsBuildCommandListener::class,
             ],
         ];
     }
