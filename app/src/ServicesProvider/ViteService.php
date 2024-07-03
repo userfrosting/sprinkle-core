@@ -26,14 +26,14 @@ class ViteService implements ServicesProviderInterface
             ViteManifestInterface::class => function (ResourceLocatorInterface $locator, Config $config) {
                 $manifestFile = $config->getString('assets.vite.manifest', 'public://.vite/manifest.json');
                 $manifestFile = (string) $locator->getResource($manifestFile);
-                
+
                 return new ViteManifest(
                     manifestPath: $manifestFile,
                     basePath: $config->getString('assets.vite.base', ''),
                     devEnabled: $config->getBool('assets.vite.dev', true),
                     serverUrl: $config->getString('assets.vite.server', ''),
                 );
-            }
+            },
         ];
     }
 }
