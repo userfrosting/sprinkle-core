@@ -25,7 +25,7 @@ return [
             'dev' => env('VITE_DEV_ENABLED', false),
         ],
     ],
-    
+
     /*
      * `confirm_sensitive_command` in production mode
      */
