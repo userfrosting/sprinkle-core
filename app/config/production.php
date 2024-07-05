@@ -15,6 +15,18 @@ declare(strict_types=1);
  */
 return [
     /*
+    * ----------------------------------------------------------------------
+    * Asset bundler Config
+    * ----------------------------------------------------------------------
+    * Under production, don't use Vite dev server by default.
+    */
+    'assets' => [
+        'vite' => [
+            'dev' => env('VITE_DEV_ENABLED', false),
+        ],
+    ],
+    
+    /*
      * `confirm_sensitive_command` in production mode
      */
     'bakery' => [

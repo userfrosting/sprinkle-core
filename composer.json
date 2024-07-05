@@ -44,7 +44,7 @@
         "slim/twig-view": "^3.0",
         "vlucas/phpdotenv": "^5.3",
         "userfrosting/framework": "~6.0.0@dev",
-        "userfrosting/vite-php-twig": "^1.0"
+        "userfrosting/vite-php-twig": "^1.0.2"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",

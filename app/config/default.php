@@ -54,9 +54,9 @@ return [
     'assets' => [
         'bundler' => env('ASSETS_BUNDLER'), // Either 'vite' or 'webpack'
         'vite'    => [
-            'manifest' => 'public://.vite/manifest.json',
-            'dev'      => env('VITE_DEV_ENABLED'),
-            'base'     => '',
+            'manifest' => 'assets://.vite/manifest.json',
+            'dev'      => env('VITE_DEV_ENABLED', true),
+            'base'     => 'assets/',
             'server'   => 'http://[::1]:3000/',
         ],
         // Defines path to Webpack Encore `entrypoints.json` and `manifest.json` files.

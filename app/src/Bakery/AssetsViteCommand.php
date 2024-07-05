@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserFrosting\Bakery\WithSymfonyStyle;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\ShellCommandHelper;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
 use UserFrosting\Sprinkle\Core\Validators\NodeVersionValidator;
@@ -37,8 +38,8 @@ final class AssetsViteCommand extends Command
     #[Inject]
     protected NpmVersionValidator $npmVersionValidator;
 
-    #[Inject('UF_MODE')]
-    protected string $envMode;
+    #[Inject]
+    protected Config $config;
 
     /**
      * {@inheritdoc}
@@ -66,7 +67,8 @@ final class AssetsViteCommand extends Command
         $this->io->title('Running Vite');
 
         // Get options
-        $production = (bool) $input->getOption('production');
+        $forceProduction = (bool) $input->getOption('production');
+        $devEnabled = $this->config->getBool('assets.vite.dev', true);
 
         // Validate dependencies
         try {
@@ -95,8 +97,8 @@ final class AssetsViteCommand extends Command
 
         // Select command based on command arguments
         $command = match (true) {
-            ($production || $this->envMode === 'production') => 'npm run vite:build',
-            default                                          => 'npm run vite:dev',
+            $forceProduction, !$devEnabled => 'npm run vite:build',
+            default                        => 'npm run vite:dev',
         };
 
         $this->io->info("Running command: $command");

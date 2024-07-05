@@ -18,6 +18,7 @@ use phpmock\MockBuilder;
 use phpmock\mockery\PHPMockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use UserFrosting\Config\Config;
 use UserFrosting\Sprinkle\Core\Bakery\AssetsViteCommand;
 use UserFrosting\Sprinkle\Core\Bakery\Helper\ShellCommandHelper;
 use UserFrosting\Sprinkle\Core\Exceptions\VersionCompareException;
@@ -56,11 +57,16 @@ class AssetsViteCommandTest extends TestCase
             ->shouldReceive('validate')->andReturn(true)
             ->getMock();
 
+        // Set config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('assets.vite.dev', true)->andReturn(true)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
+        $ci->set(Config::class, $config);
 
         /** @var AssetsViteCommand */
         $command = $ci->get(AssetsViteCommand::class);
@@ -93,11 +99,16 @@ class AssetsViteCommandTest extends TestCase
             ->shouldReceive('validate')->andReturn(true)
             ->getMock();
 
+        // Set config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('assets.vite.dev', true)->andReturn(false)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', 'production'); // Set production mode
+        $ci->set(Config::class, $config);
 
         /** @var AssetsViteCommand */
         $command = $ci->get(AssetsViteCommand::class);
@@ -130,11 +141,16 @@ class AssetsViteCommandTest extends TestCase
             ->shouldReceive('validate')->andReturn(true)
             ->getMock();
 
+        // Set config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('assets.vite.dev', true)->andReturn(true)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
+        $ci->set(Config::class, $config);
 
         /** @var AssetsViteCommand */
         $command = $ci->get(AssetsViteCommand::class);
@@ -162,11 +178,16 @@ class AssetsViteCommandTest extends TestCase
             ->shouldReceive('validate')->andReturn(true)
             ->getMock();
 
+        // Set config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('assets.vite.dev', true)->andReturn(true)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
+        $ci->set(Config::class, $config);
 
         /** @var AssetsViteCommand */
         $command = $ci->get(AssetsViteCommand::class);
@@ -192,11 +213,16 @@ class AssetsViteCommandTest extends TestCase
             ->shouldReceive('validate')->andReturn(true)
             ->getMock();
 
+        // Set config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('assets.vite.dev', true)->andReturn(true)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
+        $ci->set(Config::class, $config);
 
         /** @var AssetsViteCommand */
         $command = $ci->get(AssetsViteCommand::class);
@@ -215,11 +241,16 @@ class AssetsViteCommandTest extends TestCase
             ->getMock();
         $npm = Mockery::mock(NpmVersionValidator::class);
 
+        // Set config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('assets.vite.dev', true)->andReturn(true)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
+        $ci->set(Config::class, $config);
 
         /** @var AssetsViteCommand */
         $command = $ci->get(AssetsViteCommand::class);
@@ -239,11 +270,16 @@ class AssetsViteCommandTest extends TestCase
         ->shouldReceive('validate')->andThrow(new VersionCompareException())
         ->getMock();
 
+        // Set config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('assets.vite.dev', true)->andReturn(true)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
+        $ci->set(Config::class, $config);
 
         /** @var AssetsViteCommand */
         $command = $ci->get(AssetsViteCommand::class);
@@ -285,11 +321,16 @@ class AssetsViteCommandTest extends TestCase
             ->shouldReceive('validate')->andReturn(true)
             ->getMock();
 
+        // Set config mock
+        $config = Mockery::mock(Config::class)
+            ->shouldReceive('getBool')->with('assets.vite.dev', true)->andReturn(true)
+            ->getMock();
+
         // Set mock in CI and run command
         $ci = ContainerStub::create();
         $ci->set(NodeVersionValidator::class, $node);
         $ci->set(NpmVersionValidator::class, $npm);
-        $ci->set('UF_MODE', '');
+        $ci->set(Config::class, $config);
 
         /** @var AssetsViteCommand */
         $command = $ci->get(AssetsViteCommand::class);
