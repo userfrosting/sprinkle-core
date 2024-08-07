@@ -69,6 +69,7 @@ use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\SessionMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\URIMiddleware;
 use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
+use UserFrosting\Sprinkle\Core\Routes\ApiRoutes;
 use UserFrosting\Sprinkle\Core\ServicesProvider\AlertStreamService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\CacheService;
 use UserFrosting\Sprinkle\Core\ServicesProvider\ConfigService;
@@ -194,6 +195,7 @@ class Core implements
     {
         return [
             AlertsRoutes::class,
+            ApiRoutes::class,
         ];
     }
 
