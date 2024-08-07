@@ -37,7 +37,7 @@
         "./stores": {
             "import": "./dist/stores.js",
             "require": "./dist/stores.cjs",
-            "types": "./dist/stores/auth.d.ts"
+            "types": "./dist/stores/config.d.ts"
         },
         "./*": "./app/assets/*"
     },
