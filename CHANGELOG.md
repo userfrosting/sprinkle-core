@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [5.1.2](https://github.com/userfrosting/sprinkle-core/compare/5.1.1...5.1.2)
+- Fix [#1264](https://github.com/userfrosting/UserFrosting/issues/1264) - The browser locale is not applied automatically
+
 ## [5.1.1](https://github.com/userfrosting/sprinkle-core/compare/5.1.0...5.1.1)
 - Fix issue with sprunje using multiple listable fetched from database ([Chat Reference](https://chat.userfrosting.com/channel/support?msg=sgMq8sbAjsCN2ZGXj))
 
