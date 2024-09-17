@@ -19,6 +19,7 @@ use UserFrosting\Config\Config;
 use UserFrosting\I18n\Locale;
 use UserFrosting\I18n\Translator;
 use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
+use UserFrosting\Sprinkle\Core\I18n\SiteLocaleInterface;
 use UserFrosting\Sprinkle\Core\Tests\CoreTestCase as TestCase;
 use UserFrosting\UniformResourceLocator\ResourceLocator;
 use UserFrosting\UniformResourceLocator\ResourceStream;
@@ -341,7 +342,7 @@ class SiteLocaleTest extends TestCase
 
 class ControllerStub
 {
-    public function __invoke(Response $response, SiteLocale $siteLocale): Response
+    public function __invoke(Response $response, SiteLocaleInterface $siteLocale): Response
     {
         $response->getBody()->write($siteLocale->getLocaleIdentifier());
 
