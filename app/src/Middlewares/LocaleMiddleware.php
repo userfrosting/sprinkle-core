@@ -16,15 +16,15 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use UserFrosting\Sprinkle\Core\I18n\SiteLocale;
+use UserFrosting\Sprinkle\Core\I18n\SiteLocaleInterface;
 
 class LocaleMiddleware implements MiddlewareInterface
 {
     /**
-     * @param SiteLocale $siteLocale Inject SiteLocale service
+     * @param SiteLocaleInterface $siteLocale Inject SiteLocale service
      */
     public function __construct(
-        protected SiteLocale $siteLocale,
+        protected SiteLocaleInterface $siteLocale,
     ) {
     }
 
