@@ -62,7 +62,7 @@ use UserFrosting\Sprinkle\Core\Listeners\ModelInitiated;
 use UserFrosting\Sprinkle\Core\Listeners\ResourceLocatorInitiated;
 use UserFrosting\Sprinkle\Core\Listeners\SetRouteCaching;
 use UserFrosting\Sprinkle\Core\Middlewares\FilePermissionMiddleware;
-use UserFrosting\Sprinkle\Core\Middlewares\LocaleMiddleware;
+use UserFrosting\Sprinkle\Core\Middlewares\ServerRequestMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\SessionMiddleware;
 use UserFrosting\Sprinkle\Core\Middlewares\URIMiddleware;
 use UserFrosting\Sprinkle\Core\Routes\AlertsRoutes;
@@ -227,7 +227,7 @@ class Core implements
     public function getMiddlewares(): array
     {
         return [
-            LocaleMiddleware::class,
+            ServerRequestMiddleware::class,
             CsrfGuardMiddleware::class,
             SessionMiddleware::class,
             URIMiddleware::class,

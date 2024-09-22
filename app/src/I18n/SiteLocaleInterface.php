@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\I18n;
 
-use Psr\Http\Message\ServerRequestInterface;
 use UserFrosting\Config\Config;
 use UserFrosting\I18n\Locale;
 
@@ -70,11 +69,4 @@ interface SiteLocaleInterface
      * @todo This should accept the request service as argument, or null, in which case the `getBrowserLocale` method would be skipped
      */
     public function getLocaleIdentifier(): string;
-
-    /**
-     * Define the browser locale from the header present in the request.
-     *
-     * @param ServerRequestInterface $request
-     */
-    public function defineBrowserLocale(ServerRequestInterface $request): void;
 }
