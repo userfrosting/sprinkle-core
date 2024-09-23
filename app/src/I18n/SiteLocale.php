@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace UserFrosting\Sprinkle\Core\I18n;
 
-use Psr\Http\Message\ServerRequestInterface;
 use UserFrosting\Config\Config;
 use UserFrosting\I18n\Locale;
+use UserFrosting\Sprinkle\Core\Util\RequestContainer;
 
 /**
  * Helper methods for the locale system.
@@ -22,15 +22,12 @@ use UserFrosting\I18n\Locale;
 class SiteLocale implements SiteLocaleInterface
 {
     /**
-     * @var string|null
-     */
-    protected ?string $browserLocale = null;
-
-    /**
-     * @param Config $config
+     * @param Config           $config
+     * @param RequestContainer $request
      */
     public function __construct(
         protected Config $config,
+        protected RequestContainer $request,
     ) {
     }
 
@@ -127,8 +124,6 @@ class SiteLocale implements SiteLocaleInterface
      * Returns the locale identifier (ie. en_US) to use.
      *
      * @return string Locale identifier
-     *
-     * @todo This should accept the request service as argument, or null, in which case the `getBrowserLocale` method would be skipped
      */
     public function getLocaleIdentifier(): string
     {
@@ -150,21 +145,14 @@ class SiteLocale implements SiteLocaleInterface
      */
     protected function getBrowserLocale(): ?string
     {
-        return $this->browserLocale;
-    }
+        // Stop if there's no request
+        if (is_null($request = $this->request->getRequest())) {
+            return null;
+        }
 
-    /**
-     * Define the browser locale from the header present in the request.
-     *
-     * @param ServerRequestInterface $request
-     */
-    public function defineBrowserLocale(ServerRequestInterface $request): void
-    {
         // Stop if request doesn't have the header
         if (!$request->hasHeader('Accept-Language')) {
-            $this->browserLocale = null;
-
-            return;
+            return null;
         }
 
         // Get available locales
@@ -207,9 +195,7 @@ class SiteLocale implements SiteLocaleInterface
 
         // if no $foundLocales, return null
         if (count($foundLocales) === 0) {
-            $this->browserLocale = null;
-
-            return;
+            return null;
         }
 
         // Sort by preference (value)
@@ -218,6 +204,6 @@ class SiteLocale implements SiteLocaleInterface
         // Return first element
         reset($foundLocales);
 
-        $this->browserLocale = key($foundLocales);
+        return key($foundLocales);
     }
 }
