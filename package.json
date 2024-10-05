@@ -39,6 +39,11 @@
             "require": "./dist/stores.cjs",
             "types": "./dist/stores/config.d.ts"
         },
+        "./sprunjer": {
+            "import": "./dist/sprunjer.js",
+            "require": "./dist/sprunjer.cjs",
+            "types": "./dist/composables/sprunjer.d.ts"
+        },
         "./*": "./app/assets/*"
     },
     "files": [
