@@ -2,7 +2,7 @@ import { ref, toValue, watchEffect, computed, type Ref, type ComputedRef } from 
 import axios from 'axios'
 
 interface Sprunjer {
-    dataUrl : string
+    dataUrl: string
     size: Ref<number>
     page: Ref<number>
     totalPages: ComputedRef<number>
