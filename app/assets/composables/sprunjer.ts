@@ -23,12 +23,18 @@ interface Sprunjer {
     downloadCsv: () => void
 }
 
-const useSprunjer = (dataUrl: string) => {
+const useSprunjer = (
+    dataUrl: string,
+    defaultSorts: AssociativeArray = {},
+    defaultFilters: AssociativeArray = {},
+    defaultSize: number = 10,
+    defaultPage: number = 0
+) => {
     // Sprunje parameters
-    const size = ref<number>(10)
-    const page = ref<number>(0)
-    const sorts = ref<AssociativeArray>({})
-    const filters = ref<AssociativeArray>({})
+    const size = ref<number>(defaultSize)
+    const page = ref<number>(defaultPage)
+    const sorts = ref<AssociativeArray>(defaultSorts)
+    const filters = ref<AssociativeArray>(defaultFilters)
 
     // Raw data
     const data = ref<any>({})

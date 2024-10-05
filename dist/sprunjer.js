@@ -1,9 +1,9 @@
-import { ref as t, computed as o, watchEffect as w, toValue as x } from "vue";
-import { a as y } from "./axios-CXDYiOMX.js";
-const _ = (u) => {
-  const a = t(10), n = t(0), l = t({}), c = t({}), e = t({}), r = t(!1);
+import { ref as t, computed as o, watchEffect as M, toValue as _ } from "vue";
+import { a as j } from "./axios-CXDYiOMX.js";
+const F = (u, f = {}, d = {}, m = 10, p = 0) => {
+  const a = t(m), n = t(p), l = t(f), c = t(d), e = t({}), r = t(!1);
   async function v() {
-    r.value = !0, y.get(x(u), {
+    r.value = !0, j.get(_(u), {
       params: {
         size: a.value,
         page: n.value,
@@ -16,11 +16,11 @@ const _ = (u) => {
       console.error(s);
     });
   }
-  const f = o(() => Math.ceil(e.value.count_filtered / a.value) - 1), i = o(() => e.value.count), d = o(() => n.value * a.value + 1), m = o(() => Math.min((n.value + 1) * a.value, i.value)), p = o(() => e.value.count_filtered), g = o(() => e.value.rows);
-  function h() {
+  const g = o(() => Math.ceil(e.value.count_filtered / a.value) - 1), i = o(() => e.value.count), h = o(() => n.value * a.value + 1), w = o(() => Math.min((n.value + 1) * a.value, i.value)), x = o(() => e.value.count_filtered), y = o(() => e.value.rows);
+  function z() {
     console.log("Not yet implemented");
   }
-  return w(() => {
+  return M(() => {
     v();
   }), {
     dataUrl: u,
@@ -31,15 +31,15 @@ const _ = (u) => {
     data: e,
     fetch: v,
     loading: r,
-    downloadCsv: h,
-    totalPages: f,
-    countFiltered: p,
+    downloadCsv: z,
+    totalPages: g,
+    countFiltered: x,
     count: i,
-    rows: g,
-    first: d,
-    last: m
+    rows: y,
+    first: h,
+    last: w
   };
 };
 export {
-  _ as useSprunjer
+  F as useSprunjer
 };

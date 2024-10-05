@@ -19,7 +19,7 @@ interface Sprunjer {
     fetch: () => void;
     downloadCsv: () => void;
 }
-declare const useSprunjer: (dataUrl: string) => {
+declare const useSprunjer: (dataUrl: string, defaultSorts?: AssociativeArray, defaultFilters?: AssociativeArray, defaultSize?: number, defaultPage?: number) => {
     dataUrl: string;
     size: Ref<number, number>;
     page: Ref<number, number>;
