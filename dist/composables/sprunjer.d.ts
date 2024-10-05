@@ -1,4 +1,7 @@
 import { Ref, ComputedRef } from 'vue';
+interface AssociativeArray {
+    [key: string]: string;
+}
 interface Sprunjer {
     dataUrl: string;
     size: Ref<number>;
@@ -7,7 +10,8 @@ interface Sprunjer {
     countFiltered: ComputedRef<number>;
     first: ComputedRef<number>;
     last: ComputedRef<number>;
-    sorts: Ref<string>;
+    sorts: Ref<AssociativeArray>;
+    filters: Ref<AssociativeArray>;
     data: Ref<any>;
     loading: Ref<boolean>;
     count: ComputedRef<number>;
@@ -19,7 +23,8 @@ declare const useSprunjer: (dataUrl: string) => {
     dataUrl: string;
     size: Ref<number, number>;
     page: Ref<number, number>;
-    sorts: Ref<string, string>;
+    sorts: Ref<AssociativeArray, AssociativeArray>;
+    filters: Ref<AssociativeArray, AssociativeArray>;
     data: Ref<any, any>;
     fetch: () => Promise<void>;
     loading: Ref<boolean, boolean>;

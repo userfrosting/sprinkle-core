@@ -1,6 +1,10 @@
 import { ref, toValue, watchEffect, computed, type Ref, type ComputedRef } from 'vue'
 import axios from 'axios'
 
+interface AssociativeArray {
+    [key: string]: string;
+}
+
 interface Sprunjer {
     dataUrl: string
     size: Ref<number>
@@ -9,7 +13,8 @@ interface Sprunjer {
     countFiltered: ComputedRef<number>
     first: ComputedRef<number>
     last: ComputedRef<number>
-    sorts: Ref<string>
+    sorts: Ref<AssociativeArray>
+    filters: Ref<AssociativeArray>
     data: Ref<any>
     loading: Ref<boolean>
     count: ComputedRef<number>
@@ -22,7 +27,8 @@ const useSprunjer = (dataUrl: string) => {
     // Sprunje parameters
     const size = ref<number>(10)
     const page = ref<number>(0)
-    const sorts = ref<string>('')
+    const sorts = ref<AssociativeArray>({})
+    const filters = ref<AssociativeArray>({})
 
     // Raw data
     const data = ref<any>({})
@@ -36,14 +42,14 @@ const useSprunjer = (dataUrl: string) => {
     async function fetch() {
         loading.value = true
         axios
-            .get(
-                toValue(dataUrl) +
-                    '?size=' +
-                    size.value +
-                    '&page=' +
-                    page.value +
-                    '&sorts%5Boccurred_at%5D=desc'
-            )
+            .get(toValue(dataUrl), {
+                params: {
+                    size: size.value,
+                    page: page.value,
+                    sorts: sorts.value,
+                    filters: filters.value
+                }
+            })
             .then((response) => {
                 data.value = response.data
                 loading.value = false
@@ -104,6 +110,7 @@ const useSprunjer = (dataUrl: string) => {
         size,
         page,
         sorts,
+        filters,
         data,
         fetch,
         loading,

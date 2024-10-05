@@ -1,39 +1,45 @@
-import { ref as n, computed as t, watchEffect as h, toValue as w } from "vue";
-import { a as _ } from "./axios-CXDYiOMX.js";
-const z = (s) => {
-  const o = n(10), a = n(0), v = n(""), e = n({}), r = n(!1);
-  async function c() {
-    r.value = !0, _.get(
-      w(s) + "?size=" + o.value + "&page=" + a.value + "&sorts%5Boccurred_at%5D=desc"
-    ).then((u) => {
-      e.value = u.data, r.value = !1;
-    }).catch((u) => {
-      console.error(u);
+import { ref as t, computed as o, watchEffect as w, toValue as x } from "vue";
+import { a as y } from "./axios-CXDYiOMX.js";
+const _ = (u) => {
+  const a = t(10), n = t(0), l = t({}), c = t({}), e = t({}), r = t(!1);
+  async function v() {
+    r.value = !0, y.get(x(u), {
+      params: {
+        size: a.value,
+        page: n.value,
+        sorts: l.value,
+        filters: c.value
+      }
+    }).then((s) => {
+      e.value = s.data, r.value = !1;
+    }).catch((s) => {
+      console.error(s);
     });
   }
-  const i = t(() => Math.ceil(e.value.count_filtered / o.value) - 1), l = t(() => e.value.count), f = t(() => a.value * o.value + 1), d = t(() => Math.min((a.value + 1) * o.value, l.value)), m = t(() => e.value.count_filtered), p = t(() => e.value.rows);
-  function g() {
+  const f = o(() => Math.ceil(e.value.count_filtered / a.value) - 1), i = o(() => e.value.count), d = o(() => n.value * a.value + 1), m = o(() => Math.min((n.value + 1) * a.value, i.value)), p = o(() => e.value.count_filtered), g = o(() => e.value.rows);
+  function h() {
     console.log("Not yet implemented");
   }
-  return h(() => {
-    c();
+  return w(() => {
+    v();
   }), {
-    dataUrl: s,
-    size: o,
-    page: a,
-    sorts: v,
+    dataUrl: u,
+    size: a,
+    page: n,
+    sorts: l,
+    filters: c,
     data: e,
-    fetch: c,
+    fetch: v,
     loading: r,
-    downloadCsv: g,
-    totalPages: i,
-    countFiltered: m,
-    count: l,
-    rows: p,
-    first: f,
-    last: d
+    downloadCsv: h,
+    totalPages: f,
+    countFiltered: p,
+    count: i,
+    rows: g,
+    first: d,
+    last: m
   };
 };
 export {
-  z as useSprunjer
+  _ as useSprunjer
 };
