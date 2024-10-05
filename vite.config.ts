@@ -15,7 +15,7 @@ export default defineConfig({
                 plugin: 'app/assets/plugin.ts',
                 types: 'app/assets/interfaces/index.ts',
                 stores: 'app/assets/stores/config.ts',
-                spunjer: 'app/assets/composables/sprunjer.ts'
+                sprunjer: 'app/assets/composables/sprunjer.ts'
             }
         },
         rollupOptions: {
