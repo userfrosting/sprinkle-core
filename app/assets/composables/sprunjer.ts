@@ -22,7 +22,7 @@ const useSprunjer = (dataUrl: string) => {
     // Sprunje parameters
     const size = ref<number>(10)
     const page = ref<number>(0)
-    const sorts = ref<string>('[occurred_at]=desc')
+    const sorts = ref<string>('')
 
     // Raw data
     const data = ref<any>({})
