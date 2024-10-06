@@ -71,7 +71,8 @@ const useSprunjer = (
      */
     const totalPages = computed(() => {
         // N.B.: Sprunjer page starts at 0, not 1
-        return Math.ceil((data.value.count_filtered ?? 0) / size.value) - 1
+        // Make sure the totalPages is at least 1
+        return Math.min(Math.ceil((data.value.count_filtered ?? 0) / size.value) - 1, 1)
     })
 
     const count = computed(() => {
@@ -79,7 +80,7 @@ const useSprunjer = (
     })
 
     const first = computed(() => {
-        return page.value * size.value + 1
+        return Math.min(page.value * size.value + 1, data.value.count ?? 0)
     })
 
     const last = computed(() => {
