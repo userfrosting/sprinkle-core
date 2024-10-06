@@ -2,7 +2,7 @@ import { ref, toValue, watchEffect, computed, type Ref, type ComputedRef } from 
 import axios from 'axios'
 
 interface AssociativeArray {
-    [key: string]: string;
+    [key: string]: string
 }
 
 interface Sprunjer {
@@ -70,12 +70,12 @@ const useSprunjer = (
      * Computed properties
      */
     const totalPages = computed(() => {
-        // Sprunjer page starts at 0, not 1
-        return Math.ceil(data.value.count_filtered / size.value) - 1
+        // N.B.: Sprunjer page starts at 0, not 1
+        return Math.ceil((data.value.count_filtered ?? 0) / size.value) - 1
     })
 
     const count = computed(() => {
-        return data.value.count
+        return data.value.count ?? 0
     })
 
     const first = computed(() => {
@@ -83,15 +83,15 @@ const useSprunjer = (
     })
 
     const last = computed(() => {
-        return Math.min((page.value + 1) * size.value, count.value)
+        return Math.min((page.value + 1) * size.value, data.value.count ?? 0)
     })
 
     const countFiltered = computed(() => {
-        return data.value.count_filtered
+        return data.value.count_filtered ?? 0
     })
 
     const rows = computed(() => {
-        return data.value.rows
+        return data.value.rows ?? []
     })
 
     /**

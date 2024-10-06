@@ -1,40 +1,40 @@
 import { ref as t, computed as o, watchEffect as M, toValue as _ } from "vue";
 import { a as j } from "./axios-CXDYiOMX.js";
-const F = (u, f = {}, d = {}, m = 10, p = 0) => {
-  const a = t(m), n = t(p), l = t(f), c = t(d), e = t({}), r = t(!1);
+const F = (s, i = {}, f = {}, d = 10, m = 0) => {
+  const a = t(d), n = t(m), l = t(i), c = t(f), e = t({}), u = t(!1);
   async function v() {
-    r.value = !0, j.get(_(u), {
+    u.value = !0, j.get(_(s), {
       params: {
         size: a.value,
         page: n.value,
         sorts: l.value,
         filters: c.value
       }
-    }).then((s) => {
-      e.value = s.data, r.value = !1;
-    }).catch((s) => {
-      console.error(s);
+    }).then((r) => {
+      e.value = r.data, u.value = !1;
+    }).catch((r) => {
+      console.error(r);
     });
   }
-  const g = o(() => Math.ceil(e.value.count_filtered / a.value) - 1), i = o(() => e.value.count), h = o(() => n.value * a.value + 1), w = o(() => Math.min((n.value + 1) * a.value, i.value)), x = o(() => e.value.count_filtered), y = o(() => e.value.rows);
+  const p = o(() => Math.ceil((e.value.count_filtered ?? 0) / a.value) - 1), g = o(() => e.value.count ?? 0), h = o(() => n.value * a.value + 1), w = o(() => Math.min((n.value + 1) * a.value, e.value.count ?? 0)), x = o(() => e.value.count_filtered ?? 0), y = o(() => e.value.rows ?? []);
   function z() {
     console.log("Not yet implemented");
   }
   return M(() => {
     v();
   }), {
-    dataUrl: u,
+    dataUrl: s,
     size: a,
     page: n,
     sorts: l,
     filters: c,
     data: e,
     fetch: v,
-    loading: r,
+    loading: u,
     downloadCsv: z,
-    totalPages: g,
+    totalPages: p,
     countFiltered: x,
-    count: i,
+    count: g,
     rows: y,
     first: h,
     last: w
