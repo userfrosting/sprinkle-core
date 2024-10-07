@@ -2,7 +2,7 @@ import { ref, toValue, watchEffect, computed, type Ref, type ComputedRef } from 
 import axios from 'axios'
 
 interface AssociativeArray {
-    [key: string]: string
+    [key: string]: string | null
 }
 
 interface Sprunjer {

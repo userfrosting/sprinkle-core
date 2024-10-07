@@ -1,6 +1,6 @@
 import { Ref, ComputedRef } from 'vue';
 interface AssociativeArray {
-    [key: string]: string;
+    [key: string]: string | null;
 }
 interface Sprunjer {
     dataUrl: string;
