@@ -103,6 +103,25 @@ const useSprunjer = (
     }
 
     /**
+     * Apply sorting to a column, cycling from the previous sort order.
+     * Order goes : asc -> desc -> null -> asc
+     * Used to toggle the sort order of a column when the column header is clicked
+     * @param column The column to sort
+     */
+    function toggleSort(column: string) {
+        let newOrder: string | null
+        if (sorts.value[column] === 'asc') {
+            newOrder = 'desc'
+        } else if (sorts.value[column] === 'desc') {
+            newOrder = null
+        } else {
+            newOrder = 'asc'
+        }
+
+        sorts.value[column] = newOrder
+    }
+
+    /**
      * Automatically fetch the data when any parameters change
      */
     watchEffect(() => {
@@ -127,7 +146,8 @@ const useSprunjer = (
         count,
         rows,
         first,
-        last
+        last,
+        toggleSort
     }
 }
 

@@ -35,5 +35,6 @@ declare const useSprunjer: (dataUrl: string, defaultSorts?: AssociativeArray, de
     rows: ComputedRef<any>;
     first: ComputedRef<number>;
     last: ComputedRef<number>;
+    toggleSort: (column: string) => void;
 };
 export { useSprunjer, type Sprunjer };
