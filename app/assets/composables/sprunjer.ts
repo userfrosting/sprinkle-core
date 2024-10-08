@@ -20,7 +20,7 @@ interface Sprunjer {
     count: ComputedRef<number>
     rows: ComputedRef<any>
     fetch: () => void
-    toggleSort: () => void
+    toggleSort: (column: string) => void
     downloadCsv: () => void
 }
 
