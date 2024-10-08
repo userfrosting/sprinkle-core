@@ -17,6 +17,7 @@ interface Sprunjer {
     count: ComputedRef<number>;
     rows: ComputedRef<any>;
     fetch: () => void;
+    toggleSort: () => void;
     downloadCsv: () => void;
 }
 declare const useSprunjer: (dataUrl: string, defaultSorts?: AssociativeArray, defaultFilters?: AssociativeArray, defaultSize?: number, defaultPage?: number) => {
