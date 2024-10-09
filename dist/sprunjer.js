@@ -1,16 +1,14 @@
-import { ref as a, computed as n, watchEffect as y, toValue as z } from "vue";
-import { a as N } from "./axios-CXDYiOMX.js";
-const _ = (c, v = {}, d = {}, g = 10, m = 0) => {
-  const l = a(g), s = a(m), o = a(v), i = a(d);
-  console.log("SPRUNJER DEBUG SORT", o, v);
-  const e = a({}), r = a(!1);
-  async function f() {
-    r.value = !0, N.get(z(c), {
+import { ref as a, computed as o, watchEffect as _, toValue as j } from "vue";
+import { a as C } from "./axios-CXDYiOMX.js";
+const N = (c, f = {}, d = {}, m = 10, p = 0) => {
+  const n = a(m), u = a(p), s = a(f), v = a(d), e = a({}), r = a(!1);
+  async function i() {
+    r.value = !0, C.get(j(c), {
       params: {
-        size: l.value,
-        page: s.value,
-        sorts: o.value,
-        filters: i.value
+        size: n.value,
+        page: u.value,
+        sorts: s.value,
+        filters: v.value
       }
     }).then((t) => {
       e.value = t.data, r.value = !1;
@@ -18,35 +16,35 @@ const _ = (c, v = {}, d = {}, g = 10, m = 0) => {
       console.error(t);
     });
   }
-  const p = n(() => Math.max(Math.ceil((e.value.count_filtered ?? 0) / l.value) - 1, 0)), h = n(() => e.value.count ?? 0), w = n(() => Math.min(s.value * l.value + 1, e.value.count ?? 0)), M = n(() => Math.min((s.value + 1) * l.value, e.value.count ?? 0)), x = n(() => e.value.count_filtered ?? 0), E = n(() => e.value.rows ?? []);
-  function R() {
+  const g = o(() => Math.max(Math.ceil((e.value.count_filtered ?? 0) / n.value) - 1, 0)), h = o(() => e.value.count ?? 0), w = o(() => Math.min(u.value * n.value + 1, e.value.count ?? 0)), M = o(() => Math.min((u.value + 1) * n.value, e.value.count ?? 0)), x = o(() => e.value.count_filtered ?? 0), y = o(() => e.value.rows ?? []);
+  function z() {
     console.log("Not yet implemented");
   }
   function S(t) {
-    let u;
-    o.value[t] === "asc" ? u = "desc" : o.value[t] === "desc" ? u = null : u = "asc", o.value[t] = u;
+    let l;
+    s.value[t] === "asc" ? l = "desc" : s.value[t] === "desc" ? l = null : l = "asc", s.value[t] = l;
   }
-  return y(() => {
-    f();
+  return _(() => {
+    i();
   }), {
     dataUrl: c,
-    size: l,
-    page: s,
-    sorts: o,
-    filters: i,
+    size: n,
+    page: u,
+    sorts: s,
+    filters: v,
     data: e,
-    fetch: f,
+    fetch: i,
     loading: r,
-    downloadCsv: R,
-    totalPages: p,
+    downloadCsv: z,
+    totalPages: g,
     countFiltered: x,
     count: h,
-    rows: E,
+    rows: y,
     first: w,
     last: M,
     toggleSort: S
   };
 };
 export {
-  _ as useSprunjer
+  N as useSprunjer
 };

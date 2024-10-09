@@ -37,8 +37,6 @@ const useSprunjer = (
     const sorts = ref<AssociativeArray>(defaultSorts)
     const filters = ref<AssociativeArray>(defaultFilters)
 
-    console.log("SPRUNJER DEBUG SORT", sorts, defaultSorts);
-
     // Raw data
     const data = ref<any>({})
 
