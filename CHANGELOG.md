@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - [Bakery] The default sub commands in `AssetsBuildCommand` are now in `AssetsBuildCommandListener`
 - [Bakery] Added the server option to `assets:webpack` to run HMR server (`npm run webpack:server`) plus use new npm command syntax.
 - [Bakery] `AbstractAggregateCommandEvent` construction is now optional. Added `addCommands` and `prependCommands`. All setters methods return `$this`.
+- [Sprunje] The sprunje toArray now returns the `sortable` and `filterable` keys. These will can be used by the frontend to dynamically display which columns is filterable/sortable.
 
 ## [5.1.2](https://github.com/userfrosting/sprinkle-core/compare/5.1.1...5.1.2)
 - Replace `LocaleMiddleware` with `ServerRequestMiddleware`. A new class, `RequestContainer`, can be injected or retrieved from the container to get the server request. It will be `null` if the request is not defined (called before it is injected into the container by Middleware or if there's no request, e.g., a Bakery command).
