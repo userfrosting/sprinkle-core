@@ -6,7 +6,7 @@ interface AssociativeArray {
 }
 
 interface Sprunjer {
-    dataUrl: Ref<string>
+    dataUrl: any
     size: Ref<number>
     page: Ref<number>
     totalPages: ComputedRef<number>
@@ -25,14 +25,13 @@ interface Sprunjer {
 }
 
 const useSprunjer = (
-    defaultDataUrl: string,
+    dataUrl: any,
     defaultSorts: AssociativeArray = {},
     defaultFilters: AssociativeArray = {},
     defaultSize: number = 10,
     defaultPage: number = 0
 ) => {
     // Sprunje parameters
-    const dataUrl = ref<string>(defaultDataUrl)
     const size = ref<number>(defaultSize)
     const page = ref<number>(defaultPage)
     const sorts = ref<AssociativeArray>(defaultSorts)

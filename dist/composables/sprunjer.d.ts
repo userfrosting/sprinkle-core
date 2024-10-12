@@ -3,7 +3,7 @@ interface AssociativeArray {
     [key: string]: string | null;
 }
 interface Sprunjer {
-    dataUrl: Ref<string>;
+    dataUrl: any;
     size: Ref<number>;
     page: Ref<number>;
     totalPages: ComputedRef<number>;
@@ -20,8 +20,8 @@ interface Sprunjer {
     toggleSort: (column: string) => void;
     downloadCsv: () => void;
 }
-declare const useSprunjer: (defaultDataUrl: string, defaultSorts?: AssociativeArray, defaultFilters?: AssociativeArray, defaultSize?: number, defaultPage?: number) => {
-    dataUrl: Ref<string, string>;
+declare const useSprunjer: (dataUrl: any, defaultSorts?: AssociativeArray, defaultFilters?: AssociativeArray, defaultSize?: number, defaultPage?: number) => {
+    dataUrl: any;
     size: Ref<number, number>;
     page: Ref<number, number>;
     sorts: Ref<AssociativeArray, AssociativeArray>;
