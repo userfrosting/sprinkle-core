@@ -85,7 +85,7 @@ const useSprunjer = (
     })
 
     const last = computed(() => {
-        return Math.min((page.value + 1) * size.value, data.value.count ?? 0)
+        return Math.min((page.value + 1) * size.value, data.value.count_filtered ?? 0)
     })
 
     const countFiltered = computed(() => {
