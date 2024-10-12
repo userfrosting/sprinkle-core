@@ -117,6 +117,8 @@ class SprunjeBelongsToManyThroughTest extends CoreTestCase
                 ],
             ],
             'listable'       => [],
+            'sortable'       => [],
+            'filterable'     => [],
         ], $data);
     }
 }

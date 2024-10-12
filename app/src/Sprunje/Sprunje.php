@@ -108,6 +108,16 @@ abstract class Sprunje
     protected $listableKey = 'listable';
 
     /**
+     * @var string Array key for the list of sortable columns.
+     */
+    protected $sortableKey = 'sortable';
+
+    /**
+     * @var string Array key for the list of filterable columns.
+     */
+    protected $filterableKey = 'filterable';
+
+    /**
      * @var int CSV export split the request into multiple chunk to avoid memory overflow.
      *          Lower this value if you encounter memory issues when exporting large data sets.
      */
@@ -208,6 +218,7 @@ abstract class Sprunje
     {
         $format = $this->options['format'];
 
+        // TODO : This should be split into two methods, one for JSON and one for CSV. This would allow to add more format later.
         if ($format == 'csv') {
             // Prepare response
             $response = $response->withHeader('Content-Disposition', "attachment;filename={$this->name}.csv");
@@ -242,6 +253,8 @@ abstract class Sprunje
             $this->countFilteredKey   => $countFiltered,
             $this->rowsKey            => $rows->values()->toArray(),
             $this->listableKey        => $this->getListable(),
+            $this->sortableKey        => $this->getSortable(),
+            $this->filterableKey      => $this->getFilterable(),
         ];
     }
 
@@ -348,29 +361,6 @@ abstract class Sprunje
     }
 
     /**
-     * Get lists of values for specified fields in 'listable' option, calling a custom lister callback when appropriate.
-     *
-     * @return array<string,mixed>
-     */
-    public function getListable(): array
-    {
-        $result = [];
-        foreach ($this->listable as $name) {
-            // Determine if a custom filter method has been defined
-            $methodName = 'list' . Str::studly($name);
-
-            if (method_exists($this, $methodName)) {
-                // @phpstan-ignore-next-line Allow variable method call, since we know it exists
-                $result[$name] = $this->$methodName();
-            } else {
-                $result[$name] = $this->getColumnValues($name);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Get the underlying queryable object in its current state.
      *
      * @return EloquentBuilderContract|QueryBuilderContract
@@ -405,7 +395,7 @@ abstract class Sprunje
     {
         foreach ($this->options['filters'] as $name => $value) {
             // Check that this filter is allowed
-            if (($name != '_all') && !in_array($name, $this->filterable, true)) {
+            if (($name != '_all') && !in_array($name, $this->getFilterable(), true)) {
                 $e = new SprunjeException("Bad filter: $name");
                 $message = new UserMessage('VALIDATE.SPRUNJE.BAD_FILTER', ['name' => $name]);
                 $e->setDescription($message);
@@ -432,7 +422,7 @@ abstract class Sprunje
     {
         foreach ($this->options['sorts'] as $name => $direction) {
             // Check that this sort is allowed
-            if (!in_array($name, $this->sortable, true)) {
+            if (!in_array($name, $this->getSortable(), true)) {
                 $e = new SprunjeException("Bad sort: $name");
                 $message = new UserMessage('VALIDATE.SPRUNJE.BAD_SORT', ['name' => $name]);
                 $e->setDescription($message);
@@ -489,6 +479,16 @@ abstract class Sprunje
     }
 
     /**
+     * Returns fields to allow filtering upon.
+     *
+     * @return string[]
+     */
+    public function getFilterable(): array
+    {
+        return $this->filterable;
+    }
+
+    /**
      * Set fields to allow listing (enumeration) upon.
      *
      * @param string[] $listable
@@ -503,6 +503,30 @@ abstract class Sprunje
     }
 
     /**
+     * Get lists of values for specified fields in 'listable' option, calling a
+     * custom lister callback when appropriate.
+     *
+     * @return array<string,mixed>
+     */
+    public function getListable(): array
+    {
+        $result = [];
+        foreach ($this->listable as $name) {
+            // Determine if a custom filter method has been defined
+            $methodName = 'list' . Str::studly($name);
+
+            if (method_exists($this, $methodName)) {
+                // @phpstan-ignore-next-line Allow variable method call, since we know it exists
+                $result[$name] = $this->$methodName();
+            } else {
+                $result[$name] = $this->getColumnValues($name);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Set fields to allow sorting upon.
      *
      * @param string[] $sortable
@@ -514,6 +538,16 @@ abstract class Sprunje
         $this->sortable = $sortable;
 
         return $this;
+    }
+
+    /**
+     * Returns fields to allow sorting upon.
+     *
+     * @return string[]
+     */
+    public function getSortable(): array
+    {
+        return $this->sortable;
     }
 
     /**
@@ -554,7 +588,7 @@ abstract class Sprunje
      */
     protected function filterAll(EloquentBuilderContract|QueryBuilderContract $query, mixed $value): static
     {
-        foreach ($this->filterable as $name) {
+        foreach ($this->getFilterable() as $name) {
             if (Str::studly($name) != 'all' && !in_array($name, $this->excludeForAll, true)) {
                 // Since we want to match _any_ of the fields, we wrap the field callback in a 'orWhere' callback
                 $query->orWhere(function ($fieldQuery) use ($name, $value) {
