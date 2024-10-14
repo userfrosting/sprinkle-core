@@ -4,5 +4,6 @@ export declare enum Severity {
     Success = "Success",
     Warning = "Warning",
     Danger = "Danger",
-    Info = "Info"
+    Info = "Info",
+    Muted = "Muted"
 }
