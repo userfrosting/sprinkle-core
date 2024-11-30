@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [5.1.2](https://github.com/userfrosting/sprinkle-core/compare/5.1.1...5.1.2)
+## [5.1.5](https://github.com/userfrosting/sprinkle-core/compare/5.1.4...5.1.5)
+- Add PHP 8.4 support & tests
+
+## [5.1.4](https://github.com/userfrosting/sprinkle-core/compare/5.1.3...5.1.4)
+- Add back mobile phone responsiveness by @vinc10 in https://github.com/userfrosting/sprinkle-core/pull/41
+
+## [5.1.3](https://github.com/userfrosting/sprinkle-core/compare/5.1.2...5.1.3)
 - Replace `LocaleMiddleware` with `ServerRequestMiddleware`. A new class, `RequestContainer`, can be injected or retrieved from the container to get the server request. It will be `null` if the request is not defined (called before it is injected into the container by Middleware or if there's no request, e.g., a Bakery command).
 
 ## [5.1.2](https://github.com/userfrosting/sprinkle-core/compare/5.1.1...5.1.2)
