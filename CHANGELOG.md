@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [5.1.6](https://github.com/userfrosting/sprinkle-core/compare/5.1.5...5.1.6)
+- Fix [#1282](https://github.com/userfrosting/UserFrosting/issues/1282) - `php bakery migrate:reset:hard` fails to drop tables in MySql/MariaDB
+
 ## [5.1.5](https://github.com/userfrosting/sprinkle-core/compare/5.1.4...5.1.5)
 - Add PHP 8.4 support & tests
 
